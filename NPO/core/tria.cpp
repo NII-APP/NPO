@@ -30,6 +30,7 @@ void Tria::renderNet() const {
 }
 
 QDataStream& Tria::save(QDataStream& s) const {
+    FinitElement::save(s);
     s.writeRawData(static_cast<const char*>(static_cast<const void*>(n)), sizeof(int) * 3);
     return s;
 }

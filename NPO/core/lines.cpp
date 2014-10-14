@@ -9,7 +9,6 @@ Lines::Lines()
 }
 
 
-Lines::Lines();
 void Lines::addNode(int node) { n.push_back(node); }
 
 FinitElement* Lines::clone() const { return new Lines(*this); }
@@ -27,6 +26,7 @@ void Lines::renderNet() const {
 }
 
 QDataStream& Lines::save(QDataStream& s) const {
+    FinitElement::save(s);
     s << n.size();
     s.writeRawData(static_cast<const char*>(static_cast<const void*>(n.data())), sizeof(int) * n.size());
     return s;

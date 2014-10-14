@@ -41,6 +41,7 @@ void Quad::renderNet() const {
 }
 
 QDataStream& Quad::save(QDataStream& s) const {
+    FinitElement::save(s);
     s.writeRawData(static_cast<const char*>(static_cast<const void*>(n)), sizeof(int) * 4);
     return s;
 }

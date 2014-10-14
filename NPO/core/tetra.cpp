@@ -34,6 +34,7 @@ void Tetra::renderNet() const {
     glDrawElements(GL_LINE_STRIP, 8, GL_INT, m);
 }
 QDataStream& Tetra::save(QDataStream& s) const {
+    FinitElement::save(s);
     s.writeRawData(static_cast<const char*>(static_cast<const void*>(n)), sizeof(int) * 4);
     return s;
 }

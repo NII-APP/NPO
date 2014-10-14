@@ -13,8 +13,8 @@ namespace CGL
 
 typedef CMatrix Matrix;
 typedef CVertexes Vertexes;
-typedef QVector<unsigned int> Trace;
-typedef QVector<unsigned char> Colors;
+typedef std::vector<unsigned int> Trace;
+typedef std::vector<unsigned char> Colors;
 typedef CRange<int> CDiapason;
 typedef CRange<double> CDomain;
 

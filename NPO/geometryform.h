@@ -22,6 +22,8 @@ class GeometryForm : public Geometry
 
     int findNext(CGL::CParse &i);//Just for readCRD()
 
+    void estimateDefoultMagnitudes();
+
 protected:
     //Estimate auto MAC. Ordinaly called in constructor
     void estimateMAC();
@@ -41,11 +43,20 @@ public:
     const CGL::Vertexes& form(int i) const { return forms.at(i).form(); }
     float frequency(int i) const { return forms.at(i).frequency(); }
 
+    double getDefoultMagnitude(int f) const { return defoultMagnitude.at(f); }
+    const CGL::CArray& getDefoultMagnitudes() const { return defoultMagnitude; }
+
     void readF06(const QString &fileName);
     void readTXT(const QString &fileName);
 
     static float MAC(const GeometryForm *a, const GeometryForm *b, int i, int j);
 
+
+    friend QDataStream& operator << (QDataStream&, const GeometryForm&);
+    friend QDataStream& operator >> (QDataStream&, GeometryForm&);
 };
+
+QDataStream& operator << (QDataStream&, const GeometryForm&);
+QDataStream& operator >> (QDataStream&, GeometryForm&);
 
 #endif // GEOMETRYFORM_H

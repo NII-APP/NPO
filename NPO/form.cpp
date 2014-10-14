@@ -5,9 +5,10 @@ Form::Form()
 }
 
 Form::Form(float f, const CGL::CVertexes& v)
-    : QPair<float, CGL::CVertexes>(f, v) {}
+    : first(f)
+    , second(v) {}
 
-Form::Form(float f, int s) {
+Form::Form(float f, size_t s) {
     first = f;
     second.resize(s);
 }

@@ -370,7 +370,7 @@ void Geometry::impress() const
 void Geometry::render() const {
     if (colorized()) {
         glEnableClientState(GL_COLOR_ARRAY);
-        glColorPointer(3, GL_UNSIGNED_BYTE, 0, colors.constData());
+        glColorPointer(3, GL_UNSIGNED_BYTE, 0, colors.data());
     }
     else {
         glDisableClientState(GL_COLOR_ARRAY);
@@ -516,37 +516,50 @@ void Geometry::colorize(const CGL::CVertexes &v, const QString& mes)
 }
 
 QDataStream& operator << (QDataStream& out, const Geometry& g) {
+    qDebug() << "try to write";
     out << g.sqre << g.isTraced << g.markedNodes << g.measurment << g.file;
+    qDebug() << '\t' << g.sqre << g.file;
     Geometry::writeArray(out, g.vertexes);
     Geometry::writeArray(out, g.colors);
+    qDebug() << g.vertexes.size();
     out << g.trace.size();
     int realCount(0);
     for (Geometry::Trace::const_iterator it(g.trace.begin()), end(g.trace.end()); it != end; ++it) {
         realCount += *it != 0;
     }
     out << realCount;
+    qDebug() << "\ttrace sizes" << g.trace.size() << realCount;
     for (int i(0); i != g.trace.size(); ++i) {
         if (g.trace[i]) {
             out << i;
+            qDebug() << g.trace[i]->type() << g.trace[i]->getMaterial();
             g.trace[i]->save(out);
+            --realCount;
         }
     }
+    qDebug() << "\ttrace competition" << realCount;
     return out;
 }
 QDataStream& operator >> (QDataStream& in, Geometry& g) {
-    in >> g.vertexes >> g.sqre >> g.isTraced >> g.markedNodes >> g.colors >> g.measurment >> g.file;
+    qDebug() << "try to read";
+    in >> g.sqre >> g.isTraced >> g.markedNodes >> g.measurment >> g.file;
+    qDebug() << "\thope1" << g.sqre << g.file;
     Geometry::readArray(in, g.vertexes);
     Geometry::readArray(in, g.colors);
-    int size;
+    qDebug() << "\thope2" << g.vertexes.size();
+    Geometry::Trace::size_type size;
     in >> size;
     int realCount;
     in >> realCount;
     g.trace.resize(size, 0);
+    qDebug() << "\thope3" << size << realCount;
     for (int i(0); i != realCount; ++i) {
         int id;
         in >> id;
         g.trace[id] = FinitElement::load(in);
+        qDebug() << g.trace[id]->type();
     }
+    qDebug() << "\tfine";
     return in;
 }
 
@@ -601,6 +614,7 @@ Geometry* Geometry::composition(const Geometry& a, const Geometry& b, const QVec
     //остальные потом...
     std::clog << "конец" << std::endl;
     return ret;*/
+    return 0;
 }
 
 Geometry* Geometry::truncation(const Geometry* a, const Geometry* b)
@@ -708,4 +722,5 @@ Geometry* Geometry::truncation(const Geometry* a, const Geometry* b)
         a->stigmaticNodes[i] = numbers[i];
     std::clog << a->vertexes.size() << std::endl;
     return ret;*/
+    return 0;
 }

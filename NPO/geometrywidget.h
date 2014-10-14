@@ -13,12 +13,12 @@ class GeometryWidget : public CGLWidget
     const GeometryForm* data;
     bool net;
     int form;
+    double initialPhase;
+    QTime initialTime;
 
     AnimationOptions* animation;
 
     QTimer* repaintLoop;
-
-    QTime initPhase;
 
     QOpenGLShaderProgram* summator;
 
@@ -26,12 +26,16 @@ class GeometryWidget : public CGLWidget
     void initializeCGL();
     void timerEvent(QTimerEvent *);
 
+    double currentPhase() const;
+
 public:
     GeometryWidget(QWidget* parent = 0, QGLWidget* sharedWidget = 0, Qt::WindowFlags f = 0);
     ~GeometryWidget();
 
     void setModel(const GeometryForm*);
     void setModel(const GeometryForm&);
+    void setForm(int f);
+    int getForm() const { return form; }
 
 public slots:
     //animation properties access
@@ -44,6 +48,7 @@ public slots:
     float getFrequency() const { return animation->getFrequency(); }
     void frequencyIncr();
     void frequencyDecr();
+    void initialAnimation();
     void formIncr();
     void formDecr();
     void netTrigger() { net = !net; this->repaint(); }

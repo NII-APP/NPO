@@ -15,6 +15,7 @@
 #include <QStack>
 #include <conio.h>
 #include <QMatrix4x4>
+#include <cmath>
 
 using namespace core;
 
@@ -57,6 +58,21 @@ class Geometry
 protected:
     bool colorized() const;
     bool colorizedElements() const;
+
+
+    size_t sizeOf();
+    template <typename T> static void writeArray(QDataStream& s, const std::vector<T>& array) {
+        s << array.size();
+        s.writeRawData(static_cast<const char*>(static_cast<const void*>(array.data())), array.size() * sizeof(T));
+    }
+    template <typename T> static void readArray(QDataStream& s, std::vector<T>& array) {
+        typedef std::vector<T> vector;
+        vector::size_type size;
+        s >> size;
+        array.resize(size);
+        s.readRawData(static_cast<char*>(static_cast<void*>(array.data())), size * sizeof(T));
+    }
+
 public:
     Geometry();
     Geometry(const QString& fileName);
@@ -99,29 +115,6 @@ public:
     inline const QString& getMeasurment() { return measurment; }
     inline void setMeasurment(const QString& m) { measurment = m; }
 
-    size_t sizeOf();
-    template <typename T> static void writeArray(QDataStream& s, const std::vector<T>& array) {
-        s << array.size();
-        s.writeRawData(static_cast<const char*>(static_cast<const void*>(array.data())), array.size() * sizeof(T));
-    }
-    template <typename T> static void readArray(QDataStream& s, std::vector<T>& array) {
-        typedef std::vector<T> vector;
-        int size;
-        s >> size;
-        array.resize(size);
-        s.readRawData(static_cast<char*>(static_cast<void*>(array.data())), size * sizeof(T));
-    }
-    template <typename T> static void writeArray(QDataStream& s, const QVector<T>& array) {
-        s << array.size();
-        s.writeRawData(static_cast<const char*>(static_cast<const void*>(array.data())), array.size() * sizeof(T));
-    }
-    template <typename T> static void readArray(QDataStream& s, QVector<T>& array) {
-        typedef QVector<T> vector;
-        int size;
-        s >> size;
-        array.resize(size);
-        s.readRawData(static_cast<char*>(static_cast<void*>(array.data())), size * sizeof(T));
-    }
     friend QDataStream& operator << (QDataStream&, const Geometry&);
     friend QDataStream& operator >> (QDataStream&, Geometry&);
     const QString& getName() const { return file; }
@@ -164,7 +157,8 @@ public:
         : Geometry::RectangularCoordinateSystem(d, z, p) { }
     CylinderCoordinateSystem() {}
     void toGlobal(QVector3D& v) const {
-        float phi(v.y() / 180 * M_PI);
+        static const float k(1 / 90 * acos(0.0f));
+        float phi(v.y() * k);
         QVector3D n(QVector3D(v.x() * cos(phi), v.x() * sin(phi), v.z()));
 
         v.setX(ox.x() * n.x() + oy.x() * n.y() + oz.x() * n.z());
@@ -177,5 +171,6 @@ public:
 
 
 QDataStream& operator << (QDataStream& out, const Geometry& g);
+QDataStream& operator >> (QDataStream& out, Geometry& g);
 
 #endif // GEOMETRY_H

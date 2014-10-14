@@ -1,15 +1,17 @@
 #ifndef FORM_H
 #define FORM_H
-#include <QPair>
 #include "CGL/cgl.h"
+#include "CGL/cvertexes.h"
 
-class Form : private QPair<float, CGL::CVertexes>
+class Form
 {
+    float first;
+    CGL::CVertexes second;
     CGL::CArray third;
 public:
     Form();
     Form(float, const CGL::CVertexes&);
-    Form(float, int);
+    Form(float, size_t);
 
     float getFrequency() const { return first; }
     void  setFrequency(float v) { first = v; }
@@ -22,6 +24,6 @@ public:
     CGL::CArray& power() { return third; }
     const CGL::CArray& power() const { return third; }
 };
-typedef QVector<Form> Forms;
+typedef std::vector<Form> Forms;
 
 #endif // FORM_H

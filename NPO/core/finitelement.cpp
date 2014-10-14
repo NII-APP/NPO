@@ -5,6 +5,7 @@
 #include "quad.h"
 #include "tetra.h"
 #include "tria.h"
+#include <QDebug>
 
 namespace core {
 
@@ -20,13 +21,14 @@ const int& FinitElement::material() const { return shell; }
 
 QDataStream& FinitElement::save(QDataStream& s) const {
     return s << shell << type();
-
 }
 FinitElement* FinitElement::load(QDataStream& s) {
+    qDebug() << "load";
     int shell;
     s >> shell;
     int t;
     s >> t;
+    qDebug() << shell << t;
     FinitElement* v;
     switch (t) {
     case LinesType:

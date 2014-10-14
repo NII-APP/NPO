@@ -2,7 +2,6 @@
 #include <iostream>
 
 GeometryForm::GeometryForm()
-  : defoultMagnitude(0.15f)
 {
 }
 
@@ -71,7 +70,9 @@ void GeometryForm::readTXT(const QString &fileName)
         }
         f.skipRow();
     }
-    std::clog << "\ttxt correctly parsed. " << forms.first().form().size() / 3 << " vertexes in eign vector" << std::endl;
+
+    estimateDefoultMagnitudes();
+    std::clog << "\ttxt correctly parsed. " << forms.at(0).form().size() / 3 << " vertexes in eign vector" << std::endl;
 }
 
 void GeometryForm::readF06(const QString& fileName)
@@ -91,7 +92,7 @@ void GeometryForm::readF06(const QString& fileName)
 
 
     f.skipTo("R E A L   E I G E N V A L U E S");
-    f.skipRow();
+    f.skipTo("   MODE    EXTRACTION ");
     f.skipRow();
     f.skipRow();
     while (f.testPrew("       "))
@@ -101,7 +102,7 @@ void GeometryForm::readF06(const QString& fileName)
         f.real();
         f.real();
         forms.push_back(Form(f.real(),CGL::CVertexes(nodes().size())));
-        bender.push_back(Form(forms.last().frequency(),nodes().size()));
+        bender.push_back(Form(forms.back().frequency(),nodes().size()));
         f.skipRow();
     }
     int j = 0;
@@ -152,13 +153,12 @@ void GeometryForm::readF06(const QString& fileName)
         }
     }
     f.skipTo("                                           E L E M E N T   S T R A I N   E N E R G I E ");
-    while (f.testPrew("                                           E L E M E N T   S T R A I N   E N E R G I E ")) {
+    while (*f && f.testPrew("                                           E L E M E N T   S T R A I N   E N E R G I E ")) {
         f.skipRow();
         f.skipRow();
         f.skipRow();
         int mode(f.integer() - 1);
         CGL::CArray& v(forms[mode].power());
-        QTime loop(QTime::currentTime());
         v.resize(this->elements().size());
         f.skipRow();
         f.skipRow();
@@ -179,7 +179,25 @@ void GeometryForm::readF06(const QString& fileName)
         f.skipRow();
         f.skipRow();
     }
-    std::clog << "\tFile correctly parse " << forms.size() << " forms with " << forms.first().form().length() << " nodes with each (" << loop.msecsTo(QTime::currentTime()) / 1000. << "ms)\n";
+
+    estimateDefoultMagnitudes();
+    std::clog << "\tFile correctly parse " << forms.size() << " forms with " << (forms.empty() ? std::numeric_limits<double>::quiet_NaN() : forms.front().form().length()) << " nodes with each (" << loop.msecsTo(QTime::currentTime()) / 1000. << "ms)\n";
+}
+
+
+void GeometryForm::estimateDefoultMagnitudes() {
+    defoultMagnitude.resize(0);
+    defoultMagnitude.resize(forms.size());
+    for (int j(0); j != forms.size(); ++j) {
+        const CGL::Vertexes form(forms.at(j).form());
+        int i(form.length());
+        double v(0.0);
+        while (i) {
+            --i;
+            v = std::max(v, static_cast<double>(form(i).lengthSquared()));
+        }
+        defoultMagnitude[j] = getBox().size() / sqrt(v) / 20;
+    }
 }
 
 void GeometryForm::estimateMAC()
@@ -190,7 +208,7 @@ void GeometryForm::estimateMAC()
     preMac.resize(forms.size());
     std::fill(preMac.begin(), preMac.end(), 0.0f);
     CGL::CArray::iterator iu(preMac.begin());
-    for (Forms::const_iterator it(forms.constBegin()), end(forms.constEnd()); it != end; ++it, ++iu) {
+    for (Forms::const_iterator it(forms.begin()), end(forms.end()); it != end; ++it, ++iu) {
         const CGL::CVertexes::const_iterator jnd(it->form().end());
         for (CGL::CVertexes::const_iterator jt(it->form().begin()); jt != jnd; ++jt)
             *iu += *jt * *jt;
@@ -219,7 +237,7 @@ float GeometryForm::MAC(const GeometryForm *a, const GeometryForm *b, int i, int
         std::cout << "\tSizes conflict "
                   << i << " >= " << a->forms.size() << " || "
                   << j << " >= " << b->forms.size() << " || "
-                  << a->forms.first().form().size() << " != " << b->forms.first().form().size() << std::endl;
+                  << a->forms.front().form().size() << " != " << b->forms.front().form().size() << std::endl;
         return -1.0f;
     }
     const CGL::CVertexes& x(a->forms[i].form());
@@ -243,3 +261,13 @@ float GeometryForm::MAC(const GeometryForm *a, const GeometryForm *b, int i, int
     std::cout << s * s << '/' << z1 << '/' << z2 << "or" << a->preMac[i] << '/' << b->preMac[j] << k;*/
     return s * s / a->preMac[i] / b->preMac[j] / k / k;
 }
+
+QDataStream& operator << (QDataStream& s, const GeometryForm& g) {
+    s << static_cast<const Geometry&>(g);
+    return s;
+}
+QDataStream& operator >> (QDataStream& s, GeometryForm& g) {
+    s >> static_cast<Geometry&>(g);
+    return s;
+}
+

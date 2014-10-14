@@ -45,6 +45,7 @@ void Hexa::renderNet() const {
 }
 
 QDataStream& Hexa::save(QDataStream& s) const {
+    FinitElement::save(s);
     s.writeRawData(static_cast<const char*>(static_cast<const void*>(n)), sizeof(int) * 6);
     return s;
 }

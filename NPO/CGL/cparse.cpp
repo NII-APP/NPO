@@ -235,7 +235,7 @@ void CParse::skipRow()
 
 void CParse::skipTo(const char* dest)
 {
-    if (!d)
+    if (!*d)
     {
         return;
     }
@@ -244,18 +244,22 @@ void CParse::skipTo(const char* dest)
     while (!founding) {
         i = 0;
         founding = true;
-        while (founding && dest[i]) {
+        while (d[i] && founding && dest[i]) {
             founding = d[i] == dest[i];
             ++i;
         }
         ++d;
+    }
+    if (!d[i]) {
+        d += i;
+        return;
     }
     --d;
 }
 
 bool CParse::testPrew(const char *dest)
 {
-    if (!d) {
+    if (!*d) {
         return false;
     }
     if (!*dest) {

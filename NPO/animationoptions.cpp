@@ -3,7 +3,7 @@
 
 AnimationOptions::AnimationOptions(GeometryWidget *parent)
     : magnitude(1.0f)
-    , frequency(0.01f)
+    , frequency(1.0f)
 {
     parents.push_back(parent);
 }
