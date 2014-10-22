@@ -17,6 +17,7 @@ typedef std::vector<unsigned int> Trace;
 typedef std::vector<unsigned char> Colors;
 typedef CRange<int> CDiapason;
 typedef CRange<double> CDomain;
+typedef Trace CIndexes;
 
 const QFont DEFAULT_FONT("Times New Roman, Times, Serif", 10, 0);
 

@@ -41,7 +41,9 @@ SOURCES += main.cpp \
     CGL/carray.cpp \
     geometrywidget.cpp \
     core/hexa.cpp \
-    core/shell.cpp
+    core/shell.cpp \
+    main2.cpp \
+    pseudoInverse.cpp
 
 HEADERS += \
     geometry.h \
@@ -71,7 +73,8 @@ HEADERS += \
     CGL/carray.h \
     geometrywidget.h \
     core/hexa.h \
-    core/shell.h
+    core/shell.h \
+    pseudoInverse.h
 
 OTHER_FILES += \
     summator.vert
