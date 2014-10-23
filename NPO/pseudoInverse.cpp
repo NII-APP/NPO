@@ -1,4 +1,3 @@
-#include "pseudoInverse.h"
 #include <stdio.h>
 #include <conio.h>
 #include <iostream>
@@ -7,7 +6,7 @@
 using namespace std;
 
 
-
+#include "pseudoInverse.h"
 
 
 MethodInvMat::MethodInvMat(double ** matrixExternal, int rowExternal, int columnExternal)
@@ -19,32 +18,23 @@ MethodInvMat::MethodInvMat(double ** matrixExternal, int rowExternal, int column
 };
 MethodInvMat::~MethodInvMat()
 {}
-int MethodInvMat::GetMatrix(GeometryForm* model)
+int MethodInvMat::GetMatrix()
 {
    // qDebug() << "create mega matrux";
-    int sizeElem = model->elements().size();
-    int sizeMode = model->modes().size();
-
-    qDebug() <<
-               "sizeElem==" << sizeElem;
-    qDebug() <<
-               "sizeMode==" << sizeMode;
+    int sizeElem = form->nodes().length();
+    int sizeMode = mode.size();
 
     CGL::Matrix mat(sizeElem, sizeMode);
 
-    Forms& forms(model->modes());
-
-
-    for (int i = 0; i < sizeMode; ++i) {
-        for (int j = 0; j < sizeElem; ++j) {
-            mat[i][j] =  forms[i].power()[j];
+    for (int i = 0; i < mat.width(); ++i) {
+        for (int j = 0; j < mat.height(); ++j) {
+            mat[i][j] = rand() * 100.0 / rand();
         }
     }
-
-  // double** matrix;
-  //  matrix = mat.asCMactix();
-  //  qDebug() <<
-  //            mat[5][4] << "==" << matrix[5][4];
+    double** matrix;
+    matrix = mat.asCMactix();
+    qDebug() <<
+                mat[5][4] << "==" << matrix[5][4];
 
 
     return 0;

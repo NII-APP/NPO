@@ -5,7 +5,6 @@
 #include <conio.h>
 #include <iostream>
 using namespace std;
-#include "geometryform.h"
 
 class MethodInvMat
 {
@@ -17,7 +16,7 @@ class MethodInvMat
 
     private:
         int MethodInvMat::clear0();
-        int MethodInvMat::GetMatrix(GeometryForm *form);
+        int MethodInvMat::GetMatrix();
         int Det(double **matrixIn, int N);
         int Print(double ** matrixIn, int rowIn, int columnIn);
         int Inversion(double **matrixIn);
@@ -28,6 +27,16 @@ class MethodInvMat
         int row, column;
 };
 
+{
+    int i = 10;
+
+    if(value < 10) return 1;
+
+   while((int) value != ((int) value % i) )
+      i *= 10;
+
+   return i/10;
+}
 
 
 #endif // PSEUDOINVERSE_H
