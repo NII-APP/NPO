@@ -52,12 +52,12 @@ int main(int argc, char *argv[])
             mat[i][j] = rand() * 100.0 / rand();
         }
     }
-    double** matrix;
+   /* double** matrix;
     matrix = mat.asCMactix();
     qDebug() <<
                 mat[5][4] << "==" << matrix[5][4];
 
 
-
+*/
     return a.exec();
 }
