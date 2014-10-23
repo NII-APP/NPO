@@ -2,4 +2,8 @@
     <qresource prefix="/codes">
         <file>summator.vert</file>
     </qresource>
+    <qresource prefix="/media">
+        <file>images/togleOff.png</file>
+        <file>images/togleOn.png</file>
+    </qresource>
 </RCC>
