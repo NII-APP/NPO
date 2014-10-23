@@ -11,6 +11,7 @@ template <typename T>
 class CRange : public QPair<T, T>
 {
 public:
+    CRange() {}
     CRange(T min, T max) : QPair<T, T>(min, max) { }
 
     CRange(T center) : QPair<T, T>(center, center) { }

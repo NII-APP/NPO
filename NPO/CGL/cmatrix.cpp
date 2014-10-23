@@ -2,6 +2,7 @@
 #include <limits>
 #include <algorithm>
 #include <QDebug>
+#include "cgl.h"
 
 namespace CGL {
 
@@ -127,6 +128,16 @@ QDebug operator<< (QDebug out, const CMatrix &obj) {
     return out;
 }
 
-
+QDataStream& operator<< (QDataStream& out, const CMatrix& m) {
+    return out << m.data << m.wid;
+}
+QDataStream& operator>> (QDataStream& in, CMatrix& m) {
+    in >> m.data >> m.wid;
+    if (m.wid) {
+        m.m.resize(m.data.size() / m.wid);
+        m.repoint();
+    }
+    return in;
+}
 
 }

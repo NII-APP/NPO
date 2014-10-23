@@ -22,13 +22,11 @@ const int& FinitElement::material() const { return shell; }
 QDataStream& FinitElement::save(QDataStream& s) const {
     return s << shell << type();
 }
-FinitElement* FinitElement::load(QDataStream& s) {
-    qDebug() << "load";
+FinitElement* FinitElement::loadElement(QDataStream& s) {
     int shell;
     s >> shell;
     int t;
     s >> t;
-    qDebug() << shell << t;
     FinitElement* v;
     switch (t) {
     case LinesType:
@@ -51,6 +49,16 @@ FinitElement* FinitElement::load(QDataStream& s) {
         v = new Tria;
         v->setMaterial(shell);
         return v->load(s);
+    }
+}
+
+
+void FinitElement::moveIndexes(int n) {
+    int* it(this->begin());
+    int* lim(this->end());
+    while (it != lim) {
+        *it += n;
+        ++it;
     }
 }
 

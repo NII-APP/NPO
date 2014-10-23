@@ -47,6 +47,8 @@ public:
     inline qreal length() const { return zP - zL; }
     inline qreal size() const { qreal w(width()), h(height()), l(length()); return sqrt(w * w + h * h + l * l); }
 
+    void move(const QVector3D& v);
+
     inline void xTo(qreal v) { xL = xP = v; }
     inline void yTo(qreal v) { yL = yP = v; }
     inline void zTo(qreal v) { zL = zP = v; }

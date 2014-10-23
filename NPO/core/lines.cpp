@@ -40,6 +40,7 @@ FinitElement* Lines::load(QDataStream& s) {
 }
 
 const int* Lines::nodes() const { return n.data(); }
+int* Lines::nodes() { return n.data(); }
 int Lines::nodesCount() const { return n.size(); }
 
 }

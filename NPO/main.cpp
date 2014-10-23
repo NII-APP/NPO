@@ -6,66 +6,63 @@
 #include <iostream>
 #include <QJsonObject>
 #include <QVariantMap>
+#include "geometrypair.h"
+#include "relationdialog.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     setlocale(LC_ALL,"RUS");
 
-    QVariantMap map;
-    map["sime val"] = 10;
-    map["id"] = 0;
-    map["name"] = "MAPA";
-    map["id"] = 1;
-    qDebug() << map;
-    map.insert("name", 11);
-    qDebug() << *map.find("name");
-    qDebug() << map;
-
     printf("hello!\n");
     //Geometry* theory = new Geometry("C:\\Users\\NICK\\Downloads\\model.bdf");
     //Geometry* theory2 = new Geometry("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.bdf");
     //Geometry* practic = new Geometry("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.unv");
     GeometryForm* form = new GeometryForm;
-    //form->readBDF("C:\\Users\\NICK\\Downloads\\model.bdf");
-    //form->readF06("C:\\Users\\NICK\\Downloads\\model.f06");
-    //form->colorizeElements(form->modes().at(0).power());
+    /*form->readBDF("C:\\Users\\NICK\\Downloads\\model.bdf");
+    form->readF06("C:\\Users\\NICK\\Downloads\\model.f06");
+    form->colorizeElements(form->modes().at(0).power());//*/
     form->readBDF("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.bdf");
     form->readF06("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.f06");
 
-    //solorize to power if it readed
-    if (!form->modes().at(0).power().empty())
-        form->colorizeElements(form->modes().at(0).power());
 
-    QByteArray json("{\
-                    \"FirstName\": \"John\",\
-                    \"LastName\": \"Doe\",\
-                    \"Age\": 43,\
-                    \"Address\": {\
-                        \"Street\": \"Downing Street 10\",\
-                        \"City\": \"London\",\
-                        \"Country\": \"Great Britain\"\
-                    },\
-                    \"Phone numbers\": [\
-                        \"+44 1234567\",\
-                        \"+44 2345678\"\
-                    ]\
-                }");
-    QJsonObject arr;
-    arr["val"] = "some";
     GeometryWidget w;
     w.setModel(form);
-    qDebug() << "show";
-    w.show();
-    QFile f("tmp.mod");
+    //w.show();
+
+    /*
+    QFile f("cnt.mod");
     f.open(QFile::WriteOnly);
-    QDataStream s(&f);
-    //s << *form;
+    QDataStream s0(&f);
+    s0 << *form;
     f.close();
     f.open(QFile::ReadOnly);
-    GeometryForm* form2(new GeometryForm);
-    QDataStream r(&f);
-    //r >> *form2;
+    GeometryForm form2;
+    QDataStream s(&f);
+    s >> form2;
+    GeometryWidget w2;
+    w2.setModel(form2);
+    w2.show();//*/
+
+    //*
+    GeometryForm* form2 = new GeometryForm;
+    form2->readUNV("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.unv");
+    form2->readTXT("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.txt");
+    GeometryWidget w2;
+    w2.setModel(form2);
+    //w2.show();//*/
+
+    //w.setScene(form->box());
+    //w2.setScene(form2->box());
+    //GeometryForm* form3 = new GeometryForm(*Geometry::truncation(
+      //                                         *form2,
+        //                                       *form));
+
+    //w2.setModel(form3);
+
+    GeometryPair pair(form, form2);
+
+    RelationDialog::run(&pair);
 
     return a.exec();
 }

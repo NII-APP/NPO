@@ -19,6 +19,7 @@ public:
     QDataStream& save(QDataStream&) const;
     FinitElement* load(QDataStream&);
     const int* nodes() const { return n; }
+    int* nodes() { return n; }
     int nodesCount() const { return 3; }
 };
 

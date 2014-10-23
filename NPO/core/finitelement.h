@@ -28,10 +28,17 @@ public:
     virtual void renderNet() const = 0;
     virtual FinitElementType type() const = 0;
     virtual void getTraced(QBitArray&) const = 0;
+    virtual FinitElement* load(QDataStream&) = 0;
     virtual QDataStream& save(QDataStream&) const;
-    static FinitElement* load(QDataStream&);
+    static FinitElement* loadElement(QDataStream&);
     virtual const int* nodes() const = 0;
+    virtual int* nodes() = 0;
     virtual int nodesCount() const = 0;
+    virtual int* begin() { return nodes(); }
+    virtual int* end() { return nodes() + nodesCount(); }
+
+    //+= n to each index
+    void moveIndexes(int n);
 
     void setMaterial(const int& v);
     int getMaterial() const;

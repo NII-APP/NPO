@@ -46,11 +46,17 @@ Geometry::Geometry(const Geometry& g)
         ++d;
         ++s;
     }
+    CoordinateSystems::const_iterator i(g.systems.begin());
+    CoordinateSystems::const_iterator end2(g.systems.end());
+    while (i != end2) {
+        systems.insert(i.key(), i.value()->clone());
+    }
 }
 
 
 Geometry::~Geometry() {
     qDeleteAll(trace);
+    qDeleteAll(systems);
 }
 
 void Geometry::estimateTraced()
@@ -94,16 +100,8 @@ bool Geometry::readBDF(const QString &fileName)
     qDeleteAll(trace);
     trace.clear();
 
-    QList<int> eraseList;
-
     vertexes.reserve(81009);
     //parce each datum
-
-
-    QMap<int, RectangularCoordinateSystem*> systems;
-    //coordinate system id and vertexe id
-    typedef QPair<int, int> CoordinateLink;
-    QStack<CoordinateLink> links;
 
     while (!f.testPrew("ENDDATA")) {
         std::string type(f.word());
@@ -158,7 +156,6 @@ bool Geometry::readBDF(const QString &fileName)
             vertexes[i * 3 - 1] = f.fixFloat8();
             if (k != -1) {
                 --i;
-                eraseList.append(i);
                 links.append(CoordinateLink(k, i));
             }
             f.skipRow();
@@ -171,7 +168,6 @@ bool Geometry::readBDF(const QString &fileName)
             }
             if (coordinate - f < 15) {
                 links.append(CoordinateLink(coordinate.integer(), i - 1));
-                eraseList.append(i - 1);
                 f = coordinate;
             }
             if (static_cast<int>(vertexes.size()) < i * 3) {
@@ -204,7 +200,7 @@ bool Geometry::readBDF(const QString &fileName)
             m[7] = f.fixFloat8();
             m[8] = f.fixFloat8();
             f.skipRow();
-            systems.insert(id, new RectangularCoordinateSystem(QVector3D(m[0], m[1], m[2]),
+            systems.insert(id, new CGL::RectangularCoordinateSystem(QVector3D(m[0], m[1], m[2]),
                                                                QVector3D(m[3], m[4], m[5]),
                                                                QVector3D(m[6], m[7], m[8])));
         } else if (type == "CORD2C") {
@@ -223,7 +219,7 @@ bool Geometry::readBDF(const QString &fileName)
             m[7] = f.fixFloat8();
             m[8] = f.fixFloat8();
             f.skipRow();
-            systems.insert(id, new CylinderCoordinateSystem(QVector3D(m[0], m[1], m[2]),
+            systems.insert(id, new CGL::CylinderCoordinateSystem(QVector3D(m[0], m[1], m[2]),
                                                             QVector3D(m[3], m[4], m[5]),
                                                             QVector3D(m[6], m[7], m[8])));
         } else {
@@ -232,25 +228,19 @@ bool Geometry::readBDF(const QString &fileName)
             f.skipRow();
         }
     }
-    qDebug() << "postparse";
+    qDebug() << "\tpostparse";
     delete memory;
 
     //*
-    while (!links.isEmpty()) {
-        CoordinateLink l(links.pop());
-        if (systems.contains(l.first)) {
-            eraseList.erase(qFind(eraseList.begin() , eraseList.end(), l.second));
-            systems[l.first]->toGlobal(vertexes(l.second));
+    for (CoordinateLinks::const_iterator l(links.begin()), end(links.end()); l != end; ++l) {
+        if (systems.contains(l->first)) {
+            systems[l->first]->toGlobal(vertexes(l->second));
         }
     }
-    qDebug() << "coordinate";
-    qDeleteAll(systems);
+    qDebug() << "\tcoordinate";
 
-    qDebug() << "delete";
     estimateTraced();
-    qDebug() << "trace";
     estimateBox();
-    qDebug() << "box";
     CGL::CArray coco(trace.size());
     CGL::CArray::iterator i(coco.begin());
     Trace::const_iterator j(trace.begin());
@@ -262,7 +252,7 @@ bool Geometry::readBDF(const QString &fileName)
         ++i;
         ++j;
     }
-    qDebug() << "colorize";
+    qDebug() << "\tcolorize";
     colorizeElements(coco);
     std::clog << '\t' << loop.msecsTo(QTime::currentTime()) / 1e3 << " sec parsing pelay for .bdf model with " << vertexes.length() << " nodes" << std::endl;
     return true;
@@ -288,8 +278,7 @@ bool Geometry::readUNV(const QString &fileName)
     f.skipTo("    -1\n    15\n");
     f.skipRow();
     f.skipRow();
-    while (!f.testPrew("    -1"))
-    {
+    while (!f.testPrew("    -1")) {
         f.integer();
         f.integer();
         f.integer();
@@ -371,8 +360,7 @@ void Geometry::render() const {
     if (colorized()) {
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(3, GL_UNSIGNED_BYTE, 0, colors.data());
-    }
-    else {
+    } else {
         glDisableClientState(GL_COLOR_ARRAY);
         glColor3ub(0x00,0xFF,0x88);
     }
@@ -396,11 +384,16 @@ void Geometry::render() const {
 
     //display nodes to low-nodes model
     if (vertexes.size() < LOW_POLYGON) {
-        glBegin(GL_POINTS);
-        glColor3ub(0x88,0x88,0xFF);
-        for (size_t i(0); i != vertexes.size(); i += 3)
-            glVertex3fv(vertexes.data() + i);
-        glEnd();
+        std::vector<GLuint> indexes;
+        indexes.reserve(isTraced.size());
+        for (int i(0); i != isTraced.size(); ++i) {
+            if (isTraced.testBit(i)) {
+                indexes.push_back(i);
+            }
+        }
+        glDisableClientState(GL_COLOR_ARRAY);
+        glColor3ub(0x22,0x22,0x22);
+        glDrawElements(GL_POINTS, static_cast<GLsizei>(indexes.size()), GL_UNSIGNED_INT, indexes.data());
     }
 }
 
@@ -516,55 +509,92 @@ void Geometry::colorize(const CGL::CVertexes &v, const QString& mes)
 }
 
 QDataStream& operator << (QDataStream& out, const Geometry& g) {
-    qDebug() << "try to write";
+    qDebug() << "\nwrite to stream";
     out << g.sqre << g.isTraced << g.markedNodes << g.measurment << g.file;
-    qDebug() << '\t' << g.sqre << g.file;
-    Geometry::writeArray(out, g.vertexes);
-    Geometry::writeArray(out, g.colors);
-    qDebug() << g.vertexes.size();
+    out << g.vertexes << g.colors;
     out << g.trace.size();
     int realCount(0);
     for (Geometry::Trace::const_iterator it(g.trace.begin()), end(g.trace.end()); it != end; ++it) {
         realCount += *it != 0;
     }
     out << realCount;
-    qDebug() << "\ttrace sizes" << g.trace.size() << realCount;
     for (int i(0); i != g.trace.size(); ++i) {
         if (g.trace[i]) {
             out << i;
-            qDebug() << g.trace[i]->type() << g.trace[i]->getMaterial();
+            //qDebug() << g.trace[i]->type() << g.trace[i]->getMaterial();
             g.trace[i]->save(out);
             --realCount;
         }
+    }
+    out << g.systems.size();
+    int k(0);
+    for (Geometry::CoordinateSystems::const_iterator i(g.systems.begin()); i != g.systems.end(); ++i) {
+        out << i.key();
+        i.value()->save(out);
+
     }
     qDebug() << "\ttrace competition" << realCount;
     return out;
 }
 QDataStream& operator >> (QDataStream& in, Geometry& g) {
-    qDebug() << "try to read";
+    qDebug() << "load from stream";
     in >> g.sqre >> g.isTraced >> g.markedNodes >> g.measurment >> g.file;
-    qDebug() << "\thope1" << g.sqre << g.file;
-    Geometry::readArray(in, g.vertexes);
-    Geometry::readArray(in, g.colors);
-    qDebug() << "\thope2" << g.vertexes.size();
+    in >> g.vertexes >> g.colors;
+    qDebug() << "\tmain";
     Geometry::Trace::size_type size;
     in >> size;
+    qDebug() << "\tsize" << size;
     int realCount;
     in >> realCount;
     g.trace.resize(size, 0);
-    qDebug() << "\thope3" << size << realCount;
+    qDebug() << "\nfor" << realCount;
     for (int i(0); i != realCount; ++i) {
         int id;
         in >> id;
-        g.trace[id] = FinitElement::load(in);
-        qDebug() << g.trace[id]->type();
+        g.trace[id] = FinitElement::loadElement(in);
     }
-    qDebug() << "\tfine";
+    Geometry::CoordinateSystems::size_type s;
+    in >> s;
+    int i(0);
+    while (s--) {
+        int key;
+        CGL::RectangularCoordinateSystem* val;
+        in >> key;
+        CGL::RectangularCoordinateSystem::load(in);
+        g.systems.insert(key, val);
+    }
     return in;
 }
 
-Geometry* Geometry::composition(const Geometry& a, const Geometry& b, const QVector<int>& relation)
-{/*
+
+void Geometry::alignZero() {
+    QVector3D center(this->box().center());
+    if (center.lengthSquared() == 0 || vertexes.empty()) {
+        return;
+    }
+    int i(vertexes.length());
+    do {
+        --i;
+        vertexes(i) -= center;
+    } while (i);
+    this->box().move(-center);
+}
+
+void Geometry::scaleTo(double v) {
+    if (box().size() == 0.0) {
+        return;
+    }
+    double k(v / box().size());
+    for(CGL::CVertexes::iterator i(vertexes.begin()), end(vertexes.end()); i != end; ++i) {
+        *i *= k;
+    }
+    box().multX(k);
+    box().multY(k);
+    box().multZ(k);
+}
+
+Geometry* Geometry::composition(const Geometry& a, const Geometry& b)
+{
     std::clog << "begin composition" << std::endl;
     Geometry* ret(new Geometry(a));
     int vDest(a.vertexes.size());
@@ -572,92 +602,23 @@ Geometry* Geometry::composition(const Geometry& a, const Geometry& b, const QVec
     ret->vertexes.resize(a.vertexes.size() + b.vertexes.size());
     qCopy(b.vertexes.begin(), b.vertexes.end(), ret->vertexes.begin() + vDest);
     ret->sqre += b.sqre;
-    double k(a.defoultMagnitude / b.defoultMagnitude);//что-то у меня тут параноя на счет точности...
-    std::clog << "формы" << k << std::endl;
-    //При суммировании форма b масштабируется под a!
-    for (int i(0); i != a.forms.size(); ++i) {
-        //std::clog << "формы" << i << b.formsCount() << relation[i];
-        ret->forms[i].second.resize(vDest + b.vertexes.size());
-        Vertexes::iterator d(ret->forms[i].second.begin() + vDest);
-        if (relation[i] >= 0 && relation[i] < b.formsCount()) {
-            for (Vertexes::const_iterator it(b.forms[relation[i]].second.begin()),
-                 end(b.forms[relation[i]].second.end()); it != end; ++it, ++d)
-                *d = *it / k;
-            std::clog << i << "not null form" << std::endl;
-        }
-        else {
-            for (int it(0); it != vDest; ++it, ++d)
-                *d = 0.0f;
+    std::clog << "\ttrace" << std::endl;
+    for (Trace::const_iterator it(b.trace.begin()), end(b.trace.end()); it != end; ++it) {
+        if (*it) {
+            FinitElement* element((*it)->clone());
+            ret->trace.push_back(element);
+            ret->trace.back()->moveIndexes(tDest);
         }
     }
-    std::clog << "трассировка" << std::endl;
-    //Теперь трассировка
-    ret->sumSign = ret->lines.size();
-    ret->lines.resize(ret->lines.size() + b.lines.size());
-    QVector<Trace>::iterator ds(ret->lines.end() - b.lines.size());
-    for (QVector<Trace>::const_iterator it(b.lines.begin()), end(b.lines.end()); it != end; ++it, ++ds) {
-        ds->resize(it->size());
-        Trace::iterator d(ds->begin());
-        for (Trace::const_iterator jt(it->begin()), jnd(it->end()); jt != jnd; ++jt, ++d) {
-            *d = *jt + tDest;
-        }
-    }
-    std::clog << "трассировка квадами" << std::endl;
-    ret->cquad4.resize(ret->cquad4.size() + b.cquad4.size());
-    Trace::iterator d(ret->cquad4.end() - b.cquad4.size());
-    for (Trace::const_iterator it(b.cquad4.begin()), end(b.cquad4.end()); it != end; ++it, ++d)
-        *d = *it + tDest;
-    ret->ctetra.resize(ret->ctetra.size() + b.ctetra.size());
-    d = ret->ctetra.end() - b.ctetra.size();
-    for (Trace::const_iterator it(b.ctetra.begin()), end(b.ctetra.end()); it != end; ++it, ++d)
-        *d = *it + tDest;
-    //остальные потом...
-    std::clog << "конец" << std::endl;
-    return ret;*/
-    return 0;
+    return ret;
 }
 
-Geometry* Geometry::truncation(const Geometry* a, const Geometry* b)
+Geometry* Geometry::truncation(Geometry& a, Geometry& b)
 {
-    /*if (a->vertexes.size() < b->vertexes.size())
-        qSwap(a, b);
-
-    /*Совмещение:
-        1. совмещаем центр масштабируемой детали с началом координат
-        2. множим на коэффициент
-        3. совмещаем центр масштабируемой детали с центром опорной.
-
-    Vertexes m(b->vertexes);
-    QVector3D d(b->sqre.center());
-    QVector3D c(a->sqre.center());
-    std::clog << d << c;
-    float k(a->sqre.size() / b->sqre.size());*/
-    /*for (Trace::iterator it(b->lines.begin()), end(b->lines.end()); it != end; ++it)
-        a->lines.push_back(*it + a->vertexes.size() / 3);
-    std::clog << a->lines;*/
-    //for (Vertexes::iterator i(m.begin()), end(m.end()); i != end; i += 3) {
-        /**i   -= d.x();
-        i[1] -= d.y();
-        i[2] -= d.z();
-        *i   *= k;
-        i[1] *= k;
-        i[2] *= k;
-        *i   += c.x();
-        i[1] += c.y();
-        i[2] += c.z();
-        a->vertexes.push_back(*i);
-        a->vertexes.push_back(i[1]);
-        a->vertexes.push_back(i[2]);
-        for (int i = 0; i != a->forms.size(); ++i)
-        {
-            a->forms[i].second.push_back(0);
-            a->forms[i].second.push_back(0);
-            a->forms[i].second.push_back(0);
-        }*/
-    //}
-    //std::clog << a->vertexes.size();
-
-
+    Geometry* result(new Geometry(a));
+    b.alignZero();
+    result->alignZero();
+    result->scaleTo(b.box().size());
 /*
     //Обрезка
     const Vertexes& am(a->vertexes);

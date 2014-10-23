@@ -44,19 +44,5 @@ IndexRange CVertexes::estimateRangeIndex() const {
     return range;
 }
 
-QDataStream& operator << (QDataStream& out, const CVertexes& v) {
-    out << v.size();
-    out.writeRawData(static_cast<const char*>(static_cast<const void*>(v.data())), v.size() * sizeof(CVertexes::value_type));
-    return out;
-}
-
-QDataStream& operator >> (QDataStream& in, CVertexes& v) {
-    size_t s;
-    in >> s;
-    v.resize(s);
-    in.readRawData(static_cast<char*>(static_cast<void*>(v.data())), s * sizeof(CVertexes::value_type));
-    return in;
-}
-
 
 }

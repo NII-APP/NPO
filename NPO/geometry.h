@@ -24,6 +24,9 @@ class Geometry
     typedef std::vector<core::FinitElement*> Trace;
     typedef QVector<Shell> Shells;
     typedef std::vector<int> TraceBufer;
+    //first is coordinateSystem id, second - vertex id
+    typedef QPair<int, int> CoordinateLink;
+    typedef QVector<CoordinateLink> CoordinateLinks;
     static const unsigned char CONST_BLACK[];
     //constant ised for decide is the model is low-polygon and nodes must be displayed
     static const int LOW_POLYGON;
@@ -45,9 +48,6 @@ class Geometry
     //list of shells
     Shells shells;
 
-    class RectangularCoordinateSystem;
-    class CylinderCoordinateSystem;
-
     void estimateTraced();
     void estimateBox();
     void estimateQuadTraceBufer();
@@ -56,30 +56,24 @@ class Geometry
     void colorizeFromArray(const CGL::CArray& v);
 
 protected:
+    //coordinate systems. firest is the ordering number of coordinate system, second is correspond coordinate system
+    typedef QMap<int, CGL::RectangularCoordinateSystem*> CoordinateSystems;
+    CoordinateSystems systems;
+    //coordinate system links
+    CoordinateLinks links;
+
+
     bool colorized() const;
     bool colorizedElements() const;
 
 
     size_t sizeOf();
-    template <typename T> static void writeArray(QDataStream& s, const std::vector<T>& array) {
-        s << array.size();
-        s.writeRawData(static_cast<const char*>(static_cast<const void*>(array.data())), array.size() * sizeof(T));
-    }
-    template <typename T> static void readArray(QDataStream& s, std::vector<T>& array) {
-        typedef std::vector<T> vector;
-        vector::size_type size;
-        s >> size;
-        array.resize(size);
-        s.readRawData(static_cast<char*>(static_cast<void*>(array.data())), size * sizeof(T));
-    }
 
 public:
     Geometry();
     Geometry(const QString& fileName);
     Geometry(const Geometry& g);
     ~Geometry();
-
-    static Geometry* composition(const Geometry &, const Geometry &, const QVector<int> &relation);
 
     //reading that formsts
     bool readBDF(const QString &fileName);
@@ -119,56 +113,15 @@ public:
     friend QDataStream& operator >> (QDataStream&, Geometry&);
     const QString& getName() const { return file; }
 
-    static Geometry* truncation(const Geometry *a, const Geometry *b);
-
+    //Science operations
+    //set position of center of rect to (0,0,0) point
+    void alignZero();
+    //compose both geometryes to one
+    void scaleTo(double);
+    static Geometry* composition(const Geometry &, const Geometry &);
+    //truncate hi-vertexes geometry to low-vertexes
+    static Geometry* truncation(Geometry &, Geometry &);
 };
-
-class Geometry::RectangularCoordinateSystem {
-protected:
-    QVector3D a;
-    QVector3D oz;
-    QVector3D oy;
-    QVector3D ox;
-
-public:
-    RectangularCoordinateSystem(const QVector3D& d, const QVector3D& z, const QVector3D& p)
-        : a(d)
-        , oz(z - d)
-        , oy(QVector3D::crossProduct(oz,p - d))
-        , ox(QVector3D::crossProduct(oy,oz))
-    {
-        oz.normalize();
-        oy.normalize();
-        ox.normalize();
-    }
-    RectangularCoordinateSystem() {}
-    virtual void toGlobal(QVector3D& v) const {
-        v.setX(ox.x() * v.x() + oy.x() * v.y() + oz.x() * v.z());
-        v.setY(ox.y() * v.x() + oy.y() * v.y() + oz.y() * v.z());
-        v.setZ(ox.z() * v.x() + oy.z() * v.y() + oz.z() * v.z());
-
-        v += a;
-    }
-};
-
-class Geometry::CylinderCoordinateSystem : public Geometry::RectangularCoordinateSystem {
-public:
-    CylinderCoordinateSystem(const QVector3D& d, const QVector3D& z, const QVector3D& p)
-        : Geometry::RectangularCoordinateSystem(d, z, p) { }
-    CylinderCoordinateSystem() {}
-    void toGlobal(QVector3D& v) const {
-        static const float k(1 / 90 * acos(0.0f));
-        float phi(v.y() * k);
-        QVector3D n(QVector3D(v.x() * cos(phi), v.x() * sin(phi), v.z()));
-
-        v.setX(ox.x() * n.x() + oy.x() * n.y() + oz.x() * n.z());
-        v.setY(ox.y() * n.x() + oy.y() * n.y() + oz.y() * n.z());
-        v.setZ(ox.z() * n.x() + oy.z() * n.y() + oz.z() * n.z());
-
-        v += a;
-    }
-};
-
 
 QDataStream& operator << (QDataStream& out, const Geometry& g);
 QDataStream& operator >> (QDataStream& out, Geometry& g);

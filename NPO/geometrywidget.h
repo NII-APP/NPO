@@ -4,6 +4,7 @@
 #include "geometryform.h"
 #include "animationoptions.h"
 #include <QOpenGLShaderProgram>
+class QAction;
 class Geometry;
 
 class GeometryWidget : public CGLWidget
@@ -11,10 +12,13 @@ class GeometryWidget : public CGLWidget
     Q_OBJECT
 
     const GeometryForm* data;
-    bool net;
+    QAction* netAction;
+    QAction* animationAction;
+    QAction* pauseAction;
     int form;
     double initialPhase;
     QTime initialTime;
+    int pauseTime;
 
     AnimationOptions* animation;
 
@@ -27,6 +31,8 @@ class GeometryWidget : public CGLWidget
     void timerEvent(QTimerEvent *);
 
     double currentPhase() const;
+
+    bool isAnimation() const { return !animationAction->isChecked() && data && data->modes().size() > form && form >= 0; }
 
 public:
     GeometryWidget(QWidget* parent = 0, QGLWidget* sharedWidget = 0, Qt::WindowFlags f = 0);
@@ -51,7 +57,9 @@ public slots:
     void initialAnimation();
     void formIncr();
     void formDecr();
-    void netTrigger() { net = !net; this->repaint(); }
+    void triggerNet() { this->repaint(); }
+    void triggerAnimation();
+    void triggerPause();
 };
 
 #endif // GEOMETRYWIDGET_H

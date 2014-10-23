@@ -21,6 +21,7 @@ public:
     QDataStream& save(QDataStream&) const;
     FinitElement* load(QDataStream&);
     const int* nodes() const;
+    int* nodes();
     int nodesCount() const;
 
 private:

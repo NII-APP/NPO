@@ -1,5 +1,8 @@
 #include "carray.h"
 #include "cgl.h"
+#ifdef QT_VERSION
+#include <QDataStream>
+#endif // QT_VERSION
 namespace CGL {
 
 CArray::CArray(int size, double val) : std::vector<double>(size, val) { }
@@ -28,9 +31,6 @@ RealRange CArray::estimateRange() const {
     }
     return domain;
 }
-
-
-
 
 
 

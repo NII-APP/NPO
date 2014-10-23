@@ -4,6 +4,7 @@
 #include <cstddef>
 
 class QDebug;
+class QDataStream;
 
 namespace CGL {
 
@@ -46,7 +47,13 @@ public:
     size_t height() const { return m.size(); }
 
     friend QDebug operator<< (QDebug out, const CMatrix &obj);
+
+    friend QDataStream& operator<< (QDataStream&, const CMatrix&);
+    friend QDataStream& operator>> (QDataStream&, CMatrix&);
 };
+
+QDataStream& operator<< (QDataStream&, const CMatrix&);
+QDataStream& operator>> (QDataStream&, CMatrix&);
 
 QDebug operator<< (QDebug out, const CMatrix &obj);
 

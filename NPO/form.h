@@ -3,6 +3,8 @@
 #include "CGL/cgl.h"
 #include "CGL/cvertexes.h"
 
+class QDataStream;
+
 class Form
 {
     float first;
@@ -23,7 +25,14 @@ public:
 
     CGL::CArray& power() { return third; }
     const CGL::CArray& power() const { return third; }
+
+    friend QDataStream& operator<<(QDataStream&, const Form&);
+    friend QDataStream& operator>>(QDataStream&, Form&);
 };
+
+QDataStream& operator<<(QDataStream&, const Form&);
+QDataStream& operator>>(QDataStream&, Form&);
+
 typedef std::vector<Form> Forms;
 
 #endif // FORM_H

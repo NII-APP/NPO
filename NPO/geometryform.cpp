@@ -5,6 +5,20 @@ GeometryForm::GeometryForm()
 {
 }
 
+GeometryForm::GeometryForm(const Geometry& g) : Geometry(g) {}
+
+GeometryForm::GeometryForm(const GeometryForm& op)
+    : Geometry(op)
+    , forms(op.forms)
+    , bender(op.bender)
+    , defoultMagnitude(op.defoultMagnitude)
+    , extremums(op.extremums)
+    , mac(op.mac)
+    , preMac(op.preMac)
+    , formFile(op.formFile)
+{
+}
+
 int GeometryForm::findNext(CGL::CParse& i)
 {
     //if the pointer not in the start of string
@@ -152,6 +166,16 @@ void GeometryForm::readF06(const QString& fileName)
             i += 3;
         }
     }
+
+    /*
+    for (CoordinateLinks::const_iterator l(links.begin()), end(links.end()); l != end; ++l) {
+        if (systems.contains(l->first)) {
+            for (Forms::iterator i(forms.begin()), end(forms.end()); i != end; ++i) {
+                systems[l->first]->toGlobal(i->form()(l->second));
+            }
+        }
+    }//*/
+
     f.skipTo("                                           E L E M E N T   S T R A I N   E N E R G I E ");
     while (*f && f.testPrew("                                           E L E M E N T   S T R A I N   E N E R G I E ")) {
         f.skipRow();
@@ -262,12 +286,55 @@ float GeometryForm::MAC(const GeometryForm *a, const GeometryForm *b, int i, int
     return s * s / a->preMac[i] / b->preMac[j] / k / k;
 }
 
+/*GeometryForm* GeometryForm::composition(const GeometryForm &, const GeometryForm &, const QVector<int> &relation) {
+    std::clog << "\tforms composition" << k << std::endl;
+    //forms initial magnitude of b scaled to a...
+    for (int i(0); i != a.forms.size(); ++i) {
+        std::clog << "формы" << i << b.formsCount() << relation[i];
+        ret->forms[i].second.resize(vDest + b.vertexes.size());
+        Vertexes::iterator d(ret->forms[i].second.begin() + vDest);
+        if (relation[i] >= 0 && relation[i] < b.formsCount()) {
+            for (Vertexes::const_iterator it(b.forms[relation[i]].second.begin()),
+                 end(b.forms[relation[i]].second.end()); it != end; ++it, ++d)
+                *d = *it / k;
+            std::clog << i << "not null form" << std::endl;
+        }
+        else {
+            for (int it(0); it != vDest; ++it, ++d)
+                *d = 0.0f;
+        }
+    }
+}*/
+
 QDataStream& operator << (QDataStream& s, const GeometryForm& g) {
     s << static_cast<const Geometry&>(g);
+    s << g.forms.size() << g.bender.size();
+    for (int i(0); i != g.forms.size(); ++i) {
+        s << g.forms.at(i);
+    }
+    for (int i(0); i != g.bender.size(); ++i) {
+        s << g.bender.at(i);
+    }
+    s << g.defoultMagnitude << g.extremums << g.mac << g.preMac << g.formFile;
     return s;
 }
 QDataStream& operator >> (QDataStream& s, GeometryForm& g) {
     s >> static_cast<Geometry&>(g);
+    Forms::size_type sForms, sBender;
+    s >> sForms >> sBender;
+    qDebug() << sForms << sBender;
+    g.forms.resize(sForms);
+    g.bender.resize(sBender);
+    for (int i(0); i != g.forms.size(); ++i) {
+        s >> g.forms[i];
+    }
+    for (int i(0); i != g.bender.size(); ++i) {
+        s >> g.bender[i];
+    }
+    qDebug() << "norm";
+    s >> g.defoultMagnitude >> g.extremums;
+    qDebug() << "let's mac" << g.defoultMagnitude[0];
+    s >> g.mac >> g.preMac >> g.formFile;
     return s;
 }
 

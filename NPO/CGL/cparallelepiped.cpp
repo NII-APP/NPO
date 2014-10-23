@@ -90,3 +90,6 @@ bool CParallelepiped::operator ==(const QVector3D& v) const {
 bool CParallelepiped::operator !=(const QVector3D& v) const {
     return v.x() < xL || v.x() > xP || v.y() < yL || v.y() > yP || v.z() < zL || v.z() > zP;
 }
+
+
+void CParallelepiped::move(const QVector3D& v) { xL += v.x(); xP += v.x(); yP += v.y(); yL += v.y(); zL += v.z(); zP += v.z(); }

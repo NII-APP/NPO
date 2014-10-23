@@ -7,8 +7,7 @@
 
 class GeometryForm : public Geometry
 {
-    typedef QVector<int> Indexes;
-    typedef QVector<CGL::CDiapason> Extremums;
+    typedef std::vector<CGL::CDiapason> Extremums;
     Forms forms;
     Forms bender;//bends form
 
@@ -29,6 +28,8 @@ protected:
     void estimateMAC();
 public:
     GeometryForm();
+    GeometryForm(const Geometry&);
+    GeometryForm(const GeometryForm&);
 
     inline void colorize(int form) { Geometry::colorize(forms[form].form()); }
     const CGL::CMatrix& getMac() const { return mac; }
@@ -37,11 +38,13 @@ public:
     //whole form
     Forms& modes() { return forms; }
     const Forms& modes() const { return forms; }
+    size_t modesCount() const { return forms.size(); }
     Form& mode(int i) { return forms[i]; }
     const Form& mode(int i) const { return forms.at(i); }
-    //get direct separated frequency or form
-    const CGL::Vertexes& form(int i) const { return forms.at(i).form(); }
+    //get direct separated parameter of form
     float frequency(int i) const { return forms.at(i).frequency(); }
+    const CGL::Vertexes& form(int i) const { return forms.at(i).form(); }
+    const CGL::CArray& power(int i) const { return forms.at(i).power(); }
 
     double getDefoultMagnitude(int f) const { return defoultMagnitude.at(f); }
     const CGL::CArray& getDefoultMagnitudes() const { return defoultMagnitude; }
@@ -51,6 +54,7 @@ public:
 
     static float MAC(const GeometryForm *a, const GeometryForm *b, int i, int j);
 
+    static GeometryForm* composition(const GeometryForm &, const GeometryForm &, const QVector<int> &relation);
 
     friend QDataStream& operator << (QDataStream&, const GeometryForm&);
     friend QDataStream& operator >> (QDataStream&, GeometryForm&);

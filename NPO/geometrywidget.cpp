@@ -8,24 +8,42 @@ GeometryWidget::GeometryWidget(QWidget *parent, QGLWidget *shareWidget, Qt::Wind
 {
     initialPhase = 0.0f;
     initialTime = QTime::currentTime();
-    net = true;
     form = 0;
     repaintLoop->setInterval(10);
     this->connect(repaintLoop, SIGNAL(timeout()), SLOT(repaint()));
 
     this->menu->addSeparator();
+
+    animationAction = new QAction(tr("disable animation"), this);
+    this->connect(animationAction, SIGNAL(triggered()), SLOT(triggerAnimation()));
+    animationAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_P));
+    animationAction->setCheckable(true);
+    animationAction->setChecked(false);
+    this->menu->addAction(animationAction);
+
+    pauseAction = new QAction(tr("pause animation"), this);
+    this->connect(pauseAction, SIGNAL(triggered()), SLOT(triggerPause()));
+    pauseAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_P));
+    pauseAction->setCheckable(true);
+    pauseAction->setChecked(false);
+    this->menu->addAction(pauseAction);
+
     this->menu->addAction(tr("magnitude increment"), this, SLOT(magnitudeIncr()), QKeySequence(Qt::ControlModifier | Qt::Key_BracketRight));
     this->menu->addAction(tr("magnitude decrement"), this, SLOT(magnitudeDecr()), QKeySequence(Qt::ControlModifier | Qt::Key_BracketLeft));
     this->menu->addAction(tr("frequency increment"), this, SLOT(frequencyIncr()), QKeySequence(Qt::ControlModifier | Qt::Key_K));
     this->menu->addAction(tr("frequency decrement"), this, SLOT(frequencyDecr()), QKeySequence(Qt::ControlModifier | Qt::Key_L));
-    this->menu->addAction(tr("initial animation"),     this, SLOT(initialAnimation()), QKeySequence(Qt::ControlModifier | Qt::Key_I));
-    this->menu->addAction(tr("previous mode"), this, SLOT(formDecr()), QKeySequence(Qt::Key_L));
-    this->menu->addAction(tr("next mode"),     this, SLOT(formIncr()), QKeySequence(Qt::Key_K));
-    QAction* netAction = new QAction(tr("net"), this);
-    this->connect(netAction, SIGNAL(triggered(bool)), SLOT(netTrigger()));
+    this->menu->addAction(tr("initial animation"),   this, SLOT(initialAnimation()), QKeySequence(Qt::ControlModifier | Qt::Key_I));
+    this->menu->addSeparator();
+    this->menu->addAction(tr("previous mode"),       this, SLOT(formDecr()), QKeySequence(Qt::Key_L));
+    this->menu->addAction(tr("next mode"),           this, SLOT(formIncr()), QKeySequence(Qt::Key_K));
+
+    this->menu->addSeparator();
+    netAction = new QAction(tr("net"), this);
+    this->connect(netAction, SIGNAL(triggered()), SLOT(triggerNet()));
     netAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_N));
     netAction->setCheckable(true);
-    netAction->setChecked(net);
+    netAction->setChecked(false);
+
     this->menu->addActions(QList<QAction*>() << netAction);
 }
 
@@ -44,6 +62,8 @@ void GeometryWidget::frequencyIncr()
 }
 void GeometryWidget::frequencyDecr()
 {
+    initialPhase = currentPhase();
+    initialTime = QTime::currentTime();
     animation->multFrequency(0.8f);
 }
 void GeometryWidget::formIncr()
@@ -76,7 +96,7 @@ void GeometryWidget::paintCGL()
     repaintLoop->stop();
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, data->nodes().data());
-    if (data->modes().size() > form && form >= 0) {
+    if (isAnimation()) {
         glNormalPointer(GL_FLOAT, 0, data->form(form).data());
         glEnableClientState(GL_NORMAL_ARRAY);
     } else {
@@ -84,12 +104,12 @@ void GeometryWidget::paintCGL()
         summator->setUniformValue("k", 0.0f);
     }
     data->render();
-    if (net) {
+    if (netAction->isChecked()) {
         data->renderNet();
     }
     this->debugSpace(this->scene());
 
-    if (data->modes().size() > form && form >= 0) {
+    if (isAnimation()) {
         repaintLoop->start();
     }
 }
@@ -99,11 +119,12 @@ void GeometryWidget::setModel(const GeometryForm* g)
     this->setScene(g->box());
     data = g;
     if (form >= data->modes().size()) {
-        form = data->modes().size() - 1;
+        form = static_cast<int>(data->modes().size() - 1);
     }
     if (form < 0) {
         form = 0;
     }
+    this->repaint();
 }
 
 void GeometryWidget::setModel(const GeometryForm& g)
@@ -123,14 +144,33 @@ void GeometryWidget::initializeCGL()
     this->startTimer(10);
 }
 
+void GeometryWidget::triggerAnimation() {
+    QList<QAction*> actions(this->menu->actions());
+    int i(0);
+    while (actions.at(i) != pauseAction) {
+        ++i;
+    }
+    while (!actions.at(++i)->text().isEmpty()) {
+        actions[i]->setDisabled(animationAction->isChecked());
+    }
+    this->repaint();
+}
+
 double GeometryWidget::currentPhase() const {
-    return initialPhase + initialTime.msecsTo(QTime::currentTime()) / 1000. * acos(0.0) * 4. * animation->getFrequency();
+    return initialPhase + (initialTime.msecsTo(QTime::currentTime()) + pauseTime) / 1000. * acos(0.0) * 4. * animation->getFrequency();
 }
 
 void GeometryWidget::timerEvent(QTimerEvent*) {
-    if (data && form >= 0 || form < data->modes().size()) {
+    if (isAnimation()) {
+        if (pauseAction->isChecked()) {
+            initialTime = QTime::currentTime();
+        }
         this->makeCurrent();
         double phase(currentPhase());
         summator->setUniformValue("k", static_cast<GLfloat>(sin(phase)) * animation->getMagnitude() * static_cast<GLfloat>(data->getDefoultMagnitude(form)));
     }
+}
+
+void GeometryWidget::triggerPause() {
+    pauseTime = initialTime.msecsTo(QTime::currentTime());
 }

@@ -14,7 +14,6 @@ public:
     IndexRange estimateRangeIndex() const;
 };
 
-
 }
 
 #endif // CARRAY_H
