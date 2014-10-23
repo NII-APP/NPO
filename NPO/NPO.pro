@@ -13,9 +13,6 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 
-RESOURCES += \
-    res.qrc
-
 SOURCES += main.cpp \
     geometry.cpp \
     animationoptions.cpp \
@@ -45,10 +42,7 @@ SOURCES += main.cpp \
     geometrywidget.cpp \
     core/hexa.cpp \
     core/shell.cpp \
-    CGL/rectangularcoordinatesystem.cpp \
-    CGL/cylindercoordinatesystem.cpp \
-    relationdialog.cpp \
-    geometrypair.cpp
+    pseudoInverse.cpp
 
 HEADERS += \
     geometry.h \
@@ -79,10 +73,10 @@ HEADERS += \
     geometrywidget.h \
     core/hexa.h \
     core/shell.h \
-    CGL/rectangularcoordinatesystem.h \
-    CGL/cylindercoordinatesystem.h \
-    relationdialog.h \
-    geometrypair.h
+    pseudoInverse.h
 
 OTHER_FILES += \
     summator.vert
+
+RESOURCES += \
+    res.qrc
