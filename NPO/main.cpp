@@ -64,5 +64,7 @@ int main(int argc, char *argv[])
 
     RelationDialog::run(&pair);
 
+    pair.createTuncationForm();
+
     return a.exec();
 }
