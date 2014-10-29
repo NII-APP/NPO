@@ -66,5 +66,10 @@ int main(int argc, char *argv[])
 
     pair.createTuncationForm();
 
+    w2.setModel(pair.truncation());
+
+    qDebug() << "truncated";
+
+    w2.show();
     return a.exec();
 }

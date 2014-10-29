@@ -338,3 +338,37 @@ QDataStream& operator >> (QDataStream& s, GeometryForm& g) {
     return s;
 }
 
+
+GeometryForm* GeometryForm::truncation(const GeometryForm& a, const GeometryForm& b)
+{
+    qDebug() << "geometry form truncation";
+    qDebug() << "\tcall geometry truncation";
+    //make copy from experemental form geometry
+    GeometryForm* result(new GeometryForm(static_cast<const Geometry&>(b)));
+    result->formFile = "truncated";
+    //selecti vertexes in theory form which will be associate with exteprimental form
+    std::vector<int> interrelations(Geometry::truncationIndexVector(a, b));
+    qDebug() << interrelations.size() << result->nodes().length();
+
+    //and now just copy the form values from theory
+    result->forms.resize(a.forms.size());
+    Forms::iterator receiver(result->forms.begin());
+    for (Forms::const_iterator source(a.forms.begin()), end(a.forms.end()); source != end; ++source, ++receiver) {
+        receiver->setFrequency(source->frequency());
+        const CGL::Vertexes& theoryForm(source->form());
+        CGL::Vertexes& truncatedForm(receiver->form());
+        truncatedForm.resize(interrelations.size() * 3);
+        int i(0);
+        for (std::vector<int>::const_iterator interrelation(interrelations.begin()), end(interrelations.end()); interrelation != end; ++interrelation, ++i) {
+            truncatedForm(i) = theoryForm(*interrelation);
+        }
+    }
+    result->extremums = a.extremums;
+    result->defoultMagnitude = a.defoultMagnitude;
+
+    qDebug() << result->forms.size() << result->forms.front().form().size() << result->nodes().size();
+
+    //result->estimateMac();
+
+    return result;
+}

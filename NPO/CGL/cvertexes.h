@@ -18,6 +18,8 @@ public:
 
     RealRange estimateRange() const;
     IndexRange estimateRangeIndex() const;
+
+    void push_vector_back(const QVector3D&);
 };
 }
 

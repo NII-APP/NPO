@@ -8,6 +8,7 @@
 #include "geometrywidget.h"
 #include <QFrame>
 #include <QLabel>
+#include <QPushButton>
 
 class RelationDialog : public QDialog
 {
@@ -29,6 +30,9 @@ class RelationDialog : public QDialog
     QFrame* rightP;
     QLabel* title1;
     QLabel* title2;
+
+    QPushButton* accept;
+    QPushButton* cancel;
 
     float leftCapacity;
     float rightCapacity;
