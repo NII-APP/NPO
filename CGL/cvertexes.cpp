@@ -19,7 +19,7 @@ const QVector3D& CVertexes::operator ()(int p) const {
 
 RealRange CVertexes::estimateRange() const {
     RealRange domain((*this)(0).lengthSquared());
-    int i(this->length());
+    size_t i(this->length());
     while(i) {
         domain.include((*this)(--i).lengthSquared());
     }
@@ -44,5 +44,10 @@ IndexRange CVertexes::estimateRangeIndex() const {
     return range;
 }
 
+void CVertexes::push_vector_back(const QVector3D& v) {
+    std::vector<float>::push_back(v.x());
+    std::vector<float>::push_back(v.y());
+    std::vector<float>::push_back(v.z());
+}
 
 }

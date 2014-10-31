@@ -19,6 +19,8 @@ RelationDialog::RelationDialog(GeometryPair *forEdit, QWidget *parent)
   , lineingLeft(false)
   , title1(new QLabel(forEdit->theory().getName(), this))
   , title2(new QLabel(forEdit->practic().getName(), this))
+  , accept(new QPushButton("accept", this))
+  , cancel(new QPushButton("cancel", this))
 {
     this->setModal(true);
     this->setContentsMargins(10, 0, 10, 0);
@@ -46,6 +48,8 @@ RelationDialog::RelationDialog(GeometryPair *forEdit, QWidget *parent)
         }
     }
     bgUpdate();
+    this->connect(accept, SIGNAL(clicked()), SLOT(accept()));
+    this->connect(cancel, SIGNAL(clicked()), SLOT(accept()));
 }
 
 void RelationDialog::bgUpdate()
@@ -160,6 +164,10 @@ void RelationDialog::resizeEvent(QResizeEvent*)
     {
         rightL[i]->move(this->width() - this->contentsMargins().right() - maxW, rightCapacity * (i + .5f) - myH + 20);
     }
+    accept->move(this->width() / 2. - accept->width() - 10
+               , this->height() - accept->height() - 5);
+    cancel->move(this->width() / 2. + 10
+               , this->height() - accept->height() - 5);
 }
 
 void RelationDialog::paintEvent(QPaintEvent * e)
@@ -305,4 +313,5 @@ void RelationDialog::run(GeometryPair* forEdit, QWidget* parent)
     l->connect(dialog, SIGNAL(finished(int)), SLOT(quit()));
     dialog->show();
     l->exec();
+    qDebug() << "result";
 }

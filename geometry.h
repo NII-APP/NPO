@@ -21,15 +21,25 @@ using namespace core;
 
 class Geometry
 {
+public:
+    enum ModelType {
+        Undefined,
+        Theory,
+        Practic,
+        Truncated
+    };
+private:
     typedef std::vector<core::FinitElement*> Trace;
     typedef QVector<Shell> Shells;
     typedef std::vector<int> TraceBufer;
     //first is coordinateSystem id, second - vertex id
-    typedef QPair<int, int> CoordinateLink;
-    typedef QVector<CoordinateLink> CoordinateLinks;
+    typedef std::pair<int, int> CoordinateLink;
+    typedef std::vector<CoordinateLink> CoordinateLinks;
     static const unsigned char CONST_BLACK[];
     //constant ised for decide is the model is low-polygon and nodes must be displayed
     static const int LOW_POLYGON;
+
+    ModelType modelType;
 
     CGL::CVertexes vertexes;
     Trace trace;
@@ -120,7 +130,7 @@ public:
     void scaleTo(double);
     static Geometry* composition(const Geometry &, const Geometry &);
     //truncate hi-vertexes geometry to low-vertexes
-    static Geometry* truncation(Geometry &, Geometry &);
+    static std::vector<int> truncationIndexVector(const Geometry& from, const Geometry& to);
 };
 
 QDataStream& operator << (QDataStream& out, const Geometry& g);

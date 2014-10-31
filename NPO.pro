@@ -42,7 +42,11 @@ SOURCES += main.cpp \
     geometrywidget.cpp \
     core/hexa.cpp \
     core/shell.cpp \
-    pseudoInverse.cpp
+    pseudoInverse.cpp \
+    geometrypair.cpp \
+    CGL/cylindercoordinatesystem.cpp \
+    CGL/rectangularcoordinatesystem.cpp \
+    relationdialog.cpp
 
 HEADERS += \
     geometry.h \
@@ -73,7 +77,11 @@ HEADERS += \
     geometrywidget.h \
     core/hexa.h \
     core/shell.h \
-    pseudoInverse.h
+    pseudoInverse.h \
+    geometrypair.h \
+    CGL/cylindercoordinatesystem.h \
+    CGL/rectangularcoordinatesystem.h \
+    relationdialog.h
 
 OTHER_FILES += \
     summator.vert

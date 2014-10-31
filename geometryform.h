@@ -58,6 +58,8 @@ public:
 
     friend QDataStream& operator << (QDataStream&, const GeometryForm&);
     friend QDataStream& operator >> (QDataStream&, GeometryForm&);
+
+    static GeometryForm* truncation(const GeometryForm& a, const GeometryForm &b);
 };
 
 QDataStream& operator << (QDataStream&, const GeometryForm&);

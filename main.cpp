@@ -64,5 +64,12 @@ int main(int argc, char *argv[])
 
     RelationDialog::run(&pair);
 
+    pair.createTuncationForm();
+
+    w2.setModel(pair.truncation());
+
+    qDebug() << "truncated";
+
+    w2.show();
     return a.exec();
 }

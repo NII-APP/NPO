@@ -14,9 +14,9 @@
 const int Geometry::LOW_POLYGON = 300;
 const unsigned char Geometry::CONST_BLACK[] = { 0x00, 0x00, 0x00 };
 
-Geometry::Geometry() {}
+Geometry::Geometry() : modelType(Undefined) {}
 
-Geometry::Geometry(const QString& fileName) {
+Geometry::Geometry(const QString& fileName) : modelType(Undefined) {
     QString ext(fileName.split('.').last());
     if (ext == "bdf" && readBDF(fileName)) {
         std::clog << "Geometry correctly parse .bdf file" << std::endl;
@@ -29,7 +29,8 @@ Geometry::Geometry(const QString& fileName) {
 }
 
 Geometry::Geometry(const Geometry& g)
-    : vertexes(g.vertexes)
+    : modelType(g.modelType)
+    , vertexes(g.vertexes)
     , trace(g.trace.size())
     , sqre(g.sqre)
     , isTraced(g.isTraced)
@@ -156,7 +157,7 @@ bool Geometry::readBDF(const QString &fileName)
             vertexes[i * 3 - 1] = f.fixFloat8();
             if (k != -1) {
                 --i;
-                links.append(CoordinateLink(k, i));
+                links.push_back(CoordinateLink(k, i));
             }
             f.skipRow();
         } else if (type == "GRID*") {
@@ -167,7 +168,7 @@ bool Geometry::readBDF(const QString &fileName)
                 ++coordinate;
             }
             if (coordinate - f < 15) {
-                links.append(CoordinateLink(coordinate.integer(), i - 1));
+                links.push_back(CoordinateLink(coordinate.integer(), i - 1));
                 f = coordinate;
             }
             if (static_cast<int>(vertexes.size()) < i * 3) {
@@ -253,6 +254,7 @@ bool Geometry::readBDF(const QString &fileName)
         ++j;
     }
     qDebug() << "\tcolorize";
+    modelType = Theory;
     colorizeElements(coco);
     std::clog << '\t' << loop.msecsTo(QTime::currentTime()) / 1e3 << " sec parsing pelay for .bdf model with " << vertexes.length() << " nodes" << std::endl;
     return true;
@@ -313,6 +315,7 @@ bool Geometry::readUNV(const QString &fileName)
     delete memory;
     estimateTraced();
     estimateBox();
+    modelType = Practic;
     std::clog << '\t' << loop.msecsTo(QTime::currentTime()) / 1e3 << " sec parsing pelay" << std::endl;
     return true;
 }
@@ -510,7 +513,7 @@ void Geometry::colorize(const CGL::CVertexes &v, const QString& mes)
 
 QDataStream& operator << (QDataStream& out, const Geometry& g) {
     qDebug() << "\nwrite to stream";
-    out << g.sqre << g.isTraced << g.markedNodes << g.measurment << g.file;
+    out << g.sqre << g.isTraced << g.markedNodes << g.measurment << g.file << static_cast<int>(g.modelType);
     out << g.vertexes << g.colors;
     out << g.trace.size();
     int realCount(0);
@@ -538,7 +541,9 @@ QDataStream& operator << (QDataStream& out, const Geometry& g) {
 }
 QDataStream& operator >> (QDataStream& in, Geometry& g) {
     qDebug() << "load from stream";
-    in >> g.sqre >> g.isTraced >> g.markedNodes >> g.measurment >> g.file;
+    int modelType;
+    in >> g.sqre >> g.isTraced >> g.markedNodes >> g.measurment >> g.file >> modelType;
+    g.modelType = static_cast<Geometry::ModelType>(modelType);
     in >> g.vertexes >> g.colors;
     qDebug() << "\tmain";
     Geometry::Trace::size_type size;
@@ -613,75 +618,28 @@ Geometry* Geometry::composition(const Geometry& a, const Geometry& b)
     return ret;
 }
 
-Geometry* Geometry::truncation(Geometry& a, Geometry& b)
+std::vector<int> Geometry::truncationIndexVector(const Geometry& a, const Geometry& b)
 {
-    Geometry* result(new Geometry(a));
-    b.alignZero();
-    result->alignZero();
-    result->scaleTo(b.box().size());
-/*
-    //Обрезка
-    const Vertexes& am(a->vertexes);
-    const Vertexes& bm(b->vertexes);
-    int aDimension(am.size() / 3);
-    int bDimension(bm.size() / 3);
-    Matrix dest(bDimension);//Матрица квадратов расстояний
-    Vertexes destMem(bDimension * aDimension);//память для неё
-    Geometry* ret(new Geometry(*b));//обрезаная геометрия имеет размеры малой формы
-    std::clog << "расчет расстояний" << std::endl;
+    const CGL::Vertexes& am(a.vertexes);
+    const CGL::Vertexes& bm(b.vertexes);
+    int aDimension(am.length());
+    int bDimension(bm.length());
+    CGL::Matrix dest(bDimension, aDimension);
+    std::clog << "estimate destanations" << std::endl;
     for (int i(0); i != bDimension; ++i) {
-        dest[i] = destMem.data() + i * aDimension;
         for (int j = 0; j != aDimension; ++j) {
-            int jjj(j + j + j);
-            int iii(i + i + i);
-            float x(am.at(jjj) - bm.at(iii)), y(am.at(jjj + 1) - bm.at(iii + 1)),  z(am.at(jjj + 2) - bm.at(iii + 2));
-            dest[i][j] = x * x + y * y + z * z;
+            dest[i][j] = (am(j) - bm(i)).lengthSquared();
         }
     }
-    std::clog << "Выбор минимумов" << std::endl;
-    Trace numbers(bDimension);
-    numbers.fill(0);
+    std::clog << "selest min" << std::endl;
+    std::vector<int> numbers(bDimension, 0);
     for (int i(0); i != bDimension; ++i) {
         for (int j(1); j != aDimension; ++j) {
-            if (dest[i][j] < dest[i][numbers[i]] && a->isTraced[j]) {
+            if (dest[i][j] < dest[i][numbers.at(i)] && a.isTraced.testBit(j)) {
                 numbers[i] = j;
             }
         }
     }
-    Vertexes& r(ret->vertexes);
-    Forms& f(ret->forms);
-    const Forms& af(a->forms);
-    f.resize(af.size());
-    std::clog << "ресайз форм" << std::endl;
-    for (Forms::iterator it(f.begin()), end(f.end()); it != end; ++it)
-        it->second.resize(bm.size());
-    std::clog << "изменение данных" << std::endl;
-    float maximum(0.0f), crnt;
-    for (int i(0); i != numbers.size(); ++i) {
-        int iii(i + i + i);
-        int jjj(numbers[i] * 3);
-        //ret->vertexes[iii] = am[jjj];
-        //ret->vertexes[iii + 1] = am[jjj + 1];
-        //ret->vertexes[iii + 2] = am[jjj + 2];
-        for (int j(0); j != f.size(); ++j) {
-            f[j].second[iii] = af[j].second[jjj];
-            f[j].second[iii + 1] = af[j].second[jjj + 1];
-            f[j].second[iii + 2] = af[j].second[jjj + 2];
-            crnt = f[j].second[iii] * f[j].second[iii] + f[j].second[iii + 1] * f[j].second[iii + 1] + f[j].second[iii + 2] * f[j].second[iii + 2];
-            if (crnt > maximum) {
-                maximum = crnt;
-            }
-        }
-    }
-    ret->colorize();
-    ret->estimateMac();
-    //ret->sqre = b->sqre;
-    ret->defoultMagnitude = ret->sqre.size() / maximum / 40;
-    maximum = sqrt(maximum);
-    a->stigmaticNodes.resize(bDimension);
-    for (int i = 0; i != bDimension; ++i)
-        a->stigmaticNodes[i] = numbers[i];
-    std::clog << a->vertexes.size() << std::endl;
-    return ret;*/
-    return 0;
+
+    return numbers;
 }

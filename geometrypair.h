@@ -10,12 +10,15 @@ public:
     typedef std::vector<int> Relation;
 private:
     Relation relation;
+    GeometryForm* truncated;
 public:
     Relation& relations() { return relation; }
 
     GeometryForm& theory() { return *first; }
     GeometryForm& practic() { return *second; }
+    GeometryForm& truncation() { return *truncated; }
 
+    void createTuncationForm();
     GeometryPair(GeometryForm *theory, GeometryForm *practic);
 };
 
