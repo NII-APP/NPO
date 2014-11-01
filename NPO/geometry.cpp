@@ -6,6 +6,7 @@
 #include "core/tetra.h"
 #include "core/tria.h"
 #include "core/lines.h"
+#include "core/hexa.h"
 #include "CGL/cgl.h"
 #include "conio.h"
 #include <QFile>
@@ -38,6 +39,7 @@ Geometry::Geometry(const Geometry& g)
     , colors(g.colors)
     , file(g.file)
     , shells(g.shells)
+    , materials(g.materials)
 {
     Trace::const_iterator s(g.trace.begin());
     Trace::iterator d(trace.begin());
@@ -113,7 +115,7 @@ bool Geometry::readBDF(const QString &fileName)
             }
             int m(f.integer() - 1);
             trace[id] = new core::Quad(f.integer(), f.integer(), f.integer(), f.integer());
-            trace[id]->setMaterial(m);
+            trace[id]->setShell(m);
             f.skipRow();
         } else if (type == "CTETRA") {
             int id(f.integer());
@@ -122,7 +124,7 @@ bool Geometry::readBDF(const QString &fileName)
             }
             int m(f.integer() - 1);
             trace[id] = new core::Tetra(f.integer(), f.integer(), f.integer(), f.integer());
-            trace[id]->setMaterial(m);
+            trace[id]->setShell(m);
             f.skipRow();
         } else if (type == "CTRIA3") {
             int id(f.integer());
@@ -131,7 +133,16 @@ bool Geometry::readBDF(const QString &fileName)
             }
             int m(f.integer() - 1);
             trace[id] = new core::Tria(f.integer(), f.integer(), f.integer());
-            trace[id]->setMaterial(m);
+            trace[id]->setShell(m);
+            f.skipRow();
+        } else if (type == "CHEXA") {
+            int id(f.integer());
+            if (trace.size() <= id) {
+                trace.resize(id + 100, 0);
+            }
+            int m(f.integer() - 1);
+            trace[id] = new core::Hexa(f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer());
+            trace[id]->setShell(m);
             f.skipRow();
         } else if (type == "GRID") {
             CGL::CParse debugCatch(f);
@@ -223,9 +234,22 @@ bool Geometry::readBDF(const QString &fileName)
             systems.insert(id, new CGL::CylinderCoordinateSystem(QVector3D(m[0], m[1], m[2]),
                                                             QVector3D(m[3], m[4], m[5]),
                                                             QVector3D(m[6], m[7], m[8])));
+        } else if (type == "RBE2") {
+            f.skipRow();
+            if (*f == ' ') {
+                f.skipRow();
+            }
+        } else if (type == "$") {
+            f.skipRow();
+        } else if (type == "MAT1*") {
+            int id(f.integer());
+            if (materials.size() <= id) {
+                materials.resize(id + 1);
+            }
+            materials
         } else {
             ++f;
-            //qDebug() << "unresolved" << QString::fromStdString(type);
+            qDebug() << "unresolved" << QString::fromStdString(type);
             f.skipRow();
         }
     }
@@ -242,20 +266,7 @@ bool Geometry::readBDF(const QString &fileName)
 
     estimateTraced();
     estimateBox();
-    CGL::CArray coco(trace.size());
-    CGL::CArray::iterator i(coco.begin());
-    Trace::const_iterator j(trace.begin());
-    Trace::const_iterator end(trace.end());
-    while (j != end) {
-        if (*j) {
-            *i = shells[(*j)->material()].getFloat();
-        }
-        ++i;
-        ++j;
-    }
-    qDebug() << "\tcolorize";
     modelType = Theory;
-    colorizeElements(coco);
     std::clog << '\t' << loop.msecsTo(QTime::currentTime()) / 1e3 << " sec parsing pelay for .bdf model with " << vertexes.length() << " nodes" << std::endl;
     return true;
 }

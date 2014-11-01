@@ -10,7 +10,7 @@ Hexa::Hexa()
 {
 }
 
-Hexa::Hexa(int n1, int n2, int n3, int n4, int n5, int n6)
+Hexa::Hexa(int n1, int n2, int n3, int n4, int n5, int n6, int n7, int n8)
 {
     n[0] = n1;
     n[1] = n2;
@@ -18,6 +18,8 @@ Hexa::Hexa(int n1, int n2, int n3, int n4, int n5, int n6)
     n[3] = n4;
     n[4] = n5;
     n[5] = n6;
+    n[6] = n7;
+    n[7] = n8;
 }
 
 FinitElement* Hexa::clone() const {

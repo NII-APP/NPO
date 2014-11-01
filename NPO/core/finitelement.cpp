@@ -14,13 +14,13 @@ FinitElement::FinitElement()
 }
 
 
-void FinitElement::setMaterial(const int &v) { shell = v; }
-int FinitElement::getMaterial() const { return shell; }
-int& FinitElement::material() { return shell; }
-const int& FinitElement::material() const { return shell; }
+void FinitElement::setShell(const int &v) { shellIndex = v; }
+int FinitElement::getShell() const { return shellIndex; }
+int& FinitElement::shell() { return shellIndex; }
+const int& FinitElement::shell() const { return shellIndex; }
 
 QDataStream& FinitElement::save(QDataStream& s) const {
-    return s << shell << type();
+    return s << shellIndex << type();
 }
 FinitElement* FinitElement::loadElement(QDataStream& s) {
     int shell;
@@ -31,23 +31,23 @@ FinitElement* FinitElement::loadElement(QDataStream& s) {
     switch (t) {
     case LinesType:
         v = new Lines;
-        v->setMaterial(shell);
+        v->setShell(shell);
         return v->load(s);
     case QuadType:
         v = new Quad;
-        v->setMaterial(shell);
+        v->setShell(shell);
         return v->load(s);
     case TetraType:
         v = new Tetra;
-        v->setMaterial(shell);
+        v->setShell(shell);
         return v->load(s);
     case HexaType:
         v = new Hexa;
-        v->setMaterial(shell);
+        v->setShell(shell);
         return v->load(s);
     case TriaType:
         v = new Tria;
-        v->setMaterial(shell);
+        v->setShell(shell);
         return v->load(s);
     }
 }

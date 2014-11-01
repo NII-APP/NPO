@@ -20,6 +20,7 @@ public:
 
     RectangularCoordinateSystem(const QVector3D& d, const QVector3D& z, const QVector3D& p);
     RectangularCoordinateSystem();
+    virtual ~RectangularCoordinateSystem() {}
     virtual void toGlobal(QVector3D& v) const;
     virtual RectangularCoordinateSystem* clone() const { return new RectangularCoordinateSystem(*this); }
     virtual int type() const { return Rectangular; }

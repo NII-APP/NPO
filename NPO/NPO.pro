@@ -46,7 +46,8 @@ SOURCES += main.cpp \
     geometrypair.cpp \
     CGL/cylindercoordinatesystem.cpp \
     CGL/rectangularcoordinatesystem.cpp \
-    relationdialog.cpp
+    relationdialog.cpp \
+    core/material.cpp
 
 HEADERS += \
     geometry.h \
@@ -81,7 +82,8 @@ HEADERS += \
     geometrypair.h \
     CGL/cylindercoordinatesystem.h \
     CGL/rectangularcoordinatesystem.h \
-    relationdialog.h
+    relationdialog.h \
+    core/material.h
 
 OTHER_FILES += \
     summator.vert

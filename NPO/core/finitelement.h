@@ -9,7 +9,7 @@ namespace core {
 class FinitElement
 {
     //matherial
-    int shell;
+    int shellIndex;
 public:
     enum FinitElementType {
         //look like line stripe
@@ -22,6 +22,7 @@ public:
         TriaType
     };
     FinitElement();
+    virtual ~FinitElement() {}
     virtual FinitElement* clone() const = 0;
 
     virtual void render() const = 0;
@@ -40,10 +41,10 @@ public:
     //+= n to each index
     void moveIndexes(int n);
 
-    void setMaterial(const int& v);
-    int getMaterial() const;
-    int& material();
-    const int& material() const;
+    void setShell(const int& v);
+    int getShell() const;
+    int& shell();
+    const int& shell() const;
 };
 
 

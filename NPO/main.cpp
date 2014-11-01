@@ -8,6 +8,7 @@
 #include <QVariantMap>
 #include "geometrypair.h"
 #include "relationdialog.h"
+#include "pseudoInverse.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,16 +20,16 @@ int main(int argc, char *argv[])
     //Geometry* theory2 = new Geometry("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.bdf");
     //Geometry* practic = new Geometry("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.unv");
     GeometryForm* form = new GeometryForm;
-    /*form->readBDF("C:\\Users\\NICK\\Downloads\\model.bdf");
+    form->readBDF("C:\\Users\\NICK\\Downloads\\model.bdf");
     form->readF06("C:\\Users\\NICK\\Downloads\\model.f06");
-    form->colorizeElements(form->modes().at(0).power());//*/
-    form->readBDF("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.bdf");
-    form->readF06("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.f06");
+    form->colorizeElements(form->modes().at(4).power());//*/
+//    form->readBDF("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.bdf");
+//    form->readF06("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.f06");
 
 
     GeometryWidget w;
     w.setModel(form);
-    //w.show();
+    w.show();
 
     /*
     QFile f("cnt.mod");
@@ -48,28 +49,25 @@ int main(int argc, char *argv[])
     GeometryForm* form2 = new GeometryForm;
     form2->readUNV("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.unv");
     form2->readTXT("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.txt");
-    GeometryWidget w2;
-    w2.setModel(form2);
-    //w2.show();//*/
 
-    //w.setScene(form->box());
-    //w2.setScene(form2->box());
-    //GeometryForm* form3 = new GeometryForm(*Geometry::truncation(
-      //                                         *form2,
-        //                                       *form));
+//    GeometryPair pair(form, form2);
 
-    //w2.setModel(form3);
+//    RelationDialog::run(&pair);
 
-    GeometryPair pair(form, form2);
+//    pair.createTuncationForm();
 
-    RelationDialog::run(&pair);
+//    w.setModel(pair.truncation());
 
-    pair.createTuncationForm();
+//    qDebug() << "truncated";
 
-    w2.setModel(pair.truncation());
+//    w.show();
 
-    qDebug() << "truncated";
+    MethodInvMat programma;
 
-    w2.show();
+    programma.GetMatrix(form);
+
+    programma.PseudoInversion();
+
+
     return a.exec();
 }

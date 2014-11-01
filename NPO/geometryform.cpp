@@ -167,7 +167,7 @@ void GeometryForm::readF06(const QString& fileName)
         }
     }
 
-    /*
+    //*
     for (CoordinateLinks::const_iterator l(links.begin()), end(links.end()); l != end; ++l) {
         if (systems.contains(l->first)) {
             for (Forms::iterator i(forms.begin()), end(forms.end()); i != end; ++i) {

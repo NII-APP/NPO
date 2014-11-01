@@ -9,23 +9,29 @@ using namespace std;
 
 class MethodInvMat
 {
-    public:
-        MethodInvMat(double ** matrixExternal, int row, int column);
-        ~MethodInvMat();
-        int PseudoInversion();
-        double Round10 (double value);
+public:
+    MethodInvMat();
+    ~MethodInvMat();
+    int PseudoInversion();
+    double Round10 (double value);
+    int MethodInvMat::GetMatrix(GeometryForm *form);
 
-    private:
-        int MethodInvMat::clear0();
-        int MethodInvMat::GetMatrix(GeometryForm *form);
-        int Det(double **matrixIn, int N);
-        int Print(double ** matrixIn, int rowIn, int columnIn);
-        int Inversion(double **matrixIn);
-        int DotTranspose(double **);
-        int Dot(double ** A, double ** B);
-        double ** matrix;
-        double det;
-        int row, column;
+private:
+    int MethodInvMat::clear0();
+    int Det(double **matrixIn, int N);
+    int Print(double ** matrixIn, int rowIn, int columnIn);
+    int Inversion(double **matrixIn);
+    int DotTranspose(double **);
+    int Dot(double ** A, double ** B);
+    int calculateE();
+    double max(double* A, int n);
+    double min(double* A, int n);
+    double ** matrix;
+    double det;
+    int row, column;
+    double* frequency;
+    double* frequencyExp;
+    double* deltaE;
 };
 
 

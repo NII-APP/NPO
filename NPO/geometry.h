@@ -16,6 +16,7 @@
 #include <conio.h>
 #include <QMatrix4x4>
 #include <cmath>
+#include "core/material.h"
 
 using namespace core;
 
@@ -30,7 +31,7 @@ public:
     };
 private:
     typedef std::vector<core::FinitElement*> Trace;
-    typedef QVector<Shell> Shells;
+    typedef std::vector<Shell> Shells;
     typedef std::vector<int> TraceBufer;
     //first is coordinateSystem id, second - vertex id
     typedef std::pair<int, int> CoordinateLink;
@@ -57,6 +58,8 @@ private:
     QString file;
     //list of shells
     Shells shells;
+    //map of matherials
+    std::vector<Material> materials;
 
     void estimateTraced();
     void estimateBox();
@@ -83,7 +86,7 @@ public:
     Geometry();
     Geometry(const QString& fileName);
     Geometry(const Geometry& g);
-    ~Geometry();
+    virtual ~Geometry();
 
     //reading that formsts
     bool readBDF(const QString &fileName);

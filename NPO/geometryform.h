@@ -24,7 +24,7 @@ class GeometryForm : public Geometry
     void estimateDefoultMagnitudes();
 
 protected:
-    //Estimate auto MAC. Ordinaly called in constructor
+    //Estimate auto MAC. Ordinaly called after reading
     void estimateMAC();
 public:
     GeometryForm();
