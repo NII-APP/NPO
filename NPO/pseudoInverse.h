@@ -23,7 +23,7 @@ private:
     int Inversion(double **matrixIn);
     int DotTranspose(double **);
     int Dot(double ** A, double ** B);
-    int calculateE();
+    double* calculateE();
     double max(double* A, int n);
     double min(double* A, int n);
     double ** matrix;

@@ -237,22 +237,25 @@ int MethodInvMat::PseudoInversion()
     return 0;
 }
 
-int MethodInvMat::calculateE()
+double* MethodInvMat::calculateE()
 {
     deltaE = new double[row];
     double tempFrec;
+
+    double kof = 10^6;
 
     for (int i = 0; i < row; ++i) {
        deltaE[i] = 0;
         for (int j = 0; j < column; ++j) {
             tempFrec = frequencyExp[j] - frequency[j];
-            deltaE[i] += matrix[j][i] * tempFrec ;
+            deltaE[i] += kof * matrix[j][i] * tempFrec ;
         }
     }
 
-     qDebug() <<"\nmax deltaE="<<max(deltaE,row);
-     qDebug() <<"\nmin deltaE="<<min(deltaE,row);
-    return 0;
+//     qDebug() <<"\nmax deltaE="<<max(deltaE,row);
+//     qDebug() <<"\nmin deltaE="<<min(deltaE,row);
+
+     return deltaE;
 }
 
 double MethodInvMat::Round10 (double value)
@@ -266,7 +269,6 @@ double MethodInvMat::Round10 (double value)
 
    return i/10;
 }
-
 
 double MethodInvMat::max(double* A, int n)
 {
