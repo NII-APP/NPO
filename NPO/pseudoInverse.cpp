@@ -239,6 +239,10 @@ int MethodInvMat::PseudoInversion()
 
 double* MethodInvMat::calculateE()
 {
+    DotTranspose(matrixIn);
+    Inversion(matrixIn);
+    Dot(matrixIn,matrix);
+
     deltaE = new double[row];
     double tempFrec;
 
