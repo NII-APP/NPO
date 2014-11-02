@@ -12,20 +12,24 @@ class MethodInvMat
 public:
     MethodInvMat();
     ~MethodInvMat();
-    int PseudoInversion();
-    double Round10 (double value);
-    int MethodInvMat::GetMatrix(GeometryForm *form);
+    int MethodInvMat::pseudoInversion();
+    double MethodInvMat::round10 (double value);
+    int MethodInvMat::getMatrix(GeometryForm *form);
+    double* MethodInvMat::calculateE();
+    double MethodInvMat::maxElement(double* A, int n);
+    double MethodInvMat::minElement(double* A, int n);
+    int MethodInvMat::discreteArray(double* array, int sizeArray, int discrete);
+    int MethodInvMat::minElementsNumber(double* A, int n);
 
 private:
+
     int MethodInvMat::clear0();
-    int Det(double **matrixIn, int N);
-    int Print(double ** matrixIn, int rowIn, int columnIn);
-    int Inversion(double **matrixIn);
-    int DotTranspose(double **);
-    int Dot(double ** A, double ** B);
-    double* calculateE();
-    double max(double* A, int n);
-    double min(double* A, int n);
+    int MethodInvMat::Det(double **matrixIn, int N);
+    int MethodInvMat::Print(double ** matrixIn, int rowIn, int columnIn);
+    int MethodInvMat::Inversion(double **matrixIn);
+    int MethodInvMat::DotTranspose(double **);
+    int MethodInvMat::Dot(double ** A, double ** B);
+
     double ** matrix;
     double det;
     int row, column;

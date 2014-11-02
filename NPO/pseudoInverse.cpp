@@ -16,7 +16,7 @@ MethodInvMat::MethodInvMat()
 }
 MethodInvMat::~MethodInvMat()
 {}
-int MethodInvMat::GetMatrix(GeometryForm* model)
+int MethodInvMat::getMatrix(GeometryForm* model)
 {
    // qDebug() << "create mega matrux";
     int sizeElem = model->elements().size();
@@ -211,7 +211,7 @@ int MethodInvMat::Dot(double ** A, double ** B)
     return 0;
 }
 
-int MethodInvMat::PseudoInversion()
+int MethodInvMat::pseudoInversion()
 { //вычисление псведообратной матрицы
 
     double **matrixIn;
@@ -226,7 +226,7 @@ int MethodInvMat::PseudoInversion()
     DotTranspose(matrixIn);
     Inversion(matrixIn);
     Dot(matrixIn,matrix);
-    calculateE();
+//    calculateE();
 
 
     for (int i=0; i<column; i++) {
@@ -239,30 +239,38 @@ int MethodInvMat::PseudoInversion()
 
 double* MethodInvMat::calculateE()
 {
-    DotTranspose(matrixIn);
-    Inversion(matrixIn);
-    Dot(matrixIn,matrix);
+     qDebug() <<"\ncalculate delta E";
+     MethodInvMat::pseudoInversion();
+     qDebug() <<"PseudoInversion Dan";
 
     deltaE = new double[row];
-    double tempFrec;
+    double* tempFrec;
+    tempFrec = new double[column];
 
-    double kof = 10^6;
+    for (int i = 0; i < row; ++i) {
+             deltaE[i] = 0 ;
+      }
+
+    for (int j = 0; j < column; ++j) {
+        tempFrec[j] = frequencyExp[j] - frequency[j];
+      }
+
+    double kof = 1.e5;
+//    qDebug() <<"\nkof="<<kof;
 
     for (int i = 0; i < row; ++i) {
        deltaE[i] = 0;
         for (int j = 0; j < column; ++j) {
-            tempFrec = frequencyExp[j] - frequency[j];
-            deltaE[i] += kof * matrix[j][i] * tempFrec ;
+             deltaE[i] += matrix[j][i] * tempFrec[j] * kof ;
         }
     }
 
-//     qDebug() <<"\nmax deltaE="<<max(deltaE,row);
-//     qDebug() <<"\nmin deltaE="<<min(deltaE,row);
+
 
      return deltaE;
 }
 
-double MethodInvMat::Round10 (double value)
+double MethodInvMat::round10 (double value)
 {
     int i = 10;
 
@@ -274,7 +282,7 @@ double MethodInvMat::Round10 (double value)
    return i/10;
 }
 
-double MethodInvMat::max(double* A, int n)
+double MethodInvMat::maxElement(double* A, int n)
 {
 int i;
 double max;
@@ -288,7 +296,7 @@ if ( max < A[i] ) max = A[i];
 return( max );
 }
 
-double MethodInvMat::min(double* A, int n)
+double MethodInvMat::minElement(double* A, int n)
 {
 int i;
 double min;
@@ -300,4 +308,55 @@ if ( min > A[i] ) min = A[i];
 
 
 return( min );
+}
+
+int MethodInvMat::minElementsNumber(double* A, int n)
+{
+    int i;
+    double min;
+    int j = 0;
+
+    min = 1.e30;
+
+    for (i = 0; i < n; i++){
+        if (min > A[i]){
+             min = A[i];
+             j = i;
+        }
+    }
+
+    return(j);
+}
+
+int MethodInvMat::discreteArray(double* arrayIn, int sizeArray, int discrete)
+{
+    double max;
+    double min;
+    double step;
+    double* arrayDiscrete;
+    double* arrayDistance;
+    arrayDiscrete = new double[discrete];
+    arrayDistance = new double[discrete];
+
+    max = maxElement(arrayIn,sizeArray);
+    min = minElement(arrayIn,sizeArray);
+    step = (max - min)/(discrete+1);
+
+    for (int i = 0; i < discrete; ++i){
+        arrayDiscrete[i] = min + step * (i + 1);
+    }
+
+
+    int minNumber;
+
+    for (int i = 0; i < sizeArray; ++i){
+        for (int j = 0; j < discrete; ++j){
+            arrayDistance[j] = abs(arrayDiscrete[j] - arrayIn[i]);
+        }
+        minNumber = minElementsNumber(arrayDistance,discrete);
+        arrayIn[i] = arrayDiscrete[minNumber];
+    }
+
+
+    return 0;
 }

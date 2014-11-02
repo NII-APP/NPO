@@ -20,10 +20,10 @@ int main(int argc, char *argv[])
     //Geometry* theory2 = new Geometry("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.bdf");
     //Geometry* practic = new Geometry("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.unv");
     GeometryForm* form = new GeometryForm;
-    form->readBDF("C:\\Users\\NICK\\Downloads\\model.bdf");
-    form->readF06("C:\\Users\\NICK\\Downloads\\model.f06");
+    form->readBDF("C:\\Users\\samsung\\Desktop\\1\\Model.bdf");
+    form->readF06("C:\\Users\\samsung\\Desktop\\1\\model.f06");
     form->colorizeElements(form->modes().at(4).power());//*/
-//    form->readBDF("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.bdf");
+//    form->readBDF("C:\\Users\\samsung\\Desktop\\1\\Model.bdf");
 //    form->readF06("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.f06");
 
 
@@ -64,9 +64,13 @@ int main(int argc, char *argv[])
 
     MethodInvMat programma;
 
-    programma.GetMatrix(form);
+    double* deltaE;
+    deltaE = new double[form->elements().size()];
 
-    programma.PseudoInversion();
+    programma.getMatrix(form);
+    deltaE = programma.calculateE();
+    qDebug() << "max delta E="<<programma.maxElement(deltaE,form->elements().size());
+
 
 
     return a.exec();
