@@ -13,7 +13,7 @@ private:
     Type type;
     std::vector<double> values;
 
-    static const int VECTOR_SIZES[];
+    //static const int VECTOR_SIZES[];
 public:
     enum MAT1Indexes {
         MAT1_E = 0,
@@ -54,6 +54,7 @@ public:
 public:
 
     Material(Type t);
+    Material(){}
     double& operator[](int where) { return values[where]; }
 };
 

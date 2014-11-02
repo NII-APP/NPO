@@ -246,7 +246,6 @@ bool Geometry::readBDF(const QString &fileName)
             if (materials.size() <= id) {
                 materials.resize(id + 1);
             }
-            materials
         } else {
             ++f;
             qDebug() << "unresolved" << QString::fromStdString(type);
