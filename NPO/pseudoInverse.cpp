@@ -16,6 +16,7 @@ MethodInvMat::MethodInvMat()
 }
 MethodInvMat::~MethodInvMat()
 {}
+
 int MethodInvMat::getMatrix(GeometryForm* model)
 {
    // qDebug() << "create mega matrux";
@@ -57,6 +58,7 @@ int MethodInvMat::getMatrix(GeometryForm* model)
 
     return 0;
 }
+
 int MethodInvMat::Print(double ** matrixIn, int rowIn, int columnIn)
 { //вывод матрицы
     //printf("Output matrix \n");
@@ -71,6 +73,7 @@ int MethodInvMat::Print(double ** matrixIn, int rowIn, int columnIn)
 
     return 0;
 }
+
 int MethodInvMat::DotTranspose(double ** matrixIn)
 {
     //умножение матрицы matrix на транспониранную матрицу matrix
@@ -96,6 +99,7 @@ int MethodInvMat::DotTranspose(double ** matrixIn)
 
             return 0;
 }
+
 int MethodInvMat::Inversion(double** matrix)
 { //получение обратной матрицы методом Жордана-Гаусса
     int N = column;
@@ -327,6 +331,7 @@ int MethodInvMat::minElementsNumber(double* A, int n)
 
     return(j);
 }
+
 
 int MethodInvMat::discreteArray(double* arrayIn, int sizeArray, int discrete)
 {
