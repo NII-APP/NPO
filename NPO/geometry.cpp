@@ -11,6 +11,7 @@
 #include "conio.h"
 #include <QFile>
 #include <QTextStream>
+#include <sstream>
 
 const int Geometry::LOW_POLYGON = 300;
 const unsigned char Geometry::CONST_BLACK[] = { 0x00, 0x00, 0x00 };
@@ -115,6 +116,7 @@ bool Geometry::readBDF(const QString &fileName)
             }
             int m(f.integer() - 1);
             trace[id] = new core::Quad(f.integer(), f.integer(), f.integer(), f.integer());
+            //qDebug() << "C4QUAD set shell id" << m;
             trace[id]->setShell(m);
             f.skipRow();
         } else if (type == "CTETRA") {
@@ -194,7 +196,11 @@ bool Geometry::readBDF(const QString &fileName)
             int id(f.integer());
             if (shells.size() <= id)
                 shells.resize(id + 1);
-            shells[id] = Shell(id, f.integer(), f.real(), f.integer(), f.integer());
+            int matId = f.integer();
+            int width = f.real();
+            int anyOther = f.integer();
+            int someOneElse = f.integer();
+            shells[id] = Shell(id, matId, width, anyOther, someOneElse);
             f.skipRow();
         } else if (type == "CORD2R") {
             f += 1;
@@ -245,6 +251,16 @@ bool Geometry::readBDF(const QString &fileName)
             int id(f.integer());
             if (materials.size() <= id) {
                 materials.resize(id + 1);
+            }
+            int number(0);
+            materials[id] = Material(Material::MAT1);
+            while (*f == '*' || *f == ' ') {
+                f += *f == '*';
+                while (*f != '\n' && *f != '\r') {
+                    materials[id][number] = f.real();
+                    ++number;
+                }
+                f.skipRow();
             }
         } else {
             ++f;
@@ -433,7 +449,17 @@ void Geometry::colorize(const CGL::CArray &v, const QString& mes)
 
 void Geometry::colorizeFromArray(const CGL::CArray& v) {
 
-    const CGL::RealRange range(v.estimateRange());
+    CGL::RealRange range(v.estimateRange());
+
+    if (range.getMin() == range.getMax()) {
+        if (range.getMin() == 0.0) {
+            range = CGL::RealRange(-1.0, 1.0);
+        } else {
+            range.setMax(range.getMax() * 1.1);
+            range.setMin(range.getMin() * 0.9);
+        }
+    }
+
     const float minV(range.getMin());
     const float height(range.range());
     const float heightp2(height / 2.0f);
@@ -446,7 +472,9 @@ void Geometry::colorizeFromArray(const CGL::CArray& v) {
     {
         const float z(*it - minV);
         unsigned char r, g, b;
-        if (z <= 0) {
+        if (z != z) {
+            r = g = b = 0;
+        } else if (z <= 0) {
             r = g = 0;
             b = 255;
         } else if (z >= height) {
@@ -476,6 +504,24 @@ void Geometry::colorizeElements(const CGL::CArray &v, const QString& mes) {
 
     colorizeFromArray(v);
 }
+CGL::CArray Geometry::extractElasticityModulus() {
+    CGL::CArray elasticyModulus(trace.size());
+
+    std::clog << "colorize to elasticity modulus. Whall size:" << elasticyModulus.size();
+    for (int i = 0; i != elasticyModulus.size(); ++i) {
+        if (trace.at(i)) {
+            if (trace[i]->getShell() >= shells.size()) {
+                //qDebug() << shells.size() << "is shell size end less then" << trace[i]->getShell() << trace[i]->type();
+            } else if (materials.size() <= shells[trace[i]->getShell()].getMatId()) {
+                //qDebug() << materials.size() << "is matherial size and it's less then" << shells[trace[i]->getShell()].getMatId() << trace[i]->type();
+            } else {
+                elasticyModulus[i] = materials[shells[trace[i]->getShell()].getMatId()][Material::MAT1_E];
+            }
+        }
+    }
+    return elasticyModulus;
+}
+
 void Geometry::colorize(const CGL::CVertexes &v, const QString& mes)
 {
     std::clog << "vector colorize";
@@ -485,7 +531,17 @@ void Geometry::colorize(const CGL::CVertexes &v, const QString& mes)
     }
     measurment = mes;
 
-    const CGL::RealRange range(v.estimateRange());
+    CGL::RealRange range(v.estimateRange());
+
+    if (range.getMin() == range.getMax()) {
+        if (range.getMin() == 0.0) {
+            range = CGL::RealRange(-1.0, 1.0);
+        } else {
+            range.setMax(range.getMax() * 1.1);
+            range.setMin(range.getMin() * 0.9);
+        }
+    }
+
     const float minV(range.getMin());
     const float height(range.range());
     const float heightp2(height / 2.0f);
@@ -652,4 +708,52 @@ std::vector<int> Geometry::truncationIndexVector(const Geometry& a, const Geomet
     }
 
     return numbers;
+}
+
+
+void Geometry::layToBDF(const QString& source, const QString& dest)
+{
+    QFile base(source);
+    if (!base.open(QFile::ReadOnly | QFile::Text)) {
+        qWarning() << "can't open file" << source << "to use it as a base of bdf propagation";
+        return;
+    }
+    QByteArray data(base.readAll().append('\0'));
+    CGL::CParse f(data.data());
+    char* begin(f.data());
+
+
+    while (!f.testPrew("ENDDATA")) {
+        std::string type(f.word());
+        if (type == "CQUAD4"
+         || type == "CTRIA3"
+         || type == "CTETRA"
+         || type == "CHEXA") {
+            char* write(f.data() + 10 + (type == "CHEXA"));
+            int i(f.integer());
+            int shellId(rand());
+            std::stringstream convertor;
+            convertor << shellId;
+            std::string buf(convertor.str());
+            const char* m(buf.c_str());
+            while (*m) {
+                *write = *m;
+                ++m;
+                ++write;
+            }
+            //qDebug() << "eeee" << i << QString::fromStdString(buf) <<  QString::fromStdString(CGL::Parse(write).string());
+        } else if (type == "$") {
+            f.skipRow();
+        } else {
+            ++f;
+            f.skipRow();
+        }
+    }
+
+    QFile result(dest);
+    if (!result.open(QFile::WriteOnly | QFile::Text)) {
+        qWarning() << "can't open file" << source << "to write changed bdf data";
+        return;
+    }
+    result.write(begin);
 }

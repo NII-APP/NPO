@@ -9,6 +9,7 @@
 #include "geometrypair.h"
 #include "relationdialog.h"
 #include "pseudoInverse.h"
+#include <QThread>
 
 int main(int argc, char *argv[])
 {
@@ -25,6 +26,8 @@ int main(int argc, char *argv[])
     form->colorizeElements(form->modes().at(4).power());//*/
 //    form->readBDF("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.bdf");
 //    form->readF06("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.f06");
+
+    form->colorizeElements(form->extractElasticityModulus());
 
 
     GeometryWidget w;
@@ -45,10 +48,10 @@ int main(int argc, char *argv[])
     w2.setModel(form2);
     w2.show();//*/
 
-    //*
+    /*
     GeometryForm* form2 = new GeometryForm;
     form2->readUNV("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.unv");
-    form2->readTXT("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.txt");
+    form2->readTXT("C:\\Users\\NICK\\Downloads\\VVU developement\\Data\\METEORIT.txt");*/
 
 //    GeometryPair pair(form, form2);
 
@@ -62,11 +65,38 @@ int main(int argc, char *argv[])
 
 //    w.show();
 
+
+    QEventLoop loop;
+    QTimer t;
+    t.setInterval(2000);
+    loop.connect(&t, SIGNAL(timeout()), SLOT(quit()));
+    t.start();
+    loop.exec();
+
     MethodInvMat programma;
 
     programma.GetMatrix(form);
 
     programma.PseudoInversion();
+
+    CGL::CArray dE(programma.calculateE());
+
+    form->colorizeElements(dE);
+
+    form->layToBDF("C:\\Users\\NICK\\Downloads\\model.bdf", "C:\\Users\\NICK\\Downloads\\modified model.bdf");
+
+
+
+    QEventLoop loop;
+    QTimer t;
+    t.setInterval(2000);
+    loop.connect(&t, SIGNAL(timeout()), SLOT(quit()));
+    t.start();
+    loop.exec();
+
+
+
+
 
 
     return a.exec();

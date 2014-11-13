@@ -18,6 +18,7 @@ MethodInvMat::~MethodInvMat()
 {}
 int MethodInvMat::GetMatrix(GeometryForm* model)
 {
+    CGL::CArray elasticy(model->extractElasticityModulus());
    // qDebug() << "create mega matrux";
     int sizeElem = model->elements().size();
     int sizeMode = model->modes().size();
@@ -43,7 +44,7 @@ int MethodInvMat::GetMatrix(GeometryForm* model)
 
     for (int i = 0; i < sizeElem; ++i) {
         for (int j = 0; j < sizeMode; ++j) {
-            matrix[j][i] =  forms[j].power()[i];
+            matrix[j][i] =  forms[j].power()[i] / (elasticy[i] ? elasticy[i] : 1.0);
         }
     }
 
@@ -237,12 +238,12 @@ int MethodInvMat::PseudoInversion()
     return 0;
 }
 
-double* MethodInvMat::calculateE()
+CGL::CArray MethodInvMat::calculateE()
 {
     deltaE = new double[row];
     double tempFrec;
 
-    double kof = 10^6;
+    double kof = 100;
 
     for (int i = 0; i < row; ++i) {
        deltaE[i] = 0;
@@ -252,10 +253,11 @@ double* MethodInvMat::calculateE()
         }
     }
 
-//     qDebug() <<"\nmax deltaE="<<max(deltaE,row);
-//     qDebug() <<"\nmin deltaE="<<min(deltaE,row);
+    CGL::CArray result(deltaE, row);
 
-     return deltaE;
+    qDebug() << result.estimateRange();
+
+    return result;
 }
 
 double MethodInvMat::Round10 (double value)

@@ -16,14 +16,14 @@ public:
     double Round10 (double value);
     int MethodInvMat::GetMatrix(GeometryForm *form);
 
-private:
+public:
     int MethodInvMat::clear0();
     int Det(double **matrixIn, int N);
     int Print(double ** matrixIn, int rowIn, int columnIn);
     int Inversion(double **matrixIn);
     int DotTranspose(double **);
     int Dot(double ** A, double ** B);
-    double* calculateE();
+    CGL::CArray calculateE();
     double max(double* A, int n);
     double min(double* A, int n);
     double ** matrix;
