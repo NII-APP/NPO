@@ -14,6 +14,8 @@ public:
 
     RealRange estimateRange() const;
     IndexRange estimateRangeIndex() const;
+
+    void grade(int count);
 };
 
 }

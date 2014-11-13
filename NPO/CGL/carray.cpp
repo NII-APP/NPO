@@ -44,5 +44,18 @@ RealRange CArray::estimateRange() const {
 }
 
 
+void CArray::grade(int count) {
+    RealRange range(estimateRange());
+    double h(range.range());
+    double step = h / count;
+    for (CArray::iterator i(this->begin()), end(this->end()); i != end; ++i) {
+        int bin((*i - range.getMin()) / step);
+        if (bin == count) {
+            --bin;
+        }
+        *i = range.getMin() + step / 2. + bin * step;
+    }
+}
+
 
 }

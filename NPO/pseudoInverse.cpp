@@ -299,3 +299,46 @@ if ( min > A[i] ) min = A[i];
 
 return( min );
 }
+
+
+int MethodInvMat::minElementsNumber(double* A, int n)
+{
+    int i;
+    double min;
+    int j = 0;
+    min = 1.e30;
+    for (i = 0; i < n; i++){
+        if (min > A[i]){
+            min = A[i];
+            j = i;
+        }
+    }
+    return(j);
+}
+
+int MethodInvMat::discreteArray(double* arrayIn, int sizeArray, int discrete)
+{
+    double max;
+    double min;
+    double step;
+    double* arrayDiscrete;
+    double* arrayDistance;
+    arrayDiscrete = new double[discrete];
+    arrayDistance = new double[discrete];
+    CGL::IndexRange range(CGL::CArray(arrayIn, sizeArray).estimateRangeIndex());
+    max = range.getMax();
+    min = range.getMin();
+    step = (max - min)/(discrete+1);
+    for (int i = 0; i < discrete; ++i) {
+        arrayDiscrete[i] = min + step * (i + 1);
+    }
+    int minNumber;
+    for (int i = 0; i < sizeArray; ++i) {
+        for (int j = 0; j < discrete; ++j) {
+            arrayDistance[j] = abs(arrayDiscrete[j] - arrayIn[i]);
+        }
+        minNumber = minElementsNumber(arrayDistance,discrete);
+        arrayIn[i] = arrayDiscrete[minNumber];
+    }
+    return 0;
+}

@@ -10,6 +10,7 @@
 #include "relationdialog.h"
 #include "pseudoInverse.h"
 #include <QThread>
+#include <QPalette>
 
 int main(int argc, char *argv[])
 {
@@ -29,9 +30,11 @@ int main(int argc, char *argv[])
 
     form->colorizeElements(form->extractElasticityModulus());
 
-
     GeometryWidget w;
     w.setModel(form);
+    QPalette p(w.palette());
+    p.setColor(QPalette::Background, Qt::white);
+    w.setPalette(p);
     w.show();
 
     /*
@@ -65,13 +68,14 @@ int main(int argc, char *argv[])
 
 //    w.show();
 
-
-    QEventLoop loop;
-    QTimer t;
-    t.setInterval(2000);
-    loop.connect(&t, SIGNAL(timeout()), SLOT(quit()));
-    t.start();
-    loop.exec();
+    {
+        QEventLoop loop;
+        QTimer t;
+        t.setInterval(60000);
+        loop.connect(&t, SIGNAL(timeout()), SLOT(quit()));
+        t.start();
+        loop.exec();
+    }
 
     MethodInvMat programma;
 
@@ -82,21 +86,26 @@ int main(int argc, char *argv[])
     CGL::CArray dE(programma.calculateE());
 
     form->colorizeElements(dE);
+    w.repaint();
 
     form->layToBDF("C:\\Users\\NICK\\Downloads\\model.bdf", "C:\\Users\\NICK\\Downloads\\modified model.bdf");
 
 
+    {
+        QEventLoop loop;
+        QTimer t;
+        t.setInterval(60000);
+        loop.connect(&t, SIGNAL(timeout()), SLOT(quit()));
+        t.start();
+        loop.exec();
+    }
 
-    QEventLoop loop;
-    QTimer t;
-    t.setInterval(2000);
-    loop.connect(&t, SIGNAL(timeout()), SLOT(quit()));
-    t.start();
-    loop.exec();
 
 
+    dE.grade(4);
 
-
+    form->colorizeElements(dE);
+    w.repaint();
 
 
     return a.exec();

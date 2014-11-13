@@ -10,14 +10,16 @@ using namespace std;
 class MethodInvMat
 {
 public:
+    int discreteArray(double* arrayIn, int sizeArray, int discrete);
+    int minElementsNumber(double* A, int n);
     MethodInvMat();
     ~MethodInvMat();
     int PseudoInversion();
     double Round10 (double value);
-    int MethodInvMat::GetMatrix(GeometryForm *form);
+    int GetMatrix(GeometryForm *form);
 
 public:
-    int MethodInvMat::clear0();
+    int clear0();
     int Det(double **matrixIn, int N);
     int Print(double ** matrixIn, int rowIn, int columnIn);
     int Inversion(double **matrixIn);
