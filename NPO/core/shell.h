@@ -2,14 +2,15 @@
 #define SHELL_H
 #include <vector>
 class QDataStream;
+class QByteArray;
 
 namespace core {
 
 class Shell
 {
-    int a;
-    int b;
-    float c;
+    int id;
+    int matherialId;
+    float width;
     int d;
     int e;
 public:
@@ -18,7 +19,11 @@ public:
     friend QDataStream& operator >> (QDataStream&, Shell&);
     friend QDataStream& operator << (QDataStream&, const Shell&);
 
-    float getFloat() const { return c; }
+    int getMatId() const { return matherialId; }
+
+
+
+    QByteArray provideShell() const;
 };
 QDataStream& operator >> (QDataStream&, Shell&);
 QDataStream& operator << (QDataStream&, const Shell&);

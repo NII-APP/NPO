@@ -1,6 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 #include <vector>
+#include <QDebug>
 
 class Material
 {
@@ -51,11 +52,10 @@ public:
 
         MAT9_IndexesCount = 18
     };
-public:
 
     Material(Type t);
     Material(){}
-    double& operator[](int where) { return values[where]; }
+    double& operator[](int where) { if (values.size() <= where) { values.resize(where + 1, 0.0); } return values[where]; }
 };
 
 #endif // MATERIAL_H

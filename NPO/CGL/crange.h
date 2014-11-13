@@ -3,7 +3,7 @@
 
 #include <QPair>
 #include <limits>
-
+#include <QDebug>
 
 namespace CGL {
 
@@ -28,6 +28,11 @@ public:
         this->second = std::max(v, this->second);
     }
 };
+template <typename T> QDebug operator<<(QDebug out, const CRange<T>& r) {
+    return out << '{' << r.getMin() << ',' << r.getMax() << '}';
+}
+
+
 typedef CRange<double> RealRange;
 typedef CRange<int> IndexRange;
 
