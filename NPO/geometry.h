@@ -91,6 +91,7 @@ public:
     //reading that formsts
     bool readBDF(const QString &fileName);
     bool readUNV(const QString &fileName);
+    void layToBDF(const QString& source, const QString& dest);
 
     //estimate colors value as form interpolation in range [red : green : blue]
     void colorize(const CGL::CVertexes& v, const QString& mes = "");
@@ -134,6 +135,7 @@ public:
     static Geometry* composition(const Geometry &, const Geometry &);
     //truncate hi-vertexes geometry to low-vertexes
     static std::vector<int> truncationIndexVector(const Geometry& from, const Geometry& to);
+    CGL::CArray extractElasticityModulus();
 };
 
 QDataStream& operator << (QDataStream& out, const Geometry& g);

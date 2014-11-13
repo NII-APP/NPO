@@ -18,7 +18,7 @@ GeometryWidget::GeometryWidget(QWidget *parent, QGLWidget *shareWidget, Qt::Wind
     this->connect(animationAction, SIGNAL(triggered()), SLOT(triggerAnimation()));
     animationAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_P));
     animationAction->setCheckable(true);
-    animationAction->setChecked(false);
+    animationAction->setChecked(true);
     this->menu->addAction(animationAction);
 
     pauseAction = new QAction(tr("pause animation"), this);

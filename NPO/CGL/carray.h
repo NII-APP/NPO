@@ -10,6 +10,8 @@ class CArray : public std::vector<double>
 public:
     CArray(int size = 0, double val = 0.0f);
 
+    CArray(double* data, int size);
+
     RealRange estimateRange() const;
     IndexRange estimateRangeIndex() const;
 };
