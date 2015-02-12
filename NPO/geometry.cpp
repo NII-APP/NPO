@@ -12,6 +12,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <sstream>
+#include <cassert>
 
 const int Geometry::LOW_POLYGON = 300;
 const unsigned char Geometry::CONST_BLACK[] = { 0x00, 0x00, 0x00 };
@@ -114,7 +115,7 @@ bool Geometry::readBDF(const QString &fileName)
             if (trace.size() <= id) {
                 trace.resize(id + 100, 0);
             }
-            int m(f.integer() - 1);
+            int m(f.integer());
             trace[id] = new core::Quad(f.integer(), f.integer(), f.integer(), f.integer());
             //qDebug() << "C4QUAD set shell id" << m;
             trace[id]->setShell(m);
@@ -124,7 +125,8 @@ bool Geometry::readBDF(const QString &fileName)
             if (trace.size() <= id) {
                 trace.resize(id + 100, 0);
             }
-            int m(f.integer() - 1);
+            int m(f.integer());
+            qDebug() << m;
             trace[id] = new core::Tetra(f.integer(), f.integer(), f.integer(), f.integer());
             trace[id]->setShell(m);
             f.skipRow();
@@ -133,7 +135,8 @@ bool Geometry::readBDF(const QString &fileName)
             if (trace.size() <= id) {
                 trace.resize(id + 100, 0);
             }
-            int m(f.integer() - 1);
+            int m(f.integer());
+            qDebug() << m;
             trace[id] = new core::Tria(f.integer(), f.integer(), f.integer());
             trace[id]->setShell(m);
             f.skipRow();
@@ -142,7 +145,8 @@ bool Geometry::readBDF(const QString &fileName)
             if (trace.size() <= id) {
                 trace.resize(id + 100, 0);
             }
-            int m(f.integer() - 1);
+            int m(f.integer());
+            qDebug() << m;
             trace[id] = new core::Hexa(f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer());
             trace[id]->setShell(m);
             f.skipRow();
@@ -262,6 +266,7 @@ bool Geometry::readBDF(const QString &fileName)
                 }
                 f.skipRow();
             }
+            qDebug() << "MAT1_E:" << materials[id][Material::MAT1_E] << id;
         } else {
             ++f;
             qDebug() << "unresolved" << QString::fromStdString(type);
@@ -711,8 +716,40 @@ std::vector<int> Geometry::truncationIndexVector(const Geometry& a, const Geomet
 }
 
 
-void Geometry::layToBDF(const QString& source, const QString& dest)
+void Geometry::layToBDF(const QString& source, const QString& dest, const CGL::CArray& dE, const int difference)
 {
+    Materials newMat;
+    newMat.resize(difference, materials.at(1));
+
+    std::map<CGL::CArray::value_type, int> find;
+
+    int k(0);
+    for (int i(0); i != dE.size(); ++i) {
+        if (find.find(dE.at(i)) == find.end()) {
+            find[dE.at(i)] = k;
+            qDebug() << newMat[k][Material::MAT1_E] << '+' << dE.at(i);
+            newMat[k][Material::MAT1_E] += dE.at(i);
+            newMat[k][Material::MAT1_E] = fabs(newMat[k][Material::MAT1_E]);
+            newMat[k][Material::MAT1_G] = newMat[k][Material::MAT1_E] / 2.0 / (1.0 + newMat[k][Material::MAT1_NU]);
+            qDebug() << newMat[k][Material::MAT1_G] << newMat[k][Material::MAT1_E] << (1.0 + newMat[k][Material::MAT1_NU]);
+            qDebug() << '\t' << '=' << newMat[k][Material::MAT1_E];
+            ++k;
+        }
+    }
+    if (k != difference) {
+        qDebug() << "\nsome dE wasn't found in array" << k << difference;
+    }
+
+    Shells newShell(shells.size() * newMat.size());
+    for (int i(0); i != newMat.size(); ++i) {
+        for (int j(0); j != shells.size(); ++j) {
+            newShell[i * shells.size() + j] = shells[j];
+            newShell[i * shells.size() + j].setMatId(i);
+        }
+    }
+    QBitArray isUsed(newShell.size());
+
+
     QFile base(source);
     if (!base.open(QFile::ReadOnly | QFile::Text)) {
         qWarning() << "can't open file" << source << "to use it as a base of bdf propagation";
@@ -723,17 +760,24 @@ void Geometry::layToBDF(const QString& source, const QString& dest)
     char* begin(f.data());
 
 
+    std::vector<std::string> shellStrings(shells.size());
+    std::vector<int> usedId;
+
+
     while (!f.testPrew("ENDDATA")) {
         std::string type(f.word());
         if (type == "CQUAD4"
-         || type == "CTRIA3"
-         || type == "CTETRA"
-         || type == "CHEXA") {
+         || type == "CTRIA3") {
             char* write(f.data() + 10 + (type == "CHEXA"));
             int i(f.integer());
-            int shellId(rand());
+            int shellId(trace.at(i)->getShell() + shells.size() * find[dE.at(i)]);
+            if (std::find(usedId.begin(), usedId.end(), shellId) == usedId.end()) {
+                usedId.push_back(shellId);
+                qDebug() << "push shell" << shellId << trace.at(i)->getShell() << find[dE.at(i)] << (shellId % shells.size()) << isUsed.size();
+                isUsed.setBit(shellId);
+            }
             std::stringstream convertor;
-            convertor << shellId;
+            convertor << shellId + shells.size();
             std::string buf(convertor.str());
             const char* m(buf.c_str());
             while (*m) {
@@ -741,14 +785,117 @@ void Geometry::layToBDF(const QString& source, const QString& dest)
                 ++m;
                 ++write;
             }
+            //isUsed[shellId + shells.size() *
             //qDebug() << "eeee" << i << QString::fromStdString(buf) <<  QString::fromStdString(CGL::Parse(write).string());
-        } else if (type == "$") {
-            f.skipRow();
+        } else if (type == "PSHELL") {
+            int id(CGL::Parse(f).integer());
+            qDebug() << "founded id" << id;
+            shellStrings[id] = type + ' ' + f.string() + '\n';
+            qDebug() << shellStrings.size() << id << "shell id occur";
         } else {
             ++f;
             f.skipRow();
         }
     }
+    qDebug() << "Hello)))" << data.at(f - data.data());
+    QString newString;
+    for (int i(0); i != newMat.size(); ++i) {
+        std::stringstream buf;
+        buf << newMat[i][Material::MAT1_E];
+        qDebug() << QString::fromStdString(buf.str());
+        std::string s1("MAT1*    1              2.+11           7.69231+10      .3\n");
+        static const std::string s2("*       7800.\n");
+        static const int where(24);
+        std::string num(buf.str());
+        for (int i(0); i != num.size(); ++i) {
+            s1[i + where] = num[i];
+        }
+        static const int whereG(40);
+        std::stringstream bufG;
+        bufG << newMat[i][Material::MAT1_G];
+        std::string numG(bufG.str());
+        for (int i(0); i != numG.size(); ++i) {
+            s1[i + whereG] = numG[i];
+        }
+        static const int whereId(9);
+        std::stringstream bufId;
+        bufId << i + materials.size() + 1;
+        std::string numId(bufId.str());
+        for (int i(0); i != numId.size(); ++i) {
+            s1[i + whereId] = numId[i];
+        }
+        newString += QString::fromStdString(s1);
+        newString += QString::fromStdString(s2);
+    }
+    int WWW(0);
+    for (int it(0); it != usedId.size(); ++it) {
+        int matrixId(usedId[it]);
+        int i(matrixId / shells.size());
+        int j(matrixId % shells.size());
+
+        //qDebug() << WWW++ << i << j << matrixId;
+        int id(usedId[it] + shells.size());
+        std::string data = shellStrings[j];
+        if (!data.empty()) {
+            std::stringstream bufId;
+            //qDebug() << WWW++;
+            bufId << id;
+            std::string idNum(bufId.str());
+            static const int whereId(9);
+            //qDebug() << WWW++;
+            for (int k(0); k != idNum.size(); ++k) {
+                data[k + whereId] = idNum[k];
+            }
+            std::stringstream buf;
+            buf << i + 1;
+            //qDebug() << WWW++;
+            std::string num(buf.str());
+            static const int where(17);
+            //qDebug() << WWW++ << num.size();
+            for (int k(0); k != num.size(); ++k) {
+                data[k + where] = num[k];
+            }
+            newString = newString + QString::fromStdString(data);
+            qDebug() << WWW++ << QString::fromStdString(data) << '\n';
+        } else {
+            qDebug() << "shellStrings[" << j << "] is wrong" << usedId[it];
+        }
+    }
+    /*
+    for (int i(0); i != newMat.size(); ++i) {
+        for (int j(0); j != shells.size(); ++j) {
+            if (isUsed.testBit(i * shells.size() + j)) {
+                qDebug() << WWW++ << i << j;
+                int id(i * shells.size() + j + shells.size());
+                std::string data = shellStrings[j];
+                std::stringstream bufId;
+                qDebug() << WWW++;
+                bufId << id;
+                std::string idNum(bufId.str());
+                static const int whereId(9);
+                qDebug() << WWW++;
+                for (int k(0); k != idNum.size(); ++k) {
+                    data[k + whereId] = idNum[k];
+                }
+                std::stringstream buf;
+                buf << i;
+                qDebug() << WWW++;
+                std::string num(buf.str());
+                static const int where(17);
+                qDebug() << WWW++ << num.size();
+                for (int k(0); k != num.size(); ++k) {
+                    data[k + where] = num[k];
+                }
+                newString += QString::fromStdString(data);
+                qDebug() << WWW++ << QString::fromStdString(data);
+            }
+        }
+    }//*/
+    qDebug() << newString;
+
+    data.insert(f - data.data(), newString);
+
+
 
     QFile result(dest);
     if (!result.open(QFile::WriteOnly | QFile::Text)) {

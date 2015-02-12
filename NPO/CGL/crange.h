@@ -28,6 +28,7 @@ public:
         this->second = std::max(v, this->second);
     }
 };
+
 template <typename T> QDebug operator<<(QDebug out, const CRange<T>& r) {
     return out << '{' << r.getMin() << ',' << r.getMax() << '}';
 }

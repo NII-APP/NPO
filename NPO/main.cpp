@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     {
         QEventLoop loop;
         QTimer t;
-        t.setInterval(60000);
+        t.setInterval(20000);
         loop.connect(&t, SIGNAL(timeout()), SLOT(quit()));
         t.start();
         loop.exec();
@@ -88,24 +88,27 @@ int main(int argc, char *argv[])
     form->colorizeElements(dE);
     w.repaint();
 
-    form->layToBDF("C:\\Users\\NICK\\Downloads\\model.bdf", "C:\\Users\\NICK\\Downloads\\modified model.bdf");
-
 
     {
         QEventLoop loop;
         QTimer t;
-        t.setInterval(60000);
+        t.setInterval(20000);
         loop.connect(&t, SIGNAL(timeout()), SLOT(quit()));
         t.start();
         loop.exec();
     }
 
 
+    static const int separateCoefficient(8);
 
-    dE.grade(4);
+    dE.grade(separateCoefficient);
 
     form->colorizeElements(dE);
     w.repaint();
+
+    Geometry* cnt = new Geometry;
+    cnt->readBDF("C:\\Users\\NICK\\Desktop\\NPO_Stage_2\\model.bdf");
+    //cnt->layToBDF("C:\\Users\\NICK\\Downloads\\model.bdf", "C:\\Users\\NICK\\Downloads\\modified model.bdf", dE, separateCoefficient);
 
 
     return a.exec();

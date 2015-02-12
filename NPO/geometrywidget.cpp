@@ -1,5 +1,6 @@
 #include "geometrywidget.h"
 #include "geometry.h"
+#include <cassert>
 
 GeometryWidget::GeometryWidget(QWidget *parent, QGLWidget *shareWidget, Qt::WindowFlags f)
     : CGLWidget(parent, shareWidget, f)
@@ -18,7 +19,7 @@ GeometryWidget::GeometryWidget(QWidget *parent, QGLWidget *shareWidget, Qt::Wind
     this->connect(animationAction, SIGNAL(triggered()), SLOT(triggerAnimation()));
     animationAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_P));
     animationAction->setCheckable(true);
-    animationAction->setChecked(true);
+    animationAction->setChecked(false);
     this->menu->addAction(animationAction);
 
     pauseAction = new QAction(tr("pause animation"), this);
@@ -38,7 +39,7 @@ GeometryWidget::GeometryWidget(QWidget *parent, QGLWidget *shareWidget, Qt::Wind
     this->menu->addAction(tr("next mode"),           this, SLOT(formIncr()), QKeySequence(Qt::Key_K));
 
     this->menu->addSeparator();
-    netAction = new QAction(tr("net"), this);
+    netAction = new QAction(tr("mesh"), this);
     this->connect(netAction, SIGNAL(triggered()), SLOT(triggerNet()));
     netAction->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_N));
     netAction->setCheckable(true);
@@ -103,6 +104,7 @@ void GeometryWidget::paintCGL()
         glDisableClientState(GL_NORMAL_ARRAY);
         summator->setUniformValue("k", 0.0f);
     }
+    glEnableClientState(GL_NORMAL_ARRAY);
     data->render();
     if (netAction->isChecked()) {
         data->renderNet();
@@ -137,9 +139,11 @@ void GeometryWidget::initializeCGL()
     summator = new QOpenGLShaderProgram(this);
     if (!summator->addShaderFromSourceFile(QOpenGLShader::Vertex, ":codes/summator.vert")) {
         qWarning() << "compile impossible";
+        assert(false);
     }
     if (!summator->bind()) {
         qWarning() << "wasn't binded";
+        assert(false);
     }
     this->startTimer(10);
 }

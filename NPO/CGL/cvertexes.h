@@ -15,6 +15,8 @@ public:
     QVector3D& operator () (int p);
     size_t length() const { return size() / 3; }
 
+    ~CVertexes() {}
+
 
     RealRange estimateRange() const;
     IndexRange estimateRangeIndex() const;

@@ -201,7 +201,7 @@ std::string CParse::string()
 }
 std::string CParse::word()
 {
-    while( *d == ' ' || *d == '\t' || *d == '\n')
+    while ( *d == ' ' || *d == '\t' || *d == '\n')
         ++d;
     char* start = d;
 

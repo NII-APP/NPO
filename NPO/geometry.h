@@ -59,7 +59,8 @@ private:
     //list of shells
     Shells shells;
     //map of matherials
-    std::vector<Material> materials;
+    typedef std::vector<Material> Materials;
+    Materials materials;
 
     void estimateTraced();
     void estimateBox();
@@ -91,7 +92,7 @@ public:
     //reading that formsts
     bool readBDF(const QString &fileName);
     bool readUNV(const QString &fileName);
-    void layToBDF(const QString& source, const QString& dest);
+    void layToBDF(const QString& source, const QString& dest, const CGL::CArray &dE, const int difference);
 
     //estimate colors value as form interpolation in range [red : green : blue]
     void colorize(const CGL::CVertexes& v, const QString& mes = "");

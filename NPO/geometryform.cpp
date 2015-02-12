@@ -48,9 +48,6 @@ void GeometryForm::readTXT(const QString &fileName)
     CGL::CParse f(fileArray.data());
     //parse::UNIXRowSymbol(f);
 
-
-    std::clog << "Файл считан" << std::endl;
-
     QString head(QString::fromStdString(f.string()));
 
     QRegExp numbers("[\\+,\\-]?\\d+\\.?\\d*([e,E]?[\\+,\\-]?\\d+)?");

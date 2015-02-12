@@ -6,6 +6,7 @@
 #include "tetra.h"
 #include "tria.h"
 #include <QDebug>
+#include <cassert>
 
 namespace core {
 

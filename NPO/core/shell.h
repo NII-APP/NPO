@@ -20,6 +20,7 @@ public:
     friend QDataStream& operator << (QDataStream&, const Shell&);
 
     int getMatId() const { return matherialId; }
+    void setMatId(int i) { matherialId = i; }
 
 
 

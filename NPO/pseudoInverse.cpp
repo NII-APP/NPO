@@ -6,7 +6,7 @@
 #include "CGL/cgl.h"
 using namespace std;
 
-
+#include "QDebug"
 
 
 
@@ -243,7 +243,7 @@ CGL::CArray MethodInvMat::calculateE()
     deltaE = new double[row];
     double tempFrec;
 
-    double kof = 100;
+    double kof = 5000;
 
     for (int i = 0; i < row; ++i) {
        deltaE[i] = 0;
