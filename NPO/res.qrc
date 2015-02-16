@@ -6,4 +6,7 @@
         <file>images/togleOff.png</file>
         <file>images/togleOn.png</file>
     </qresource>
+    <qresource prefix="/css" lang="css">
+        <file>css.css</file>
+    </qresource>
 </RCC>
