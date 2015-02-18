@@ -6,13 +6,12 @@
 
 Application::Application(int argc, char** argv)
     : QApplication(argc, argv)
+    , self(new Identity)
+    , pro(new Project)
 {
     QFile css(":/css/css.css");
     css.open(QFile::ReadOnly);
     this->setStyleSheet(QString(css.readAll()));
-
-    self = new Identity;
-    pro = new Project;
 }
 
 Application::~Application()

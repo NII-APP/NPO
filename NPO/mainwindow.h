@@ -3,11 +3,14 @@
 
 #include <QMainWindow>
 
+class QSplitter;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
 signals:

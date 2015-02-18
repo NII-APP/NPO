@@ -1,0 +1,19 @@
+{
+    "language": "rus",
+    "file menu" : {
+        "rus" : "Файл",
+        "eng" : "File",
+        "items" : [
+            {
+                "rus" : "Открыть проект",
+                "eng" : "Open project",
+                "hootkey" : "ctrl+o"
+            },
+            {
+                "rus" : "Импортировать модель",
+                "eng" : "Model import",
+                "hootkey" : "ctrl+i"
+            }
+        ]
+    }
+}

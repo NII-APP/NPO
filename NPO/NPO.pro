@@ -51,7 +51,8 @@ SOURCES += main.cpp \
     application.cpp \
     identity.cpp \
     project.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    geometriesmodel.cpp
 
 HEADERS += \
     engine/animationoptions.h \
@@ -91,7 +92,8 @@ HEADERS += \
     application.h \
     identity.h \
     project.h \
-    mainwindow.h
+    mainwindow.h \
+    geometriesmodel.h
 
 OTHER_FILES += \
     summator.vert
@@ -100,4 +102,5 @@ RESOURCES += \
     res.qrc
 
 DISTFILES += \
-    css.css
+    css.css \
+    main.json

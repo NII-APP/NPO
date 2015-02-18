@@ -7,11 +7,20 @@
  * when this widget developed without any dependence of this application.
  */
 
+#include <QJsonObject>
+
 class Identity
 {
+    const QJsonObject configuration;
+
+    static const QJsonObject readConfig();
 public:
     Identity();
     ~Identity();
+
+    const QJsonObject& config() const { return configuration; }
+
+
 };
 
 #endif // IDENTITY_H
