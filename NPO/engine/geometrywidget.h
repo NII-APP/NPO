@@ -3,6 +3,7 @@
 #include "CGL/cglwidget.h"
 #include "geometryform.h"
 #include "animationoptions.h"
+#include <functional>
 #include <QOpenGLShaderProgram>
 class QAction;
 class Geometry;
@@ -26,6 +27,10 @@ class GeometryWidget : public CGLWidget
 
     QOpenGLShaderProgram* summator;
 
+    //experemental function-style programing
+    typedef std::function<void(GeometryWidget*)> VoidFunction;
+    VoidFunction paintDisable;
+
     void paintCGL();
     void initializeCGL();
     void timerEvent(QTimerEvent *);
@@ -42,6 +47,8 @@ public:
     void setModel(const GeometryForm&);
     void setForm(int f);
     int getForm() const { return form; }
+
+    void setDisablePaintFunction(VoidFunction);
 
 public slots:
     //animation properties access

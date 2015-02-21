@@ -5,8 +5,9 @@
     <qresource prefix="/media">
         <file>images/togleOff.png</file>
         <file>images/togleOn.png</file>
+        <file>images/hill.png</file>
     </qresource>
-    <qresource lang="css" prefix="/css">
+    <qresource prefix="/css" lang="css">
         <file>css.css</file>
     </qresource>
     <qresource prefix="/json">

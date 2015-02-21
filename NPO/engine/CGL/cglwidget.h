@@ -31,7 +31,6 @@ protected:
     void safelyUpdate() { update(); }//ну там всякие соображения... не придавайте значения... можно менять
     virtual void drawIdantityQuad() { }
     void drawGradienQuad(const QRgb c1, const QRgb c2, const QRgb c3, const QRgb c4);
-    void clear();
     void loadRotate();
 
     void initializeGL();
@@ -50,6 +49,7 @@ protected:
     void bufRotate();
 
 public:
+    void clear();
     static void drawAxes();
 
     CGLWidget(QWidget *parent = 0, const QGLWidget* shareWidget = 0, Qt::WindowFlags f = 0);

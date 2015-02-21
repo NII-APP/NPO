@@ -4,9 +4,11 @@
 
 GeometryWidget::GeometryWidget(QWidget *parent, QGLWidget *shareWidget, Qt::WindowFlags f)
     : CGLWidget(parent, shareWidget, f)
+    , data(0)
     , repaintLoop(new QTimer(this))
     , animation(new AnimationOptions(this))
 {
+    paintDisable = [](GeometryWidget*){};
     initialPhase = 0.0f;
     initialTime = QTime::currentTime();
     form = 0;
@@ -92,9 +94,19 @@ GeometryWidget::~GeometryWidget()
         delete animation;
 }
 
+void GeometryWidget::setDisablePaintFunction(VoidFunction f) {
+    paintDisable = f;
+}
+
 void GeometryWidget::paintCGL()
 {
     repaintLoop->stop();
+
+    if (!data) {
+        paintDisable(this);
+        return;
+    }
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, data->nodes().data());
     if (isAnimation()) {

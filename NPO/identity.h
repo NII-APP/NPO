@@ -8,19 +8,29 @@
  */
 
 #include <QJsonObject>
+#include <QAction>
+#include <QList>
 
 class Identity
 {
     const QJsonObject configuration;
 
     static const QJsonObject readConfig();
+    QJsonValue at(const QString&) const;
+    static QList<QAction*> toActions(const QJsonArray &menu, QObject* parent);
 public:
     Identity();
     ~Identity();
 
     const QJsonObject& config() const { return configuration; }
 
+    QString language() const;
 
+    QString geometriesModelAdd() const;
+    QString geometryWidgetNoDataImage() const;
+
+    QString menuFileName() const;
+    QList<QAction*> menuFileActions(QObject* parent) const;
 };
 
 #endif // IDENTITY_H

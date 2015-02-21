@@ -7,13 +7,16 @@
             {
                 "rus" : "Открыть проект",
                 "eng" : "Open project",
-                "hootkey" : "ctrl+o"
+                "hotkey" : "ctrl+o"
             },
             {
                 "rus" : "Импортировать модель",
                 "eng" : "Model import",
-                "hootkey" : "ctrl+i"
+                "hotkey" : "ctrl+i"
             }
         ]
-    }
+    },
+    "geometries model add rus" : "Добавить модель . . .",
+    "geometries model add eng" : "Add mesh . . .",
+    "geometry widget no data image" : ":/media/images/hill.png"
 }

@@ -19,7 +19,7 @@ public:
     Project();
     ~Project();
 
-    const Geometries& modelsList() { return geometries; }
+    const Geometries& modelsList() const { return geometries; }
     bool isModified() { return someModified; }
 };
 

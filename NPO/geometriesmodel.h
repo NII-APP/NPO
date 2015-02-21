@@ -10,8 +10,8 @@ public:
     GeometriesModel(QObject *parent = 0);
     ~GeometriesModel();
 
-    int rowCount(const QModelIndex &parent) const { return 0; }
-    QVariant data(const QModelIndex &index, int role) const { return QVariant(); }
+    int rowCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
 };
 
 #endif // GEOMETRIESMODEL_H

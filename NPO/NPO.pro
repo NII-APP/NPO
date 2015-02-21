@@ -7,8 +7,8 @@
 QT       += core opengl widgets gui
 
 TARGET = NPO
-CONFIG   += console
-CONFIG   -= app_bundle
+#CONFIG   += console
+#CONFIG   += app_bundle
 
 TEMPLATE = app
 
@@ -25,7 +25,6 @@ SOURCES += main.cpp \
     engine/CGL/cexpression.cpp \
     engine/CGL/cgl.cpp \
     engine/CGL/cglwidget.cpp \
-    engine/CGL/cglwidgetmenu.cpp \
     engine/CGL/cinterval.cpp \
     engine/CGL/clabel.cpp \
     engine/CGL/cmatrix.cpp \
@@ -66,7 +65,6 @@ HEADERS += \
     engine/CGL/cexpression.h \
     engine/CGL/cgl.h \
     engine/CGL/cglwidget.h \
-    engine/CGL/cglwidgetmenu.h \
     engine/CGL/cinterval.h \
     engine/CGL/clabel.h \
     engine/CGL/cmatrix.h \

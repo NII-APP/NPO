@@ -4,7 +4,6 @@
 
 Project::Project()
 {
-
 }
 
 Project::~Project()
