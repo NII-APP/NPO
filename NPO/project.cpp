@@ -1,6 +1,9 @@
 #include "project.h"
 
 #include "engine/geometry.h"
+#include <QString>
+
+const QString Project::INSURANCE_ROW = "In vino veritas, in aqua sanitas";
 
 Project::Project()
 {

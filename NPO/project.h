@@ -4,9 +4,11 @@
 #include <vector>
 
 class Geometry;
+class QString;
 
 class Project
 {
+    static const QString INSURANCE_ROW;
 public:
     typedef std::vector<Geometry* const> Geometries;
     typedef std::vector<const Geometry* const> ConstGeometries;
