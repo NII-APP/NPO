@@ -111,7 +111,7 @@ public:
     void setBox(const CParallelepiped& box) { sqre = box; }
     CParallelepiped getBox() { return sqre; }
 
-    //nodes coordinates
+    //node coordinates
     const CGL::CVertexes& nodes() const { return vertexes; }
     CGL::CVertexes& nodes() { return vertexes; }
     CGL::CVertexes getNodes() const { return vertexes; }

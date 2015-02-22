@@ -15,8 +15,6 @@ class Identity
 {
     const QJsonObject configuration;
 
-    static const unsigned PROGRAM_VERSION;
-
     static const QJsonObject readConfig();
     QJsonValue at(const QString&) const;
     static QList<QAction*> toActions(const QJsonArray &menu, QObject* parent);
@@ -24,6 +22,8 @@ class Identity
 public:
     Identity();
     ~Identity();
+
+    static const unsigned PROGRAM_VERSION;
 
     const QJsonObject& config() const { return configuration; }
 

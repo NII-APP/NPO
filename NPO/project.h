@@ -2,16 +2,20 @@
 #define PROJECT_H
 
 #include <vector>
+#include <Qstring>
+#include "identity.h"
 
 class Geometry;
 class QString;
+class Identity;
 
 class Project
 {
-    static const QString INSURANCE_ROW;
 public:
     typedef std::vector<Geometry* const> Geometries;
     typedef std::vector<const Geometry* const> ConstGeometries;
+
+    static const QString INSURANCE_ROW;
 private:
     //whole geometries
     Geometries geometries;
@@ -23,8 +27,10 @@ public:
 
     const Geometries& modelsList() const { return geometries; }
     bool isModified() { return someModified; }
-
     void pushMesh(Geometry*);
+
+    void save(const QString& filename);
+    void load(const QString& filename);
 };
 
 #endif // PROJECT_H
