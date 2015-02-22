@@ -16,7 +16,7 @@ public:
     ~Application();
 
     static const Identity* identity();
-    static const Project* project();
+    static Project *project();
 };
 
 #endif // APPLICATION_H

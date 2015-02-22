@@ -1,2 +1,6 @@
 **.user
 build**/
+**.bdf
+**.f06
+**.unv
+*.txt

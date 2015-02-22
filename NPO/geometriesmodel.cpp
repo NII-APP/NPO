@@ -2,6 +2,7 @@
 #include "application.h"
 #include "project.h"
 #include "identity.h"
+#include "engine/geometryform.h"
 
 GeometriesModel::GeometriesModel(QObject* parent)
     : QAbstractListModel(parent)
@@ -26,4 +27,12 @@ QVariant GeometriesModel::data(const QModelIndex &index, int role) const {
         return Application::identity()->geometriesModelAdd();
     }
     return QVariant(index.row());
+}
+
+GeometryForm* GeometriesModel::mesh(const QModelIndex &index) {
+    if (index.row() >= Application::project()->modelsList().size() || index.row() < 0) {
+        return 0;
+    } else {
+        return static_cast<GeometryForm*>(Application::project()->modelsList().at(index.row()));
+    }
 }

@@ -15,9 +15,12 @@ class Identity
 {
     const QJsonObject configuration;
 
+    static const unsigned PROGRAM_VERSION;
+
     static const QJsonObject readConfig();
     QJsonValue at(const QString&) const;
     static QList<QAction*> toActions(const QJsonArray &menu, QObject* parent);
+    QString execOpenFileNameDialog(const QJsonObject& config, QWidget* parent) const;
 public:
     Identity();
     ~Identity();
@@ -28,6 +31,9 @@ public:
 
     QString geometriesModelAdd() const;
     QString geometryWidgetNoDataImage() const;
+
+    QString choseModelFile(QWidget *parent = 0) const;
+    QString choseModesFile(QWidget* parent) const;
 
     QString menuFileName() const;
     QList<QAction*> menuFileActions(QObject* parent) const;

@@ -126,7 +126,6 @@ bool Geometry::readBDF(const QString &fileName)
                 trace.resize(id + 100, 0);
             }
             int m(f.integer());
-            qDebug() << m;
             trace[id] = new core::Tetra(f.integer(), f.integer(), f.integer(), f.integer());
             trace[id]->setShell(m);
             f.skipRow();
@@ -136,7 +135,6 @@ bool Geometry::readBDF(const QString &fileName)
                 trace.resize(id + 100, 0);
             }
             int m(f.integer());
-            qDebug() << m;
             trace[id] = new core::Tria(f.integer(), f.integer(), f.integer());
             trace[id]->setShell(m);
             f.skipRow();
@@ -146,7 +144,6 @@ bool Geometry::readBDF(const QString &fileName)
                 trace.resize(id + 100, 0);
             }
             int m(f.integer());
-            qDebug() << m;
             trace[id] = new core::Hexa(f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer());
             trace[id]->setShell(m);
             f.skipRow();
@@ -269,7 +266,7 @@ bool Geometry::readBDF(const QString &fileName)
             qDebug() << "MAT1_E:" << materials[id][Material::MAT1_E] << id;
         } else {
             ++f;
-            qDebug() << "unresolved" << QString::fromStdString(type);
+            //qDebug() << "unresolved" << QString::fromStdString(type);
             f.skipRow();
         }
     }

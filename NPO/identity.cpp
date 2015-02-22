@@ -6,6 +6,9 @@
 #include "application.h"
 #include <QDebug>
 #include <QJsonArray>
+#include <QFileDialog>
+
+const unsigned Identity::PROGRAM_VERSION = 1488;
 
 Identity::Identity()
     : configuration(readConfig())
@@ -99,6 +102,29 @@ QString Identity::geometriesModelAdd() const {
     Q_ASSERT(configuration.contains("geometries model add " + language()));
     return configuration["geometries model add " + language()].toString();
 }
+
+QString Identity::choseModelFile(QWidget* parent) const {
+    Q_ASSERT(configuration.contains("chose model") && configuration["chose model"].isObject());
+    return execOpenFileNameDialog(configuration["chose model"].toObject(), parent);
+}
+
+QString Identity::choseModesFile(QWidget* parent) const {
+    Q_ASSERT(configuration.contains("chose modes") && configuration["chose modes"].isObject());
+    return execOpenFileNameDialog(configuration["chose modes"].toObject(), parent);
+}
+
+QString Identity::execOpenFileNameDialog(const QJsonObject& config, QWidget* parent) const {
+    QString caption;
+    QString filter;
+    if (config.contains("filter")) {
+        filter = config["filter"].toString();
+    }
+    if (config.contains("caption " + language())) {
+        caption = config["caption " + language()].toString();
+    }
+    return QFileDialog::getOpenFileName(parent, caption, QString(), filter);
+}
+
 
 Identity::~Identity()
 {

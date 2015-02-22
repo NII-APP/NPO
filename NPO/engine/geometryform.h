@@ -49,6 +49,7 @@ public:
     double getDefoultMagnitude(int f) const { return defoultMagnitude.at(f); }
     const CGL::CArray& getDefoultMagnitudes() const { return defoultMagnitude; }
 
+    void read(const QString &fileName);
     void readF06(const QString &fileName);
     void readTXT(const QString &fileName);
 

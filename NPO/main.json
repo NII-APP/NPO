@@ -18,5 +18,15 @@
     },
     "geometries model add rus" : "Добавить модель . . .",
     "geometries model add eng" : "Add mesh . . .",
-    "geometry widget no data image" : ":/media/images/hill.png"
+    "geometry widget no data image" : ":/media/images/hill.png",
+    "chose model" : {
+        "caption rus" : "Укажите файл модели",
+        "caption eng" : "Chose mesh file",
+        "filter" : "mesh(*.bdf *.unv)"
+    },
+    "chose modes" : {
+        "caption rus" : "Укажите файл форм колебаний (не обязательно)",
+        "caption eng" : "Chose mesh file (optioanl)",
+        "filter" : "modes(*.f06 *.txt)"
+    }
 }

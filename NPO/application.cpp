@@ -22,5 +22,5 @@ Application::~Application()
 
 const Identity* Application::identity() { return static_cast<Application*>(qApp)->self; }
 
-const Project* Application::project() { return static_cast<Application*>(qApp)->pro; }
+Project* Application::project() { return static_cast<Application*>(qApp)->pro; }
 

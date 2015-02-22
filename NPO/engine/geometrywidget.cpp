@@ -109,6 +109,7 @@ void GeometryWidget::paintCGL()
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, data->nodes().data());
+    qDebug() << "animation" << isAnimation() << currentPhase();
     if (isAnimation()) {
         glNormalPointer(GL_FLOAT, 0, data->form(form).data());
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -116,7 +117,6 @@ void GeometryWidget::paintCGL()
         glDisableClientState(GL_NORMAL_ARRAY);
         summator->setUniformValue("k", 0.0f);
     }
-    glEnableClientState(GL_NORMAL_ARRAY);
     data->render();
     if (netAction->isChecked()) {
         data->renderNet();
@@ -149,14 +149,8 @@ void GeometryWidget::setModel(const GeometryForm& g)
 void GeometryWidget::initializeCGL()
 {
     summator = new QOpenGLShaderProgram(this);
-    if (!summator->addShaderFromSourceFile(QOpenGLShader::Vertex, ":codes/summator.vert")) {
-        qWarning() << "compile impossible";
-        assert(false);
-    }
-    if (!summator->bind()) {
-        qWarning() << "wasn't binded";
-        assert(false);
-    }
+    Q_ASSERT(summator->addShaderFromSourceFile(QOpenGLShader::Vertex, ":codes/summator.vert"));
+    Q_ASSERT(summator->bind());
     this->startTimer(10);
 }
 
@@ -173,6 +167,7 @@ void GeometryWidget::triggerAnimation() {
 }
 
 double GeometryWidget::currentPhase() const {
+    qDebug() << initialPhase << initialTime.msecsTo(QTime::currentTime()) << pauseTime << animation->getFrequency();
     return initialPhase + (initialTime.msecsTo(QTime::currentTime()) + pauseTime) / 1000. * acos(0.0) * 4. * animation->getFrequency();
 }
 

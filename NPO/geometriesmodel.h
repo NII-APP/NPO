@@ -4,6 +4,8 @@
 #include <QAbstractListModel>
 #include <QVariant>
 
+class GeometryForm;
+
 class GeometriesModel : public QAbstractListModel
 {
 public:
@@ -12,6 +14,8 @@ public:
 
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
+
+    static GeometryForm* mesh(const QModelIndex &index);
 };
 
 #endif // GEOMETRIESMODEL_H

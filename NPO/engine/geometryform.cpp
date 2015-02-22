@@ -205,6 +205,20 @@ void GeometryForm::readF06(const QString& fileName)
     std::clog << "\tFile correctly parse " << forms.size() << " forms with " << (forms.empty() ? std::numeric_limits<double>::quiet_NaN() : forms.front().form().length()) << " nodes with each (" << loop.msecsTo(QTime::currentTime()) / 1000. << "ms)\n";
 }
 
+void GeometryForm::read(const QString &fileName) {
+    const QString format(fileName.split('.').last());
+    if (!format.compare("BDF",Qt::CaseInsensitive)) {
+        this->readBDF(fileName);
+    } else if (!format.compare("UNV", Qt::CaseInsensitive)) {
+        this->readUNV(fileName);
+    } else if (!format.compare("txt", Qt::CaseInsensitive)) {
+        this->readTXT(fileName);
+    } else if (!format.compare("f06", Qt::CaseInsensitive)) {
+        this->readF06(fileName);
+    } else {
+        std::clog << "undexpected file format " << format.toStdString() << " for geometry parsing";
+    }
+}
 
 void GeometryForm::estimateDefoultMagnitudes() {
     defoultMagnitude.resize(0);

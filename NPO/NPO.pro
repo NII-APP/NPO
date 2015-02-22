@@ -7,8 +7,8 @@
 QT       += core opengl widgets gui
 
 TARGET = NPO
-#CONFIG   += console
-#CONFIG   += app_bundle
+CONFIG   += console
+CONFIG   -= app_bundle
 
 TEMPLATE = app
 
@@ -51,7 +51,8 @@ SOURCES += main.cpp \
     identity.cpp \
     project.cpp \
     mainwindow.cpp \
-    geometriesmodel.cpp
+    geometriesmodel.cpp \
+    viewer.cpp
 
 HEADERS += \
     engine/animationoptions.h \
@@ -91,7 +92,8 @@ HEADERS += \
     identity.h \
     project.h \
     mainwindow.h \
-    geometriesmodel.h
+    geometriesmodel.h \
+    viewer.h
 
 OTHER_FILES += \
     summator.vert

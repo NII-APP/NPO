@@ -21,6 +21,8 @@ public:
 
     const Geometries& modelsList() const { return geometries; }
     bool isModified() { return someModified; }
+
+    void pushMesh(Geometry*);
 };
 
 #endif // PROJECT_H
