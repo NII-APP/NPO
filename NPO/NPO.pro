@@ -18,10 +18,6 @@ SOURCES += main.cpp \
     engine/geometrywidget.cpp \
     engine/relationdialog.cpp \
     engine/CGL/carray.cpp \
-    engine/CGL/cchart.cpp \
-    engine/CGL/cchart3d.cpp \
-    engine/CGL/cchartdata.cpp \
-    engine/CGL/cdimension.cpp \
     engine/CGL/cexpression.cpp \
     engine/CGL/cgl.cpp \
     engine/CGL/cglwidget.cpp \
@@ -52,17 +48,15 @@ SOURCES += main.cpp \
     project.cpp \
     mainwindow.cpp \
     geometriesmodel.cpp \
-    viewer.cpp
+    viewer.cpp \
+    engine/CGL/ccolumnchart.cpp \
+    engine/CGL/c3dchart.cpp
 
 HEADERS += \
     engine/animationoptions.h \
     engine/geometrywidget.h \
     engine/relationdialog.h \
     engine/CGL/carray.h \
-    engine/CGL/cchart.h \
-    engine/CGL/cchart3d.h \
-    engine/CGL/cchartdata.h \
-    engine/CGL/cdimension.h \
     engine/CGL/cexpression.h \
     engine/CGL/cgl.h \
     engine/CGL/cglwidget.h \
@@ -93,7 +87,9 @@ HEADERS += \
     project.h \
     mainwindow.h \
     geometriesmodel.h \
-    viewer.h
+    viewer.h \
+    engine/CGL/ccolumnchart.h \
+    engine/CGL/c3dchart.h
 
 OTHER_FILES += \
     summator.vert

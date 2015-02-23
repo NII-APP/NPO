@@ -35,6 +35,7 @@ Viewer::Viewer(QWidget *parent)
 void Viewer::listPatrol(QModelIndex i) {
     if (GeometriesModel::mesh(i)) {
         geometryWidget->setModel(GeometriesModel::mesh(i));
+        geometryWidget->setForm(0);
     } else {
         GeometryForm* forAdd(new GeometryForm);
         QString bdf(Application::identity()->choseModelFile(this));
@@ -49,6 +50,7 @@ void Viewer::listPatrol(QModelIndex i) {
         Application::project()->pushMesh(forAdd);
         Q_ASSERT(forAdd == GeometriesModel::mesh(i));
         geometryWidget->setModel(forAdd);
+        geometryWidget->setForm(0);
         geometriesView->reset();
     }
 }

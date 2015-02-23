@@ -6,6 +6,7 @@
 const QString Project::INSURANCE_ROW = "In vino veritas, in aqua sanitas";
 
 Project::Project()
+ : someModified(false)
 {
 }
 
@@ -19,16 +20,30 @@ void Project::pushMesh(Geometry* g) {
     geometries.push_back(g);
 }
 
+bool Project::isOwnProject(const QString& filename) {
+    QFile file(filename);
+    if(!file.exists() || !file.open(QIODevice::ReadOnly)) {
+        return false;
+    }
+    QDataStream in(&file);
+    QString insuranceRow;
+    in >> insuranceRow;
+    if (insuranceRow != INSURANCE_ROW) {
+        return false;
+    }
+    return true;
+}
+
 void Project::save(const QString &filename)
 {
     QFile file(filename);
 
     if(file.exists()) {
-        qDebug() << "Файл " + filename + " уже сущесвует и будет перезаписан.";
+        qDebug() << "file " + filename + " already exist.";
     }
 
     if(!file.open(QIODevice::WriteOnly)) {
-        qDebug() << "Ошибка открытия для записи";
+        qDebug() << "can't open file";
         return;
     }
 
@@ -46,12 +61,12 @@ void Project::load(const QString &filename)
     QFile file(filename);
 
     if(file.exists()) {
-        qDebug() << "Файл " + filename + " не существует.";
+        qDebug() << "file " + filename + " doesn't exist.";
         return;
     }
 
     if(!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "Ошибка открытия для записи";
+        qDebug() << "Can't open file fot reading";
         return;
     }
 
@@ -68,6 +83,7 @@ void Project::load(const QString &filename)
     in >> programVersion;
     programVersion < Identity::PROGRAM_VERSION ?
         qDebug() << "Warning: The file was save in older version of program" :
+                    //you shure? what if programVersion equal Identity::PROGRAM_VERSION
         qDebug() << "Warning: The file was save in newer version of program";
 
     in >> geometries;

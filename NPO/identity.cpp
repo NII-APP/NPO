@@ -52,16 +52,16 @@ QString Identity::menuFileName() const {
     return m[language()].toString();
 }
 
-QList<QAction *> Identity::menuFileActions(QObject* parent) const {
+QList<QAction *> Identity::menuFileActions(QObject* parent, const Relations& relations) const {
     const QJsonValue menu(at("file menu"));
     Q_ASSERT(menu.isObject());
     const QJsonObject m(menu.toObject());
     Q_ASSERT(m.contains("items"));
     Q_ASSERT(m["items"].isArray());
-    return Identity::toActions(m["items"].toArray(), parent);
+    return Identity::toActions(m["items"].toArray(), parent, relations);
 }
 
-QList<QAction*> Identity::toActions(const QJsonArray& menu, QObject *parent) {
+QList<QAction*> Identity::toActions(const QJsonArray& menu, QObject *parent, const Relations& relations) {
     QList<QAction*> actions;
     foreach (const QJsonValue item, menu) {
         Q_ASSERT(item.isObject() || item.isString());
@@ -92,6 +92,11 @@ QList<QAction*> Identity::toActions(const QJsonArray& menu, QObject *parent) {
             if (act.contains("enabled")) {
                 current->setEnabled(act["enabled"].toBool());
             }
+            if (act.contains("signal") && relations.contains(act["signal"].toString())) {
+                foreach (const Acceptor acceptor, relations.values(act["signal"].toString())) {
+                    QObject::connect(current, SIGNAL(triggered()), acceptor.first, acceptor.second);
+                }
+            }
             actions.push_back(current);
         }
     }
@@ -111,6 +116,31 @@ QString Identity::choseModelFile(QWidget* parent) const {
 QString Identity::choseModesFile(QWidget* parent) const {
     Q_ASSERT(configuration.contains("chose modes") && configuration["chose modes"].isObject());
     return execOpenFileNameDialog(configuration["chose modes"].toObject(), parent);
+}
+
+QString Identity::choseProjectFile(QWidget* parent) const {
+    Q_ASSERT(configuration.contains("load project") && configuration["load project"].isObject());
+    return execOpenFileNameDialog(configuration["load project"].toObject(), parent);
+}
+
+QString Identity::choseSaveFile(QWidget* parent) const {
+    Q_ASSERT(configuration.contains("save project") && configuration["save project"].isObject());
+    return execOpenFileNameDialog(configuration["save project"].toObject(), parent);
+}
+
+QMessageBox::StandardButton Identity::choseIsSaveQuestion(QWidget* parent) const {
+    Q_ASSERT(configuration.contains("is save") && configuration["is save"].isObject());
+    QJsonObject q(configuration["is save"].toObject());
+    Q_ASSERT(q.contains("text " + language()));
+    return QMessageBox::question(parent, q["title " + language()].toString(), q["text " + language()].toString(),
+            QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel));
+}
+
+void Identity::messageWrongProFile(QWidget* parent) const {
+    Q_ASSERT(configuration.contains("wrong file") && configuration["wrong file"].isObject());
+    QJsonObject q(configuration["wrong file"].toObject());
+    Q_ASSERT(q.contains("text " + language()));
+    QMessageBox::warning(parent, q["title " + language()].toString(), q["text " + language()].toString());
 }
 
 QString Identity::execOpenFileNameDialog(const QJsonObject& config, QWidget* parent) const {

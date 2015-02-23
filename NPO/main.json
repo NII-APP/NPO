@@ -5,11 +5,25 @@
         "eng" : "File",
         "items" : [
             {
+                "signal" : "open",
                 "rus" : "Открыть проект",
                 "eng" : "Open project",
                 "hotkey" : "ctrl+o"
             },
             {
+                "signal" : "save",
+                "rus" : "Сохранить проект",
+                "eng" : "Save project",
+                "hotkey" : "ctrl+s"
+            },
+            {
+                "signal" : "save as",
+                "rus" : "Сохранить проект как...",
+                "eng" : "Save project as...",
+                "hotkey" : "ctrl+shift+s"
+            },
+            {
+                "signal" : "import",
                 "rus" : "Импортировать модель",
                 "eng" : "Model import",
                 "hotkey" : "ctrl+i"
@@ -28,5 +42,26 @@
         "caption rus" : "Укажите файл форм колебаний (не обязательно)",
         "caption eng" : "Chose mesh file (optioanl)",
         "filter" : "modes(*.f06 *.txt)"
+    },
+    "save project" : {
+        "caption rus" : "Сохранить проект",
+        "caption eng" : "Save project",
+        "filter" : "project(*.pro)"
+    },
+    "load project" : {
+        "caption rus" : "Открытие проекта",
+        "caption eng" : "Open project",
+        "filter" : "project(*.pro)"
+    },
+    "can't save file rus" : "Невозможно открыть файл для записи (отказано в доступе)",
+    "can't save file eng" : "Can't open file for writing (acces denied)",
+    "is save" : {
+        "text eng" : "Save changes before closing?",
+        "text rus" : "Сохранить изменения перед закрытием?"
+    },
+    "wrong file" : {
+        "text rus" : "Файл не является проектом, созданным в данном приложении",
+        "text eng" : "Chosen file isn't a project of this appliccation",
+        "title rus" : "Возникла ошибка при открытии файла"
     }
 }

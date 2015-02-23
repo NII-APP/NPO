@@ -29,6 +29,7 @@ public:
     bool isModified() { return someModified; }
     void pushMesh(Geometry*);
 
+    static bool isOwnProject(const QString& filename);
     void save(const QString& filename);
     void load(const QString& filename);
 };

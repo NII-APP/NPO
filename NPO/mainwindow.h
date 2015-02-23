@@ -9,6 +9,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    //from where project was be loaded or saved at last time
+    QString disposed;
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -16,6 +18,9 @@ public:
 signals:
 
 public slots:
+    void save();
+    void saveAs();
+    void open();
 };
 
 #endif // MAINWINDOW_H
