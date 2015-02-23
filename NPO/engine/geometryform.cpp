@@ -83,6 +83,7 @@ void GeometryForm::readTXT(const QString &fileName)
     }
 
     estimateDefoultMagnitudes();
+    estimateMAC();
     std::clog << "\ttxt correctly parsed. " << forms.at(0).form().size() / 3 << " vertexes in eign vector" << std::endl;
 }
 
@@ -202,6 +203,7 @@ void GeometryForm::readF06(const QString& fileName)
     }
 
     estimateDefoultMagnitudes();
+    estimateMAC();
     std::clog << "\tFile correctly parse " << forms.size() << " forms with " << (forms.empty() ? std::numeric_limits<double>::quiet_NaN() : forms.front().form().length()) << " nodes with each (" << loop.msecsTo(QTime::currentTime()) / 1000. << "ms)\n";
 }
 
@@ -235,6 +237,11 @@ void GeometryForm::estimateDefoultMagnitudes() {
     }
 }
 
+const CGL::CMatrix& GeometryForm::getMac() const
+{
+    return mac;
+}
+
 void GeometryForm::estimateMAC()
 {
     std::clog << "Estimate auto MAC" << std::endl;
@@ -251,7 +258,7 @@ void GeometryForm::estimateMAC()
     for (i = 0; i != size; ++i) {
         for (int j = 0; j != size; ++j) {
             if (i == j) {
-                mac[i][j] = 1;
+                mac[i][j] = 1.0;
             } else {
                 float nm(0.0f);
                 const CGL::CVertexes::const_iterator end(forms[i].form().end());

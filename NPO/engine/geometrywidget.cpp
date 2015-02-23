@@ -94,6 +94,21 @@ GeometryWidget::~GeometryWidget()
         delete animation;
 }
 
+void GeometryWidget::drawIdantityQuad() {
+    glBegin(GL_QUADS);
+    glColor3ub(0x77,0x77,0xDD);
+    glVertex3d(-1.,-1., 0.9999999);
+    glNormal3i(0,0,0);
+    glVertex3d( 1.,-1., 0.9999999);
+    glNormal3i(0,0,0);
+    glColor3ub(0xAA,0xAA,0xAA);
+    glVertex3d( 1., 1., 0.9999999);
+    glNormal3i(0,0,0);
+    glVertex3d(-1., 1., 0.9999999);
+    glNormal3i(0,0,0);
+    glEnd();
+}
+
 void GeometryWidget::setDisablePaintFunction(VoidFunction f) {
     paintDisable = f;
 }
@@ -109,7 +124,6 @@ void GeometryWidget::paintCGL()
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, data->nodes().data());
-    qDebug() << "animation" << isAnimation() << currentPhase();
     if (isAnimation()) {
         glNormalPointer(GL_FLOAT, 0, data->form(form).data());
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -167,7 +181,6 @@ void GeometryWidget::triggerAnimation() {
 }
 
 double GeometryWidget::currentPhase() const {
-    qDebug() << initialPhase << initialTime.msecsTo(QTime::currentTime()) << pauseTime << animation->getFrequency();
     return initialPhase + (initialTime.msecsTo(QTime::currentTime()) + pauseTime) / 1000. * acos(0.0) * 4. * animation->getFrequency();
 }
 

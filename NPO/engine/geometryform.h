@@ -24,7 +24,7 @@ class GeometryForm : public Geometry
     void estimateDefoultMagnitudes();
 
 protected:
-    //Estimate auto MAC. Ordinaly called after reading
+    //Estimate auto MAC
     void estimateMAC();
 public:
     GeometryForm();
@@ -32,7 +32,7 @@ public:
     GeometryForm(const GeometryForm&);
 
     inline void colorize(int form) { Geometry::colorize(forms[form].form()); }
-    const CGL::CMatrix& getMac() const { return mac; }
+    const CGL::CMatrix& getMac() const;
     const CGL::CArray& getPreMac() const { return preMac; }
 
     //whole form

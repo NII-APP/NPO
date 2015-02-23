@@ -49,9 +49,9 @@ protected:
     void bufRotate();
 
     QMatrix4x4 modelviewMatrix();
+    void clear();
 
 public:
-    void clear();
     static void drawAxes();
 
     CGLWidget(QWidget *parent = 0, const QGLWidget* shareWidget = 0, Qt::WindowFlags f = 0);

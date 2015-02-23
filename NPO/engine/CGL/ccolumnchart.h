@@ -1,13 +1,26 @@
 #ifndef CCOLUMNCHART_H
 #define CCOLUMNCHART_H
 
-#include "cglwidget.h"
+#include "c3dchart.h"
+#include "cmatrix.h"
 
-class CColumnChart : public CGLWidget
+namespace CGL {
+
+class CColumnChart : public C3dChart
 {
+    CMatrix data;
+    size_t size;
+    qreal scale;
+    qreal max;
 public:
-    CColumnChart();
+    CColumnChart(QWidget* parent = 0);
     ~CColumnChart();
+
+    void setData(const CMatrix&);
+
+    void paintCGL();
 };
+
+}
 
 #endif // CCOLUMNCHART_H

@@ -38,6 +38,7 @@ class GeometryWidget : public CGLWidget
     double currentPhase() const;
 
     bool isAnimation() const { return !animationAction->isChecked() && data && data->modes().size() > form && form >= 0; }
+    void drawIdantityQuad();
 
 public:
     GeometryWidget(QWidget* parent = 0, QGLWidget* sharedWidget = 0, Qt::WindowFlags f = 0);

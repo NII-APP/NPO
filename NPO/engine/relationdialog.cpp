@@ -43,7 +43,7 @@ RelationDialog::RelationDialog(GeometryPair *forEdit, QWidget *parent)
 
     if (relation.size() != leftL.size()) {
         relation.resize(leftL.size());
-        for (int i(0); i < relation.size(); ++i) {
+        for (size_t i(0); i < relation.size(); ++i) {
             relation[i] = rightL.size() > i ? i : -1;
         }
     }

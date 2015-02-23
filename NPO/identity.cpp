@@ -125,7 +125,7 @@ QString Identity::choseProjectFile(QWidget* parent) const {
 
 QString Identity::choseSaveFile(QWidget* parent) const {
     Q_ASSERT(configuration.contains("save project") && configuration["save project"].isObject());
-    return execOpenFileNameDialog(configuration["save project"].toObject(), parent);
+    return execSaveFileNameDialog(configuration["save project"].toObject(), parent);
 }
 
 QMessageBox::StandardButton Identity::choseIsSaveQuestion(QWidget* parent) const {
@@ -153,6 +153,18 @@ QString Identity::execOpenFileNameDialog(const QJsonObject& config, QWidget* par
         caption = config["caption " + language()].toString();
     }
     return QFileDialog::getOpenFileName(parent, caption, QString(), filter);
+}
+
+QString Identity::execSaveFileNameDialog(const QJsonObject& config, QWidget* parent) const {
+    QString caption;
+    QString filter;
+    if (config.contains("filter")) {
+        filter = config["filter"].toString();
+    }
+    if (config.contains("caption " + language())) {
+        caption = config["caption " + language()].toString();
+    }
+    return QFileDialog::getSaveFileName(parent, caption, QString(), filter);
 }
 
 

@@ -24,6 +24,7 @@ private:
     QJsonValue at(const QString&) const;
     static QList<QAction*> toActions(const QJsonArray &menu, QObject* parent, const Relations & relations = Relations());
     QString execOpenFileNameDialog(const QJsonObject& config, QWidget* parent) const;
+    QString execSaveFileNameDialog(const QJsonObject& config, QWidget* parent) const;
 public:
     Identity();
     ~Identity();

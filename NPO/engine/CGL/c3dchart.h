@@ -3,6 +3,8 @@
 
 #include "cglwidget.h"
 
+namespace CGL {
+
 class C3dChart : public CGLWidget
 {
 
@@ -11,5 +13,7 @@ public:
 
     ~C3dChart();
 };
+
+}
 
 #endif // C3DCHART_H

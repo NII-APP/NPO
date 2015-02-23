@@ -4,6 +4,7 @@
 #include <QSplitter>
 #include <QModelIndex>
 #include <QListView>
+#include "engine/CGL/ccolumnchart.h"
 class GeometryWidget;
 
 class Viewer : public QSplitter
@@ -11,6 +12,8 @@ class Viewer : public QSplitter
     Q_OBJECT
     GeometryWidget* geometryWidget;
     QListView* geometriesView;
+    CGL::CColumnChart* macChart;
+
 public:
     explicit Viewer(QWidget *parent = 0);
     ~Viewer();
@@ -18,6 +21,7 @@ public:
 signals:
 
 public slots:
+    void addModel();
 private slots:
     void listPatrol(QModelIndex);
 };
