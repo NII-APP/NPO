@@ -17,7 +17,7 @@ class CGLWidget : public QGLWidget
     QPair<GLfloat, GLfloat> rotate;
     //accumulated rotate
     QMatrix4x4 rotateMatrix;
-    //rotate muf with copy of rotateMatrix when popup menu selecting
+    //rotate buf with copy of rotateMatrix when popup menu under selecting
     QMatrix4x4 rotateBuf;
     CParallelepiped sceneSize;
     GLfloat zoom;
@@ -47,6 +47,8 @@ protected:
     virtual void keyPressEvent(QKeyEvent *);
     void debugSpace(const CParallelepiped &s);
     void bufRotate();
+
+    QMatrix4x4 modelviewMatrix();
 
 public:
     void clear();

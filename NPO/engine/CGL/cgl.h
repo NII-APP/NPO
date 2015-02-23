@@ -31,7 +31,7 @@ const QFont DEFAULT_FONT("Times New Roman, Times, Serif", 10, 0);
 #include <QDataStream>
 template <typename T> QDataStream& operator<< (QDataStream& s, const std::vector<T>& array) {
     s << array.size();
-    s.writeRawData(static_cast<const char*>(static_cast<const void*>(array.data())), array.size() * sizeof(T));
+    s.writeRawData(static_cast<const char*>(static_cast<const void*>(array.data())), static_cast<int>(array.size()) * sizeof(T));
     return s;
 }
 template <typename T> QDataStream& operator>> (QDataStream& s, std::vector<T>& array) {
@@ -39,7 +39,7 @@ template <typename T> QDataStream& operator>> (QDataStream& s, std::vector<T>& a
     vector::size_type size;
     s >> size;
     array.resize(size);
-    s.readRawData(static_cast<char*>(static_cast<void*>(array.data())), size * sizeof(T));
+    s.readRawData(static_cast<char*>(static_cast<void*>(array.data())), static_cast<int>(size) * sizeof(T));
     return s;
 }
 #endif // QT_VERSION

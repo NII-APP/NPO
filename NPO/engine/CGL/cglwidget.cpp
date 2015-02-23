@@ -276,16 +276,22 @@ void CGLWidget::mouseReleaseEvent(QMouseEvent*)
 void CGLWidget::bufRotate()
 {
     if (rotate.first && rotate.second) {
-        this->makeCurrent();
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        loadRotate();
-#if QT_VERSION >= 0x050000
-        glGetFloatv(GL_MODELVIEW_MATRIX, rotateMatrix.data());
-#else
-        glGetDoublev(GL_MODELVIEW_MATRIX, rotateMatrix.data());
-#endif
+        rotateMatrix = modelviewMatrix();
         rotate.first = rotate.second = 0.0f;
         safelyUpdate();
     }
+}
+
+QMatrix4x4 CGLWidget::modelviewMatrix() {
+    QMatrix4x4 result;
+    this->makeCurrent();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    loadRotate();
+#if QT_VERSION >= 0x050000
+    glGetFloatv(GL_MODELVIEW_MATRIX, result.data());
+#else
+    glGetDoublev(GL_MODELVIEW_MATRIX, result.data());
+#endif
+    return result;
 }

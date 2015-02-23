@@ -29,10 +29,10 @@ void CMatrix::repoint() {
     for (Pointers::iterator it(m.begin()); it != m.end(); ++it)
         *it = data.data() + i++ * wid;
 }
-CMatrix::T CMatrix::minInRow(size_t r) {
+CMatrix::T CMatrix::minInRow(size_t r) const {
     return *std::min_element(data.begin() + wid * r, data.begin() + wid * r + wid);
 }
-CMatrix::T CMatrix::minInColumn(size_t c) {
+CMatrix::T CMatrix::minInColumn(size_t c) const {
     T min(std::numeric_limits<T>::infinity());
     for (const T* it(data.data() + c), *end(data.data() + data.size()); it < end; it += wid) {
         if (*it < min) {
@@ -41,7 +41,7 @@ CMatrix::T CMatrix::minInColumn(size_t c) {
     }
     return min;
 }
-CMatrix::T CMatrix::minInRowExclude(size_t r, size_t exclude) {
+CMatrix::T CMatrix::minInRowExclude(size_t r, size_t exclude) const {
     if (height() <= 1)
         return 0;
     if (exclude == 0)
@@ -51,7 +51,7 @@ CMatrix::T CMatrix::minInRowExclude(size_t r, size_t exclude) {
     return std::min(*std::min_element(data.begin() + wid * r, data.begin() + wid * r + exclude),
                     *std::min_element(data.begin() + wid * r + exclude + 1, data.begin() + wid * r + wid));
 }
-CMatrix::T CMatrix::minInColumnExclude(size_t c, size_t exclude) {
+CMatrix::T CMatrix::minInColumnExclude(size_t c, size_t exclude) const {
     if (height() <= 1)
         return 0;//Если строка одна, то исключая её возвращать нечего
     T min(std::numeric_limits<T>::infinity());
@@ -61,6 +61,16 @@ CMatrix::T CMatrix::minInColumnExclude(size_t c, size_t exclude) {
         }
     }
     return min;
+}
+CRange<CMatrix::T> CMatrix::estimateRange() const {
+    if (data.empty()) {
+        return CRange<T>();
+    }
+    CRange<T> result(data.front());
+    for (Data::const_iterator it(data.begin() + 1), end(data.end()); it != end; ++it) {
+        result.include(*it);
+    }
+    return result;
 }
 void CMatrix::plusInRow(size_t r, const T& val) {
     T* mass(m[r]);

@@ -66,7 +66,7 @@ Geometry::~Geometry() {
 
 void Geometry::estimateTraced()
 {
-    isTraced.fill(false, vertexes.length());
+    isTraced.fill(false, static_cast<int>(vertexes.length()));
     for (Trace::const_iterator i(trace.begin()), end(trace.end()); i != end; ++i) {
         if (*i) {
             (*i)->getTraced(isTraced);

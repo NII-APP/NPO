@@ -265,7 +265,7 @@ void RelationDialog::updateLines()
               QPoint(rightL.last()->geometry().left(), (leftCapacity > rightCapacity ? rightL : leftL).last()->geometry().bottom())));
 }
 
-void RelationDialog::mousePressEvent(QMouseEvent * e)
+void RelationDialog::mousePressEvent(QMouseEvent *)
 {
     if (underToggle >= 0 && lineingState < 0)
     {
