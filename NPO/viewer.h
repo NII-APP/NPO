@@ -22,6 +22,7 @@ signals:
 
 public slots:
     void addModel();
+    void resetListView();
 private slots:
     void listPatrol(QModelIndex);
 };

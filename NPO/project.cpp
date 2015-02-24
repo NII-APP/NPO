@@ -32,6 +32,8 @@ bool Project::isOwnProject(const QString& filename) {
         return false;
     }
     return true;
+
+    file.close();
 }
 
 void Project::save(const QString &filename)
@@ -51,17 +53,21 @@ void Project::save(const QString &filename)
     QTime loop(QTime::currentTime());
     out << Project::INSURANCE_ROW;
     out << Identity::PROGRAM_VERSION;
-    out << geometries;
-    qDebug() << "Time to save: " << loop.msecsTo(QTime::currentTime()) / 1000 << " с";
+    out << geometries.size();
+    for (size_t i = 0; i < geometries.size(); ++i ){
+        out << *(geometries.at(i));
+    }
+    qDebug() << "Time to save: " << loop.msecsTo(QTime::currentTime()) / 1000 << " ms";
     file.close();
+
+    someModified = false;
 }
 
 void Project::load(const QString &filename)
 {
     QFile file(filename);
 
-    if(file.exists()) {
-        qDebug() << "file " + filename + " doesn't exist.";
+    if(!file.exists()) {
         return;
     }
 
@@ -81,13 +87,22 @@ void Project::load(const QString &filename)
         return;
     }
     in >> programVersion;
-    programVersion < Identity::PROGRAM_VERSION ?
-        qDebug() << "Warning: The file was save in older version of program" :
-                    //you shure? what if programVersion equal Identity::PROGRAM_VERSION
-        qDebug() << "Warning: The file was save in newer version of program";
+    if (programVersion < Identity::PROGRAM_VERSION) {
+        qDebug() << "Warning: The file was save in older version of program";
+    } else
+        if (programVersion > Identity::PROGRAM_VERSION) {
+            qDebug() << "Warning: The file was save in newer version of program";
+        }
 
-    in >> geometries;
-    qDebug() << "Time to load: " << loop.msecsTo(QTime::currentTime()) / 1000 << " с";
+    size_t size;
+    in >> size;
+    geometries.clear();
+    for (size_t i = 0; i < size; ++i) {
+        Geometry* g = new Geometry();
+        in >> *g;
+        geometries.push_back(g);
+    }
+    qDebug() << "Time to load: " << loop.msecsTo(QTime::currentTime()) << " ms";
 
     file.close();
 }
