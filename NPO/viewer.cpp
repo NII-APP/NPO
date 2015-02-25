@@ -21,7 +21,7 @@ Viewer::Viewer(QWidget *parent)
         paint->drawPixmap(me->width() / 2.0 - img.width() / 2.0, me->height() / 2.0 - img.height() / 2.0, img);
         delete paint;
         me->makeCurrent();
-        me->swapBuffers();*/
+        me->swapBuffers();//*/
         me->makeCurrent();
     });
 
@@ -70,6 +70,13 @@ void Viewer::addModel() {
 void Viewer::resetListView()
 {
     geometriesView->reset();
+}
+
+void Viewer::setMode(int m) {
+    /*for (int i(0); i != Application::project()->modelsList().size(); ++i) {
+        
+    }*/
+    //geometryWidget->getModel()->colorize();
 }
 
 Viewer::~Viewer()
