@@ -31,7 +31,7 @@ public:
     GeometryForm(const Geometry&);
     GeometryForm(const GeometryForm&);
 
-    inline void colorize(int form) { Geometry::colorize(forms[form].form()); }
+    inline void colorize(int form) { if (forms.size() > form && form > 0) { Geometry::colorize(forms[form].form()); } }
     const CGL::CMatrix& getMac() const;
     const CGL::CArray& getPreMac() const { return preMac; }
 

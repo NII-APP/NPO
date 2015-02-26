@@ -288,6 +288,29 @@ bool Geometry::readBDF(const QString &fileName)
     return true;
 }
 
+int Geometry::arriveKnownUNVBlock(CGL::CParse& f) {
+    while (*f && !(f.testPrew("    -1\n    15\n") ||
+                   f.testPrew("    -1\n    82\n") ||
+                   f.testPrew("    -1\n  2420\n") ||
+                   f.testPrew("    -1\n  2411\n")))
+        ++f;
+    f.skipRow();
+    if        (f.testPrew("    15\n")) {
+        f.skipRow();
+        return 15;
+    } else if (f.testPrew("    82\n")) {
+        f.skipRow();
+        return 82;
+    } else if (f.testPrew("  2420\n")) {
+        f.skipRow();
+        return 2420;
+    } else if (f.testPrew("  2411\n")) {
+        f.skipRow();
+        return 2411;
+    }
+    return *f ? -1 : 0;
+}
+
 bool Geometry::readUNV(const QString &fileName)
 {
     std::clog << "UNV parsing" << std::endl;
@@ -304,41 +327,72 @@ bool Geometry::readUNV(const QString &fileName)
     f.UNIXRowSymbol();
 
     vertexes.resize(0);
-
-    f.skipTo("    -1\n    15\n");
-    f.skipRow();
-    f.skipRow();
-    while (!f.testPrew("    -1")) {
-        f.integer();
-        f.integer();
-        f.integer();
-        f.integer();
-        vertexes.push_back(f.real());
-        vertexes.push_back(f.real());
-        vertexes.push_back(f.real());
-        ++f;
+    if (!trace.empty()) {
+        qDeleteAll(trace);
+        trace.clear();
     }
-    std::clog << '\t' << vertexes.length() << " vertexes in geometryr" << std::endl;
-    f.skipRow();
-    core::Lines* elem;
-    trace.push_back(elem = new core::Lines);
-    while (f.testPrew("    -1\n    82")) {
-        f.skipRow();
-        f.skipRow();
-        if (*f != ' ' || f[1] != '\n') {
+
+    core::Lines* elem(new core::Lines);
+    trace.push_back(elem);
+    int blockId;
+    while (blockId = arriveKnownUNVBlock(f)) {
+        switch (blockId) {
+        case 15:
+        {
+            //it's set of vertexes
+            while (!f.testPrew("    -1")) {
+                f.integer();
+                f.integer();
+                f.integer();
+                f.integer();
+                vertexes.push_back(f.real());
+                vertexes.push_back(f.real());
+                vertexes.push_back(f.real());
+                ++f;
+            }
+            std::clog << '\t' << vertexes.length() << " vertexes in geometryr" << std::endl;
+        } break;
+        case 82: {
+            //it's the trace of experemental nodes
+            if (*f != ' ' || f[1] != '\n') {
+                f.skipRow();
+                f.skipRow();
+            }
+            while (!f.testPrew("\n    -1")) {
+                unsigned n(f.integer() - 1);
+                if (n < unsigned(-1)) {
+                    elem->addNode(n);
+                } else {
+                    trace.push_back(elem = new core::Lines);
+                }
+            }
+            ++f;
             f.skipRow();
-            f.skipRow();
-        }
-        while (!f.testPrew("\n    -1")) {
-            unsigned n(f.integer() - 1);
-            if (n < unsigned(-1)) {
-                elem->addNode(n);
-            } else {
-                trace.push_back(elem = new core::Lines);
+        } break;
+        case 2411: {
+            //it's enother way to declare a vertexes
+            while (!f.testPrew("    -1\n")) {
+                f.skipRow();
+                vertexes.push_back(f.real());
+                vertexes.push_back(f.real());
+                vertexes.push_back(f.real());
+                f.skipRow();
+            }
+        } break;
+        case 2420: {
+            //it's a transformation matrices
+            while (!f.testPrew("    -1\n")) {
+                f.skipRow();
+            }
+        } break;
+        case -1:
+        default:
+            f -= 6;
+            std::clog << "inknown BDF block (" << f.integer() << "). try to skip. . .";
+            while (!f.testPrew("    -1\n")) {
+                f.skipRow();
             }
         }
-        ++f;
-        f.skipRow();
     }
     delete memory;
     estimateTraced();
@@ -352,7 +406,7 @@ void Geometry::renderSelect() const
 {
     glBegin(GL_POINTS);
     bool allMarked(markedNodes.size() != vertexes.length());
-    for (int i = 0, size(vertexes.length()); i != size; ++i) {
+    for (int i = 0, size(static_cast<int>(vertexes.length())); i != size; ++i) {
         if (allMarked || markedNodes.testBit(i)) {
             glColor3ub( i % 0x100, (i / 0x100) % 0x100, i / 0x10000);
             glVertex3fv(vertexes.data() + 3 * i);
@@ -507,7 +561,7 @@ void Geometry::colorizeElements(const CGL::CArray &v, const QString& mes) {
     colorizeFromArray(v);
 }
 CGL::CArray Geometry::extractElasticityModulus() {
-    CGL::CArray elasticyModulus(trace.size());
+    CGL::CArray elasticyModulus(static_cast<int>(trace.size()));
 
     std::clog << "colorize to elasticity modulus. Whall size:" << elasticyModulus.size();
     for (int i = 0; i != elasticyModulus.size(); ++i) {
@@ -598,7 +652,6 @@ QDataStream& operator << (QDataStream& out, const Geometry& g) {
         }
     }
     out << g.systems.size();
-    int k(0);
     for (Geometry::CoordinateSystems::const_iterator i(g.systems.begin()); i != g.systems.end(); ++i) {
         out << i.key();
         i.value()->save(out);
@@ -628,7 +681,6 @@ QDataStream& operator >> (QDataStream& in, Geometry& g) {
     }
     Geometry::CoordinateSystems::size_type s;
     in >> s;
-    int i(0);
     while (s--) {
         int key;
         CGL::RectangularCoordinateSystem* val;
@@ -645,7 +697,7 @@ void Geometry::alignZero() {
     if (center.lengthSquared() == 0 || vertexes.empty()) {
         return;
     }
-    int i(vertexes.length());
+    int i(static_cast<int>(vertexes.length()));
     do {
         --i;
         vertexes(i) -= center;
@@ -670,7 +722,7 @@ Geometry* Geometry::composition(const Geometry& a, const Geometry& b)
 {
     std::clog << "begin composition" << std::endl;
     Geometry* ret(new Geometry(a));
-    int vDest(a.vertexes.size());
+    int vDest(static_cast<int>(a.vertexes.size()));
     int tDest(vDest / 3);
     ret->vertexes.resize(a.vertexes.size() + b.vertexes.size());
     qCopy(b.vertexes.begin(), b.vertexes.end(), ret->vertexes.begin() + vDest);
@@ -690,8 +742,8 @@ std::vector<int> Geometry::truncationIndexVector(const Geometry& a, const Geomet
 {
     const CGL::Vertexes& am(a.vertexes);
     const CGL::Vertexes& bm(b.vertexes);
-    int aDimension(am.length());
-    int bDimension(bm.length());
+    int aDimension(static_cast<int>(am.length()));
+    int bDimension(static_cast<int>(bm.length()));
     CGL::Matrix dest(bDimension, aDimension);
     std::clog << "estimate destanations" << std::endl;
     for (int i(0); i != bDimension; ++i) {
@@ -744,7 +796,7 @@ void Geometry::layToBDF(const QString& source, const QString& dest, const CGL::C
             newShell[i * shells.size() + j].setMatId(i);
         }
     }
-    QBitArray isUsed(newShell.size());
+    QBitArray isUsed(static_cast<int>(newShell.size()));
 
 
     QFile base(source);

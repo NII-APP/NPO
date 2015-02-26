@@ -16,6 +16,9 @@ CColumnChart::~CColumnChart()
 
 void CColumnChart::setData(const CMatrix& d) {
     data = d;
+    if (data.empry()) {
+        return;
+    }
     RealRange r(data.estimateRange());
     r.include(0.0);
     size = std::max(data.width(), data.height());

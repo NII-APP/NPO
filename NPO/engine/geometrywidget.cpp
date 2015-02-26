@@ -135,7 +135,7 @@ void GeometryWidget::paintCGL()
     if (netAction->isChecked()) {
         data->renderNet();
     }
-    //this->debugSpace(this->scene());
+    this->debugSpace(this->scene());
 
     if (isAnimation()) {
         repaintLoop->start();

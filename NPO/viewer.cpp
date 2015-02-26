@@ -27,6 +27,7 @@ Viewer::Viewer(QWidget *parent)
 
     geometriesView = new QListView(this);
     geometriesView->setModel(new GeometriesModel(this));
+    geometriesView->setSelectionMode(QAbstractItemView::SingleSelection);
     this->addWidget(geometriesView);
 
     this->setStretchFactor(0,5);
@@ -63,7 +64,10 @@ void Viewer::addModel() {
     geometryWidget->setModel(forAdd);
     forAdd->colorize(0);
     geometryWidget->setForm(0);
-    macChart->setData(forAdd->getMac());
+    CGL::CMatrix m(forAdd->getMac());
+    if (m.width()) {
+        macChart->setData(forAdd->getMac());
+    }
     geometriesView->reset();
 }
 
