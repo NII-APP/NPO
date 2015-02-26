@@ -46,6 +46,7 @@ public:
 
     void setModel(const GeometryForm*);
     void setModel(const GeometryForm&);
+    const GeometryForm* getModel() { return data; }
     void setForm(int f);
     int getForm() const { return form; }
 

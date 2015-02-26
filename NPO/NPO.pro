@@ -50,7 +50,9 @@ SOURCES += main.cpp \
     geometriesmodel.cpp \
     viewer.cpp \
     engine/CGL/ccolumnchart.cpp \
-    engine/CGL/c3dchart.cpp
+    engine/CGL/c3dchart.cpp \
+    engine/CGL/cscale.cpp \
+    engine/CGL/ccolorscale.cpp
 
 HEADERS += \
     engine/animationoptions.h \
@@ -89,7 +91,9 @@ HEADERS += \
     geometriesmodel.h \
     viewer.h \
     engine/CGL/ccolumnchart.h \
-    engine/CGL/c3dchart.h
+    engine/CGL/c3dchart.h \
+    engine/CGL/cscale.h \
+    engine/CGL/ccolorscale.h
 
 OTHER_FILES += \
     summator.vert

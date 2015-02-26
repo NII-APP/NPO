@@ -20,6 +20,10 @@
 
 using namespace core;
 
+namespace CGL {
+    class CParse;
+}
+
 class Geometry
 {
 public:
@@ -62,6 +66,8 @@ private:
     typedef std::vector<Material> Materials;
     Materials materials;
 
+    static int arriveKnownUNVBlock(CGL::CParse& f);
+    
     void estimateTraced();
     void estimateBox();
     void estimateQuadTraceBufer();

@@ -32,6 +32,7 @@ public:
     inline bool testPrew(const std::string& dest) { return testPrew(dest.c_str()); }
 
     CParse& operator +=(int v) { d += v; return *this; }
+    CParse& operator -=(int v) { d -= v; return *this; }
     CParse& operator ++() { ++d; return *this; }
     CParse& operator ++(int) { ++d; return *this; }
     int operator- (const CParse& p) const { return d - p.d; }

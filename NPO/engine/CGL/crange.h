@@ -27,6 +27,9 @@ public:
         this->first = std::min(v, this->first);
         this->second = std::max(v, this->second);
     }
+
+    T operator() (const qreal& op) const { return getMin() + range() * op; }
+    qreal operator[] (const T& op) const { return (op - getMin()) / range(); }
 };
 
 template <typename T> QDebug operator<<(QDebug out, const CRange<T>& r) {

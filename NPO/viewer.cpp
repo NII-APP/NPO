@@ -21,12 +21,13 @@ Viewer::Viewer(QWidget *parent)
         paint->drawPixmap(me->width() / 2.0 - img.width() / 2.0, me->height() / 2.0 - img.height() / 2.0, img);
         delete paint;
         me->makeCurrent();
-        me->swapBuffers();*/
+        me->swapBuffers();//*/
         me->makeCurrent();
     });
 
     geometriesView = new QListView(this);
     geometriesView->setModel(new GeometriesModel(this));
+    geometriesView->setSelectionMode(QAbstractItemView::SingleSelection);
     this->addWidget(geometriesView);
 
     this->setStretchFactor(0,5);
@@ -63,13 +64,23 @@ void Viewer::addModel() {
     geometryWidget->setModel(forAdd);
     forAdd->colorize(0);
     geometryWidget->setForm(0);
-    macChart->setData(forAdd->getMac());
+    CGL::CMatrix m(forAdd->getMac());
+    if (m.width()) {
+        macChart->setData(forAdd->getMac());
+    }
     geometriesView->reset();
 }
 
 void Viewer::resetListView()
 {
     geometriesView->reset();
+}
+
+void Viewer::setMode(int m) {
+    /*for (int i(0); i != Application::project()->modelsList().size(); ++i) {
+        
+    }*/
+    //geometryWidget->getModel()->colorize();
 }
 
 Viewer::~Viewer()
