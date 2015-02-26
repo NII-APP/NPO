@@ -36,10 +36,10 @@ void RectangularCoordinateSystem::save(QDataStream& to) const
 
 RectangularCoordinateSystem* RectangularCoordinateSystem::load(QDataStream& in)
 {
-    int typ;
-    in >> typ;
+    int type;
+    in >> type;
     RectangularCoordinateSystem* g;
-    switch (typ) {
+    switch (type) {
     case Rectangular:
         g = new RectangularCoordinateSystem;
         break;
@@ -51,5 +51,10 @@ RectangularCoordinateSystem* RectangularCoordinateSystem::load(QDataStream& in)
     return g;
 }
 
+bool operator==(const RectangularCoordinateSystem &l, const RectangularCoordinateSystem &r)
+{
+    return (l.type() == r.type()) && (l.a == r.a) && (l.ox == r.ox) && (l.oy == r.oy) && (l.oz == r.oz);
+}
 
 }
+

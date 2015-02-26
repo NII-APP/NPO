@@ -96,7 +96,7 @@ void Project::load(const QString &filename)
 
     size_t size;
     in >> size;
-    geometries.clear();
+    //geometries.clear();
     for (size_t i = 0; i < size; ++i) {
         Geometry* g = new Geometry();
         in >> *g;

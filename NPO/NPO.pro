@@ -74,7 +74,7 @@ HEADERS += \
     engine/geometryform.h \
     engine/geometrypair.h \
     engine/pseudoInverse.h \
-    engine/engine/core/finitelement.h \
+    engine/core/finitelement.h \
     engine/core/hexa.h \
     engine/core/lines.h \
     engine/core/material.h \

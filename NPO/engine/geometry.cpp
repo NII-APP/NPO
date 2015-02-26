@@ -387,6 +387,7 @@ void Geometry::impress() const
     render();
 }
 
+
 void Geometry::render() const {
     if (colorized()) {
         glEnableClientState(GL_COLOR_ARRAY);
@@ -579,63 +580,116 @@ void Geometry::colorize(const CGL::CVertexes &v, const QString& mes)
     }
 }
 
+bool operator==(const Geometry &l, const Geometry &r)
+{
+    if (l.trace.size() != r.trace.size()){
+        return false;
+    }
+
+    for (size_t i = 0; i < l.trace.size(); ++i){
+        if (!l.trace[i]) continue;
+
+        size_t leftSize = l.trace[i]->nodesCount();
+        size_t rightSize = r.trace[i]->nodesCount();
+
+        if (leftSize != rightSize) {
+            qDebug() << i << " " << leftSize << " " << rightSize;
+            return false;
+        }
+
+        int* left = l.trace[i]->nodes();
+        int* right = r.trace[i]->nodes();
+
+        for (size_t j = 0; j < leftSize; ++j) {
+            if (left[j] != right[j]) {
+                qDebug() << i << " " << left[j] << " " << right[j];
+                return false;
+            }
+        }
+    }
+
+    if (l.systems.size() != r.systems.size()){
+        return false;
+    }
+
+    auto systemLeft = l.systems.begin();
+    auto systemRight = r.systems.begin();
+    for (size_t i = 0; i < l.systems.size(); ++i) {
+        if (systemLeft.key() != systemRight.key()){
+            return false;
+        }
+        if (systemLeft.value() != systemRight.value()){
+            return false;
+        }
+        ++systemLeft;
+        ++systemRight;
+    }
+
+    return (l.sqre == r.sqre) && (l.isTraced == r.isTraced) && (l.markedNodes == r.markedNodes) &&
+            (l.measurment == r.measurment) && (l.file == r.file) && (l.modelType == r.modelType) &&
+            (l.vertexes == r.vertexes) && (l.colors == r.colors) && (l.trace.size() == r.trace.size());
+}
+
 QDataStream& operator << (QDataStream& out, const Geometry& g) {
-    qDebug() << "\nwrite to stream";
+    qDebug() << "Write to stream...";
     out << g.sqre << g.isTraced << g.markedNodes << g.measurment << g.file << static_cast<int>(g.modelType);
     out << g.vertexes << g.colors;
     out << g.trace.size();
-    int realCount(0);
+
+    size_t realCount(0);
     for (Geometry::Trace::const_iterator it(g.trace.begin()), end(g.trace.end()); it != end; ++it) {
         realCount += *it != 0;
     }
     out << realCount;
-    for (int i(0); i != g.trace.size(); ++i) {
+
+    for (size_t i(0); i != g.trace.size(); ++i) {
         if (g.trace[i]) {
             out << i;
-            //qDebug() << g.trace[i]->type() << g.trace[i]->getMaterial();
-            g.trace[i]->save(out);
-            --realCount;
+            FinitElement::saveElement(out, *g.trace[i]);
         }
     }
+
     out << g.systems.size();
-    int k(0);
+
     for (Geometry::CoordinateSystems::const_iterator i(g.systems.begin()); i != g.systems.end(); ++i) {
         out << i.key();
         i.value()->save(out);
-
     }
-    qDebug() << "\ttrace competition" << realCount;
+
     return out;
 }
 QDataStream& operator >> (QDataStream& in, Geometry& g) {
-    qDebug() << "load from stream";
+    qDebug() << "Load from stream...";
     int modelType;
     in >> g.sqre >> g.isTraced >> g.markedNodes >> g.measurment >> g.file >> modelType;
     g.modelType = static_cast<Geometry::ModelType>(modelType);
     in >> g.vertexes >> g.colors;
-    qDebug() << "\tmain";
+
     Geometry::Trace::size_type size;
     in >> size;
-    qDebug() << "\tsize" << size;
-    int realCount;
+
+    size_t realCount;
     in >> realCount;
+
     g.trace.resize(size, 0);
-    qDebug() << "\nfor" << realCount;
-    for (int i(0); i != realCount; ++i) {
-        int id;
+    for (size_t i(0); i != realCount; ++i) {
+        size_t id;
         in >> id;
         g.trace[id] = FinitElement::loadElement(in);
     }
+
     Geometry::CoordinateSystems::size_type s;
     in >> s;
-    int i(0);
+
+    int key;
+    CGL::RectangularCoordinateSystem* val;
     while (s--) {
-        int key;
-        CGL::RectangularCoordinateSystem* val;
         in >> key;
-        CGL::RectangularCoordinateSystem::load(in);
+        val = CGL::RectangularCoordinateSystem::load(in);
+
         g.systems.insert(key, val);
     }
+
     return in;
 }
 

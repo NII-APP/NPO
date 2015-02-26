@@ -30,7 +30,8 @@ public:
     virtual FinitElementType type() const = 0;
     virtual void getTraced(QBitArray&) const = 0;
     virtual FinitElement* load(QDataStream&) = 0;
-    virtual QDataStream& save(QDataStream&) const;
+    static QDataStream& saveElement(QDataStream&, FinitElement&);
+    virtual QDataStream& save(QDataStream&, FinitElement&) const = 0;
     static FinitElement* loadElement(QDataStream&);
     virtual const int* nodes() const = 0;
     virtual int* nodes() = 0;

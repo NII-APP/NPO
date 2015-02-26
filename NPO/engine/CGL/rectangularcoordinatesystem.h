@@ -26,6 +26,7 @@ public:
     virtual int type() const { return Rectangular; }
 
     friend QDataStream& operator << (QDataStream& out, const RectangularCoordinateSystem& g);
+    friend bool operator==(const RectangularCoordinateSystem&, const RectangularCoordinateSystem&);
 
     static RectangularCoordinateSystem* load(QDataStream& in);
 
@@ -36,6 +37,7 @@ public:
 
 
 QDataStream& operator << (QDataStream& out, const CGL::RectangularCoordinateSystem& g);
+bool operator==(const CGL::RectangularCoordinateSystem& l, const CGL::RectangularCoordinateSystem& r);
 
 
 #endif // RECTANGULARCOORDINATESYSTEM_H

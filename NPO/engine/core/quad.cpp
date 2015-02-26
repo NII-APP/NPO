@@ -40,13 +40,25 @@ void Quad::renderNet() const {
     glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, n);
 }
 
-QDataStream& Quad::save(QDataStream& s) const {
-    FinitElement::save(s);
-    s.writeRawData(static_cast<const char*>(static_cast<const void*>(n)), sizeof(int) * 4);
-    return s;
+QDataStream& Quad::save(QDataStream& out, FinitElement& el) const {
+    size_t size = el.nodesCount();
+    out << size;
+
+    int* data = el.nodes();
+    for (size_t i = 0; i < size; ++i) {
+        out << data[i];
+    }
+    return out;
 }
-FinitElement* Quad::load(QDataStream& s) {
-    s.readRawData(static_cast<char*>(static_cast<void*>(n)), sizeof(int) * 4);
+FinitElement* Quad::load(QDataStream& in) {
+    size_t size;
+    in >> size;
+
+    for (size_t i = 0; i < size; ++i) {
+        int data;
+        in >> data;
+        n[i] = data;
+    }
     return this;
 }
 

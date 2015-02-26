@@ -2,6 +2,7 @@
 #include <QBitArray>
 #include <QtOpenGL>
 #include <QDataStream>
+
 namespace core {
 
 Lines::Lines()
@@ -25,17 +26,45 @@ void Lines::renderNet() const {
     render();
 }
 
-QDataStream& Lines::save(QDataStream& s) const {
-    FinitElement::save(s);
-    s << n.size();
-    s.writeRawData(static_cast<const char*>(static_cast<const void*>(n.data())), sizeof(int) * n.size());
-    return s;
+QDataStream& Lines::save(QDataStream& out, FinitElement& el) const {
+    Nodes::size_type size;
+    size = el.nodesCount();
+    out << size;
+//    qDebug() << size;
+    int* data = el.nodes();
+    for (size_t i = 0; i < size; ++i) {
+        out << data[i];
+    }
+
+    //out.writeRawData(static_cast<const char*>(static_cast<const void*>(el.nodes())), sizeof(Nodes::value_type) * size);
+
+    //qDebug() << "-------------------- SAVE:";
+    //qDebug() << "size: " << size;
+    //qDebug() << "n.data(): " << el.nodes();
+    //qDebug() << "sizeof: " << sizeof(Nodes::value_type) * size;
+    //qDebug() << "-------------------- SAVE END";
+
+    return out;
 }
-FinitElement* Lines::load(QDataStream& s) {
-    Nodes::size_type b;
-    s >> b;
-    n.resize(b);
-    s.readRawData(static_cast<char*>(static_cast<void*>(n.data())), sizeof(Nodes::value_type) * b);
+FinitElement* Lines::load(QDataStream& in) {
+    Nodes::size_type size;
+    in >> size;
+    n.resize(size);
+//    qDebug() << size;
+    int data;
+    for (size_t i = 0; i < size; ++i) {
+        in >> data;
+        n[i] = data;
+    }
+
+    //in.readRawData(static_cast<char*>(static_cast<void*>(n.data())), sizeof(Nodes::value_type) * size);
+    /*
+    qDebug() << "-------------------- LOAD:";
+    qDebug() << "size: " << size;
+    qDebug() << "n.data(): " << n.data();
+    qDebug() << "sizeof: " << sizeof(Nodes::value_type) * size;
+    qDebug() << "-------------------- LOAD END";
+    */
     return this;
 }
 

@@ -126,6 +126,7 @@ public:
 
     friend QDataStream& operator << (QDataStream&, const Geometry&);
     friend QDataStream& operator >> (QDataStream&, Geometry&);
+    friend bool operator==(const Geometry&, const Geometry&);
     const QString& getName() const { return file; }
 
     //Science operations
@@ -139,6 +140,7 @@ public:
     CGL::CArray extractElasticityModulus();
 };
 
+bool operator==(const Geometry& l, const Geometry& r);
 QDataStream& operator << (QDataStream& out, const Geometry& g);
 QDataStream& operator >> (QDataStream& out, Geometry& g);
 

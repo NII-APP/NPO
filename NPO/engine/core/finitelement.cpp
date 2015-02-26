@@ -7,6 +7,7 @@
 #include "tria.h"
 #include <QDebug>
 #include <cassert>
+#include <vector>
 
 namespace core {
 
@@ -20,37 +21,71 @@ int FinitElement::getShell() const { return shellIndex; }
 int& FinitElement::shell() { return shellIndex; }
 const int& FinitElement::shell() const { return shellIndex; }
 
-QDataStream& FinitElement::save(QDataStream& s) const {
-    return s << shellIndex << type();
-}
-FinitElement* FinitElement::loadElement(QDataStream& s) {
-    int shell;
-    s >> shell;
-    int t;
-    s >> t;
+QDataStream &FinitElement::saveElement(QDataStream &out, FinitElement& el)
+{
+    int shell = el.shell();
+    int type = el.type();
+
+    out << shell;
+    out << type;
+
     FinitElement* v;
-    switch (t) {
+    switch (type) {
     case LinesType:
         v = new Lines;
         v->setShell(shell);
-        return v->load(s);
+        return v->save(out, el);
     case QuadType:
         v = new Quad;
         v->setShell(shell);
-        return v->load(s);
+        return v->save(out, el);
     case TetraType:
         v = new Tetra;
         v->setShell(shell);
-        return v->load(s);
+        return v->save(out, el);
     case HexaType:
         v = new Hexa;
         v->setShell(shell);
-        return v->load(s);
+        return v->save(out, el);
     case TriaType:
         v = new Tria;
         v->setShell(shell);
-        return v->load(s);
+        return v->save(out, el);
+        break;
     }
+    return out;
+}
+
+FinitElement* FinitElement::loadElement(QDataStream& in) {
+    int shell;
+    in >> shell;
+    int type;
+    in >> type;
+
+    FinitElement* v;
+    switch (type) {
+    case LinesType:
+        v = new Lines;
+        v->setShell(shell);
+        return v->load(in);
+    case QuadType:
+        v = new Quad;
+        v->setShell(shell);
+        return v->load(in);
+    case TetraType:
+        v = new Tetra;
+        v->setShell(shell);
+        return v->load(in);
+    case HexaType:
+        v = new Hexa;
+        v->setShell(shell);
+        return v->load(in);
+    case TriaType:
+        v = new Tria;
+        v->setShell(shell);
+        return v->load(in);
+    }
+    return v = nullptr;
 }
 
 
