@@ -31,25 +31,25 @@ public:
     GeometryForm(const Geometry&);
     GeometryForm(const GeometryForm&);
 
-    inline void colorize(int form) { if (forms.size() > form && form > 0) { Geometry::colorize(forms[form].form()); } }
+    inline void colorize(int form) { if (forms.size() > form && form >= 0) { Geometry::colorize(forms[form].form()); } }
     const CGL::CMatrix& getMac() const;
     const CGL::CArray& getPreMac() const { return preMac; }
 
     //whole form
     Forms& modes() { return forms; }
     const Forms& modes() const { return forms; }
-    size_t modesCount() const { return forms.size(); }
+    int modesCount() const { return static_cast<int>(forms.size()); }
     Form& mode(int i) { return forms[i]; }
     const Form& mode(int i) const { return forms.at(i); }
     //get direct separated parameter of form
-    float frequency(int i) const { return forms.at(i).frequency(); }
+    float frequency(int i) const { return forms.size() > i && i >= 0 ? forms.at(i).frequency() : 0.0; }
     const CGL::Vertexes& form(int i) const { return forms.at(i).form(); }
     const CGL::CArray& power(int i) const { return forms.at(i).power(); }
 
     double getDefoultMagnitude(int f) const { return defoultMagnitude.at(f); }
     const CGL::CArray& getDefoultMagnitudes() const { return defoultMagnitude; }
 
-    void read(const QString &fileName);
+    bool read(const QString &fileName);
     void readF06(const QString &fileName);
     void readTXT(const QString &fileName);
 

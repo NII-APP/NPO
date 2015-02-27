@@ -12,7 +12,7 @@ class GeometryWidget : public CGLWidget
 {
     Q_OBJECT
 
-    const GeometryForm* data;
+    const Geometry* data;
     QAction* netAction;
     QAction* animationAction;
     QAction* pauseAction;
@@ -37,16 +37,16 @@ class GeometryWidget : public CGLWidget
 
     double currentPhase() const;
 
-    bool isAnimation() const { return !animationAction->isChecked() && data && data->modes().size() > form && form >= 0; }
+    bool isAnimation() const;
     void drawIdantityQuad();
 
 public:
     GeometryWidget(QWidget* parent = 0, QGLWidget* sharedWidget = 0, Qt::WindowFlags f = 0);
     ~GeometryWidget();
 
-    void setModel(const GeometryForm*);
-    void setModel(const GeometryForm&);
-    const GeometryForm* getModel() { return data; }
+    void setModel(const Geometry *);
+    void setModel(const Geometry&);
+    const Geometry* getModel() { return data; }
     void setForm(int f);
     int getForm() const { return form; }
 

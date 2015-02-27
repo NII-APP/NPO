@@ -17,6 +17,8 @@
 #include <QMatrix4x4>
 #include <cmath>
 #include "core/material.h"
+#include <QMatrix3x3>
+#include "form.h"
 
 using namespace core;
 
@@ -65,6 +67,8 @@ private:
     //map of matherials
     typedef std::vector<Material> Materials;
     Materials materials;
+    //UNV can store the transformation matrices for forms coordinate systems.
+    std::vector<QMatrix3x3> UNVTransformations;
 
     static int arriveKnownUNVBlock(CGL::CParse& f);
     
@@ -89,10 +93,13 @@ protected:
 
     size_t sizeOf();
 
+    void UNVTransformation(Forms&) const;
+
 public:
     Geometry();
     Geometry(const QString& fileName);
     Geometry(const Geometry& g);
+    virtual bool read(const QString &fileName);
     virtual ~Geometry();
 
     //reading that formsts

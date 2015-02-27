@@ -16,7 +16,7 @@ CColumnChart::~CColumnChart()
 
 void CColumnChart::setData(const CMatrix& d) {
     data = d;
-    if (data.empry()) {
+    if (data.empty()) {
         return;
     }
     RealRange r(data.estimateRange());

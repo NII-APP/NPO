@@ -50,6 +50,14 @@ GeometryWidget::GeometryWidget(QWidget *parent, QGLWidget *shareWidget, Qt::Wind
     this->menu->addActions(QList<QAction*>() << netAction);
 }
 
+bool GeometryWidget::isAnimation() const {
+    try {
+        return !animationAction->isChecked() && data && dynamic_cast<const GeometryForm&>(*data).modes().size() > form && form >= 0;
+    } catch (const std::bad_cast&) {
+        return false;
+    }
+}
+
 void GeometryWidget::initialAnimation() {
     initialPhase = currentPhase();
     initialTime = QTime::currentTime();
@@ -71,9 +79,12 @@ void GeometryWidget::frequencyDecr()
 }
 void GeometryWidget::formIncr()
 {
-    if (data && data->modes().size() - 1 > form)
-        setForm(form + 1);
-    this->repaint();
+    const GeometryForm* data(dynamic_cast<const GeometryForm*>(this->data));
+    if (data) {
+        if (data && data->modes().size() - 1 > form)
+            setForm(form + 1);
+        this->repaint();
+    }
 }
 void GeometryWidget::formDecr()
 {
@@ -125,7 +136,9 @@ void GeometryWidget::paintCGL()
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, data->nodes().data());
     if (isAnimation()) {
-        glNormalPointer(GL_FLOAT, 0, data->form(form).data());
+        if (dynamic_cast<const GeometryForm*>(data)) {
+            glNormalPointer(GL_FLOAT, 0, dynamic_cast<const GeometryForm*>(data)->form(form).data());
+        }
         glEnableClientState(GL_NORMAL_ARRAY);
     } else {
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -142,20 +155,25 @@ void GeometryWidget::paintCGL()
     }
 }
 
-void GeometryWidget::setModel(const GeometryForm* g)
+void GeometryWidget::setModel(const Geometry* g)
 {
     this->setScene(g->box());
     data = g;
-    if (form >= data->modes().size()) {
-        form = static_cast<int>(data->modes().size() - 1);
+
+    if (dynamic_cast<const GeometryForm*>(this->data)) {
+        if (form >= dynamic_cast<const GeometryForm*>(this->data)->modes().size()) {
+            form = static_cast<int>(dynamic_cast<const GeometryForm*>(this->data)->modes().size() - 1);
+        }
+        if (form < 0) {
+            form = 0;
+        }
     }
-    if (form < 0) {
-        form = 0;
-    }
+
+    qDebug() << "repaint new mesh";
     this->repaint();
 }
 
-void GeometryWidget::setModel(const GeometryForm& g)
+void GeometryWidget::setModel(const Geometry &g)
 {
     this->setModel(&g);
 }
@@ -185,13 +203,16 @@ double GeometryWidget::currentPhase() const {
 }
 
 void GeometryWidget::timerEvent(QTimerEvent*) {
-    if (isAnimation()) {
-        if (pauseAction->isChecked()) {
-            initialTime = QTime::currentTime();
+    const GeometryForm* data(dynamic_cast<const GeometryForm*>(this->data));
+    if (data) {
+        if (isAnimation()) {
+            if (pauseAction->isChecked()) {
+                initialTime = QTime::currentTime();
+            }
+            this->makeCurrent();
+            double phase(currentPhase());
+            summator->setUniformValue("k", static_cast<GLfloat>(sin(phase)) * animation->getMagnitude() * static_cast<GLfloat>(data->getDefoultMagnitude(form)));
         }
-        this->makeCurrent();
-        double phase(currentPhase());
-        summator->setUniformValue("k", static_cast<GLfloat>(sin(phase)) * animation->getMagnitude() * static_cast<GLfloat>(data->getDefoultMagnitude(form)));
     }
 }
 

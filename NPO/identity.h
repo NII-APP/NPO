@@ -23,8 +23,8 @@ private:
     static const QJsonObject readConfig();
     QJsonValue at(const QString&) const;
     static QList<QAction*> toActions(const QJsonArray &menu, QObject* parent, const Relations & relations = Relations());
-    QString execOpenFileNameDialog(const QJsonObject& config, QWidget* parent) const;
-    QString execSaveFileNameDialog(const QJsonObject& config, QWidget* parent) const;
+    QString execOpenFileNameDialog(const QJsonObject& config) const;
+    QString execSaveFileNameDialog(const QJsonObject& config) const;
 public:
     Identity();
     ~Identity();
@@ -37,15 +37,17 @@ public:
     QString language() const;
 
     QString geometriesModelAdd() const;
+    QString formSelectorLabel() const;
+    QString hertz() const;
     QString geometryWidgetNoDataImage() const;
 
-    QString choseModelFile(QWidget *parent = 0) const;
-    QString choseModesFile(QWidget* parent) const;
-    QString choseProjectFile(QWidget* parent = 0) const;
-    QString choseSaveFile(QWidget* parent = 0) const;
-    QMessageBox::StandardButton choseIsSaveQuestion(QWidget* parent = 0) const;
+    QString choseModelFile() const;
+    QString choseModesFile() const;
+    QString choseProjectFile() const;
+    QString choseSaveFile() const;
+    QMessageBox::StandardButton choseIsSaveQuestion() const;
 
-    void messageWrongProFile(QWidget* parent = 0) const;
+    void messageWrongProFile() const;
 
     QString menuFileName() const;
     QList<QAction*> menuFileActions(QObject* parent, const Relations& = Relations()) const;

@@ -1,5 +1,6 @@
 #include "geometryform.h"
 #include <iostream>
+#include <QVector3D>
 
 GeometryForm::GeometryForm()
 {
@@ -64,23 +65,29 @@ void GeometryForm::readTXT(const QString &fileName)
         pos += numbers.matchedLength();
     }
     while ((*f >= 'A' && *f <= 'Z') || (*f >= 'a' && *f <= 'z')) {
-        f.skipTo(":+Z");
+        f.skipTo(":+");
+        QVector3D orientation;
+        switch (tolower(f[2])) {
+        case 'z':
+            orientation = QVector3D(0.0f,0.0f,1.0f);
+            break;
+        case 'y':
+            orientation = QVector3D(0.0f,1.0f,0.0f);
+            break;
+        case 'x': default:
+            orientation = QVector3D(1.0f,0.0f,0.0f);
+        }
+
         f += 4;
         for (int i = 0; i != forms.size(); ++i) {
             f.real();
             f.real();
             f.real();
-            if (nodes().size() == 33) {
-                forms[i].form().push_back(f.real());
-            }
-            forms[i].form().push_back(0.0f);
-            if (nodes().size() != 33) {
-                forms[i].form().push_back(f.real());
-            }
-            forms[i].form().push_back(0.0f);
+            forms[i].form().push_vector_back(f.real() * orientation);
         }
         f.skipRow();
     }
+    UNVTransformation(forms);
 
     estimateDefoultMagnitudes();
     estimateMAC();
@@ -207,19 +214,20 @@ void GeometryForm::readF06(const QString& fileName)
     std::clog << "\tFile correctly parse " << forms.size() << " forms with " << (forms.empty() ? std::numeric_limits<double>::quiet_NaN() : forms.front().form().length()) << " nodes with each (" << loop.msecsTo(QTime::currentTime()) / 1000. << "ms)\n";
 }
 
-void GeometryForm::read(const QString &fileName) {
+bool GeometryForm::read(const QString &fileName) {
     const QString format(fileName.split('.').last());
-    if (!format.compare("BDF",Qt::CaseInsensitive)) {
-        this->readBDF(fileName);
-    } else if (!format.compare("UNV", Qt::CaseInsensitive)) {
-        this->readUNV(fileName);
-    } else if (!format.compare("txt", Qt::CaseInsensitive)) {
-        this->readTXT(fileName);
-    } else if (!format.compare("f06", Qt::CaseInsensitive)) {
-        this->readF06(fileName);
-    } else {
-        std::clog << "undexpected file format " << format.toStdString() << " for geometry parsing";
+    if (Geometry::read(fileName)) {
+        return true;
     }
+    if (!format.compare("txt", Qt::CaseInsensitive)) {
+        this->readTXT(fileName);
+        return true;
+    }
+    if (!format.compare("f06", Qt::CaseInsensitive)) {
+        this->readF06(fileName);
+        return true;
+    }
+    return false;
 }
 
 void GeometryForm::estimateDefoultMagnitudes() {

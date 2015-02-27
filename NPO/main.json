@@ -33,6 +33,8 @@
     "geometries model add rus" : "Добавить модель . . .",
     "geometries model add eng" : "Add mesh . . .",
     "geometry widget no data image" : ":/media/images/hill.png",
+    "form selector label eng" : "Mode:",
+    "form selector label rus" : "Форма:",
     "chose model" : {
         "caption rus" : "Укажите файл модели",
         "caption eng" : "Chose mesh file",
@@ -63,5 +65,7 @@
         "text rus" : "Файл не является проектом, созданным в данном приложении",
         "text eng" : "Chosen file isn't a project of this appliccation",
         "title rus" : "Возникла ошибка при открытии файла"
-    }
+    },
+    "hertz eng" : "Hz",
+    "hertz rus" : "Гц"
 }
