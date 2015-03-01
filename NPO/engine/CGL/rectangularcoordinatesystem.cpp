@@ -2,6 +2,7 @@
 #include <QDataStream>
 #include <QVector3D>
 #include "cylindercoordinatesystem.h"
+#include <QDebug>
 
 namespace CGL {
 
@@ -53,6 +54,7 @@ RectangularCoordinateSystem* RectangularCoordinateSystem::load(QDataStream& in)
 
 bool operator==(const RectangularCoordinateSystem &l, const RectangularCoordinateSystem &r)
 {
+    qDebug() << l.type() << " " << r.type() << ' ' << l.a << " " << r.a;
     return (l.type() == r.type()) && (l.a == r.a) && (l.ox == r.ox) && (l.oy == r.oy) && (l.oz == r.oz);
 }
 

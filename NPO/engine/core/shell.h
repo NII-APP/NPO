@@ -18,6 +18,7 @@ public:
     Shell(int, int, float, int, int);
     friend QDataStream& operator >> (QDataStream&, Shell&);
     friend QDataStream& operator << (QDataStream&, const Shell&);
+    friend bool operator==(const Shell&, const Shell&);
 
     int getMatId() const { return matherialId; }
     void setMatId(int i) { matherialId = i; }
@@ -28,6 +29,7 @@ public:
 };
 QDataStream& operator >> (QDataStream&, Shell&);
 QDataStream& operator << (QDataStream&, const Shell&);
+bool operator==(const Shell&, const Shell&);
 
 typedef std::vector<Shell> Materials;
 

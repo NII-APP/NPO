@@ -663,6 +663,7 @@ bool operator==(const Geometry &l, const Geometry &r)
     }
 
     if (l.systems.size() != r.systems.size()){
+        qDebug() << "systems size " << l.systems.size() << " " << r.systems.size();
         return false;
     }
 
@@ -670,26 +671,84 @@ bool operator==(const Geometry &l, const Geometry &r)
     auto systemRight = r.systems.begin();
     for (size_t i = 0; i < l.systems.size(); ++i) {
         if (systemLeft.key() != systemRight.key()){
+            qDebug() << "materials key " << i << " " << systemLeft.key() << " " << systemRight.key();
             return false;
         }
-        if (systemLeft.value() != systemRight.value()){
+/*
+        if (!(systemLeft.value() == systemRight.value())){
+            qDebug() << "materials value " << i;// << " " << *systemLeft.value() << " " << *systemRight.value();
             return false;
         }
+*/
         ++systemLeft;
         ++systemRight;
     }
 
+    if (l.shells.size() != r.shells.size()){
+        qDebug() << "shells size " << l.shells.size() << " " << r.shells.size();
+        return false;
+    }
+    for (size_t i = 0; i < l.shells.size(); ++i) {
+        if (!(l.shells[i] == r.shells[i])) {
+            qDebug() << "shells i " << i;
+            return false;
+        }
+    }
+
+    if (l.materials.size() != r.materials.size()){
+        qDebug() << "materials size " << l.materials.size() << " " << r.materials.size();
+        return false;
+    }
+    for (size_t i = 0; i < l.materials.size(); ++i) {
+        if (!(l.materials[i] == r.materials[i])) {
+            qDebug() << "materials i " << i;
+            return false;
+        }
+    }
+
+    if (l.links.size() != r.links.size()){
+        qDebug() << "links size " << l.links.size() << " " << r.links.size();
+        return false;
+    }
+    for (size_t i = 0; i < l.links.size(); ++i) {
+        if ((l.links[i] != r.links[i])) {
+            qDebug() << "links i " << i;
+            return false;
+        }
+    }
     return (l.sqre == r.sqre) && (l.isTraced == r.isTraced) && (l.markedNodes == r.markedNodes) &&
             (l.measurment == r.measurment) && (l.file == r.file) && (l.modelType == r.modelType) &&
-            (l.vertexes == r.vertexes) && (l.colors == r.colors) && (l.trace.size() == r.trace.size());
+            (l.vertexes == r.vertexes) && (l.colors == r.colors) ;
 }
 
 QDataStream& operator << (QDataStream& out, const Geometry& g) {
     qDebug() << "Write to stream...";
     out << g.sqre << g.isTraced << g.markedNodes << g.measurment << g.file << static_cast<int>(g.modelType);
     out << g.vertexes << g.colors;
-    out << g.trace.size();
 
+    size_t shellsSize;
+    shellsSize = g.shells.size();
+    out << shellsSize;
+    for (size_t i = 0; i < shellsSize; ++i) {
+        out << g.shells[i];
+    }
+
+    size_t materialsSize;
+    materialsSize = g.materials.size();
+    out << materialsSize;
+    for (size_t i = 0; i < materialsSize; ++i) {
+        out << g.materials[i];
+    }
+
+    size_t linksSize;
+    linksSize = g.links.size();
+    out << linksSize;
+    for (size_t i = 0; i < linksSize; ++i) {
+        out << g.links[i].first;
+        out << g.links[i].second;
+    }
+
+    out << g.trace.size();
     size_t realCount(0);
     for (Geometry::Trace::const_iterator it(g.trace.begin()), end(g.trace.end()); it != end; ++it) {
         realCount += *it != 0;
@@ -709,6 +768,8 @@ QDataStream& operator << (QDataStream& out, const Geometry& g) {
         i.value()->save(out);
     }
 
+
+
     return out;
 }
 QDataStream& operator >> (QDataStream& in, Geometry& g) {
@@ -717,6 +778,28 @@ QDataStream& operator >> (QDataStream& in, Geometry& g) {
     in >> g.sqre >> g.isTraced >> g.markedNodes >> g.measurment >> g.file >> modelType;
     g.modelType = static_cast<Geometry::ModelType>(modelType);
     in >> g.vertexes >> g.colors;
+
+    size_t shellsSize;
+    in >> shellsSize;
+    g.shells.resize(shellsSize);
+    for (size_t i = 0; i < shellsSize; ++i) {
+        in >> g.shells[i];
+    }
+
+    size_t materialsSize;
+    in >> materialsSize;
+    g.materials.resize(materialsSize);
+    for (size_t i = 0; i < materialsSize; ++i) {
+        in >> g.materials[i];
+    }
+
+    size_t linksSize;
+    in >> linksSize;
+    g.links.resize(linksSize);
+    for (size_t i = 0; i < linksSize; ++i) {
+        in >> g.links[i].first;
+        in >> g.links[i].second;
+    }
 
     Geometry::Trace::size_type size;
     in >> size;

@@ -2,6 +2,7 @@
 #define MATERIAL_H
 #include <vector>
 #include <QDebug>
+#include <QDataStream>
 
 class Material
 {
@@ -56,6 +57,14 @@ public:
     Material(Type t);
     Material(){}
     double& operator[](int where) { if (values.size() <= where) { values.resize(where + 1, 0.0); } return values[where]; }
+
+    friend QDataStream& operator >> (QDataStream&, Material&);
+    friend QDataStream& operator << (QDataStream&, const Material&);
+    friend bool operator==(const Material&, const Material&);
 };
+
+QDataStream& operator >> (QDataStream&, Material&);
+QDataStream& operator << (QDataStream&, const Material&);
+bool operator==(const Material&, const Material&);
 
 #endif // MATERIAL_H
