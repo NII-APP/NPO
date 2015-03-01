@@ -26,7 +26,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::open() {
     while (Application::project()->isModified()) {
-        QMessageBox::StandardButton todo(Application::identity()->choseIsSaveQuestion(this));
+        QMessageBox::StandardButton todo(Application::identity()->choseIsSaveQuestion());
         if (todo == QMessageBox::Cancel) {
             return;
         } else if (todo == QMessageBox::Yes) {
@@ -35,16 +35,16 @@ void MainWindow::open() {
             break;
         }
     }
-    QString name(Application::identity()->choseProjectFile(this));
+    QString name(Application::identity()->choseProjectFile());
     if (Project::isOwnProject(name)) {
         Application::project()->load(name);
     } else {
-        Application::identity()->messageWrongProFile(this);
+        Application::identity()->messageWrongProFile();
     }
 }
 
 void MainWindow::saveAs() {
-    QString where(Application::identity()->choseSaveFile(this));
+    QString where(Application::identity()->choseSaveFile());
     if (!where.isEmpty()) {
         disposed = where;
         save();

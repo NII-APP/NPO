@@ -107,43 +107,51 @@ QString Identity::geometriesModelAdd() const {
     Q_ASSERT(configuration.contains("geometries model add " + language()));
     return configuration["geometries model add " + language()].toString();
 }
+QString Identity::formSelectorLabel() const {
+    Q_ASSERT(configuration.contains("form selector label " + language()));
+    return configuration["form selector label " + language()].toString();
+}
+QString Identity::hertz() const {
+    Q_ASSERT(configuration.contains("hertz " + language()));
+    return configuration["hertz " + language()].toString();
+}
 
-QString Identity::choseModelFile(QWidget* parent) const {
+QString Identity::choseModelFile() const {
     Q_ASSERT(configuration.contains("chose model") && configuration["chose model"].isObject());
-    return execOpenFileNameDialog(configuration["chose model"].toObject(), parent);
+    return execOpenFileNameDialog(configuration["chose model"].toObject());
 }
 
-QString Identity::choseModesFile(QWidget* parent) const {
+QString Identity::choseModesFile() const {
     Q_ASSERT(configuration.contains("chose modes") && configuration["chose modes"].isObject());
-    return execOpenFileNameDialog(configuration["chose modes"].toObject(), parent);
+    return execOpenFileNameDialog(configuration["chose modes"].toObject());
 }
 
-QString Identity::choseProjectFile(QWidget* parent) const {
+QString Identity::choseProjectFile() const {
     Q_ASSERT(configuration.contains("load project") && configuration["load project"].isObject());
-    return execOpenFileNameDialog(configuration["load project"].toObject(), parent);
+    return execOpenFileNameDialog(configuration["load project"].toObject());
 }
 
-QString Identity::choseSaveFile(QWidget* parent) const {
+QString Identity::choseSaveFile() const {
     Q_ASSERT(configuration.contains("save project") && configuration["save project"].isObject());
-    return execSaveFileNameDialog(configuration["save project"].toObject(), parent);
+    return execSaveFileNameDialog(configuration["save project"].toObject());
 }
 
-QMessageBox::StandardButton Identity::choseIsSaveQuestion(QWidget* parent) const {
+QMessageBox::StandardButton Identity::choseIsSaveQuestion() const {
     Q_ASSERT(configuration.contains("is save") && configuration["is save"].isObject());
     QJsonObject q(configuration["is save"].toObject());
     Q_ASSERT(q.contains("text " + language()));
-    return QMessageBox::question(parent, q["title " + language()].toString(), q["text " + language()].toString(),
+    return QMessageBox::question(QApplication::topLevelWidgets().first(), q["title " + language()].toString(), q["text " + language()].toString(),
             QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel));
 }
 
-void Identity::messageWrongProFile(QWidget* parent) const {
+void Identity::messageWrongProFile() const {
     Q_ASSERT(configuration.contains("wrong file") && configuration["wrong file"].isObject());
     QJsonObject q(configuration["wrong file"].toObject());
     Q_ASSERT(q.contains("text " + language()));
-    QMessageBox::warning(parent, q["title " + language()].toString(), q["text " + language()].toString());
+    QMessageBox::warning(QApplication::topLevelWidgets().first(), q["title " + language()].toString(), q["text " + language()].toString());
 }
 
-QString Identity::execOpenFileNameDialog(const QJsonObject& config, QWidget* parent) const {
+QString Identity::execOpenFileNameDialog(const QJsonObject& config) const {
     QString caption;
     QString filter;
     if (config.contains("filter")) {
@@ -152,10 +160,10 @@ QString Identity::execOpenFileNameDialog(const QJsonObject& config, QWidget* par
     if (config.contains("caption " + language())) {
         caption = config["caption " + language()].toString();
     }
-    return QFileDialog::getOpenFileName(parent, caption, QString(), filter);
+    return QFileDialog::getOpenFileName(QApplication::topLevelWidgets().first(), caption, QString(), filter);
 }
 
-QString Identity::execSaveFileNameDialog(const QJsonObject& config, QWidget* parent) const {
+QString Identity::execSaveFileNameDialog(const QJsonObject& config) const {
     QString caption;
     QString filter;
     if (config.contains("filter")) {
@@ -164,7 +172,7 @@ QString Identity::execSaveFileNameDialog(const QJsonObject& config, QWidget* par
     if (config.contains("caption " + language())) {
         caption = config["caption " + language()].toString();
     }
-    return QFileDialog::getSaveFileName(parent, caption, QString(), filter);
+    return QFileDialog::getSaveFileName(QApplication::topLevelWidgets().first(), caption, QString(), filter);
 }
 
 

@@ -13,6 +13,7 @@
 #include <QTextStream>
 #include <sstream>
 #include <cassert>
+#include "form.h"
 
 const int Geometry::LOW_POLYGON = 300;
 const unsigned char Geometry::CONST_BLACK[] = { 0x00, 0x00, 0x00 };
@@ -42,12 +43,13 @@ Geometry::Geometry(const Geometry& g)
     , file(g.file)
     , shells(g.shells)
     , materials(g.materials)
+    , UNVTransformations(g.UNVTransformations)
 {
     Trace::const_iterator s(g.trace.begin());
     Trace::iterator d(trace.begin());
     Trace::iterator end(trace.end());
     while (d != end) {
-        *d = (*s)->clone();
+        *d = *s ? (*s)->clone() : 0;
         ++d;
         ++s;
     }
@@ -55,9 +57,22 @@ Geometry::Geometry(const Geometry& g)
     CoordinateSystems::const_iterator end2(g.systems.end());
     while (i != end2) {
         systems.insert(i.key(), i.value()->clone());
+        ++i;
     }
 }
 
+bool Geometry::read(const QString &fileName) {
+    const QString format(fileName.split('.').last());
+    if (!format.compare("BDF",Qt::CaseInsensitive)) {
+        this->readBDF(fileName);
+        return true;
+    }
+    if (!format.compare("UNV", Qt::CaseInsensitive)) {
+        this->readUNV(fileName);
+        return true;
+    }
+    return false;
+}
 
 Geometry::~Geometry() {
     qDeleteAll(trace);
@@ -100,10 +115,11 @@ bool Geometry::readBDF(const QString &fileName)
     CGL::Parse f(CGL::Parse::parseFile(fileName.toStdString()));
     char* memory(f.data());
 
-    vertexes.resize(0);
+    vertexes.clear();
 
     qDeleteAll(trace);
     trace.clear();
+    UNVTransformations.clear();
 
     vertexes.reserve(81009);
     //parce each datum
@@ -331,6 +347,7 @@ bool Geometry::readUNV(const QString &fileName)
         qDeleteAll(trace);
         trace.clear();
     }
+    UNVTransformations.clear();
 
     core::Lines* elem(new core::Lines);
     trace.push_back(elem);
@@ -380,8 +397,29 @@ bool Geometry::readUNV(const QString &fileName)
             }
         } break;
         case 2420: {
+            f.skipRow();
+            f.skipRow();
             //it's a transformation matrices
             while (!f.testPrew("    -1\n")) {
+                const int i(f.integer() - 1);
+                if (UNVTransformations.size() <= i) {
+                    UNVTransformations.resize(i + 1);
+                }
+                f.skipRow();
+                f.skipRow();
+                QMatrix3x3& m(UNVTransformations[i]);
+                m(0,0) = f.real();
+                m(0,1) = f.real();
+                m(0,2) = f.real();
+
+                m(1,0) = f.real();
+                m(1,1) = f.real();
+                m(1,2) = f.real();
+
+                m(2,0) = f.real();
+                m(2,1) = f.real();
+                m(2,2) = f.real();
+                f.skipRow();
                 f.skipRow();
             }
         } break;
@@ -400,6 +438,21 @@ bool Geometry::readUNV(const QString &fileName)
     modelType = Practic;
     std::clog << '\t' << loop.msecsTo(QTime::currentTime()) / 1e3 << " sec parsing pelay" << std::endl;
     return true;
+}
+
+void Geometry::UNVTransformation(Forms & f) const {
+    for (Forms::iterator it(f.begin()); it != f.end(); ++it) {
+        if (it->form().length() == UNVTransformations.size()) {
+            std::vector<QMatrix3x3>::const_iterator m(UNVTransformations.begin());
+            CGL::Vertexes& v(it->form());
+            for (int i(0); i != v.length(); ++i) {
+                v(i) = QVector3D(v(i).x() * ((*m)(0,0) + (*m)(1,0) + (*m)(2,0)),
+                                 v(i).y() * ((*m)(0,1) + (*m)(1,1) + (*m)(2,1)),
+                                 v(i).z() * ((*m)(0,2) + (*m)(1,2) + (*m)(2,2)));
+                ++m;
+            }
+        }
+    }
 }
 
 void Geometry::renderSelect() const
@@ -564,7 +617,7 @@ void Geometry::colorizeElements(const CGL::CArray &v, const QString& mes) {
 CGL::CArray Geometry::extractElasticityModulus() {
     CGL::CArray elasticyModulus(static_cast<int>(trace.size()));
 
-    std::clog << "colorize to elasticity modulus. Whall size:" << elasticyModulus.size();
+    std::clog << "\ncolorize to elasticity modulus. Whall size:" << elasticyModulus.size();
     for (int i = 0; i != elasticyModulus.size(); ++i) {
         if (trace.at(i)) {
             if (trace[i]->getShell() >= shells.size()) {
@@ -581,7 +634,6 @@ CGL::CArray Geometry::extractElasticityModulus() {
 
 void Geometry::colorize(const CGL::CVertexes &v, const QString& mes)
 {
-    std::clog << "vector colorize";
     if (v.size() != vertexes.size()) {
         std::clog << "\twrong colors size " << v.size() << vertexes.size();
         return;
@@ -956,7 +1008,7 @@ void Geometry::layToBDF(const QString& source, const QString& dest, const CGL::C
          || type == "CTRIA3") {
             char* write(f.data() + 10 + (type == "CHEXA"));
             int i(f.integer());
-            int shellId(trace.at(i)->getShell() + shells.size() * find[dE.at(i)]);
+            int shellId(static_cast<int>(trace.at(i)->getShell() + shells.size() * find[dE.at(i)]));
             if (std::find(usedId.begin(), usedId.end(), shellId) == usedId.end()) {
                 usedId.push_back(shellId);
                 qDebug() << "push shell" << shellId << trace.at(i)->getShell() << find[dE.at(i)] << (shellId % shells.size()) << isUsed.size();
@@ -993,22 +1045,22 @@ void Geometry::layToBDF(const QString& source, const QString& dest, const CGL::C
         static const std::string s2("*       7800.\n");
         static const int where(24);
         std::string num(buf.str());
-        for (int i(0); i != num.size(); ++i) {
-            s1[i + where] = num[i];
+        for (int j(0); j != num.size(); ++j) {
+            s1[j + where] = num[j];
         }
         static const int whereG(40);
         std::stringstream bufG;
         bufG << newMat[i][Material::MAT1_G];
         std::string numG(bufG.str());
-        for (int i(0); i != numG.size(); ++i) {
-            s1[i + whereG] = numG[i];
+        for (int j(0); j != numG.size(); ++j) {
+            s1[j + whereG] = numG[j];
         }
         static const int whereId(9);
         std::stringstream bufId;
         bufId << i + materials.size() + 1;
         std::string numId(bufId.str());
-        for (int i(0); i != numId.size(); ++i) {
-            s1[i + whereId] = numId[i];
+        for (int j(0); j != numId.size(); ++j) {
+            s1[j + whereId] = numId[j];
         }
         newString += QString::fromStdString(s1);
         newString += QString::fromStdString(s2);
@@ -1016,11 +1068,11 @@ void Geometry::layToBDF(const QString& source, const QString& dest, const CGL::C
     int WWW(0);
     for (int it(0); it != usedId.size(); ++it) {
         int matrixId(usedId[it]);
-        int i(matrixId / shells.size());
+        int i(matrixId / static_cast<int>(shells.size()));
         int j(matrixId % shells.size());
 
         //qDebug() << WWW++ << i << j << matrixId;
-        int id(usedId[it] + shells.size());
+        int id(static_cast<int>(usedId[it] + shells.size()));
         std::string data = shellStrings[j];
         if (!data.empty()) {
             std::stringstream bufId;

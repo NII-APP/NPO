@@ -5,7 +5,10 @@
 #include <QModelIndex>
 #include <QListView>
 #include "engine/CGL/ccolumnchart.h"
+#include <QSpinBox>
+#include <QLabel>
 class GeometryWidget;
+class Geometry;
 
 class Viewer : public QSplitter
 {
@@ -13,6 +16,13 @@ class Viewer : public QSplitter
     GeometryWidget* geometryWidget;
     QListView* geometriesView;
     CGL::CColumnChart* macChart;
+
+    QFrame* formSelector;
+    QLabel* formLabel;
+    QLabel* formSubLabel;
+    QSpinBox* form;
+
+    bool colorizeBundle;
 
 public:
     explicit Viewer(QWidget *parent = 0);
@@ -24,6 +34,7 @@ public slots:
     void addModel();
     void resetListView();
     void setMode(int);
+    void setMesh(Geometry* g);
 private slots:
     void listPatrol(QModelIndex);
 };

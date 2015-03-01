@@ -88,14 +88,14 @@ double CParse::real()
 
     double num(0);
     double k(1.);
-    while ((*d >= '0' && *d <= '9') || *d == '.')
+    while ((*d >= '0' && *d <= '9') || *d == '.' || *d == ',')
     {
-        if (*d != '.' && k == 1.)
+        if ((*d != '.' && *d != ',') && k == 1.)
         {
             num *= 10.;
             num += *d - '0';
         }
-        else if (*d != '.')
+        else if (*d != '.' && *d != ',')
         {
             num += (*d - '0') * k;
             k /= 10.;
