@@ -62,14 +62,8 @@ void Viewer::listPatrol(QModelIndex i) {
     }
 
     geometryWidget->setModel(GeometriesModel::mesh(i));
-    qDebug() << "one";
     form->setValue(0);
-    qDebug() << "two";
-    qDebug() << GeometriesModel::mesh(i);
-    CGL::CMatrix m(GeometriesModel::mesh(i)->getMac());
-    qDebug() << GeometriesModel::mesh(i)->getMac();
     macChart->setData(GeometriesModel::mesh(i)->getMac());
-    qDebug() << "thre";
 }
 
 void Viewer::addModel() {

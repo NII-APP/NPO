@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     static_cast<QTabWidget*>(centralWidget())->addTab(new TruncationTab(this),
                     Application::identity()->tabPairIcon(), Application::identity()->tabPair());
 
+    cnt->connect(this, SIGNAL(porjectLoaded()), SLOT(resetListView()));
+
     Identity::Relations relations;
     relations.insert("save", Identity::Acceptor(this, SLOT(save())));
     relations.insert("save as", Identity::Acceptor(this, SLOT(saveAs())));
@@ -46,6 +48,7 @@ void MainWindow::open() {
     QString name(Application::identity()->choseProjectFile());
     if (Project::isOwnProject(name)) {
         Application::project()->load(name);
+        emit porjectLoaded();
     } else {
         Application::identity()->messageWrongProFile();
     }

@@ -16,6 +16,7 @@ public:
     ~MainWindow();
 
 signals:
+    void porjectLoaded();
 
 public slots:
     void save();
