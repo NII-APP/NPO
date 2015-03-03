@@ -16,9 +16,18 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     QSplitter* selectors(new QSplitter(Qt::Vertical, main));
     selectors->addWidget(first);
     selectors->addWidget(second);
+    connect(first, SIGNAL(meshSelected(GeometryForm*)), SLOT(previewPatrol()));
+    connect(second, SIGNAL(meshSelected(GeometryForm*)), SLOT(previewPatrol()));
     main->addWidget(selectors);
+    relation = new RelationDialog(0, main);
+    main->addWidget(relation);
+    chart = new CGL::CColumnChart(main);
+    main->addWidget(chart);
     this->layout()->addWidget(main);
     this->resize(500,500);
+
+    current = 0;
+    previewPatrol();
 }
 
 TruncationWizard::~TruncationWizard()
@@ -26,17 +35,24 @@ TruncationWizard::~TruncationWizard()
 
 }
 
-GeometryPair* TruncationWizard::exec(QWidget* parent) {
+GeometryPair* TruncationWizard::exec(QWidget* parent)
+{
     QEventLoop* loop(new QEventLoop(parent));
     TruncationWizard* w(new TruncationWizard(parent));
     loop->connect(w, SIGNAL(finished(int)), SLOT(quit()));
     w->show();
     loop->exec();
-    try {
-        return new GeometryPair(dynamic_cast<GeometryForm*>(Application::project()->modelsList()[0]),
-                dynamic_cast<GeometryForm*>(Application::project()->modelsList()[1]));
-    } catch (std::exception) {
-        return 0;
-    }
+    return w->current;
 }
 
+void TruncationWizard::previewPatrol()
+{
+    delete current;
+    if (first->current() && second->current()) {
+        current = new GeometryPair(first->current(), second->current());
+        relation->setPair(current);
+        chart->setData(current->getMac());
+    } else {
+        current = 0;
+    }
+}

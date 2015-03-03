@@ -394,7 +394,5 @@ GeometryForm* GeometryForm::truncation(const GeometryForm& a, const GeometryForm
 
     qDebug() << result->forms.size() << result->forms.front().form().size() << result->nodes().size();
 
-    //result->estimateMac();
-
     return result;
 }

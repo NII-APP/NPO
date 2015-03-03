@@ -10,14 +10,14 @@
 #include <QLabel>
 #include <QPushButton>
 
-class RelationDialog : public QDialog
+class RelationDialog : public QWidget
 {
     Q_OBJECT
     const QImage toggleOn;
     const QImage toggleOff;
 
-    GeometryPair& pair;
-    GeometryPair::Relation& relation;
+    GeometryPair* pair;
+    GeometryPair::Relation& relation() const { return pair->relations(); }
 
     typedef QVector<QLabel*> Labels;
     Labels  leftL;
@@ -30,9 +30,6 @@ class RelationDialog : public QDialog
     QFrame* rightP;
     QLabel* title1;
     QLabel* title2;
-
-    QPushButton* accept;
-    QPushButton* cancel;
 
     float leftCapacity;
     float rightCapacity;
@@ -61,7 +58,7 @@ class RelationDialog : public QDialog
 
 public:
     RelationDialog(GeometryPair* forEdit, QWidget *parent = 0);
-
+    void setPair(GeometryPair* p);
     static void run(GeometryPair* forEdit, QWidget* parent = 0);
     
 signals:

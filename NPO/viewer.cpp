@@ -61,9 +61,7 @@ void Viewer::listPatrol(QModelIndex i) {
         return;
     }
 
-    geometryWidget->setModel(GeometriesModel::mesh(i));
-    form->setValue(0);
-    macChart->setData(GeometriesModel::mesh(i)->getMac());
+    setMesh(GeometriesModel::mesh(i));
 }
 
 void Viewer::addModel() {

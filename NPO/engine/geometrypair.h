@@ -3,20 +3,24 @@
 #include <map>
 #include "geometryform.h"
 
-class GeometryPair : std::pair<GeometryForm*, GeometryForm*>
+class GeometryPair : std::pair<GeometryForm* const, GeometryForm* const>
 {
-    typedef std::pair<GeometryForm*, GeometryForm*> BacePair;
 public:
     typedef std::vector<int> Relation;
 private:
     Relation relation;
     GeometryForm* truncated;
+    CGL::CMatrix mac;
+
+    void estimateMac();
 public:
     Relation& relations() { return relation; }
 
-    GeometryForm& theory() { return *first; }
-    GeometryForm& practic() { return *second; }
-    GeometryForm& truncation() { return *truncated; }
+    GeometryForm* theory() { return first; }
+    GeometryForm* practic() { return second; }
+    GeometryForm* truncation() { return truncated; }
+
+    const CGL::CMatrix& getMac() const { return mac; }
 
     void createTuncationForm();
     GeometryPair(GeometryForm *theory, GeometryForm *practic);

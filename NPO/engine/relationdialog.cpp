@@ -5,27 +5,29 @@
 #include <QDir>
 
 RelationDialog::RelationDialog(GeometryPair *forEdit, QWidget *parent)
-  : QDialog(parent)
+  : QWidget(parent)
   , toggleOff(":/media/images/togleOff.png")
   , toggleOn(":/media/images/togleOn.png")
-  , pair(*forEdit)
-  , relation(pair.relations())
-  , leftL(pair.theory().modesCount())
-  , rightL(pair.practic().modesCount())
+  , pair(forEdit)
+  , leftL(0)
+  , rightL(0)
   , maxW(0)
   , underToggle(-1)
   , underLeftToggle(false)
   , lineingState(-1)
   , lineingLeft(false)
-  , title1(new QLabel(forEdit->theory().getName(), this))
-  , title2(new QLabel(forEdit->practic().getName(), this))
-  , accept(new QPushButton("accept", this))
-  , cancel(new QPushButton("cancel", this))
+  , title1(new QLabel(this))
+  , title2(new QLabel(this))
 {
-    this->setModal(true);
+}
+
+void RelationDialog::setPair(GeometryPair* p) {
+    pair = p;
+    leftL.resize(pair->theory()->modesCount());
+    rightL.resize(pair->practic()->modesCount());
     this->setContentsMargins(10, 0, 10, 0);
-    bildLabels(leftL, pair.theory());
-    bildLabels(rightL, pair.practic());
+    bildLabels(leftL, *pair->theory());
+    bildLabels(rightL, *pair->practic());
     foreach (QLabel* l, leftL)
         l->resize(maxW, l->height());
     foreach (QLabel* l, rightL)
@@ -38,18 +40,16 @@ RelationDialog::RelationDialog(GeometryPair *forEdit, QWidget *parent)
     this->setPalette(p);
     this->setMouseTracking(true);
 
-    popupConfig(leftP, leftF, pair.theory());
-    popupConfig(rightP, rightF, pair.practic());
+    popupConfig(leftP, leftF, *pair->theory());
+    popupConfig(rightP, rightF, *pair->practic());
 
-    if (relation.size() != leftL.size()) {
-        relation.resize(leftL.size());
-        for (size_t i(0); i < relation.size(); ++i) {
-            relation[i] = rightL.size() > i ? i : -1;
+    if (relation().size() != leftL.size()) {
+        relation().resize(leftL.size());
+        for (size_t i(0); i < relation().size(); ++i) {
+            relation()[i] = rightL.size() > i ? i : -1;
         }
     }
     bgUpdate();
-    this->connect(accept, SIGNAL(clicked()), SLOT(accept()));
-    this->connect(cancel, SIGNAL(clicked()), SLOT(accept()));
 }
 
 void RelationDialog::bgUpdate()
@@ -60,9 +60,9 @@ void RelationDialog::bgUpdate()
     }
     for (int i(0); i != leftL.size(); ++i)
     {
-        if (relation[i] >= 0)
+        if (relation()[i] >= 0)
         {
-            rightL[relation[i]]->setBackgroundRole(QPalette::Light);
+            rightL[relation()[i]]->setBackgroundRole(QPalette::Light);
             leftL[i]->setBackgroundRole(QPalette::Light);
         }
         else
@@ -153,9 +153,9 @@ void RelationDialog::resizeEvent(QResizeEvent*)
 {
     title1->move(this->contentsMargins().left(),5);
     title2->move(this->width() - this->contentsMargins().right() - maxW, 5);
-    float myH(leftL.first()->height() / 2.);
     leftCapacity = (this->height() - 20) * 1.0f / leftL.size();
     rightCapacity = (this->height() - 20) * 1.0f / rightL.size();
+    float myH(leftL.isEmpty() ? 0 : leftL.first()->height() / 2.);
     for (int i(0); i != leftL.size(); ++i)
     {
         leftL[i]->move(this->contentsMargins().left(), leftCapacity * (i + .5f) - myH + 20);
@@ -164,14 +164,13 @@ void RelationDialog::resizeEvent(QResizeEvent*)
     {
         rightL[i]->move(this->width() - this->contentsMargins().right() - maxW, rightCapacity * (i + .5f) - myH + 20);
     }
-    accept->move(this->width() / 2. - accept->width() - 10
-               , this->height() - accept->height() - 5);
-    cancel->move(this->width() / 2. + 10
-               , this->height() - accept->height() - 5);
 }
 
 void RelationDialog::paintEvent(QPaintEvent * e)
 {
+    if (!pair) {
+        return;
+    }
     QPainter p(this);
     p.setRenderHint(QPainter::SmoothPixmapTransform);
     p.setRenderHint(QPainter::HighQualityAntialiasing);
@@ -185,13 +184,12 @@ void RelationDialog::paintEvent(QPaintEvent * e)
     p.setPen(pen);
     //p.fillRect(e->rect(), QColor(rand() % 0x100, rand() % 0x100, rand() % 0x100));
     p.fillRect(e->rect(), QColor(0xFF, 0xFF, 0xFF));
-    GeometryPair::Relation& relation(pair.relations());
-    for (int i = 0; i != pair.relations().size(); ++i)
+    for (int i = 0; i != relation().size(); ++i)
     {
-        if (relation[i] >= 0)
+        if (relation()[i] >= 0)
         {
             p.drawLine(this->contentsMargins().left() + maxW + 24, leftCapacity * (i + .5f) + 20,
-                       this->width() - this->contentsMargins().right() - maxW - 24, rightCapacity * (relation[i] + .5f) + 20);
+                       this->width() - this->contentsMargins().right() - maxW - 24, rightCapacity * (relation()[i] + .5f) + 20);
         }
     }
     pen.setColor(QColor(0x88,0xFF, 0x88));
@@ -273,12 +271,12 @@ void RelationDialog::mousePressEvent(QMouseEvent *)
         lineingLeft = underLeftToggle;
         if (underLeftToggle)
         {
-            relation[underToggle] = -1;
+            relation()[underToggle] = -1;
             source = QPoint(this->contentsMargins().left() + maxW + 24, leftCapacity * (underToggle + .5f) + 20);
         }
         else
         {
-            *qFind(relation.begin(), relation.end(), underToggle) = -1;
+            *qFind(relation().begin(), relation().end(), underToggle) = -1;
             source = QPoint(this->width() - this->contentsMargins().right() - maxW - 24, rightCapacity * (underToggle + .5f) + 20);
         }
     }
@@ -286,14 +284,14 @@ void RelationDialog::mousePressEvent(QMouseEvent *)
     {
         if (underLeftToggle)
         {
-            relation[underToggle] = lineingState;
+            relation()[underToggle] = lineingState;
         }
         else
         {
-            GeometryPair::Relation::iterator esc(qFind(relation.begin(), relation.end(), underToggle));
-            if (esc != relation.end())
+            GeometryPair::Relation::iterator esc(qFind(relation().begin(), relation().end(), underToggle));
+            if (esc != relation().end())
                 *esc = -1;
-            relation[lineingState] = underToggle;
+            relation()[lineingState] = underToggle;
         }
         lineingState = -1;
     }

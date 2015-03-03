@@ -27,6 +27,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     relations.insert("import", Identity::Acceptor(cnt, SLOT(addModel())));
     QMenu* fileMenu(this->menuBar()->addMenu(Application::identity()->menuFileName()));
     fileMenu->addActions(Application::identity()->menuFileActions(fileMenu, relations));
+
+    //just for simply debug
+    if (Project::isOwnProject("../pro.pro")) {
+        Application::project()->load("../pro.pro");
+        emit porjectLoaded();
+    }
 }
 
 MainWindow::~MainWindow()

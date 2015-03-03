@@ -8,18 +8,31 @@
 #include <QVBoxLayout>
 #include "application.h"
 #include "project.h"
+#include "engine/relationdialog.h"
+#include "engine/CGL/ccolumnchart.h"
 
 class TruncationWizard : public QDialog
 {
+    Q_OBJECT
+
     class Preview;
     Preview* first;
     Preview* second;
+
+    RelationDialog* relation;
+
+    CGL::CColumnChart* chart;
+
+    GeometryPair* current;
 
     TruncationWizard(QWidget* parent = 0);
     ~TruncationWizard();
 public:
 
     static GeometryPair* exec(QWidget* parent);
+
+private slots:
+    void previewPatrol();
 };
 
 class TruncationWizard::Preview : public QWidget {
@@ -56,14 +69,30 @@ public:
         selectorPatrol();
     }
 
-    GeometryForm* current() const {
+    GeometryForm* current() const
+    {
         return selector->currentIndex() < meshes.size() && selector->currentIndex() >= 0
                 ? meshes.at(selector->currentIndex()) : 0;
     }
+signals:
+    void meshSelected(int id);
+    void meshSelected(GeometryForm*);
 
 private slots:
-    void selectorPatrol() {
-        screen->setModel(current());
+    void selectorPatrol()
+    {
+        GeometryForm* c(current());
+
+        screen->setModel(c);
+
+        emit meshSelected(c);
+
+        const Project::Geometries& m(Application::project()->modelsList());
+        int i(0);
+        while (m.at(i) != c && m.size() > i) {
+            ++i;
+        }
+        emit meshSelected(i < m.size() ? i : -1);
     }
 };
 

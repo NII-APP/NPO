@@ -4,3 +4,4 @@ build**/
 **.f06
 **.unv
 *.txt
+*.pro

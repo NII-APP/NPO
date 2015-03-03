@@ -15,7 +15,7 @@ TruncationTab::TruncationTab(QWidget *parent) : QMainWindow(parent)
 
 void TruncationTab::addPair()
 {
-    TruncationWizard::exec(QApplication::topLevelWidgets().first());
+    TruncationWizard::exec(QApplication::topLevelWidgets()[1]);
 }
 
 TruncationTab::~TruncationTab()
