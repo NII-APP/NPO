@@ -55,12 +55,15 @@ void Project::save(const QString &filename)
     out << Identity::PROGRAM_VERSION;
     out << geometries.size();
     for (size_t i = 0; i < geometries.size(); ++i ){
+        qDebug() << typeid(*geometries.at(i)).name();
         if (dynamic_cast<GeometryForm*>(geometries.at(i))) {
+            qDebug() << "cast ";
             out << true;
-            out << static_cast<GeometryForm*>(geometries.at(i));
+            out << *static_cast<GeometryForm*>(geometries.at(i));
         } else {
+            qDebug() << "cast false";
             out << false;
-            out << geometries.at(i);
+            out << *geometries.at(i);
         }
     }
     qDebug() << "Time to save: " << loop.msecsTo(QTime::currentTime()) / 1000 << " ms";
@@ -103,7 +106,6 @@ void Project::load(const QString &filename)
     size_t size;
     in >> size;
     geometries.clear();
-    geometries.reserve(size);
     for (size_t i = 0; i < size; ++i) {
         bool isForm;
         in >> isForm;
