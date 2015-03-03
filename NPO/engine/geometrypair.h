@@ -11,8 +11,6 @@ private:
     Relation relation;
     GeometryForm* truncated;
     CGL::CMatrix mac;
-
-    void estimateMac();
 public:
     Relation& relations() { return relation; }
 
