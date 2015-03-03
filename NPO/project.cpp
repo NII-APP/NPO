@@ -1,6 +1,6 @@
 #include "project.h"
 #include "engine/geometry.h"
-
+#include "engine/geometryform.h"
 #include <QTime>
 
 const QString Project::INSURANCE_ROW = "In vino veritas, in aqua sanitas";
@@ -55,7 +55,13 @@ void Project::save(const QString &filename)
     out << Identity::PROGRAM_VERSION;
     out << geometries.size();
     for (size_t i = 0; i < geometries.size(); ++i ){
-        out << *(geometries.at(i));
+        if (dynamic_cast<GeometryForm*>(geometries.at(i))) {
+            out << true;
+            out << static_cast<GeometryForm*>(geometries.at(i));
+        } else {
+            out << false;
+            out << geometries.at(i);
+        }
     }
     qDebug() << "Time to save: " << loop.msecsTo(QTime::currentTime()) / 1000 << " ms";
     file.close();
@@ -99,8 +105,16 @@ void Project::load(const QString &filename)
     geometries.clear();
     geometries.reserve(size);
     for (size_t i = 0; i < size; ++i) {
-        Geometry* g = new Geometry();
-        in >> *g;
+        bool isForm;
+        in >> isForm;
+        Geometry* g;
+        if (isForm) {
+            g = new GeometryForm();
+            in >> static_cast<GeometryForm&>(*g);
+        } else {
+            g = new Geometry();
+            in >> *g;
+        }
         geometries.push_back(g);
     }
     qDebug() << geometries.size();

@@ -1,6 +1,5 @@
 #include "application.h"
 #include "mainwindow.h"
-#include <QtPlugin>
 
 int main(int argc, char *argv[])
 {

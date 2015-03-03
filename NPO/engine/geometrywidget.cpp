@@ -7,6 +7,7 @@ GeometryWidget::GeometryWidget(QWidget *parent, QGLWidget *shareWidget, Qt::Wind
     , data(0)
     , repaintLoop(new QTimer(this))
     , animation(new AnimationOptions(this))
+    , pauseTime(0)
 {
     paintDisable = [](GeometryWidget*){};
     initialPhase = 0.0f;
@@ -159,8 +160,14 @@ void GeometryWidget::paintCGL()
 
 void GeometryWidget::setModel(const Geometry* g)
 {
-    this->setScene(g->box());
+    if (data == g) {
+        return;
+    }
     data = g;
+    if (!g) {
+        return;
+    }
+    this->setScene(g->box());
 
     if (dynamic_cast<const GeometryForm*>(this->data)) {
         if (form >= dynamic_cast<const GeometryForm*>(this->data)->modes().size()) {

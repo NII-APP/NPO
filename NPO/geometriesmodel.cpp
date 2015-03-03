@@ -26,7 +26,7 @@ QVariant GeometriesModel::data(const QModelIndex &index, int role) const {
     if (index.row() >= Application::project()->modelsList().size()) {
         return Application::identity()->geometriesModelAdd();
     }
-    return QVariant(index.row());
+    return QVariant(mesh(index)->getName());
 }
 
 GeometryForm* GeometriesModel::mesh(const QModelIndex &index) {

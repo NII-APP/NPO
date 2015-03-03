@@ -41,6 +41,7 @@ Geometry::Geometry(const Geometry& g)
     , markedNodes(g.markedNodes)
     , colors(g.colors)
     , file(g.file)
+    , name(g.name)
     , shells(g.shells)
     , materials(g.materials)
     , UNVTransformations(g.UNVTransformations)
@@ -79,6 +80,15 @@ Geometry::~Geometry() {
     qDeleteAll(systems);
 }
 
+QString Geometry::getName() const
+{
+    return name;
+}
+void Geometry::setName(const QString & n)
+{
+    name = n;
+}
+
 void Geometry::estimateTraced()
 {
     isTraced.fill(false, static_cast<int>(vertexes.length()));
@@ -111,6 +121,9 @@ bool Geometry::readBDF(const QString &fileName)
         return false;
     }
     this->file = fileName;
+    if (name.isEmpty()) {
+        name = fileName.split('/').last();
+    }
     file.close();
     CGL::Parse f(CGL::Parse::parseFile(fileName.toStdString()));
     char* memory(f.data());
@@ -338,6 +351,9 @@ bool Geometry::readUNV(const QString &fileName)
         return false;
     }
     this->file = fileName;
+    if (name.isEmpty()) {
+        name = fileName.split('/').last();
+    }
     CGL::CParse f(CGL::Parse::parseFile(fileName.toStdString()));
     char* memory(f.data());
     f.UNIXRowSymbol();
@@ -776,6 +792,7 @@ bool operator==(const Geometry &l, const Geometry &r)
 QDataStream& operator << (QDataStream& out, const Geometry& g) {
     qDebug() << "Write to stream...";
     out << g.sqre << g.isTraced << g.markedNodes << g.measurment << g.file << static_cast<int>(g.modelType);
+    out << g.name;
     out << g.vertexes << g.colors;
 
     size_t shellsSize;
@@ -828,6 +845,7 @@ QDataStream& operator >> (QDataStream& in, Geometry& g) {
     qDebug() << "Load from stream...";
     int modelType;
     in >> g.sqre >> g.isTraced >> g.markedNodes >> g.measurment >> g.file >> modelType;
+    in >> g.name;
     g.modelType = static_cast<Geometry::ModelType>(modelType);
     in >> g.vertexes >> g.colors;
 

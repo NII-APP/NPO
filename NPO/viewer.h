@@ -24,6 +24,12 @@ class Viewer : public QSplitter
 
     bool colorizeBundle;
 
+    enum EnapledItems {
+        MAC_chart,
+        Geometry_widget,
+        Models_list
+    };
+
 public:
     explicit Viewer(QWidget *parent = 0);
     ~Viewer();

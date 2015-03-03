@@ -60,8 +60,10 @@ private:
     CGL::Colors colors;
     //measurment of colorzed value
     QString measurment;
-    //name of file which was parset to this object
+    //name of file which was parsed to this object
     QString file;
+    //name
+    QString name;
     //list of shells
     Shells shells;
     //map of matherials
@@ -102,6 +104,9 @@ public:
     virtual bool read(const QString &fileName);
     virtual ~Geometry();
 
+    virtual QString getName() const;
+    virtual void setName(const QString&);
+
     //reading that formsts
     bool readBDF(const QString &fileName);
     bool readUNV(const QString &fileName);
@@ -140,7 +145,6 @@ public:
     friend QDataStream& operator << (QDataStream&, const Geometry&);
     friend QDataStream& operator >> (QDataStream&, Geometry&);
     friend bool operator==(const Geometry&, const Geometry&);
-    const QString& getName() const { return file; }
 
     //Science operations
     //set position of center of rect to (0,0,0) point
