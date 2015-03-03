@@ -52,10 +52,9 @@ RectangularCoordinateSystem* RectangularCoordinateSystem::load(QDataStream& in)
     return g;
 }
 
-bool operator==(const RectangularCoordinateSystem &l, const RectangularCoordinateSystem &r)
+bool RectangularCoordinateSystem::operator==(const RectangularCoordinateSystem &r) const
 {
-    qDebug() << l.type() << " " << r.type() << ' ' << l.a << " " << r.a;
-    return (l.type() == r.type()) && (l.a == r.a) && (l.ox == r.ox) && (l.oy == r.oy) && (l.oz == r.oz);
+    return (type() == r.type()) && (a == r.a) && (ox == r.ox) && (oy == r.oy) && (oz == r.oz);
 }
 
 }

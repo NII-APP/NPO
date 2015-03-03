@@ -726,12 +726,12 @@ bool operator==(const Geometry &l, const Geometry &r)
             qDebug() << "materials key " << i << " " << systemLeft.key() << " " << systemRight.key();
             return false;
         }
-/*
-        if (!(systemLeft.value() == systemRight.value())){
-            qDebug() << "materials value " << i;// << " " << *systemLeft.value() << " " << *systemRight.value();
+
+        if (!(systemLeft.value()->operator==(*systemRight.value()))) {
+             qDebug() << "materials value " << i;
             return false;
         }
-*/
+
         ++systemLeft;
         ++systemRight;
     }
@@ -873,7 +873,6 @@ QDataStream& operator >> (QDataStream& in, Geometry& g) {
     while (s--) {
         in >> key;
         val = CGL::RectangularCoordinateSystem::load(in);
-
         g.systems.insert(key, val);
     }
 

@@ -96,12 +96,14 @@ void Project::load(const QString &filename)
 
     size_t size;
     in >> size;
-    //geometries.clear();
+    geometries.clear();
+    geometries.reserve(size);
     for (size_t i = 0; i < size; ++i) {
         Geometry* g = new Geometry();
         in >> *g;
         geometries.push_back(g);
     }
+    qDebug() << geometries.size();
     qDebug() << "Time to load: " << loop.msecsTo(QTime::currentTime()) << " ms";
 
     file.close();
