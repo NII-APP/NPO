@@ -4,11 +4,11 @@
 #
 #-------------------------------------------------
 
-QT       += core opengl widgets gui
+QT       += core opengl gui
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = NPO
-CONFIG   += console
-CONFIG   -= app_bundle
 
 TEMPLATE = app
 
@@ -52,7 +52,9 @@ SOURCES += main.cpp \
     engine/CGL/ccolumnchart.cpp \
     engine/CGL/c3dchart.cpp \
     engine/CGL/cscale.cpp \
-    engine/CGL/ccolorscale.cpp
+    engine/CGL/ccolorscale.cpp \
+    truncationtab.cpp \
+    truncationwizard.cpp
 
 HEADERS += \
     engine/animationoptions.h \
@@ -93,7 +95,9 @@ HEADERS += \
     engine/CGL/ccolumnchart.h \
     engine/CGL/c3dchart.h \
     engine/CGL/cscale.h \
-    engine/CGL/ccolorscale.h
+    engine/CGL/ccolorscale.h \
+    truncationtab.h \
+    truncationwizard.h
 
 OTHER_FILES += \
     summator.vert

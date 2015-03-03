@@ -30,6 +30,12 @@
             }
         ]
     },
+    "tab view eng" : "View",
+    "tab view rus" : "Просмотр",
+    "tab view icon" : ":/media/images/view.png",
+    "tab pair eng" : "Mode pairs",
+    "tab pair rus" : "Модальные пары",
+    "tab pair icon" : ":/media/images/pair.png",
     "geometries model add rus" : "Добавить модель . . .",
     "geometries model add eng" : "Add mesh . . .",
     "geometry widget no data image" : ":/media/images/hill.png",

@@ -37,6 +37,7 @@ QJsonValue Identity::at(const QString & name) const {
     Q_ASSERT(configuration.contains(name));
     return configuration[name];
 }
+
 QString Identity::geometryWidgetNoDataImage() const {
     Q_ASSERT(configuration.contains("geometry widget no data image"));
     return configuration["geometry widget no data image"].toString();
@@ -114,6 +115,23 @@ QString Identity::formSelectorLabel() const {
 QString Identity::hertz() const {
     Q_ASSERT(configuration.contains("hertz " + language()));
     return configuration["hertz " + language()].toString();
+}
+QString Identity::tabView() const {
+    Q_ASSERT(configuration.contains("tab view " + language()));
+    return configuration["tab view " + language()].toString();
+}
+QString Identity::tabPair() const {
+    Q_ASSERT(configuration.contains("tab pair " + language()));
+    return configuration["tab pair " + language()].toString();
+}
+
+QIcon Identity::tabViewIcon() const {
+    Q_ASSERT(configuration.contains("tab view icon"));
+    return QIcon(configuration["tab view icon"].toString());
+}
+QIcon Identity::tabPairIcon() const {
+    Q_ASSERT(configuration.contains("tab pair icon"));
+    return QIcon(configuration["tab pair icon"].toString());
 }
 
 QString Identity::choseModelFile() const {

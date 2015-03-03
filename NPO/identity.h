@@ -40,6 +40,10 @@ public:
     QString formSelectorLabel() const;
     QString hertz() const;
     QString geometryWidgetNoDataImage() const;
+    QString tabView() const;
+    QString tabPair() const;
+    QIcon tabViewIcon() const;
+    QIcon tabPairIcon() const;
 
     QString choseModelFile() const;
     QString choseModesFile() const;

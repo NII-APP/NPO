@@ -126,6 +126,7 @@ void GeometryWidget::setDisablePaintFunction(VoidFunction f) {
 
 void GeometryWidget::paintCGL()
 {
+    Q_ASSERT(summator->link());
     repaintLoop->stop();
 
     if (!data) {
@@ -135,6 +136,7 @@ void GeometryWidget::paintCGL()
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, data->nodes().data());
+    Q_ASSERT(summator->isLinked());
     if (isAnimation()) {
         if (dynamic_cast<const GeometryForm*>(data)) {
             glNormalPointer(GL_FLOAT, 0, dynamic_cast<const GeometryForm*>(data)->form(form).data());
@@ -148,7 +150,7 @@ void GeometryWidget::paintCGL()
     if (netAction->isChecked()) {
         data->renderNet();
     }
-    this->debugSpace(this->scene());
+    //this->debugSpace(this->scene());
 
     if (isAnimation()) {
         repaintLoop->start();
@@ -181,8 +183,19 @@ void GeometryWidget::setModel(const Geometry &g)
 void GeometryWidget::initializeCGL()
 {
     summator = new QOpenGLShaderProgram(this);
-    Q_ASSERT(summator->addShaderFromSourceFile(QOpenGLShader::Vertex, ":codes/summator.vert"));
-    Q_ASSERT(summator->bind());
+    qDebug() << (QFile::exists(":codes/summator.vert") ? "exist" : "doesn't exist");
+    if (!summator->addShaderFromSourceFile(QOpenGLShader::Vertex, ":codes/summator.vert")) {
+        qDebug() << summator->log();
+    } else {
+        qDebug() << "hope add";
+    }
+    if (!summator->bind()) {
+        qDebug() << summator->log();
+    } else {
+        qDebug() << "hope bind";
+    }
+    Q_ASSERT(summator->isLinked());
+
     this->startTimer(10);
 }
 

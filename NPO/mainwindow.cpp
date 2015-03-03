@@ -5,16 +5,24 @@
 #include "identity.h"
 #include "project.h"
 #include <QMessageBox>
+#include <QTabWidget>
+#include "truncationtab.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    this->setCentralWidget(new Viewer(this));
+    this->setCentralWidget(new QTabWidget(this));
+    Viewer* cnt;
+    static_cast<QTabWidget*>(centralWidget())->setTabPosition(QTabWidget::West);
+    static_cast<QTabWidget*>(centralWidget())->addTab(cnt = new Viewer(this),
+                    Application::identity()->tabViewIcon(), Application::identity()->tabView());
+    static_cast<QTabWidget*>(centralWidget())->addTab(new TruncationTab(this),
+                    Application::identity()->tabPairIcon(), Application::identity()->tabPair());
 
     Identity::Relations relations;
     relations.insert("save", Identity::Acceptor(this, SLOT(save())));
     relations.insert("save as", Identity::Acceptor(this, SLOT(saveAs())));
     relations.insert("open", Identity::Acceptor(this, SLOT(open())));
-    relations.insert("import", Identity::Acceptor(this->centralWidget(), SLOT(addModel())));
+    relations.insert("import", Identity::Acceptor(cnt, SLOT(addModel())));
     QMenu* fileMenu(this->menuBar()->addMenu(Application::identity()->menuFileName()));
     fileMenu->addActions(Application::identity()->menuFileActions(fileMenu, relations));
 }

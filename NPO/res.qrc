@@ -6,6 +6,8 @@
         <file>images/togleOff.png</file>
         <file>images/togleOn.png</file>
         <file>images/hill.png</file>
+        <file>images/view.png</file>
+        <file>images/pair.png</file>
     </qresource>
     <qresource prefix="/css" lang="css">
         <file>css.css</file>

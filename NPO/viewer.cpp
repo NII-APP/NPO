@@ -13,6 +13,7 @@
 Viewer::Viewer(QWidget *parent)
     : QSplitter(Qt::Horizontal, parent)
 {
+    colorizeBundle = true;
     macChart = new CGL::CColumnChart(this);
     this->addWidget(macChart);
 
