@@ -96,7 +96,7 @@ void CMatrix::excludeRow(size_t r) {
 void CMatrix::excludeColumn(size_t c) {
     if (width() <= c)
         return;
-    if (width() == 1) {//Матрица бдет вырождена. очищаем её.
+    if (width() == 1) {//Матрица бyдет вырождена. очищаем её.
         *this = CMatrix();
         return;
     }
@@ -148,6 +148,128 @@ QDataStream& operator>> (QDataStream& in, CMatrix& m) {
         m.repoint();
     }
     return in;
+}
+double CMatrix::det(){
+    if ( height() != width()){
+    qDebug() << "Warning! The matrix is not square \ndet not available";
+    return 0;
+    }
+    int i, j, k;
+    double det = 1;
+    for ( i = 0; i < height(); i++){
+        for ( j = i+1; j < height(); j++){
+            if (m[i][i] == 0){
+            return 0;
+            }
+            double b = m[j][i]/m[i][i];
+            for( k = i; k < height(); k++){
+            m[j][k] = m[j][k] - m[i][k] * b;
+            }
+        }
+    det *= m[i][i];
+    }
+    return det;
+}
+CMatrix CMatrix::operator*(const CMatrix& matrix2) const {
+    if (width() != matrix2.height()) {
+        return CMatrix();
+    }
+    CMatrix result(matrix2.width(),height());
+    for(int i(0); i < height(); i++){
+        for(int j(0); j < matrix2.width(); j++){
+            for(int k(0); k < width(); k++){
+                result[i][j] += m[i][k] * matrix2[k][j];
+            }
+        }
+    }
+    return result;
+}
+
+CMatrix CMatrix::invers() const {
+    if ( height() != width()){
+    qDebug() << "Warning! The matrix is not square! \ninvers not available";
+    return *this;
+    }
+//    if ( this->det() <= 0.00001){
+//    qDebug() << "Warning! Matrix is badly condition! \ninvers() may be wrong";
+//    }
+    CMatrix matrixE(height(),width());
+    for (int i(0); i < height(); i++){
+        for (int j(0); j < width(); j++)
+        {
+                matrixE[i][j] = 0.0;
+            if (i == j){
+                matrixE[i][j] = 1.0;
+            }
+        }
+    }
+    T temp;
+    for (int k(0); k < height(); k++)
+       {
+           temp = m[k][k];
+           for (int j(0); j < height(); j++){
+               m[k][j] /= temp;
+               matrixE[k][j] /= temp;
+           }
+
+           for (int i(k+1); i < height(); i++){
+               temp = m[i][k];
+               for (int j(0); j < height(); j++){
+                   m[i][j] -= m[k][j] * temp;
+                   matrixE[i][j] -= matrixE[k][j] * temp;
+               }
+           }
+       }
+    for (int k(height() - 1); k > 0; k--){
+        for (int i(k - 1); i >= 0; i--){
+            temp = m[i][k];
+            for (int j = 0; j < height(); j++){
+                  m[i][j] -= m[k][j] * temp;
+                  matrixE[i][j] -= matrixE[k][j] * temp;
+            }
+          }
+    }
+    return matrixE;
+}
+
+CMatrix CMatrix::dotTranspose() const{
+    CMatrix tempM(this->height(),this->height());
+    for(int i(0); i < height(); i++){
+        for(int j(0); j < height(); j++){
+            tempM[i][j] = 0.0;
+        }
+    }
+    for(int k(0); k < height(); k++){
+        for( int i(0); i < height(); i++){
+            for(int j(0); j < width(); j++){
+                tempM[k][i] += m[k][j] * m[i][j];
+            }
+        }
+    }
+    return tempM;
+}
+
+CMatrix CMatrix::transpose() const{
+    CMatrix result(height(),width());
+    for (int i(0); i < height(); i++){
+        for (int j(0); j < width(); j++){
+            result[i][j] = m[j][i];
+        }
+    }
+     return result;
+}
+
+CMatrix CMatrix::pseudoInvers() const{
+    CMatrix result(height(),width());
+    result = *this;
+    CMatrix tempM(height(), height());
+    tempM = this->dotTranspose();
+    if (tempM.det() <= 0.00001){
+    qDebug() << "Warning! Matrix is badly condition! \npseudoInvers() may be wrong";
+    }
+    tempM = tempM.invers();
+    result = tempM * result;
+    return result;
 }
 
 }

@@ -21,6 +21,8 @@ private:
     Pointers m;
     size_t wid;
     void repoint();
+
+    CMatrix dotTranspose() const;
 public:
     CMatrix();
     CMatrix(size_t w, size_t h);
@@ -42,6 +44,13 @@ public:
     void plusInColumn(size_t c, const T& val);
     void excludeRow(size_t r);
     void excludeColumn(size_t c);
+
+    CMatrix pseudoInvers() const;
+    CMatrix invers() const;
+    CMatrix transpose() const;
+    CMatrix operator*(const CMatrix&) const;
+    T det();
+
 
     void naNtoInf();
 
