@@ -123,7 +123,6 @@ void CMatrix::naNtoInf() {
         }
     }
 }
-
 QDebug operator<< (QDebug out, const CMatrix &obj) {
     QString matrix("CMatrix {\n");
     for (int i(0); i != obj.height(); ++i) {
@@ -137,7 +136,6 @@ QDebug operator<< (QDebug out, const CMatrix &obj) {
     out << matrix;
     return out;
 }
-
 QDataStream& operator<< (QDataStream& out, const CMatrix& m) {
     return out << m.data << m.wid;
 }
@@ -248,7 +246,6 @@ CMatrix CMatrix::dotTranspose() const{
     }
     return tempM;
 }
-
 CMatrix CMatrix::transpose() const{
     CMatrix result(height(),width());
     for (int i(0); i < height(); i++){
@@ -258,7 +255,6 @@ CMatrix CMatrix::transpose() const{
     }
      return result;
 }
-
 CMatrix CMatrix::pseudoInvers() const{
     CMatrix result(height(),width());
     result = *this;

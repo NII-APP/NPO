@@ -45,6 +45,7 @@ public:
     void excludeRow(size_t r);
     void excludeColumn(size_t c);
 
+
     CMatrix pseudoInvers() const;
     CMatrix invers() const;
     CMatrix transpose() const;
