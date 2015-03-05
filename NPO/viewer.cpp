@@ -90,9 +90,7 @@ void Viewer::addModel() {
 }
 
 void Viewer::setMesh(Geometry *g) {
-    qDebug() << "try to set mesh";
     geometryWidget->setModel(g);
-    qDebug() << "all right";
     try {
         const GeometryForm& full(dynamic_cast<GeometryForm&>(*g));
         formSelector->show();
