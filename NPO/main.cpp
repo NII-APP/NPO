@@ -1,7 +1,5 @@
 #include "application.h"
 #include "mainwindow.h"
-#include "engine/CGL/cmatrix.h"
-#include <QDebug>
 
 int main(int argc, char *argv[])
 {

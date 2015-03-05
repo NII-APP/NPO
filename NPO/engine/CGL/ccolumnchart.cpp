@@ -29,13 +29,12 @@ void CColumnChart::setData(const CMatrix& d) {
 }
 
 void CColumnChart::paintCGL() {
-    qDebug() << "paint MAC" << data.width() << data.height();
     qreal x0(0.5 * (data.width() - size));
     qreal y0(0.5 * (data.height() - size));
     for (int i(0); i != data.width(); ++i) {
         for (int j(0); j != data.height(); ++j) {
             QRgb c(color(data[i][j]) | 0xFF000000);
-            glColor3ubv(static_cast<unsigned char*>(static_cast<void*>(&c)) + 1);
+            glColor4ubv(static_cast<unsigned char*>(static_cast<void*>(&c)));
             drowParallelepiped(CParallelepiped(x0 + i + REGILAR_MARGIN, x0 + i + 1 - REGILAR_MARGIN,
                                                scale(data[i][j]), scale(0.0),
                                y0 + j + REGILAR_MARGIN, y0 + j + 1 - REGILAR_MARGIN));

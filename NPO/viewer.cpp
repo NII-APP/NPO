@@ -97,7 +97,6 @@ void Viewer::setMesh(Geometry *g) {
         const GeometryForm& full(dynamic_cast<GeometryForm&>(*g));
         formSelector->show();
         setMode(1);
-        qDebug() << full.getMac();
         if (!full.getMac().empty()) {
             macChart->setData(full.getMac());
         }
