@@ -391,6 +391,8 @@ GeometryForm* GeometryForm::truncation(const GeometryForm& a, const GeometryForm
     }
     result->extremums = a.extremums;
     result->defoultMagnitude = a.defoultMagnitude;
+    result->preMac = a.preMac;
+    result->mac = a.mac;
 
     qDebug() << result->forms.size() << result->forms.front().form().size() << result->nodes().size();
 

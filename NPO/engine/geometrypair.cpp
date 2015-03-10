@@ -16,6 +16,7 @@ GeometryPair::GeometryPair(GeometryForm* theory, GeometryForm *practic)
         }
     }
 
+    /*
     //estimate relations
     relation.clear();
     relation.resize(mac.height(),-1);
@@ -43,5 +44,6 @@ GeometryPair::GeometryPair(GeometryForm* theory, GeometryForm *practic)
         taked.setBit(max);
         max = -1; max2 = -1;
     }
+    */
 }
 
