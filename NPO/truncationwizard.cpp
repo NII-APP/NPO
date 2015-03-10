@@ -38,7 +38,7 @@ TruncationWizard::~TruncationWizard()
 GeometryPair* TruncationWizard::exec(QWidget* parent)
 {
     QEventLoop* loop(new QEventLoop(parent));
-    TruncationWizard* w(new TruncationWizard(parent));
+    TruncationWizard* w(new TruncationWizard(0));
     loop->connect(w, SIGNAL(finished(int)), SLOT(quit()));
     w->show();
     loop->exec();

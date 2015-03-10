@@ -284,10 +284,10 @@ float GeometryForm::MAC(const GeometryForm *a, const GeometryForm *b, int i, int
     std::clog << "estimate MAC";
     if (i >= a->forms.size() || j >= b->forms.size() || a->forms[i].form().size() != b->forms[j].form().size())
     {
-        std::cout << "\tSizes conflict "
+        qDebug()  << "\tSizes conflict "
                   << i << " >= " << a->forms.size() << " || "
                   << j << " >= " << b->forms.size() << " || "
-                  << a->forms.front().form().size() << " != " << b->forms.front().form().size() << std::endl;
+                  << a->forms.front().form().size() << " != " << b->forms.front().form().size();
         return -1.0f;
     }
     const CGL::CVertexes& x(a->forms[i].form());
@@ -393,6 +393,7 @@ GeometryForm* GeometryForm::truncation(const GeometryForm& a, const GeometryForm
     result->defoultMagnitude = a.defoultMagnitude;
     result->preMac = a.preMac;
     result->mac = a.mac;
+    result->bender = a.bender;
 
     qDebug() << result->forms.size() << result->forms.front().form().size() << result->nodes().size();
 
