@@ -7,16 +7,20 @@
 #include <QMessageBox>
 #include <QTabWidget>
 #include "truncationtab.h"
+#include "maintabbar.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    this->setCentralWidget(new QTabWidget(this));
+    this->setCentralWidget(new TabWidget(this));
     Viewer* cnt;
+    static_cast<TabWidget*>(centralWidget())->setTabBar(new MainTabBar(this->centralWidget()));
     static_cast<QTabWidget*>(centralWidget())->setTabPosition(QTabWidget::West);
     static_cast<QTabWidget*>(centralWidget())->addTab(cnt = new Viewer(this),
                     Application::identity()->tabViewIcon(), Application::identity()->tabView());
     static_cast<QTabWidget*>(centralWidget())->addTab(new TruncationTab(this),
                     Application::identity()->tabPairIcon(), Application::identity()->tabPair());
+    static_cast<QTabWidget*>(centralWidget())->addTab(new QWidget(this),"");
+    static_cast<QTabWidget*>(centralWidget())->setTabEnabled(2,false);
 
     cnt->connect(this, SIGNAL(porjectLoaded()), SLOT(resetListView()));
 

@@ -55,7 +55,8 @@ SOURCES += main.cpp \
     engine/CGL/cscale.cpp \
     engine/CGL/ccolorscale.cpp \
     truncationtab.cpp \
-    truncationwizard.cpp
+    truncationwizard.cpp \
+    maintabbar.cpp
 
 HEADERS += \
     engine/animationoptions.h \
@@ -98,7 +99,8 @@ HEADERS += \
     engine/CGL/cscale.h \
     engine/CGL/ccolorscale.h \
     truncationtab.h \
-    truncationwizard.h
+    truncationwizard.h \
+    maintabbar.h
 
 OTHER_FILES += \
     summator.vert
