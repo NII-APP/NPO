@@ -25,7 +25,6 @@ GeometryPair::GeometryPair(GeometryForm* theory, GeometryForm *practic)
     taked.fill(false, mac.width());
     taked2.fill(false, mac.height());
     int max(-1), max2(-1);
-    int count(0);
     for (int kontrol(0); kontrol != relation.size(); ++kontrol)
     {
         for (int i = 0; i != minForm; ++i) {
@@ -41,10 +40,6 @@ GeometryPair::GeometryPair(GeometryForm* theory, GeometryForm *practic)
         }
         if (max == -1) continue;
 
-        ++count;
-        if (count > minForm) break;
-
-        qDebug() << "m: " << max << max2 << relation.size();
         relation[max] = max2;
         taked2.setBit(max2);
         taked.setBit(max);
