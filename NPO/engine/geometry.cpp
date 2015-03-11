@@ -21,15 +21,7 @@ const unsigned char Geometry::CONST_BLACK[] = { 0x00, 0x00, 0x00 };
 Geometry::Geometry() : modelType(Undefined) {}
 
 Geometry::Geometry(const QString& fileName) : modelType(Undefined) {
-    QString ext(fileName.split('.').last());
-    if (ext == "bdf" && readBDF(fileName)) {
-        std::clog << "Geometry correctly parse .bdf file" << std::endl;
-    }
-    else if (ext == "unv" && readUNV(fileName)) {
-        std::clog << "Geometry correctly parse .unv file" << std::endl;
-    } else {
-        std::clog << "Geometry parser give unresolved file format (." << ext.toStdString() << ")" << std::endl;
-    }
+    read(fileName);
 }
 
 Geometry::Geometry(const Geometry& g)
@@ -842,7 +834,10 @@ QDataStream& operator << (QDataStream& out, const Geometry& g) {
     return out;
 }
 QDataStream& operator >> (QDataStream& in, Geometry& g) {
-    qDebug() << "Load from stream...";
+
+#ifndef QT_NO_DEBUG
+    QTime loop(QTime::currentTime());
+#endif
     int modelType;
     in >> g.sqre >> g.isTraced >> g.markedNodes >> g.measurment >> g.file >> modelType;
     in >> g.name;
@@ -893,6 +888,10 @@ QDataStream& operator >> (QDataStream& in, Geometry& g) {
         val = CGL::RectangularCoordinateSystem::load(in);
         g.systems.insert(key, val);
     }
+#ifndef QT_NO_DEBUG
+    qDebug() << "\tmesh with name" << g.name <<
+             "was finaly uploaded (" << loop.msecsTo(QTime::currentTime()) << "ms)";
+#endif
 
     return in;
 }

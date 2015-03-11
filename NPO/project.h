@@ -2,7 +2,7 @@
 #define PROJECT_H
 
 #include <vector>
-#include <Qstring>
+#include <QString>
 #include "identity.h"
 
 class Geometry;

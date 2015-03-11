@@ -40,12 +40,8 @@ void Project::save(const QString &filename)
 {
     QFile file(filename);
 
-    if(file.exists()) {
-        qDebug() << "file " + filename + " already exist.";
-    }
-
     if(!file.open(QIODevice::WriteOnly)) {
-        qDebug() << "can't open file";
+        throw QFileDevice::OpenError;
         return;
     }
 
@@ -55,18 +51,18 @@ void Project::save(const QString &filename)
     out << Identity::PROGRAM_VERSION;
     out << geometries.size();
     for (size_t i = 0; i < geometries.size(); ++i ){
-        qDebug() << typeid(*geometries.at(i)).name();
         if (dynamic_cast<GeometryForm*>(geometries.at(i))) {
-            qDebug() << "cast ";
             out << true;
             out << *static_cast<GeometryForm*>(geometries.at(i));
         } else {
-            qDebug() << "cast false";
             out << false;
             out << *geometries.at(i);
         }
     }
+    /// @todo save/load pairs
+#ifndef QT_NO_DEBUG
     qDebug() << "Time to save: " << loop.msecsTo(QTime::currentTime()) / 1000 << " ms";
+#endif
     file.close();
 
     someModified = false;
@@ -74,6 +70,10 @@ void Project::save(const QString &filename)
 
 void Project::load(const QString &filename)
 {
+#ifndef QT_NO_DEBUG
+    QTime loop(QTime::currentTime());
+#endif
+
     QFile file(filename);
 
     if(!file.exists()) {
@@ -81,26 +81,25 @@ void Project::load(const QString &filename)
     }
 
     if(!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "Can't open file fot reading";
+        throw QFileDevice::OpenError;
         return;
     }
 
     QString insuranceRow;
     unsigned programVersion;
     QDataStream in(&file);
-    QTime loop(QTime::currentTime());
-
     in >> insuranceRow;
     if (insuranceRow != Project::INSURANCE_ROW) {
-        qDebug() << "INSURANCE_ROW don't equals";
+        throw QFileDevice::ReadError;
         return;
     }
     in >> programVersion;
     if (programVersion < Identity::PROGRAM_VERSION) {
-        qDebug() << "Warning: The file was save in older version of program";
+        /// @todo when you start to use versin control system call the load&update functions from here insted the throw
+        throw QFileDevice::ResourceError;
     } else
         if (programVersion > Identity::PROGRAM_VERSION) {
-            qDebug() << "Warning: The file was save in newer version of program";
+            throw QFileDevice::ResourceError;
         }
 
     size_t size;
@@ -119,9 +118,12 @@ void Project::load(const QString &filename)
         }
         geometries.push_back(g);
     }
-    qDebug() << geometries.size();
-    qDebug() << "Time to load: " << loop.msecsTo(QTime::currentTime()) << " ms";
 
     file.close();
+
+    /// @todo save/load pairs
+#ifndef QT_NO_DEBUG
+    qDebug() << "Time to load project: " << loop.msecsTo(QTime::currentTime()) << " ms";
+#endif
 }
 

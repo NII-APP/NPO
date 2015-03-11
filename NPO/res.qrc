@@ -8,6 +8,7 @@
         <file>images/hill.png</file>
         <file>images/view.png</file>
         <file>images/pair.png</file>
+        <file>images/busy.gif</file>
     </qresource>
     <qresource prefix="/css" lang="css">
         <file>css.css</file>

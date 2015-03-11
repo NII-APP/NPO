@@ -20,6 +20,8 @@ class MainWindow : public QMainWindow
         void setTabBar(QTabBar* b) { QTabWidget::setTabBar(b); }
     };
 
+    void load(const QString& location);
+
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();

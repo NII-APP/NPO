@@ -7,9 +7,9 @@ class QDataStream;
 
 class Form
 {
-    float first;
-    CGL::CVertexes second;
-    CGL::CArray third;
+    float first;//frequency
+    CGL::CVertexes second;//form
+    CGL::CArray third;//power
 public:
     Form();
     Form(float, const CGL::CVertexes&);

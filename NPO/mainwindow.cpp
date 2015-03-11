@@ -8,6 +8,7 @@
 #include <QTabWidget>
 #include "truncationtab.h"
 #include "maintabbar.h"
+#include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -33,15 +34,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     fileMenu->addActions(Application::identity()->menuFileActions(fileMenu, relations));
 
     //just for simply debug
-    if (Project::isOwnProject("../pro.pro")) {
-        Application::project()->load("../pro.pro");
-        emit porjectLoaded();
+    if (!QDir("../").entryList(QStringList() << "*.pro").isEmpty()) {
+        load("../" + QDir("../").entryList(QStringList() << "*.pro").first());
     }
 }
 
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::load(const QString& location) {
+    disposed = location;
+    Application::project()->load(disposed);
+    emit porjectLoaded();
 }
 
 void MainWindow::open() {
@@ -57,8 +63,7 @@ void MainWindow::open() {
     }
     QString name(Application::identity()->choseProjectFile());
     if (Project::isOwnProject(name)) {
-        Application::project()->load(name);
-        emit porjectLoaded();
+        load(name);
     } else {
         Application::identity()->messageWrongProFile();
     }

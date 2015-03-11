@@ -190,16 +190,11 @@ void GeometryWidget::setModel(const Geometry &g)
 void GeometryWidget::initializeCGL()
 {
     summator = new QOpenGLShaderProgram(this);
-    qDebug() << (QFile::exists(":codes/summator.vert") ? "exist" : "doesn't exist");
     if (!summator->addShaderFromSourceFile(QOpenGLShader::Vertex, ":codes/summator.vert")) {
         qDebug() << summator->log();
-    } else {
-        qDebug() << "hope add";
     }
     if (!summator->bind()) {
         qDebug() << summator->log();
-    } else {
-        qDebug() << "hope bind";
     }
     Q_ASSERT(summator->isLinked());
 

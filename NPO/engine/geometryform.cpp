@@ -346,9 +346,11 @@ QDataStream& operator << (QDataStream& s, const GeometryForm& g) {
 }
 QDataStream& operator >> (QDataStream& s, GeometryForm& g) {
     s >> static_cast<Geometry&>(g);
+#ifndef QT_NO_DEBUG
+    QTime loop(QTime::currentTime());
+#endif
     Forms::size_type sForms, sBender;
     s >> sForms >> sBender;
-    qDebug() << sForms << sBender;
     g.forms.resize(sForms);
     g.bender.resize(sBender);
     for (int i(0); i != g.forms.size(); ++i) {
@@ -357,10 +359,12 @@ QDataStream& operator >> (QDataStream& s, GeometryForm& g) {
     for (int i(0); i != g.bender.size(); ++i) {
         s >> g.bender[i];
     }
-    qDebug() << "norm";
     s >> g.defoultMagnitude >> g.extremums;
-    qDebug() << "let's mac" << g.defoultMagnitude[0];
     s >> g.mac >> g.preMac >> g.formFile;
+
+#ifndef QT_NO_DEBUG
+    qDebug() << "\tmode shapes uploaded also (" << loop.msecsTo(QTime::currentTime()) << "ms)";
+#endif
     return s;
 }
 
