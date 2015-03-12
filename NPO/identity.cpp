@@ -4,14 +4,18 @@
 #include <QJsonParseError>
 #include <QFile>
 #include "application.h"
+#ifndef QT_NO_DEBUG
 #include <QDebug>
+#endif
 #include <QJsonArray>
 #include <QFileDialog>
+#include <QMessageBox>
 
 const unsigned Identity::PROGRAM_VERSION = 1488;
 
 Identity::Identity()
     : configuration(readConfig())
+    , topLavelParent(0)
 {
     Q_ASSERT(!language().isEmpty());
 }
@@ -27,7 +31,9 @@ const QJsonObject Identity::readConfig() {
     QJsonParseError* errors(new QJsonParseError);
     QJsonDocument doc(QJsonDocument::fromJson(f.readAll(), errors));
     if (errors->errorString() != QString("no error occurred")) {
+#ifndef QT_NO_DEBUG
         qDebug() << errors->errorString();
+#endif
         Q_ASSERT("JSON error occured");
     }
     return doc.object();
@@ -158,15 +164,33 @@ QMessageBox::StandardButton Identity::choseIsSaveQuestion() const {
     Q_ASSERT(configuration.contains("is save") && configuration["is save"].isObject());
     QJsonObject q(configuration["is save"].toObject());
     Q_ASSERT(q.contains("text " + language()));
-    return QMessageBox::question(QApplication::topLevelWidgets().first(), q["title " + language()].toString(), q["text " + language()].toString(),
+    return QMessageBox::question(QApplication::topLevelWidgets().first(),
+                                 q["title " + language()].toString(), q["text " + language()].toString(),
             QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel));
 }
 
 void Identity::messageWrongProFile() const {
+    Q_ASSERT(configuration.contains("cant open") && configuration["cant open"].isObject());
+    QJsonObject q(configuration["cant open"].toObject());
+    Q_ASSERT(q.contains("text " + language()));
+    QMessageBox::warning(QApplication::topLevelWidgets().first(), q["title " + language()].toString(),
+            q["text " + language()].toString());
+}
+
+void Identity::messageCantOpen() const {
     Q_ASSERT(configuration.contains("wrong file") && configuration["wrong file"].isObject());
     QJsonObject q(configuration["wrong file"].toObject());
     Q_ASSERT(q.contains("text " + language()));
-    QMessageBox::warning(QApplication::topLevelWidgets().first(), q["title " + language()].toString(), q["text " + language()].toString());
+    QMessageBox::warning(QApplication::topLevelWidgets().first(), q["title " + language()].toString(),
+            q["text " + language()].toString());
+}
+
+void Identity::messageObsoleteProgram() const {
+    Q_ASSERT(configuration.contains("obsolete program") && configuration["obsolete program"].isObject());
+    QJsonObject q(configuration["obsolete program"].toObject());
+    Q_ASSERT(q.contains("text " + language()));
+    QMessageBox::warning(QApplication::topLevelWidgets().first(), q["title " + language()].toString(),
+            q["text " + language()].toString());
 }
 
 QString Identity::execOpenFileNameDialog(const QJsonObject& config) const {
@@ -192,7 +216,6 @@ QString Identity::execSaveFileNameDialog(const QJsonObject& config) const {
     }
     return QFileDialog::getSaveFileName(QApplication::topLevelWidgets().first(), caption, QString(), filter);
 }
-
 
 Identity::~Identity()
 {

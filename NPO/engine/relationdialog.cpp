@@ -307,9 +307,7 @@ void RelationDialog::run(GeometryPair* forEdit, QWidget* parent)
 {
     QEventLoop* l(new QEventLoop(parent));
     RelationDialog* dialog(new RelationDialog(forEdit, parent));
-    qDebug() << "construct";
     l->connect(dialog, SIGNAL(finished(int)), SLOT(quit()));
     dialog->show();
     l->exec();
-    qDebug() << "result";
 }

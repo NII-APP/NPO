@@ -178,7 +178,6 @@ void GeometryWidget::setModel(const Geometry* g)
         }
     }
 
-    qDebug() << "repaint new mesh";
     this->repaint();
 }
 
@@ -191,10 +190,14 @@ void GeometryWidget::initializeCGL()
 {
     summator = new QOpenGLShaderProgram(this);
     if (!summator->addShaderFromSourceFile(QOpenGLShader::Vertex, ":codes/summator.vert")) {
+#ifndef QT_NO_DEBUG
         qDebug() << summator->log();
+#endif
     }
     if (!summator->bind()) {
+#ifndef QT_NO_DEBUG
         qDebug() << summator->log();
+#endif
     }
     Q_ASSERT(summator->isLinked());
 

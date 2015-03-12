@@ -151,7 +151,6 @@ public:
     void alignZero();
     //compose both geometryes to one
     void scaleTo(double);
-    static Geometry* composition(const Geometry &, const Geometry &);
     //truncate hi-vertexes geometry to low-vertexes
     static std::vector<int> truncationIndexVector(const Geometry& from, const Geometry& to);
     CGL::CArray extractElasticityModulus();

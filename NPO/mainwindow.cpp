@@ -9,6 +9,7 @@
 #include "truncationtab.h"
 #include "maintabbar.h"
 #include <QDir>
+#include <QFileDevice>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -46,7 +47,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::load(const QString& location) {
     disposed = location;
-    Application::project()->load(disposed);
+    try {
+        Application::project()->load(disposed);
+    } catch (QFileDevice::FileError error) {
+        switch (error) {
+        case QFileDevice::OpenError:
+            Application::identity()->messageCantOpen();
+            break;
+        case QFileDevice::ReadError:
+            Application::identity()->messageWrongProFile();
+            break;
+        case QFileDevice::ResourceError:
+        default:
+            Application::identity()->messageObsoleteProgram();
+            break;
+        }
+        return;
+    }
+
     emit porjectLoaded();
 }
 

@@ -21,7 +21,7 @@ Viewer::Viewer(QWidget *parent)
     this->addWidget(geometryWidget);
     geometryWidget->setDisablePaintFunction([](GeometryWidget* me){
         /*QPainter* paint(new QPainter(me));
-        static const QPixmap img(Application::identity()->geometryWidgetNoDataImage());
+        static const QPixmap img(Application::identity()->geometryWidgetNoDataIttmage());
         paint->drawPixmap(me->width() / 2.0 - img.width() / 2.0, me->height() / 2.0 - img.height() / 2.0, img);
         delete paint;
         me->makeCurrent();
@@ -74,9 +74,7 @@ void Viewer::addModel() {
     setMesh(forAdd);
     QString mode(Application::identity()->choseModesFile());
     if (QFile::exists(mode)) {
-        qDebug() << "\ttry to convert";
         GeometryForm* enother = new GeometryForm(*forAdd);
-        qDebug() << "\ttry to read";
         if (enother->read(mode)) {
             delete forAdd;
             forAdd = enother;
@@ -95,7 +93,6 @@ void Viewer::setMesh(Geometry *g) {
         const GeometryForm& full(dynamic_cast<GeometryForm&>(*g));
         formSelector->show();
         setMode(1);
-        qDebug() << full.getMac();
         if (!full.getMac().empty()) {
             macChart->setData(full.getMac());
         }

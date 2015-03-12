@@ -281,13 +281,17 @@ void GeometryForm::estimateMAC()
 
 float GeometryForm::MAC(const GeometryForm *a, const GeometryForm *b, int i, int j)
 {
-    std::clog << "estimate MAC";
+#ifndef QT_NO_DEBUG
+    qDebug() << "estimate MAC";
+#endif
     if (i >= a->forms.size() || j >= b->forms.size() || a->forms[i].form().size() != b->forms[j].form().size())
     {
+#ifndef QT_NO_DEBUG
         qDebug()  << "\tSizes conflict "
                   << i << " >= " << a->forms.size() << " || "
                   << j << " >= " << b->forms.size() << " || "
                   << a->forms.front().form().size() << " != " << b->forms.front().form().size();
+#endif
         return -1.0f;
     }
     const CGL::CVertexes& x(a->forms[i].form());
@@ -295,42 +299,11 @@ float GeometryForm::MAC(const GeometryForm *a, const GeometryForm *b, int i, int
 
     float k(a->defoultMagnitude[i] / b->defoultMagnitude[j]);
 
-    if (x.size() != y.size()) {
-        std::cout << "Не совпали размерности массивов при расчёте МАС" << x.size() << "!=" << y.size() << std::endl;
-        return 0.0f;
-    }
     float s(0.0f);
     for (CGL::CVertexes::const_iterator it(x.begin()), jt(y.begin()), end(x.end()); it != end; ++it, ++jt)
         s += *it * *jt * k;
-    /*float z1(0.0f);
-    float z2(0.0f);
-    for (Vertexes::const_iterator it(x.begin()), end(x.end()); it != end; ++it)
-        z1 += *it * *it;
-    for (Vertexes::const_iterator it(y.begin()), end(y.end()); it != end; ++it)
-        z2 += *it * *it;
-    std::cout << s * s << '/' << z1 << '/' << z2 << "or" << a->preMac[i] << '/' << b->preMac[j] << k;*/
     return s * s / a->preMac[i] / b->preMac[j] / k / k;
 }
-
-/*GeometryForm* GeometryForm::composition(const GeometryForm &, const GeometryForm &, const QVector<int> &relation) {
-    std::clog << "\tforms composition" << k << std::endl;
-    //forms initial magnitude of b scaled to a...
-    for (int i(0); i != a.forms.size(); ++i) {
-        std::clog << "формы" << i << b.formsCount() << relation[i];
-        ret->forms[i].second.resize(vDest + b.vertexes.size());
-        Vertexes::iterator d(ret->forms[i].second.begin() + vDest);
-        if (relation[i] >= 0 && relation[i] < b.formsCount()) {
-            for (Vertexes::const_iterator it(b.forms[relation[i]].second.begin()),
-                 end(b.forms[relation[i]].second.end()); it != end; ++it, ++d)
-                *d = *it / k;
-            std::clog << i << "not null form" << std::endl;
-        }
-        else {
-            for (int it(0); it != vDest; ++it, ++d)
-                *d = 0.0f;
-        }
-    }
-}*/
 
 QDataStream& operator << (QDataStream& s, const GeometryForm& g) {
     s << static_cast<const Geometry&>(g);
@@ -371,14 +344,11 @@ QDataStream& operator >> (QDataStream& s, GeometryForm& g) {
 
 GeometryForm* GeometryForm::truncation(const GeometryForm& a, const GeometryForm& b)
 {
-    qDebug() << "geometry form truncation";
-    qDebug() << "\tcall geometry truncation";
     //make copy from experemental form geometry
     GeometryForm* result(new GeometryForm(static_cast<const Geometry&>(b)));
     result->formFile = "truncated";
     //selecti vertexes in theory form which will be associate with exteprimental form
     std::vector<int> interrelations(Geometry::truncationIndexVector(a, b));
-    qDebug() << interrelations.size() << result->nodes().length();
 
     //and now just copy the form values from theory
     result->forms.resize(a.forms.size());
@@ -398,8 +368,6 @@ GeometryForm* GeometryForm::truncation(const GeometryForm& a, const GeometryForm
     result->preMac = a.preMac;
     result->mac = a.mac;
     result->bender = a.bender;
-
-    qDebug() << result->forms.size() << result->forms.front().form().size() << result->nodes().size();
 
     return result;
 }

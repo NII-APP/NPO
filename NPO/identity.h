@@ -18,6 +18,7 @@ public:
     typedef QPair<QObject*, const char*> Acceptor;
     typedef QMultiMap<QString, Acceptor> Relations;
 private:
+    QWidget* topLavelParent;
     const QJsonObject configuration;
 
     static const QJsonObject readConfig();
@@ -51,6 +52,8 @@ public:
     QString choseSaveFile() const;
     QMessageBox::StandardButton choseIsSaveQuestion() const;
 
+    void messageCantOpen() const;
+    void messageObsoleteProgram() const;
     void messageWrongProFile() const;
 
     QString menuFileName() const;

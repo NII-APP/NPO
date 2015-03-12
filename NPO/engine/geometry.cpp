@@ -105,11 +105,12 @@ void Geometry::estimateBox()
 
 bool Geometry::readBDF(const QString &fileName)
 {
-    std::clog << "BDF parsing" << std::endl;
+#ifndef QT_NO_DEBUG
+    qDebug() << "BDF parsing";
+#endif
     QTime loop(QTime::currentTime());
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        std::clog << "\tCan't open file " << file.fileName().toStdString() << std::endl;
         return false;
     }
     this->file = fileName;
@@ -138,7 +139,6 @@ bool Geometry::readBDF(const QString &fileName)
             }
             int m(f.integer());
             trace[id] = new core::Quad(f.integer(), f.integer(), f.integer(), f.integer());
-            //qDebug() << "C4QUAD set shell id" << m;
             trace[id]->setShell(m);
             f.skipRow();
         } else if (type == "CTETRA") {
@@ -284,14 +284,11 @@ bool Geometry::readBDF(const QString &fileName)
                 }
                 f.skipRow();
             }
-            qDebug() << "MAT1_E:" << materials[id][Material::MAT1_E] << id;
         } else {
             ++f;
-            //qDebug() << "unresolved" << QString::fromStdString(type);
             f.skipRow();
         }
     }
-    qDebug() << "\tpostparse";
     delete memory;
 
     //*
@@ -300,12 +297,13 @@ bool Geometry::readBDF(const QString &fileName)
             systems[l->first]->toGlobal(vertexes(l->second));
         }
     }
-    qDebug() << "\tcoordinate";
 
     estimateTraced();
     estimateBox();
     modelType = Theory;
-    std::clog << '\t' << loop.msecsTo(QTime::currentTime()) / 1e3 << " sec parsing pelay for .bdf model with " << vertexes.length() << " nodes" << std::endl;
+#ifndef QT_NO_DEBUG
+    qDebug() << '\t' << loop.msecsTo(QTime::currentTime()) / 1e3 << " sec parsing pelay for .bdf model with " << vertexes.length() << " nodes";
+#endif
     return true;
 }
 
@@ -334,12 +332,13 @@ int Geometry::arriveKnownUNVBlock(CGL::CParse& f) {
 
 bool Geometry::readUNV(const QString &fileName)
 {
-    std::clog << "UNV parsing" << std::endl;
+#ifndef QT_NO_DEBUG
+    qDebug() << "UNV parsing";
+#endif
     QTime loop(QTime::currentTime());
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        std::clog << "\tCan't open file " << file.fileName().toStdString() << std::endl;
         return false;
     }
     this->file = fileName;
@@ -375,7 +374,9 @@ bool Geometry::readUNV(const QString &fileName)
                 vertexes.push_back(f.real());
                 ++f;
             }
-            std::clog << '\t' << vertexes.length() << " vertexes in geometryr" << std::endl;
+#ifndef QT_NO_DEBUG
+            qDebug() << '\t' << vertexes.length() << " vertexes in geometryr";
+#endif
         } break;
         case 82: {
             //it's the trace of experemental nodes
@@ -434,7 +435,9 @@ bool Geometry::readUNV(const QString &fileName)
         case -1:
         default:
             f -= 6;
-            std::clog << "inknown BDF block (" << f.integer() << "). try to skip. . .";
+#ifndef QT_NO_DEBUG
+            qDebug() << "\tinknown UNV block (" << f.integer() << "). try to skip. . .";
+#endif
             while (!f.testPrew("    -1\n")) {
                 f.skipRow();
             }
@@ -444,7 +447,9 @@ bool Geometry::readUNV(const QString &fileName)
     estimateTraced();
     estimateBox();
     modelType = Practic;
-    std::clog << '\t' << loop.msecsTo(QTime::currentTime()) / 1e3 << " sec parsing pelay" << std::endl;
+#ifndef QT_NO_DEBUG
+    qDebug() << '\t' << loop.msecsTo(QTime::currentTime()) / 1e3 << "s parsing pelay";
+#endif
     return true;
 }
 
@@ -554,10 +559,8 @@ void Geometry::renderSelectLabel(int vertex) const {
 
 void Geometry::colorize(const CGL::CArray &v, const QString& mes)
 {
-    std::clog << "scale colorize";
     if (static_cast<int>(v.size()) != vertexes.length()) {
         colors.resize(0);
-        std::clog << "\twrong colors size " << v.size() << vertexes.size();
         return;
     }
     measurment = mes;
@@ -613,9 +616,7 @@ void Geometry::colorizeFromArray(const CGL::CArray& v) {
 }
 
 void Geometry::colorizeElements(const CGL::CArray &v, const QString& mes) {
-    std::clog << "trace colorize";
     if (v.size() != static_cast<size_t>(trace.size())) {
-        std::clog << "\twrong colors size " << v.size() << ' ' << vertexes.size();
         return;
     }
     measurment = mes;
@@ -625,13 +626,10 @@ void Geometry::colorizeElements(const CGL::CArray &v, const QString& mes) {
 CGL::CArray Geometry::extractElasticityModulus() {
     CGL::CArray elasticyModulus(static_cast<int>(trace.size()));
 
-    std::clog << "\ncolorize to elasticity modulus. Whall size:" << elasticyModulus.size();
     for (int i = 0; i != elasticyModulus.size(); ++i) {
         if (trace.at(i)) {
             if (trace[i]->getShell() >= shells.size()) {
-                //qDebug() << shells.size() << "is shell size end less then" << trace[i]->getShell() << trace[i]->type();
             } else if (materials.size() <= shells[trace[i]->getShell()].getMatId()) {
-                //qDebug() << materials.size() << "is matherial size and it's less then" << shells[trace[i]->getShell()].getMatId() << trace[i]->type();
             } else {
                 elasticyModulus[i] = materials[shells[trace[i]->getShell()].getMatId()][Material::MAT1_E];
             }
@@ -643,7 +641,6 @@ CGL::CArray Geometry::extractElasticityModulus() {
 void Geometry::colorize(const CGL::CVertexes &v, const QString& mes)
 {
     if (v.size() != vertexes.size()) {
-        std::clog << "\twrong colors size " << v.size() << vertexes.size();
         return;
     }
     measurment = mes;
@@ -696,6 +693,9 @@ void Geometry::colorize(const CGL::CVertexes &v, const QString& mes)
 
 bool operator==(const Geometry &l, const Geometry &r)
 {
+#ifndef QT_NO_DEBUG
+    qDebug() << "meshes comparation (is" << &l << "==" << &r << ")";
+#endif
     if (l.trace.size() != r.trace.size()){
         return false;
     }
@@ -707,7 +707,9 @@ bool operator==(const Geometry &l, const Geometry &r)
         size_t rightSize = r.trace[i]->nodesCount();
 
         if (leftSize != rightSize) {
-            qDebug() << i << " " << leftSize << " " << rightSize;
+#ifndef QT_NO_DEBUG
+            qDebug() << '\t' << i << " " << leftSize << " " << rightSize;
+#endif
             return false;
         }
 
@@ -716,14 +718,18 @@ bool operator==(const Geometry &l, const Geometry &r)
 
         for (size_t j = 0; j < leftSize; ++j) {
             if (left[j] != right[j]) {
-                qDebug() << i << " " << left[j] << " " << right[j];
+#ifndef QT_NO_DEBUG
+                qDebug() << '\t' << i << " " << left[j] << " " << right[j];
+#endif
                 return false;
             }
         }
     }
 
     if (l.systems.size() != r.systems.size()){
-        qDebug() << "systems size " << l.systems.size() << " " << r.systems.size();
+#ifdef QT_NO_DEBUG
+        qDebug() << "\tsystems size " << l.systems.size() << " " << r.systems.size();
+#endif
         return false;
     }
 
@@ -731,12 +737,16 @@ bool operator==(const Geometry &l, const Geometry &r)
     auto systemRight = r.systems.begin();
     for (size_t i = 0; i < l.systems.size(); ++i) {
         if (systemLeft.key() != systemRight.key()){
-            qDebug() << "materials key " << i << " " << systemLeft.key() << " " << systemRight.key();
+#ifdef QT_NO_DEBUG
+            qDebug() << "\tmaterials key " << i << " " << systemLeft.key() << " " << systemRight.key();
+#endif
             return false;
         }
 
         if (!(systemLeft.value()->operator==(*systemRight.value()))) {
-             qDebug() << "materials value " << i;
+#ifdef QT_NO_DEBUG
+             qDebug() << "\tmaterials value " << i;
+#endif
             return false;
         }
 
@@ -745,44 +755,67 @@ bool operator==(const Geometry &l, const Geometry &r)
     }
 
     if (l.shells.size() != r.shells.size()){
-        qDebug() << "shells size " << l.shells.size() << " " << r.shells.size();
+#ifdef QT_NO_DEBUG
+        qDebug() << "\tshells size " << l.shells.size() << " " << r.shells.size();
+#endif
         return false;
     }
     for (size_t i = 0; i < l.shells.size(); ++i) {
         if (!(l.shells[i] == r.shells[i])) {
-            qDebug() << "shells i " << i;
+#ifdef QT_NO_DEBUG
+            qDebug() << "\tshells i " << i;
+#endif
             return false;
         }
     }
 
     if (l.materials.size() != r.materials.size()){
-        qDebug() << "materials size " << l.materials.size() << " " << r.materials.size();
+#ifdef QT_NO_DEBUG
+        qDebug() << "\tmaterials size " << l.materials.size() << " " << r.materials.size();
+#endif
         return false;
     }
     for (size_t i = 0; i < l.materials.size(); ++i) {
         if (!(l.materials[i] == r.materials[i])) {
-            qDebug() << "materials i " << i;
+#ifdef QT_NO_DEBUG
+            qDebug() << "\tmaterials i " << i;
+#endif
             return false;
         }
     }
 
     if (l.links.size() != r.links.size()){
-        qDebug() << "links size " << l.links.size() << " " << r.links.size();
+#ifdef QT_NO_DEBUG
+        qDebug() << "\tlinks size " << l.links.size() << " " << r.links.size();
+#endif
         return false;
     }
     for (size_t i = 0; i < l.links.size(); ++i) {
         if ((l.links[i] != r.links[i])) {
-            qDebug() << "links i " << i;
+#ifdef QT_NO_DEBUG
+            qDebug() << "\tlinks i " << i;
+#endif
             return false;
         }
     }
-    return (l.sqre == r.sqre) && (l.isTraced == r.isTraced) && (l.markedNodes == r.markedNodes) &&
+    if ((l.sqre == r.sqre) && (l.isTraced == r.isTraced) && (l.markedNodes == r.markedNodes) &&
             (l.measurment == r.measurment) && (l.file == r.file) && (l.modelType == r.modelType) &&
-            (l.vertexes == r.vertexes) && (l.colors == r.colors) ;
+            (l.vertexes == r.vertexes) && (l.colors == r.colors)) {
+#ifdef QT_NO_DEBUG
+            qDebug() << "meses is equal";
+#endif
+        return true;
+    }
+#ifdef QT_NO_DEBUG
+            qDebug() << "some of meshes isn't identity";
+#endif
+    return false;
 }
 
 QDataStream& operator << (QDataStream& out, const Geometry& g) {
-    qDebug() << "Write to stream...";
+#ifndef QT_NO_DEBUG
+    QTime loop(QTime::currentTime());
+#endif
     out << g.sqre << g.isTraced << g.markedNodes << g.measurment << g.file << static_cast<int>(g.modelType);
     out << g.name;
     out << g.vertexes << g.colors;
@@ -829,7 +862,10 @@ QDataStream& operator << (QDataStream& out, const Geometry& g) {
         i.value()->save(out);
     }
 
-
+#ifndef QT_NO_DEBUG
+    qDebug() << "\tmesh with name" << g.name <<
+             "was finaly saved (" << loop.msecsTo(QTime::currentTime()) << "ms)";
+#endif
 
     return out;
 }
@@ -892,7 +928,6 @@ QDataStream& operator >> (QDataStream& in, Geometry& g) {
     qDebug() << "\tmesh with name" << g.name <<
              "was finaly uploaded (" << loop.msecsTo(QTime::currentTime()) << "ms)";
 #endif
-
     return in;
 }
 
@@ -923,26 +958,6 @@ void Geometry::scaleTo(double v) {
     box().multZ(k);
 }
 
-Geometry* Geometry::composition(const Geometry& a, const Geometry& b)
-{
-    std::clog << "begin composition" << std::endl;
-    Geometry* ret(new Geometry(a));
-    int vDest(static_cast<int>(a.vertexes.size()));
-    int tDest(vDest / 3);
-    ret->vertexes.resize(a.vertexes.size() + b.vertexes.size());
-    qCopy(b.vertexes.begin(), b.vertexes.end(), ret->vertexes.begin() + vDest);
-    ret->sqre += b.sqre;
-    std::clog << "\ttrace" << std::endl;
-    for (Trace::const_iterator it(b.trace.begin()), end(b.trace.end()); it != end; ++it) {
-        if (*it) {
-            FinitElement* element((*it)->clone());
-            ret->trace.push_back(element);
-            ret->trace.back()->moveIndexes(tDest);
-        }
-    }
-    return ret;
-}
-
 std::vector<int> Geometry::truncationIndexVector(const Geometry& a, const Geometry& b)
 {
     const CGL::Vertexes& am(a.vertexes);
@@ -950,13 +965,11 @@ std::vector<int> Geometry::truncationIndexVector(const Geometry& a, const Geomet
     int aDimension(static_cast<int>(am.length()));
     int bDimension(static_cast<int>(bm.length()));
     CGL::Matrix dest(bDimension, aDimension);
-    std::clog << "estimate destanations" << std::endl;
     for (int i(0); i != bDimension; ++i) {
         for (int j = 0; j != aDimension; ++j) {
             dest[i][j] = (am(j) - bm(i)).lengthSquared();
         }
     }
-    std::clog << "selest min" << std::endl;
     std::vector<int> numbers(bDimension, 0);
     for (int i(0); i != bDimension; ++i) {
         for (int j(1); j != aDimension; ++j) {
@@ -981,17 +994,11 @@ void Geometry::layToBDF(const QString& source, const QString& dest, const CGL::C
     for (int i(0); i != dE.size(); ++i) {
         if (find.find(dE.at(i)) == find.end()) {
             find[dE.at(i)] = k;
-            qDebug() << newMat[k][Material::MAT1_E] << '+' << dE.at(i);
             newMat[k][Material::MAT1_E] += dE.at(i);
             newMat[k][Material::MAT1_E] = fabs(newMat[k][Material::MAT1_E]);
             newMat[k][Material::MAT1_G] = newMat[k][Material::MAT1_E] / 2.0 / (1.0 + newMat[k][Material::MAT1_NU]);
-            qDebug() << newMat[k][Material::MAT1_G] << newMat[k][Material::MAT1_E] << (1.0 + newMat[k][Material::MAT1_NU]);
-            qDebug() << '\t' << '=' << newMat[k][Material::MAT1_E];
             ++k;
         }
-    }
-    if (k != difference) {
-        qDebug() << "\nsome dE wasn't found in array" << k << difference;
     }
 
     Shells newShell(shells.size() * newMat.size());
@@ -1006,7 +1013,6 @@ void Geometry::layToBDF(const QString& source, const QString& dest, const CGL::C
 
     QFile base(source);
     if (!base.open(QFile::ReadOnly | QFile::Text)) {
-        qWarning() << "can't open file" << source << "to use it as a base of bdf propagation";
         return;
     }
     QByteArray data(base.readAll().append('\0'));
@@ -1027,7 +1033,6 @@ void Geometry::layToBDF(const QString& source, const QString& dest, const CGL::C
             int shellId(static_cast<int>(trace.at(i)->getShell() + shells.size() * find[dE.at(i)]));
             if (std::find(usedId.begin(), usedId.end(), shellId) == usedId.end()) {
                 usedId.push_back(shellId);
-                qDebug() << "push shell" << shellId << trace.at(i)->getShell() << find[dE.at(i)] << (shellId % shells.size()) << isUsed.size();
                 isUsed.setBit(shellId);
             }
             std::stringstream convertor;
@@ -1039,24 +1044,18 @@ void Geometry::layToBDF(const QString& source, const QString& dest, const CGL::C
                 ++m;
                 ++write;
             }
-            //isUsed[shellId + shells.size() *
-            //qDebug() << "eeee" << i << QString::fromStdString(buf) <<  QString::fromStdString(CGL::Parse(write).string());
         } else if (type == "PSHELL") {
             int id(CGL::Parse(f).integer());
-            qDebug() << "founded id" << id;
             shellStrings[id] = type + ' ' + f.string() + '\n';
-            qDebug() << shellStrings.size() << id << "shell id occur";
         } else {
             ++f;
             f.skipRow();
         }
     }
-    qDebug() << "Hello)))" << data.at(f - data.data());
     QString newString;
     for (int i(0); i != newMat.size(); ++i) {
         std::stringstream buf;
         buf << newMat[i][Material::MAT1_E];
-        qDebug() << QString::fromStdString(buf.str());
         std::string s1("MAT1*    1              2.+11           7.69231+10      .3\n");
         static const std::string s2("*       7800.\n");
         static const int where(24);
@@ -1081,71 +1080,32 @@ void Geometry::layToBDF(const QString& source, const QString& dest, const CGL::C
         newString += QString::fromStdString(s1);
         newString += QString::fromStdString(s2);
     }
-    int WWW(0);
     for (int it(0); it != usedId.size(); ++it) {
         int matrixId(usedId[it]);
         int i(matrixId / static_cast<int>(shells.size()));
         int j(matrixId % shells.size());
 
-        //qDebug() << WWW++ << i << j << matrixId;
         int id(static_cast<int>(usedId[it] + shells.size()));
         std::string data = shellStrings[j];
         if (!data.empty()) {
             std::stringstream bufId;
-            //qDebug() << WWW++;
             bufId << id;
             std::string idNum(bufId.str());
             static const int whereId(9);
-            //qDebug() << WWW++;
             for (int k(0); k != idNum.size(); ++k) {
                 data[k + whereId] = idNum[k];
             }
             std::stringstream buf;
             buf << i + 1;
-            //qDebug() << WWW++;
             std::string num(buf.str());
             static const int where(17);
-            //qDebug() << WWW++ << num.size();
             for (int k(0); k != num.size(); ++k) {
                 data[k + where] = num[k];
             }
             newString = newString + QString::fromStdString(data);
-            qDebug() << WWW++ << QString::fromStdString(data) << '\n';
         } else {
-            qDebug() << "shellStrings[" << j << "] is wrong" << usedId[it];
         }
     }
-    /*
-    for (int i(0); i != newMat.size(); ++i) {
-        for (int j(0); j != shells.size(); ++j) {
-            if (isUsed.testBit(i * shells.size() + j)) {
-                qDebug() << WWW++ << i << j;
-                int id(i * shells.size() + j + shells.size());
-                std::string data = shellStrings[j];
-                std::stringstream bufId;
-                qDebug() << WWW++;
-                bufId << id;
-                std::string idNum(bufId.str());
-                static const int whereId(9);
-                qDebug() << WWW++;
-                for (int k(0); k != idNum.size(); ++k) {
-                    data[k + whereId] = idNum[k];
-                }
-                std::stringstream buf;
-                buf << i;
-                qDebug() << WWW++;
-                std::string num(buf.str());
-                static const int where(17);
-                qDebug() << WWW++ << num.size();
-                for (int k(0); k != num.size(); ++k) {
-                    data[k + where] = num[k];
-                }
-                newString += QString::fromStdString(data);
-                qDebug() << WWW++ << QString::fromStdString(data);
-            }
-        }
-    }//*/
-    qDebug() << newString;
 
     data.insert(f - data.data(), newString);
 
@@ -1153,7 +1113,6 @@ void Geometry::layToBDF(const QString& source, const QString& dest, const CGL::C
 
     QFile result(dest);
     if (!result.open(QFile::WriteOnly | QFile::Text)) {
-        qWarning() << "can't open file" << source << "to write changed bdf data";
         return;
     }
     result.write(begin);

@@ -67,11 +67,24 @@
         "text eng" : "Save changes before closing?",
         "text rus" : "Сохранить изменения перед закрытием?"
     },
-    "wrong file" : {
-        "text rus" : "Файл не является проектом, созданным в данном приложении",
-        "text eng" : "Chosen file isn't a project of this appliccation",
-        "title rus" : "Возникла ошибка при открытии файла"
-    },
     "hertz eng" : "Hz",
-    "hertz rus" : "Гц"
+    "hertz rus" : "Гц",
+    "cant open" : {
+        "text rus" : "Не удалось открыть файл для чтеиия",
+        "text eng" : "Can't open file for reading",
+        "title rus" : "Возникла ошибка при открытии файла",
+        "title eng" : "File error"
+    },
+    "wrong file" : {
+        "text rus" : "Файл не является проектом, поддерживаемым данным приложением",
+        "text eng" : "Can't open this file as a projecto of this application",
+        "title rus" : "Возникла ошибка при открытии файла",
+        "title eng" : "File error"
+    },
+    "obsolete program" : {
+        "text rus" : "Проект создан в более новой версии приложения",
+        "text eng" : "This project was saved in newer sersion of application",
+        "title rus" : "Возникла ошибка при открытии файла",
+        "title eng" : "File error"
+    }
 }

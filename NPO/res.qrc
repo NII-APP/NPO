@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/codes">
         <file>summator.vert</file>
+        <file>parser.py</file>
     </qresource>
     <qresource prefix="/media">
         <file>images/togleOff.png</file>
