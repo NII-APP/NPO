@@ -1,4 +1,6 @@
 {
+    "py" : "C:/Python34/python.exe",
+    "BDFParse" : "../readBDF.py",
     "language": "rus",
     "file menu" : {
         "rus" : "Файл",

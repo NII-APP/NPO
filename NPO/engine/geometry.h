@@ -19,6 +19,7 @@
 #include "core/material.h"
 #include <QMatrix3x3>
 #include "form.h"
+#include "pyParse/BDFEntity.h"
 
 using namespace core;
 
@@ -78,9 +79,13 @@ private:
     void estimateBox();
     void estimateQuadTraceBufer();
 
-
     void colorizeFromArray(const CGL::CArray& v);
 
+#ifndef BDFENTITY_H
+    void obsoleteBDFParser();
+#else
+    void scarfUp(const PyParse::BDFEntity& entity);
+#endif
 protected:
     //coordinate systems. firest is the ordering number of coordinate system, second is correspond coordinate system
     typedef QMap<int, CGL::RectangularCoordinateSystem*> CoordinateSystems;

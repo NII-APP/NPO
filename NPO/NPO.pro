@@ -56,7 +56,9 @@ SOURCES += main.cpp \
     engine/CGL/ccolorscale.cpp \
     truncationtab.cpp \
     truncationwizard.cpp \
-    maintabbar.cpp
+    maintabbar.cpp \
+    engine/pyParse/BDFEntity.cpp \
+    engine/geometryobsoleteparse.cpp
 
 HEADERS += \
     engine/animationoptions.h \
@@ -100,7 +102,8 @@ HEADERS += \
     engine/CGL/ccolorscale.h \
     truncationtab.h \
     truncationwizard.h \
-    maintabbar.h
+    maintabbar.h \
+    engine/pyParse/BDFEntity.h
 
 OTHER_FILES += \
     summator.vert

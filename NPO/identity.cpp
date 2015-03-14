@@ -10,6 +10,7 @@
 #include <QJsonArray>
 #include <QFileDialog>
 #include <QMessageBox>
+#include "engine/pyParse/BDFEntity.h"
 
 const unsigned Identity::PROGRAM_VERSION = 1488;
 
@@ -18,6 +19,10 @@ Identity::Identity()
     , topLavelParent(0)
 {
     Q_ASSERT(!language().isEmpty());
+    Q_ASSERT(configuration.contains("py"));
+    PyParse::BDFEntity::py(configuration["py"].toString());
+    Q_ASSERT(configuration.contains("BDFParse"));
+    PyParse::BDFEntity::program(configuration["BDFParse"].toString());
 }
 
 QString Identity::language() const {
