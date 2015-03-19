@@ -87,7 +87,7 @@ void Geometry::estimateTraced()
     isTraced.fill(false, static_cast<int>(vertexes.length()));
     for (Trace::const_iterator i(trace.begin()), end(trace.end()); i != end; ++i) {
         if (*i) {
-            (*i)->getTraced(isTraced);
+            (*i)->fillTraced(isTraced);
         }
     }
 }
@@ -104,9 +104,11 @@ void Geometry::estimateBox()
     }
 }
 
+#ifdef BDFENTITY_H
 void Geometry::scarfUp(const PyParse::BDFEntity& entity) {
 
 }
+#endif
 
 bool Geometry::readBDF(const QString &fileName)
 {
@@ -115,7 +117,7 @@ bool Geometry::readBDF(const QString &fileName)
     QTime loop(QTime::currentTime());
 #endif
 #ifndef BDFENTITY_H
-    obsoleteBDFParser();
+    obsoleteBDFParser(fileName);
 #else
     scarfUp(PyParse::BDFEntity(fileName, QApplication::topLevelWidgets().first()));
 #endif
@@ -674,7 +676,7 @@ QDataStream& operator << (QDataStream& out, const Geometry& g) {
     for (size_t i(0); i != g.trace.size(); ++i) {
         if (g.trace[i]) {
             out << i;
-            FinitElement::saveElement(out, *g.trace[i]);
+            out << *g.trace[i];
         }
     }
 
@@ -734,7 +736,7 @@ QDataStream& operator >> (QDataStream& in, Geometry& g) {
     for (size_t i(0); i != realCount; ++i) {
         size_t id;
         in >> id;
-        g.trace[id] = FinitElement::loadElement(in);
+        g.trace[id] = FinitElement::load(in);
     }
 
     Geometry::CoordinateSystems::size_type s;

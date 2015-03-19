@@ -17,8 +17,6 @@ public:
     FinitElementType type() const;
     void getTraced(QBitArray&) const;
 
-    QDataStream& save(QDataStream&, FinitElement&) const;
-    FinitElement* load(QDataStream&);
     const int* nodes() const { return n; }
     int* nodes() { return n; }
     int nodesCount() const { return 4; }

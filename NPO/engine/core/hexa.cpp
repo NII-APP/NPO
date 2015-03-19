@@ -46,27 +46,4 @@ void Hexa::renderNet() const {
     //glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, n);
 }
 
-QDataStream& Hexa::save(QDataStream& out, FinitElement& el) const {
-    size_t size = el.nodesCount();
-    out << size;
-
-    int* data = el.nodes();
-    for (size_t i = 0; i < size; ++i) {
-        out << data[i];
-    }
-    return out;
-}
-FinitElement* Hexa::load(QDataStream& in) {
-    size_t size;
-    in >> size;
-
-    for (size_t i = 0; i < size; ++i) {
-        int data;
-        in >> data;
-        n[i] = data;
-    }
-    return this;
-}
-
-
 }

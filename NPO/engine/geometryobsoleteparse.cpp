@@ -1,10 +1,14 @@
-#ifndef BDFENTITY_H
 #include "geometryform.h"
+#include "core/quad.h"
+#include "core/tetra.h"
+#include "core/tria.h"
+#include "core/hexa.h"
 
-void Geometry::obsoleteBDFParser() {
+#ifndef BDFENTITY_H
+void Geometry::obsoleteBDFParser(const QString& fileName) {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return false;
+        return;
     }
     this->file = fileName;
     if (name.isEmpty()) {
@@ -191,5 +195,4 @@ void Geometry::obsoleteBDFParser() {
         }
     }
 }
-
 #endif

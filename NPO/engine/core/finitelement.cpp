@@ -8,10 +8,12 @@
 #include <QDebug>
 #include <cassert>
 #include <vector>
+#include <QBitArray>
 
 namespace core {
 
 FinitElement::FinitElement()
+    : shellIndex(-1)
 {
 }
 
@@ -21,71 +23,58 @@ int FinitElement::getShell() const { return shellIndex; }
 int& FinitElement::shell() { return shellIndex; }
 const int& FinitElement::shell() const { return shellIndex; }
 
-QDataStream &FinitElement::saveElement(QDataStream &out, FinitElement& el)
-{
-    int shell = el.shell();
-    int type = el.type();
-
-    out << shell;
-    out << type;
-
-    FinitElement* v;
-    switch (type) {
-    case LinesType:
-        v = new Lines;
-        v->setShell(shell);
-        return v->save(out, el);
-    case QuadType:
-        v = new Quad;
-        v->setShell(shell);
-        return v->save(out, el);
-    case TetraType:
-        v = new Tetra;
-        v->setShell(shell);
-        return v->save(out, el);
-    case HexaType:
-        v = new Hexa;
-        v->setShell(shell);
-        return v->save(out, el);
-    case TriaType:
-        v = new Tria;
-        v->setShell(shell);
-        return v->save(out, el);
-        break;
-    }
+QDataStream& operator<<(QDataStream& out, const FinitElement& element) {
+    out << static_cast<int>(element.type()) << element.getShell() << element.size();
+    out.writeRawData(static_cast<const char*>(static_cast<const void*>(element.begin())), element.size() * sizeof(int));
     return out;
 }
 
-FinitElement* FinitElement::loadElement(QDataStream& in) {
+QDataStream& operator>>(QDataStream& in, FinitElement& element){
     int shell;
     in >> shell;
+    element.setShell(shell);
+    int size;
+    in >> size;
+    qDebug() << shell << size;
+    element.resize(size);
+    in.readRawData(static_cast<char*>(static_cast<void*>(element.begin())), element.size() * sizeof(int));
+    qDebug() << "all";
+    return in;
+}
+
+void FinitElement::fillTraced(QBitArray & a) const {
+    for(const int& val: *this) {
+        a.setBit(val);
+    }
+}
+
+FinitElement* FinitElement::load(QDataStream& in) {
     int type;
     in >> type;
+    qDebug() << type << "element type" << (type == LinesType);
 
     FinitElement* v;
     switch (type) {
     case LinesType:
         v = new Lines;
-        v->setShell(shell);
-        return v->load(in);
+        break;
     case QuadType:
         v = new Quad;
-        v->setShell(shell);
-        return v->load(in);
+        break;
     case TetraType:
         v = new Tetra;
-        v->setShell(shell);
-        return v->load(in);
+        break;
     case HexaType:
         v = new Hexa;
-        v->setShell(shell);
-        return v->load(in);
+        break;
     case TriaType:
         v = new Tria;
-        v->setShell(shell);
-        return v->load(in);
+        break;
+    default:
+        return nullptr;
     }
-    return v = nullptr;
+    in >> *v;
+    return v;
 }
 
 

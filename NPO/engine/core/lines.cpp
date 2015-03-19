@@ -26,46 +26,9 @@ void Lines::renderNet() const {
     render();
 }
 
-QDataStream& Lines::save(QDataStream& out, FinitElement& el) const {
-    Nodes::size_type size;
-    size = el.nodesCount();
-    out << size;
-//    qDebug() << size;
-    int* data = el.nodes();
-    for (size_t i = 0; i < size; ++i) {
-        out << data[i];
-    }
-
-    //out.writeRawData(static_cast<const char*>(static_cast<const void*>(el.nodes())), sizeof(Nodes::value_type) * size);
-
-    //qDebug() << "-------------------- SAVE:";
-    //qDebug() << "size: " << size;
-    //qDebug() << "n.data(): " << el.nodes();
-    //qDebug() << "sizeof: " << sizeof(Nodes::value_type) * size;
-    //qDebug() << "-------------------- SAVE END";
-
-    return out;
-}
-FinitElement* Lines::load(QDataStream& in) {
-    Nodes::size_type size;
-    in >> size;
-    n.resize(size);
-//    qDebug() << size;
-    int data;
-    for (size_t i = 0; i < size; ++i) {
-        in >> data;
-        n[i] = data;
-    }
-
-    //in.readRawData(static_cast<char*>(static_cast<void*>(n.data())), sizeof(Nodes::value_type) * size);
-    /*
-    qDebug() << "-------------------- LOAD:";
-    qDebug() << "size: " << size;
-    qDebug() << "n.data(): " << n.data();
-    qDebug() << "sizeof: " << sizeof(Nodes::value_type) * size;
-    qDebug() << "-------------------- LOAD END";
-    */
-    return this;
+void Lines::setNodesCount(int newSize, int defaultNode)
+{
+    n.resize(static_cast<Nodes::size_type>(newSize), static_cast<Nodes::value_type>(defaultNode));
 }
 
 const int* Lines::nodes() const { return n.data(); }

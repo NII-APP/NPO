@@ -19,7 +19,7 @@
 #include "core/material.h"
 #include <QMatrix3x3>
 #include "form.h"
-#include "pyParse/BDFEntity.h"
+//#include "pyParse/BDFEntity.h"
 
 using namespace core;
 
@@ -82,7 +82,7 @@ private:
     void colorizeFromArray(const CGL::CArray& v);
 
 #ifndef BDFENTITY_H
-    void obsoleteBDFParser();
+    void obsoleteBDFParser(const QString &);
 #else
     void scarfUp(const PyParse::BDFEntity& entity);
 #endif
