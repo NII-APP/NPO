@@ -11,9 +11,10 @@ CParse::CParse(char *string)
 }
 
 CParse::CParse(const char *string)
-    : d(new char[strlen(string) + 1])
 {
-    strcpy(d, string);
+    int len = static_cast<int>(strlen(string)) + 1;
+    d = new char[len];
+    memcpy(d, string, len);
 }
 
 void CParse::UNIXRowSymbol() {
@@ -263,7 +264,7 @@ bool CParse::testPrew(const char *dest)
         return false;
     }
     if (!*dest) {
-        return *d;
+        return !!*d;
     }
     bool ret;
     int i(0);

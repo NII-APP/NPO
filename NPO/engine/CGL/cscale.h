@@ -21,9 +21,9 @@ public:
     ~CScale() {}
 
     //direct transformation
-    virtual Out operator ()(const In& op) const { return range.getMin() + (op - domain.getMin()) * range.range(); }
+    virtual Out operator ()(const In& op) const { return range.getMin() + (op - domain.getMin()) / domain.range() * range.range(); }
     //reverse transformation
-    virtual In operator [](const Out& op) const { return domain.getMin() + (op - range.getMin()) * domain.range(); }
+    virtual In operator [](const Out& op) const { return domain.getMin() + (op - range.getMin()) / range.range() * domain.range(); }
 
     const OutRange& getRange() const { return range; }
     const InRange& getDomain() const { return domain; }

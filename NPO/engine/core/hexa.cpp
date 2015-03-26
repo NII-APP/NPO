@@ -10,7 +10,7 @@ Hexa::Hexa()
 {
 }
 
-Hexa::Hexa(int n1, int n2, int n3, int n4, int n5, int n6, int n7, int n8)
+Hexa::Hexa(quint32 n1, quint32 n2, quint32 n3, quint32 n4, quint32 n5, quint32 n6, quint32 n7, quint32 n8)
 {
     n[0] = n1;
     n[1] = n2;

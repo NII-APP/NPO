@@ -156,6 +156,11 @@ void GeometryWidget::paintCGL()
     if (isAnimation()) {
         repaintLoop->start();
     }
+
+//    for(int i(0); i != data->nodes().length(); ++i) {
+//        QVector3D c(data->nodes()(i));
+//        renderText(c.x(),c.y(),c.z(), QString::number(atan2(c.y(), c.x()) / acos(-1.0) * 180),QFont("Tahoma", 20));
+//    }
 }
 
 void GeometryWidget::setModel(const Geometry* g)

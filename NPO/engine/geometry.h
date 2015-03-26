@@ -84,7 +84,7 @@ private:
 #ifndef BDFENTITY_H
     void obsoleteBDFParser(const QString &);
 #else
-    void scarfUp(const PyParse::BDFEntity& entity);
+    void scarfUp(PyParse::BDFEntity &entity);
 #endif
 protected:
     //coordinate systems. firest is the ordering number of coordinate system, second is correspond coordinate system
@@ -97,6 +97,7 @@ protected:
     bool colorized() const;
     bool colorizedElements() const;
 
+    void loadTrace(QIODevice&);
 
     size_t sizeOf();
 

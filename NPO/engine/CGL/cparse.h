@@ -35,7 +35,7 @@ public:
     CParse& operator -=(int v) { d -= v; return *this; }
     CParse& operator ++() { ++d; return *this; }
     CParse& operator ++(int) { ++d; return *this; }
-    int operator- (const CParse& p) const { return d - p.d; }
+    int operator- (const CParse& p) const { return static_cast<int>(d - p.d); }
     char operator *() const { return *d; }
     char operator [](int i) const { return d[i]; }
 };

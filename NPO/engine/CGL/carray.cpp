@@ -2,6 +2,7 @@
 #include "cgl.h"
 #ifdef QT_VERSION
 #include <QDataStream>
+#include <cmath>
 #endif // QT_VERSION
 namespace CGL {
 

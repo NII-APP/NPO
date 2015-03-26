@@ -9,7 +9,7 @@ namespace core {
 Tetra::Tetra()
 {
 }
-Tetra::Tetra(int n1, int n2, int n3, int n4) {
+Tetra::Tetra(quint32 n1, quint32 n2, quint32 n3, quint32 n4) {
     n[0] = n1;
     n[1] = n2;
     n[2] = n3;
@@ -26,11 +26,11 @@ void Tetra::getTraced(QBitArray& b) const {
     b.setBit(n[3]);
 }
 void Tetra::render() const {
-    const int m[] = { n[0], n[1], n[2], n[3], n[0], n[1] };
+    const quint32 m[] = { n[0], n[1], n[2], n[3], n[0], n[1] };
     glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, m);
 }
 void Tetra::renderNet() const {
-    const int m[] = { n[0], n[1], n[2], n[3], n[0], n[2], n[1], n[3] };
+    const quint32 m[] = { n[0], n[1], n[2], n[3], n[0], n[2], n[1], n[3] };
     glDrawElements(GL_LINE_STRIP, 8, GL_INT, m);
 }
 

@@ -10,7 +10,7 @@ Quad::Quad()
 {
 }
 
-Quad::Quad(int n1, int n2, int n3, int n4)
+Quad::Quad(quint32 n1, quint32 n2, quint32 n3, quint32 n4)
 {
     n[0] = n1;
     n[1] = n2;

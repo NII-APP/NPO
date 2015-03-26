@@ -12,7 +12,7 @@
 #include <QMessageBox>
 #include "engine/pyParse/BDFEntity.h"
 
-const unsigned Identity::PROGRAM_VERSION = 1;
+const unsigned Identity::PROGRAM_VERSION = 2;
 
 Identity::Identity()
     : configuration(readConfig())

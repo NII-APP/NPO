@@ -58,7 +58,14 @@ SOURCES += main.cpp \
     truncationwizard.cpp \
     maintabbar.cpp \
     engine/pyParse/BDFEntity.cpp \
-    engine/geometryobsoleteparse.cpp
+    engine/geometryobsoleteparse.cpp \
+    engine/CGL/c2dchart.cpp \
+    engine/CGL/c2dchartplace.cpp \
+    engine/CGL/cchartdata.cpp \
+    engine/CGL/cdimension.cpp \
+    engine/CGL/cdimensionarray.cpp \
+    engine/CGL/cdimensioninterval.cpp \
+    engine/CGL/c2dchartaxis.cpp
 
 HEADERS += \
     engine/animationoptions.h \
@@ -103,7 +110,14 @@ HEADERS += \
     truncationtab.h \
     truncationwizard.h \
     maintabbar.h \
-    engine/pyParse/BDFEntity.h
+    engine/pyParse/BDFEntity.h \
+    engine/CGL/c2dchart.h \
+    engine/CGL/c2dchartplace.h \
+    engine/CGL/cchartdata.h \
+    engine/CGL/cdimension.h \
+    engine/CGL/cdimensionarray.h \
+    engine/CGL/cdimensioninterval.h \
+    engine/CGL/c2dchartaxis.h
 
 OTHER_FILES += \
     summator.vert

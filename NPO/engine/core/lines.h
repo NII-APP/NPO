@@ -8,9 +8,9 @@ namespace core {
 class Lines : public FinitElement
 {
 public:
-    typedef std::vector<int> Nodes;
+    typedef std::vector<quint32> Nodes;
     Lines();
-    void addNode(int node);
+    void addNode(quint32 node);
 
     void render() const;
     void renderNet() const;
@@ -18,11 +18,11 @@ public:
     FinitElementType type() const;
     void getTraced(QBitArray&) const;
 
-    void setNodesCount(int newSize, int defaultNode = 0);
+    void setNodesCount(quint32 newSize, quint32 defaultNode = 0);
 
-    const int* nodes() const;
-    int* nodes();
-    int nodesCount() const;
+    const quint32* nodes() const;
+    quint32* nodes();
+    quint32 nodesCount() const;
 
 private:
     Nodes n;

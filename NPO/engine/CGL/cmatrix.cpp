@@ -62,12 +62,12 @@ CMatrix::T CMatrix::minInColumnExclude(size_t c, size_t exclude) const {
     }
     return min;
 }
-CRange<CMatrix::T> CMatrix::estimateRange() const {
+RealRange CMatrix::estimateRange() const {
     if (data.empty()) {
-        return CRange<T>();
+        return RealRange();
     }
-    CRange<T> result(data.front());
-    for (Data::const_iterator it(data.begin() + 1), end(data.end()); it != end; ++it) {
+    RealRange result;
+    for (Data::const_iterator it(data.begin()), end(data.end()); it != end; ++it) {
         result.include(*it);
     }
     return result;
@@ -218,7 +218,7 @@ CMatrix CMatrix::invers() const {
                }
            }
        }
-    for (int k(height() - 1); k > 0; k--){
+    for (int k(static_cast<int>(height()) - 1); k > 0; k--){
         for (int i(k - 1); i >= 0; i--){
             temp = m[i][k];
             for (int j = 0; j < height(); j++){

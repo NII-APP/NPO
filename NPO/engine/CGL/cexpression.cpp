@@ -173,7 +173,7 @@ CExpression& CExpression::rebild(const char* CExpression)
         return *this;
     }
     //Переписываем содежимое строки CExpression в sourseString
-    int len = strlen(CExpression);
+    int len = static_cast<int>(strlen(CExpression));
     char* sourseString = new char[len * 3 + 1];//Выражение, как правило, не длинное а нам пригодится память вовремя разбора. к тому же она будет очищена сразу после создания объекта
     for (int i = 0, j = 0; i < len; ++i)
         sourseString[j++] = CExpression[i];
@@ -228,7 +228,7 @@ short strlen(char* st){
 /*Так как функция из библиотеки выдаёт ворнинг я её переписал*/
     char* len = st;
     while (*len) ++len;
-    return len - st;
+    return static_cast<short>(len - st);
 }
 void CExpression::sintAdaptation (char* st)
 {

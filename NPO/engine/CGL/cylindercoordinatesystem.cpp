@@ -1,6 +1,9 @@
 #include "cylindercoordinatesystem.h"
 #include <QVector3D>
 #include <QDataStream>
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <math.h>
 
 namespace CGL {
 
@@ -8,7 +11,7 @@ CylinderCoordinateSystem::CylinderCoordinateSystem(const QVector3D& d, const QVe
     : RectangularCoordinateSystem(d, z, p) { }
 
 void CylinderCoordinateSystem::toGlobal(QVector3D& v) const {
-    static const float k(1. / 90. * acos(0.0f));
+    static const float k(static_cast<float>(1. / 90. * M_PI));
     float phi(v.y() * k);
     //Optimization)) be careful
     v.setY(v.x() * sin(phi));

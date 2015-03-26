@@ -1,12 +1,3 @@
-/*
- ласс предоставл€ет возможность хранить массив вещественных (double) чисел,
-с посто€нным шагом. ћассив можно измен€ть в рамере, мен€ть шаг и мен€ть все
-элементы сразу на одинаковую величину. Ўаг и размер могут быть нулевыми.
-ќбеспечиваетс€ поддержка.
-¬ажно понимать, что колличество чисел в таком массиве всегда на 1 больше
-чем колличество шагов отрезков в интервале от begin до end. „тобы сохранить
-общность с контейнерами, мы выбрали именно такой способ представлени€ данных.
-*/
 #ifndef CINTERVAL_H
 #define CINTERVAL_H
 #include <iostream>
@@ -15,27 +6,28 @@
 #include <QDataStream>
 #include <QDebug>
 #include <cmath>
+#include "crange.h"
 
-class CInterval
+namespace CGL {
+
+class CInterval : public RealRange
 {
-    size_t s;
-    double st;
-    double min;
+    int s;
 public:
     CInterval();
-    CInterval(double begin, double step, double end);
-    CInterval(double begin, double step, size_t size);
-    CInterval(double begin, double step, int size);
-    static CInterval interval(double begin, double end, size_t size);
-    inline double first() const { return min; }
-    inline double last() const { return min + st * (s - 1); }
-    inline double step() const { return st; }
+    CInterval(const RealRange& range, int size = 1000);
+    CInterval(double begin, double end, int size = 1000);
+    static CInterval interval(double begin, double step, int size);
+    inline double first() const { return getMin(); }
+    inline double last() const { return getMax(); }
+    inline double step() const { return range() / (s - 1); }
     inline bool isEmpty() const { return static_cast<bool>(s); }
-    inline size_t size() const { return s; }
+    inline int size() const { return s; }
 
-    inline double operator[] (int i) const { return min + st * i; }
-    inline bool operator !=(const CInterval& v) const { return v.s != s || v.min != min || v.st != st; }
-    inline bool operator ==(const CInterval& v) const { return v.s == s && v.min == min && v.st == st; }
+    inline double operator[] (int i) const {
+        return getMin() + (i ? step() * i : 0.0); }
+    inline bool operator !=(const CInterval& v) const { return RealRange::operator !=(v) && s != v.s; }
+    inline bool operator ==(const CInterval& v) const { return RealRange::operator ==(v) && s == v.s; }
 
     friend std::ostream& operator << (std::ostream& out, const CInterval& i);
     friend std::istream& operator >> (std::istream& in, CInterval& i);
@@ -53,5 +45,7 @@ QTextStream& operator >> (QTextStream& in, CInterval& i);
 QDataStream& operator << (QDataStream& out, const CInterval& i);
 QDataStream& operator >> (QDataStream& out, CInterval& i);
 QDebug operator << (QDebug out, const CInterval& i);
+
+}
 
 #endif // CINTERVAL_H

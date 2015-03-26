@@ -36,7 +36,7 @@ template <typename T> QDataStream& operator<< (QDataStream& s, const std::vector
 }
 template <typename T> QDataStream& operator>> (QDataStream& s, std::vector<T>& array) {
     typedef std::vector<T> vector;
-    vector::size_type size;
+    typename vector::size_type size;
     s >> size;
     array.resize(size);
     s.readRawData(static_cast<char*>(static_cast<void*>(array.data())), static_cast<int>(size) * sizeof(T));

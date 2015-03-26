@@ -7,7 +7,7 @@ namespace core {
 Tria::Tria()
 {
 }
-Tria::Tria(int n1, int n2, int n3) {
+Tria::Tria(quint32 n1, quint32 n2, quint32 n3) {
     n[0] = n1;
     n[1] = n2;
     n[2] = n3;

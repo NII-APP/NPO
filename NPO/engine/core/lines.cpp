@@ -10,7 +10,7 @@ Lines::Lines()
 }
 
 
-void Lines::addNode(int node) { n.push_back(node); }
+void Lines::addNode(quint32 node) { n.push_back(node); }
 
 FinitElement* Lines::clone() const { return new Lines(*this); }
 FinitElement::FinitElementType Lines::type() const { return LinesType; }
@@ -26,13 +26,13 @@ void Lines::renderNet() const {
     render();
 }
 
-void Lines::setNodesCount(int newSize, int defaultNode)
+void Lines::setNodesCount(quint32 newSize, quint32 defaultNode)
 {
     n.resize(static_cast<Nodes::size_type>(newSize), static_cast<Nodes::value_type>(defaultNode));
 }
 
-const int* Lines::nodes() const { return n.data(); }
-int* Lines::nodes() { return n.data(); }
-int Lines::nodesCount() const { return n.size(); }
+const quint32* Lines::nodes() const { return n.data(); }
+quint32* Lines::nodes() { return n.data(); }
+quint32 Lines::nodesCount() const { return n.size(); }
 
 }

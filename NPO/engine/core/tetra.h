@@ -6,10 +6,10 @@ namespace core {
 
 class Tetra : public FinitElement
 {
-    int n[4];
+    quint32 n[4];
 public:
     Tetra();
-    Tetra(int n1, int n2, int n3, int n4);
+    Tetra(quint32 n1, quint32 n2, quint32 n3, quint32 n4);
 
     void render() const;
     void renderNet() const;
@@ -17,9 +17,9 @@ public:
     FinitElementType type() const;
     void getTraced(QBitArray&) const;
 
-    const int* nodes() const { return n; }
-    int* nodes() { return n; }
-    int nodesCount() const { return 4; }
+    const quint32* nodes() const { return n; }
+    quint32* nodes() { return n; }
+    quint32 nodesCount() const { return 4; }
 };
 
 }

@@ -39,7 +39,7 @@ public:
     T minInColumn(size_t c) const;
     T minInRowExclude(size_t r, size_t exclude) const;
     T minInColumnExclude(size_t c, size_t exclude) const;
-    CRange<T> estimateRange() const;
+    RealRange estimateRange() const;
     void plusInRow(size_t r, const T& val);
     void plusInColumn(size_t c, const T& val);
     void excludeRow(size_t r);

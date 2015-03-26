@@ -105,8 +105,11 @@ void Geometry::estimateBox()
 }
 
 #ifdef BDFENTITY_H
-void Geometry::scarfUp(const PyParse::BDFEntity& entity) {
-
+void Geometry::scarfUp(PyParse::BDFEntity& entity) {
+    qint32 size;
+    entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(qint32));
+    vertexes.resize(size, 0.0f);
+    entity.read(static_cast<char*>(static_cast<void*>(vertexes.data())), size * sizeof(float));
 }
 #endif
 
@@ -537,8 +540,8 @@ bool operator==(const Geometry &l, const Geometry &r)
             return false;
         }
 
-        int* left = l.trace[i]->nodes();
-        int* right = r.trace[i]->nodes();
+        quint32* left = l.trace[i]->nodes();
+        quint32* right = r.trace[i]->nodes();
 
         for (size_t j = 0; j < leftSize; ++j) {
             if (left[j] != right[j]) {
@@ -726,18 +729,7 @@ QDataStream& operator >> (QDataStream& in, Geometry& g) {
         in >> g.links[i].second;
     }
 
-    Geometry::Trace::size_type size;
-    in >> size;
-
-    size_t realCount;
-    in >> realCount;
-
-    g.trace.resize(size, 0);
-    for (size_t i(0); i != realCount; ++i) {
-        size_t id;
-        in >> id;
-        g.trace[id] = FinitElement::load(in);
-    }
+    g.loadTrace(*in.device());
 
     Geometry::CoordinateSystems::size_type s;
     in >> s;
@@ -755,6 +747,21 @@ QDataStream& operator >> (QDataStream& in, Geometry& g) {
     return in;
 }
 
+void Geometry::loadTrace(QIODevice & device) {
+    QDataStream in(&device);
+    quint32 size;
+    in >> size;
+
+    quint32 realCount;
+    in >> realCount;
+
+    trace.resize(size, 0);
+    for (size_t i(0); i != realCount; ++i) {
+        quint32 id;
+        in >> id;
+        trace[id] = FinitElement::load(in);
+    }
+}
 
 void Geometry::alignZero() {
     QVector3D center(this->box().center());

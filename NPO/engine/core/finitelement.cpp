@@ -18,38 +18,38 @@ FinitElement::FinitElement()
 }
 
 
-void FinitElement::setShell(const int &v) { shellIndex = v; }
-int FinitElement::getShell() const { return shellIndex; }
-int& FinitElement::shell() { return shellIndex; }
-const int& FinitElement::shell() const { return shellIndex; }
+void FinitElement::setShell(const quint32 &v) { shellIndex = v; }
+quint32 FinitElement::getShell() const { return shellIndex; }
+quint32& FinitElement::shell() { return shellIndex; }
+const quint32& FinitElement::shell() const { return shellIndex; }
 
 QDataStream& operator<<(QDataStream& out, const FinitElement& element) {
-    out << static_cast<int>(element.type()) << element.getShell() << element.size();
-    out.writeRawData(static_cast<const char*>(static_cast<const void*>(element.begin())), element.size() * sizeof(int));
+    out << static_cast<quint32>(element.type()) << element.getShell() << element.size();
+    out.writeRawData(static_cast<const char*>(static_cast<const void*>(element.begin())), element.size() * sizeof(quint32));
     return out;
 }
 
 QDataStream& operator>>(QDataStream& in, FinitElement& element){
-    int shell;
+    quint32 shell;
     in >> shell;
     element.setShell(shell);
-    int size;
+    quint32 size;
     in >> size;
     qDebug() << shell << size;
     element.resize(size);
-    in.readRawData(static_cast<char*>(static_cast<void*>(element.begin())), element.size() * sizeof(int));
+    in.readRawData(static_cast<char*>(static_cast<void*>(element.begin())), element.size() * sizeof(quint32));
     qDebug() << "all";
     return in;
 }
 
 void FinitElement::fillTraced(QBitArray & a) const {
-    for(const int& val: *this) {
+    for(const quint32& val: *this) {
         a.setBit(val);
     }
 }
 
 FinitElement* FinitElement::load(QDataStream& in) {
-    int type;
+    quint32 type;
     in >> type;
     qDebug() << type << "element type" << (type == LinesType);
 
@@ -70,6 +70,11 @@ FinitElement* FinitElement::load(QDataStream& in) {
     case TriaType:
         v = new Tria;
         break;
+    case BushType: case BarType: {
+        quint32 size;
+        in >> size;
+        in.skipRawData(size * sizeof(quint32));
+    }
     default:
         return nullptr;
     }
@@ -78,9 +83,9 @@ FinitElement* FinitElement::load(QDataStream& in) {
 }
 
 
-void FinitElement::moveIndexes(int n) {
-    int* it(this->begin());
-    int* lim(this->end());
+void FinitElement::moveIndexes(quint32 n) {
+    quint32* it(this->begin());
+    quint32* lim(this->end());
     while (it != lim) {
         *it += n;
         ++it;

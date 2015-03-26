@@ -64,6 +64,7 @@ void GeometryForm::readTXT(const QString &fileName)
         }
         pos += numbers.matchedLength();
     }
+    int j(0);
     while ((*f >= 'A' && *f <= 'Z') || (*f >= 'a' && *f <= 'z')) {
         f.skipTo(":+");
         QVector3D orientation;
@@ -83,11 +84,21 @@ void GeometryForm::readTXT(const QString &fileName)
             f.real();
             f.real();
             f.real();
-            forms[i].form().push_vector_back(f.real() * orientation);
+            ///forms[i].form().push_vector_back(f.real() * orientation); it's still not have normal format... fix for every file
+            //double v(f.real());
+            //QVector3D current(nodes()(j));
+            //qreal angle(atan2(current.x(), current.y()));
+            //qreal angle((rand() % 180) / 180. * acos(-1.));
+            //qDebug() << "angle" << angle / acos(-1.) * 180 << QVector3D(cos(angle) * v, sin(angle) * v, 0.0)
+              //       << v * current * QVector3D(1.,1.,0.);
+            //forms[i].form().push_vector_back(QVector3D(sin(angle) * v, cos(angle) * v, 0.0));
+            //qDebug() << v << '*' << current * QVector3D(1.0,1.0,0.0) << '=' << v * current * QVector3D(1.,1.,0.) << angle / acos(-1.0) * 180;
+            forms[i].form().push_vector_back(f.real() * nodes()(j) * QVector3D(1.0,1.0,0.0));
         }
         f.skipRow();
+        ++j;
     }
-    UNVTransformation(forms);
+    //UNVTransformation(forms);
 
     estimateDefoultMagnitudes();
     estimateMAC();
@@ -120,7 +131,7 @@ void GeometryForm::readF06(const QString& fileName)
         f.integer();
         f.real();
         f.real();
-        forms.push_back(Form(f.real(),CGL::CVertexes(nodes().size())));
+        forms.push_back(Form(f.real(),CGL::CVertexes(static_cast<int>(nodes().size()))));
         bender.push_back(Form(forms.back().frequency(),nodes().size()));
         f.skipRow();
     }
@@ -235,7 +246,7 @@ void GeometryForm::estimateDefoultMagnitudes() {
     defoultMagnitude.resize(forms.size());
     for (int j(0); j != forms.size(); ++j) {
         const CGL::Vertexes form(forms.at(j).form());
-        int i(form.length());
+        int i(static_cast<int>(form.length()));
         double v(0.0);
         while (i) {
             --i;
@@ -253,7 +264,8 @@ const CGL::CMatrix& GeometryForm::getMac() const
 void GeometryForm::estimateMAC()
 {
     std::clog << "Estimate auto MAC" << std::endl;
-    int i(0), size(forms.size());
+    int i(0);
+    size_t size(forms.size());
     mac = CGL::Matrix(size, size);
     preMac.resize(forms.size());
     std::fill(preMac.begin(), preMac.end(), 0.0f);
