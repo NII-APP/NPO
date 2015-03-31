@@ -63,6 +63,8 @@ public:
     static GeometryForm* truncation(const GeometryForm& a, const GeometryForm &b);
 };
 
+typedef GeometryForm MeshModes;
+
 QDataStream& operator << (QDataStream&, const GeometryForm&);
 QDataStream& operator >> (QDataStream&, GeometryForm&);
 

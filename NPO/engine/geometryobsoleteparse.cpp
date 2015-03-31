@@ -25,8 +25,8 @@ void Geometry::obsoleteBDFParser(const QString& fileName) {
     UNVTransformations.clear();
 
     vertexes.reserve(81009);
-    //parce each datum
 
+    //parce each datum
     while (!f.testPrew("ENDDATA")) {
         std::string type(f.word());
         if (type == "CQUAD4") {

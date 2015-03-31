@@ -20,8 +20,8 @@ int MethodInvMat::GetMatrix(GeometryForm* model)
 {
     CGL::CArray elasticy(model->extractElasticityModulus());
    // qDebug() << "create mega matrux";
-    int sizeElem = model->elements().size();
-    int sizeMode = model->modes().size();
+    int sizeElem = static_cast<int>(model->elements().size());
+    int sizeMode = static_cast<int>(model->modes().size());
 
     qDebug() << "sizeElem ==" << sizeElem;
     qDebug() << "sizeMode ==" << sizeMode;

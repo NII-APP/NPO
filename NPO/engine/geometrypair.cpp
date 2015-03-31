@@ -22,8 +22,8 @@ GeometryPair::GeometryPair(GeometryForm* theory, GeometryForm *practic)
     size_t minForm(std::min(mac.width(), mac.height()));
     QBitArray taked;
     QBitArray taked2;
-    taked.fill(false, mac.width());
-    taked2.fill(false, mac.height());
+    taked.fill(false, static_cast<int>(mac.width()));
+    taked2.fill(false, static_cast<int>(mac.height()));
     int max(-1), max2(-1);
     for (int kontrol(0); kontrol != relation.size(); ++kontrol)
     {

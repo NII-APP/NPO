@@ -162,6 +162,8 @@ public:
     CGL::CArray extractElasticityModulus();
 };
 
+typedef Geometry Mesh;
+
 bool operator==(const Geometry& l, const Geometry& r);
 QDataStream& operator << (QDataStream& out, const Geometry& g);
 QDataStream& operator >> (QDataStream& out, Geometry& g);

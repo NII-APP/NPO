@@ -20,7 +20,7 @@ void Lines::getTraced(QBitArray& b) const {
     }
 }
 void Lines::render() const {
-    glDrawElements(GL_LINE_STRIP, n.size(), GL_UNSIGNED_INT, n.data());
+    glDrawElements(GL_LINE_STRIP, static_cast<GLsizei>(n.size()), GL_UNSIGNED_INT, n.data());
 }
 void Lines::renderNet() const {
     render();
@@ -33,6 +33,6 @@ void Lines::setNodesCount(quint32 newSize, quint32 defaultNode)
 
 const quint32* Lines::nodes() const { return n.data(); }
 quint32* Lines::nodes() { return n.data(); }
-quint32 Lines::nodesCount() const { return n.size(); }
+quint32 Lines::nodesCount() const { return static_cast<quint32>(n.size()); }
 
 }

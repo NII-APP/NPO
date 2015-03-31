@@ -45,7 +45,7 @@ void RelationDialog::setPair(GeometryPair* p) {
 
     if (relation().size() != leftL.size()) {
         relation().resize(leftL.size());
-        for (size_t i(0); i < relation().size(); ++i) {
+        for (int i(0); i < static_cast<int>(relation().size()); ++i) {
             relation()[i] = rightL.size() > i ? i : -1;
         }
     }

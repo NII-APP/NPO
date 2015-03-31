@@ -672,12 +672,12 @@ QDataStream& operator << (QDataStream& out, const Geometry& g) {
     out << g.trace.size();
     size_t realCount(0);
     for (Geometry::Trace::const_iterator it(g.trace.begin()), end(g.trace.end()); it != end; ++it) {
-        realCount += *it != 0;
+        realCount += *it != nullptr;
     }
     out << realCount;
 
     for (size_t i(0); i != g.trace.size(); ++i) {
-        if (g.trace[i]) {
+        if (g.trace[i] != nullptr) {
             out << i;
             out << *g.trace[i];
         }
@@ -696,8 +696,8 @@ QDataStream& operator << (QDataStream& out, const Geometry& g) {
 
     return out;
 }
-QDataStream& operator >> (QDataStream& in, Geometry& g) {
-
+QDataStream& operator >> (QDataStream& in, Geometry& g)
+{
 #ifndef QT_NO_DEBUG
     QTime loop(QTime::currentTime());
 #endif
@@ -749,17 +749,18 @@ QDataStream& operator >> (QDataStream& in, Geometry& g) {
 
 void Geometry::loadTrace(QIODevice & device) {
     QDataStream in(&device);
-    quint32 size;
+    size_t size;
     in >> size;
 
-    quint32 realCount;
+    size_t realCount;
     in >> realCount;
 
     trace.resize(size, 0);
     for (size_t i(0); i != realCount; ++i) {
-        quint32 id;
+        size_t id;
         in >> id;
         trace[id] = FinitElement::load(in);
+        Q_ASSERT(trace[id] && "type element fail");
     }
 }
 

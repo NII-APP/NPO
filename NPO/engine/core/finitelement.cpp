@@ -24,7 +24,8 @@ quint32& FinitElement::shell() { return shellIndex; }
 const quint32& FinitElement::shell() const { return shellIndex; }
 
 QDataStream& operator<<(QDataStream& out, const FinitElement& element) {
-    out << static_cast<quint32>(element.type()) << element.getShell() << element.size();
+    out << static_cast<quint32>(element.type())
+        << element.getShell() << element.size();
     out.writeRawData(static_cast<const char*>(static_cast<const void*>(element.begin())), element.size() * sizeof(quint32));
     return out;
 }
@@ -35,10 +36,8 @@ QDataStream& operator>>(QDataStream& in, FinitElement& element){
     element.setShell(shell);
     quint32 size;
     in >> size;
-    qDebug() << shell << size;
     element.resize(size);
     in.readRawData(static_cast<char*>(static_cast<void*>(element.begin())), element.size() * sizeof(quint32));
-    qDebug() << "all";
     return in;
 }
 
@@ -51,7 +50,6 @@ void FinitElement::fillTraced(QBitArray & a) const {
 FinitElement* FinitElement::load(QDataStream& in) {
     quint32 type;
     in >> type;
-    qDebug() << type << "element type" << (type == LinesType);
 
     FinitElement* v;
     switch (type) {
@@ -75,7 +73,8 @@ FinitElement* FinitElement::load(QDataStream& in) {
         in >> size;
         in.skipRawData(size * sizeof(quint32));
     }
-    default:
+        break;
+    default:        
         return nullptr;
     }
     in >> *v;
