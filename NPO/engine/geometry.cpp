@@ -318,7 +318,7 @@ bool Geometry::colorizedElements() const {
 
 void Geometry::renderNet() const {
     glDisableClientState(GL_COLOR_ARRAY);
-    glColor3ub(0x00,0x00,0x00);
+    glColor3ub(0x00,0x88,0x88);
     for (Trace::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) {
         if (*it) {
             (*it)->renderNet();
@@ -384,7 +384,7 @@ void Geometry::renderSelectLabel(int vertex) const {
     glEnd();
 }
 
-void Geometry::colorize(const CGL::CArray &v, const QString& mes)
+void Geometry::colorize(const CGL::CArray &v, const QString& mes) const
 {
     if (static_cast<int>(v.size()) != vertexes.length()) {
         colors.resize(0);
@@ -395,18 +395,12 @@ void Geometry::colorize(const CGL::CArray &v, const QString& mes)
     colorizeFromArray(v);
 }
 
-void Geometry::colorizeFromArray(const CGL::CArray& v) {
+void Geometry::colorizeFromArray(const CGL::CArray& v) const
+{
 
     CGL::RealRange range(v.estimateRange());
 
-    if (range.getMin() == range.getMax()) {
-        if (range.getMin() == 0.0) {
-            range = CGL::RealRange(-1.0, 1.0);
-        } else {
-            range.setMax(range.getMax() * 1.1);
-            range.setMin(range.getMin() * 0.9);
-        }
-    }
+    range.flatProof();
 
     const float minV(range.getMin());
     const float height(range.range());
@@ -442,7 +436,8 @@ void Geometry::colorizeFromArray(const CGL::CArray& v) {
     }
 }
 
-void Geometry::colorizeElements(const CGL::CArray &v, const QString& mes) {
+void Geometry::colorizeElements(const CGL::CArray &v, const QString& mes) const
+{
     if (v.size() != static_cast<size_t>(trace.size())) {
         return;
     }
@@ -465,25 +460,15 @@ CGL::CArray Geometry::extractElasticityModulus() {
     return elasticyModulus;
 }
 
-void Geometry::colorize(const CGL::CVertexes &v, const QString& mes)
+void Geometry::colorize(const CGL::CVertexes &v, const QString& mes) const
 {
     if (v.size() != vertexes.size()) {
         return;
     }
     measurment = mes;
 
-    CGL::RealRange range(v.estimateRange());
+    CGL::RealRange range(v.estimateRange().flatProof());
 
-    if (range.getMin() == range.getMax()) {
-        if (range.getMin() == 0.0) {
-            range = CGL::RealRange(-1.0, 1.0);
-        } else {
-            range.setMax(range.getMax() * 1.1);
-            range.setMin(range.getMin() * 0.9);
-        }
-    }
-
-    const float minV(range.getMin());
     const float height(range.range());
     const float heightp2(height / 2.0f);
     const float heightp4(height / 4.0f);
@@ -491,9 +476,9 @@ void Geometry::colorize(const CGL::CVertexes &v, const QString& mes)
 
     colors.resize(v.size());
     CGL::Colors::iterator i(colors.begin());
-    for (CGL::Vertexes::const_iterator it(v.begin()), end(v.end()); it != end; ++(++(++it)))
+    for (int j(0), length(static_cast<int>(v.length())); j != length; ++j)
     {
-        const float z(sqrt(*it * *it + it[1] * it[1] + it[2] * it[2]) - minV);
+        const float z(v(j).length());
         unsigned char r, g, b;
         if(z <= 0) {
             r = g = 0;

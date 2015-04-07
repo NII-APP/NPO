@@ -2,13 +2,14 @@
 #include <QListView>
 #include <QFileDialog>
 #include "geometriesmodel.h"
-#include "engine/geometrywidget.h"
+#include "engine/meshscene.h"
 #include "identity.h"
 #include "application.h"
 #include "project.h"
 #include <QHBoxLayout>
 #include <QGraphicsDropShadowEffect>
 #include <iostream>
+#include "engine/geometryform.h"
 
 Viewer::Viewer(QWidget *parent)
     : QSplitter(Qt::Horizontal, parent)
@@ -17,17 +18,17 @@ Viewer::Viewer(QWidget *parent)
     macChart = new CGL::CColumnChart(this);
     this->addWidget(macChart);
 
-    geometryWidget = new GeometryWidget(this);
+    geometryWidget = new MeshScene(this);
     this->addWidget(geometryWidget);
-    geometryWidget->setDisablePaintFunction([](GeometryWidget* me){
+    /*geometryWidget->setDisablePaintFunction([](MeshPlace* me){
         /*QPainter* paint(new QPainter(me));
         static const QPixmap img(Application::identity()->geometryWidgetNoDataIttmage());
         paint->drawPixmap(me->width() / 2.0 - img.width() / 2.0, me->height() / 2.0 - img.height() / 2.0, img);
         delete paint;
         me->makeCurrent();
-        me->swapBuffers();//*/
+        me->swapBuffers();//*//*
         me->makeCurrent();
-    });
+    });*/
 
     geometriesView = new QListView(this);
     geometriesView->setModel(new GeometriesModel(this));
@@ -88,7 +89,7 @@ void Viewer::addModel() {
 }
 
 void Viewer::setMesh(Geometry *g) {
-    geometryWidget->setModel(g);
+    geometryWidget->setData(g);
     try {
         const GeometryForm& full(dynamic_cast<GeometryForm&>(*g));
         formSelector->show();
@@ -105,6 +106,8 @@ void Viewer::setMesh(Geometry *g) {
 void Viewer::resetListView()
 {
     geometriesView->reset();
+    geometriesView->setCurrentIndex(geometriesView->model()->index(0,0));
+    listPatrol(geometriesView->model()->index(0,0));
 }
 
 void Viewer::setMode(int m) {
@@ -112,21 +115,24 @@ void Viewer::setMode(int m) {
         form->setValue(m);
         return;
     }
-    if (!geometryWidget->getModel()) {
+    if (geometryWidget->getData().isEmpty()) {
         return;
     }
     //numeration from 0 in memry and from 1 in human
     --m;
-    const GeometryForm* g(dynamic_cast<const GeometryForm*>(geometryWidget->getModel()));
-    if (g) {
-        geometryWidget->setForm(m);
-        formSubLabel->setText(QString::number(g->frequency(m)) + ' ' + Application::identity()->hertz());
+    geometryWidget->setMode(m);
+    const QVector<const Mesh*> g(geometryWidget->getData());
+    if (g.size() == 1 && dynamic_cast<const GeometryForm*>(g.first())) {
+        formSubLabel->setText(QString::number(dynamic_cast<const GeometryForm*>(g.first())->frequency(m))
+                              + ' ' + Application::identity()->hertz());
+    } else {
+        formSubLabel->setText("");
     }
 
     if (colorizeBundle) {
         int i(0);
         while (i != Application::project()->modelsList().size() &&
-               geometryWidget->getModel() != Application::project()->modelsList().at(i)) {
+               geometryWidget->getData().first() != Application::project()->modelsList().at(i)) {
             ++i;
         }
         if (i == Application::project()->modelsList().size()) {

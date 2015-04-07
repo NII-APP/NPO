@@ -82,11 +82,11 @@ void C2dChartPlace::paintGL()
         glEnd();
     }
 
-    vArray->bind();
     static const QRgb defoultColorsCludge[] = { 0x880000FF, 0x008800FF, 0x000088FF,
                                                 0x888800FF, 0x880088FF, 0x008888FF,
                                                 0x88FFFFFF, 0xFF88FFFF, 0xFFFF88FF,
                                                 0x8888FFFF, 0x88FF88FF, 0xFF8888FF };
+    vArray->bind();
     for (int i(1); i != bariers.size(); ++i) {
         glColor3ubv(static_cast<const GLubyte*>(static_cast<const void*>(defoultColorsCludge + i)));
         glDrawArrays(GL_LINE_STRIP, bariers.at(i - 1), bariers.at(i) - bariers.at(i - 1));

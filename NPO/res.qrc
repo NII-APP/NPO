@@ -2,6 +2,7 @@
     <qresource prefix="/codes">
         <file>summator.vert</file>
         <file>parser.py</file>
+        <file>meshSummator.vert</file>
     </qresource>
     <qresource prefix="/media">
         <file>images/togleOff.png</file>
@@ -11,7 +12,7 @@
         <file>images/pair.png</file>
         <file>images/busy.gif</file>
     </qresource>
-    <qresource prefix="/css" lang="css">
+    <qresource lang="css" prefix="/css">
         <file>css.css</file>
     </qresource>
     <qresource prefix="/json">

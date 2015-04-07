@@ -65,7 +65,9 @@ SOURCES += main.cpp \
     engine/CGL/cdimension.cpp \
     engine/CGL/cdimensionarray.cpp \
     engine/CGL/cdimensioninterval.cpp \
-    engine/CGL/c2dchartaxis.cpp
+    engine/CGL/c2dchartaxis.cpp \
+    engine/meshplace.cpp \
+    engine/meshscene.cpp
 
 HEADERS += \
     engine/animationoptions.h \
@@ -117,7 +119,9 @@ HEADERS += \
     engine/CGL/cdimension.h \
     engine/CGL/cdimensionarray.h \
     engine/CGL/cdimensioninterval.h \
-    engine/CGL/c2dchartaxis.h
+    engine/CGL/c2dchartaxis.h \
+    engine/meshplace.h \
+    engine/meshscene.h
 
 OTHER_FILES += \
     summator.vert

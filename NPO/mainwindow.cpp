@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     //just for simply debug
     if (!QDir("../").entryList(QStringList() << "*.pro").isEmpty()) {
-        //load("../" + QDir("../").entryList(QStringList() << "*.pro").first());
+        load("../" + QDir("../").entryList(QStringList() << "*.pro").first());
     }
 }
 
@@ -46,9 +46,9 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::load(const QString& location) {
-    disposed = location;
     try {
-        Application::project()->load(disposed);
+        Application::project()->load(location);
+        disposed = location;
     } catch (QFileDevice::FileError error) {
         switch (error) {
         case QFileDevice::OpenError:

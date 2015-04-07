@@ -35,8 +35,9 @@ int GeometryForm::findNext(CGL::CParse& i)
 
 void GeometryForm::readTXT(const QString &fileName)
 {
-    std::clog << "parse .txt forms" << std::endl;
+#ifndef QT_NO_DEBUG
     QTime loop(QTime::currentTime());
+#endif
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -93,7 +94,7 @@ void GeometryForm::readTXT(const QString &fileName)
               //       << v * current * QVector3D(1.,1.,0.);
             //forms[i].form().push_vector_back(QVector3D(sin(angle) * v, cos(angle) * v, 0.0));
             //qDebug() << v << '*' << current * QVector3D(1.0,1.0,0.0) << '=' << v * current * QVector3D(1.,1.,0.) << angle / acos(-1.0) * 180;
-            forms[i].form().push_vector_back(f.real() * nodes()(j) * QVector3D(1.0,1.0,0.0));
+            forms[i].form().push_vector_back(f.real() * getNodes()(j) * QVector3D(1.0,1.0,0.0));
         }
         f.skipRow();
         ++j;
@@ -102,7 +103,10 @@ void GeometryForm::readTXT(const QString &fileName)
 
     estimateDefoultMagnitudes();
     estimateMAC();
-    std::clog << "\ttxt correctly parsed. " << forms.at(0).form().size() / 3 << " vertexes in eign vector" << std::endl;
+#ifndef QT_NO_DEBUG
+    std::clog << "\ttxt correctly parsed. " << forms.at(0).form().length() <<
+                 " vertexes in eign vector (" << loop.msecsTo(QTime::currentTime()) / 1000.0 << "ms )" << std::endl;
+#endif
 }
 
 void GeometryForm::readF06(const QString& fileName)
@@ -131,8 +135,8 @@ void GeometryForm::readF06(const QString& fileName)
         f.integer();
         f.real();
         f.real();
-        forms.push_back(Form(f.real(),CGL::CVertexes(static_cast<int>(nodes().size()))));
-        bender.push_back(Form(forms.back().frequency(),nodes().size()));
+        forms.push_back(Form(f.real(),CGL::CVertexes(static_cast<int>(getNodes().size()))));
+        bender.push_back(Form(forms.back().frequency(),getNodes().size()));
         f.skipRow();
     }
     int j = 0;

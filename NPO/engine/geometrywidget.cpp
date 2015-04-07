@@ -136,7 +136,7 @@ void GeometryWidget::paintCGL()
     }
 
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, data->nodes().data());
+    glVertexPointer(3, GL_FLOAT, 0, data->getNodes().data());
     Q_ASSERT(summator->isLinked());
     if (isAnimation()) {
         if (dynamic_cast<const GeometryForm*>(data)) {

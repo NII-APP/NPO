@@ -87,6 +87,19 @@ public:
 
     bool operator ==(const RealRange& op) const { return op.getMin() == getMin() && op.getMax() == op.getMax(); }
     bool operator !=(const RealRange& op) const { return op.getMin() != getMin() && op.getMax() != op.getMax(); }
+
+    RealRange& flatProof() {
+        if (range()) {
+            return *this;
+        }
+        if (getMin()) {
+            setMin(getMin() * 0.9);
+            setMax(getMax() * 1.1);
+        } else {
+            *this = RealRange(-1.0, 1.0);
+        }
+        return *this;
+    }
 };
 typedef CRange<int> IndexRange;
 

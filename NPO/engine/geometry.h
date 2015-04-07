@@ -58,9 +58,9 @@ private:
     //nodes may be marked to some reason
     QBitArray markedNodes;
     //colorize... may be equal to size of vertexes or trace...
-    CGL::Colors colors;
+    mutable CGL::Colors colors;
     //measurment of colorzed value
-    QString measurment;
+    mutable QString measurment;
     //name of file which was parsed to this object
     QString file;
     //name
@@ -79,7 +79,7 @@ private:
     void estimateBox();
     void estimateQuadTraceBufer();
 
-    void colorizeFromArray(const CGL::CArray& v);
+    void colorizeFromArray(const CGL::CArray& v) const;
 
 #ifndef BDFENTITY_H
     void obsoleteBDFParser(const QString &);
@@ -119,9 +119,9 @@ public:
     void layToBDF(const QString& source, const QString& dest, const CGL::CArray &dE, const int difference);
 
     //estimate colors value as form interpolation in range [red : green : blue]
-    void colorize(const CGL::CVertexes& v, const QString& mes = "");
-    void colorize(const CGL::CArray& v, const QString& mes = "");
-    void colorizeElements(const CGL::CArray &v, const QString& mes = "");
+    void colorize(const CGL::CVertexes& v, const QString& mes = "") const;
+    void colorize(const CGL::CArray& v, const QString& mes = "") const;
+    void colorizeElements(const CGL::CArray &v, const QString& mes = "") const;
 
     //rendering
     void render() const;
@@ -133,13 +133,17 @@ public:
     const CParallelepiped& box() const { return sqre; }
     CParallelepiped& box() { return sqre; }
     void setBox(const CParallelepiped& box) { sqre = box; }
-    CParallelepiped getBox() { return sqre; }
+    CParallelepiped getBox() const { return sqre; }
 
     //node coordinates
-    const CGL::CVertexes& nodes() const { return vertexes; }
-    CGL::CVertexes& nodes() { return vertexes; }
-    CGL::CVertexes getNodes() const { return vertexes; }
+    const CGL::CVertexes& getNodes() const { return vertexes; }
+    CGL::CVertexes& getNodes() { return vertexes; }
     void setNodes(const CGL::CVertexes& v) { vertexes = v; }
+
+    //colorss
+    const CGL::Colors& getColors() const { return colors; }
+    CGL::Colors& getColors() { return colors; }
+    void setColors(const CGL::Colors& v) { colors = v; }
 
     //elements
     std::vector<core::FinitElement*>& elements() { return trace; }

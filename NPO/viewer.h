@@ -7,13 +7,13 @@
 #include "engine/CGL/ccolumnchart.h"
 #include <QSpinBox>
 #include <QLabel>
-class GeometryWidget;
+class MeshScene;
 class Geometry;
 
 class Viewer : public QSplitter
 {
     Q_OBJECT
-    GeometryWidget* geometryWidget;
+    MeshScene* geometryWidget;
     QListView* geometriesView;
     CGL::CColumnChart* macChart;
 

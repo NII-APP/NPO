@@ -11,8 +11,8 @@ CylinderCoordinateSystem::CylinderCoordinateSystem(const QVector3D& d, const QVe
     : RectangularCoordinateSystem(d, z, p) { }
 
 void CylinderCoordinateSystem::toGlobal(QVector3D& v) const {
-    static const float k(static_cast<float>(1. / 90. * M_PI));
-    float phi(v.y() * k);
+    static const float k(static_cast<float>(1. / 180. * M_PI));
+    const float phi(v.y() * k);
     //Optimization)) be careful
     v.setY(v.x() * sin(phi));
     v.setX(v.x() * cos(phi));

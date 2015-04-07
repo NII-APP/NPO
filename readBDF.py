@@ -6,7 +6,7 @@ writeInt = lambda val: write(val.to_bytes(4, sys.byteorder))
 fname = 'C:\\Users\\BOPOHOB\\Documents\\Qt\\work\\NPO\\Aaron.bdf'
 mesh = BDF(debug=False,log=None)
 mesh.read_bdf(input("read") if 'fname' not in locals() else fname, xref=True)
-a = impot("readed:\n")
+a = imput("readed:\n")
 print(a)
 
 #store the vertexes
