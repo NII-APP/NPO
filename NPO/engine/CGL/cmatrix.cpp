@@ -248,8 +248,8 @@ CMatrix CMatrix::dotTranspose() const{
 }
 CMatrix CMatrix::transpose() const{
     CMatrix result(height(),width());
-    for (int i(0); i < height(); i++){
-        for (int j(0); j < width(); j++){
+    for (int i(0); i < width(); i++){
+        for (int j(0); j < height(); j++){
             result[i][j] = m[j][i];
         }
     }
