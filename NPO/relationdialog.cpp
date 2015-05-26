@@ -3,6 +3,8 @@
 #include <QEvent>
 #include <QMouseEvent>
 #include <QDir>
+#include "application.h"
+#include "identity.h"
 
 RelationDialog::RelationDialog(GeometryPair *forEdit, QWidget *parent)
   : QWidget(parent)
@@ -72,15 +74,15 @@ void RelationDialog::bgUpdate()
     }
 }
 
-void RelationDialog::popupConfig(QFrame*& p, GeometryWidget *&f, const GeometryForm& v)
+void RelationDialog::popupConfig(QFrame*& p, Viewer *&f, const GeometryForm& v)
 {
     p = new QFrame(this, Qt::Popup);
     p->setContentsMargins(0,0,0,0);
     p->setFrameStyle(QFrame::Plain | QFrame::StyledPanel);
     p->setLineWidth(1);
     p->setFixedSize(maxW, maxW);
-    f = new GeometryWidget(p);
-    f->setModel(v);
+    f = new Viewer(p, Viewer::MeshPane);
+    f->setMesh(&v);
     p->setLayout(new QHBoxLayout(p));
     p->layout()->setMargin(0);
     p->layout()->addWidget(f);
@@ -93,7 +95,7 @@ void RelationDialog::bildLabels(Labels &lbls, GeometryForm& g)
     p.setBrush(QPalette::Dark, QColor(0x88,0x88,0x88));
     for (int i = 0; i != lbls.size(); ++i)
     {
-        QLabel* l(new QLabel(QString("%1 form (%2hz)").arg(QString::number(i + 1), QString::number(g.frequency(i))),this));
+        QLabel* l(new QLabel(QString(Application::identity()->formSelectorLabel() + " %1 (%2 " + Application::identity()->hertz() + ")").arg(QString::number(i + 1), QString::number(g.frequency(i))),this));
         l->resize(l->sizeHint());
         l->setFrameStyle(QFrame::Plain | QFrame::StyledPanel);
         l->setLineWidth(1);
@@ -130,7 +132,7 @@ void RelationDialog::showForm(QObject* s)
     {
         leftP->move(this->mapToGlobal(QPoint(0,0)) + wgt->geometry().bottomLeft() - QPoint(0,
                                    (wgt->height() + leftP->height()) * (d - 1 > leftL.size() / 2)));
-        leftF->setForm(d);
+        leftF->setMode(d);
         leftP->show();
         return;
     }
@@ -143,7 +145,7 @@ void RelationDialog::showForm(QObject* s)
     {
         rightP->move(this->mapToGlobal(QPoint(0,0)) + wgt->geometry().bottomLeft() - QPoint(0,
                                    (wgt->height() + rightP->height()) * (d - 1 > rightL.size() / 2)));
-        rightF->setForm(d);
+        rightF->setMode(d);
         rightP->show();
         return;
     }

@@ -2,7 +2,7 @@
 #include <QListView>
 #include <QFileDialog>
 #include "geometriesmodel.h"
-#include "engine/meshscene.h"
+#include "engine/meshplace.h"
 #include "identity.h"
 #include "application.h"
 #include "project.h"
@@ -11,49 +11,64 @@
 #include <iostream>
 #include "engine/geometryform.h"
 
-Viewer::Viewer(QWidget *parent)
+Viewer::Viewer(QWidget *parent, unsigned enabledItems)
     : QSplitter(Qt::Horizontal, parent)
+    , geometryWidget(nullptr)
+    , geometriesView(nullptr)
+    , macChart(nullptr)
+    , formSelector(nullptr)
+    , formLabel(nullptr)
+    , formSubLabel(nullptr)
+    , form(nullptr)
+    , colorizeBundle(true)
 {
-    colorizeBundle = true;
-    macChart = new CGL::CColumnChart(this);
-    this->addWidget(macChart);
+    if (enabledItems & MACChart) {
+        macChart = new CGL::CColumnChart(this);
+        this->addWidget(macChart);
+        this->setStretchFactor(0,5);
+    }
 
-    geometryWidget = new MeshScene(this);
-    this->addWidget(geometryWidget);
-    /*geometryWidget->setDisablePaintFunction([](MeshPlace* me){
-        /*QPainter* paint(new QPainter(me));
-        static const QPixmap img(Application::identity()->geometryWidgetNoDataIttmage());
-        paint->drawPixmap(me->width() / 2.0 - img.width() / 2.0, me->height() / 2.0 - img.height() / 2.0, img);
-        delete paint;
-        me->makeCurrent();
-        me->swapBuffers();//*//*
-        me->makeCurrent();
-    });*/
+    if (enabledItems & MeshPane) {
+        geometryWidget = new MeshPlace(this);
+        this->addWidget(geometryWidget);
+        this->setStretchFactor(enabledItems & MACChart ? 1 : 0,10);
 
-    geometriesView = new QListView(this);
-    geometriesView->setModel(new GeometriesModel(this));
-    geometriesView->setSelectionMode(QAbstractItemView::SingleSelection);
-    this->addWidget(geometriesView);
+        if (enabledItems & FormSpinner) {
+            formSelector = new QFrame(geometryWidget);
+            formSelector->setFrameStyle(QFrame::StyledPanel | QFrame::Plain);
+            formSelector->setAutoFillBackground(true);
+            formSelector->setLayout(new QHBoxLayout);
+            formSelector->layout()->setMargin(5);
+            formSelector->move(30,30);
+            formSelector->resize(200, formSelector->height());
+            formSelector->layout()->addWidget(formLabel = new QLabel(Application::identity()->formSelectorLabel(), formSelector));
+            formSelector->layout()->addWidget(form = new QSpinBox(formSelector));
+            formSelector->layout()->addWidget(formSubLabel = new QLabel(formSelector));
+            form->setMinimum(1);
+            connect(form, SIGNAL(valueChanged(int)), SLOT(setMode(int)));
+            formSelector->hide();
+        }
+    }
 
-    this->setStretchFactor(0,5);
-    this->setStretchFactor(1,10);
-    this->setStretchFactor(2,1);
+    if (enabledItems & MeshList) {
+        geometriesView = new QListView(this);
+        geometriesView->setModel(new GeometriesModel(this));
+        geometriesView->setSelectionMode(QAbstractItemView::SingleSelection);
+        this->addWidget(geometriesView);
 
-    formSelector = new QFrame(geometryWidget);
-    formSelector->setFrameStyle(QFrame::StyledPanel | QFrame::Plain);
-    formSelector->setAutoFillBackground(true);
-    formSelector->setLayout(new QHBoxLayout);
-    formSelector->layout()->setMargin(5);
-    formSelector->move(30,30);
-    formSelector->resize(200, formSelector->height());
-    formSelector->layout()->addWidget(formLabel = new QLabel(Application::identity()->formSelectorLabel(), formSelector));
-    formSelector->layout()->addWidget(form = new QSpinBox(formSelector));
-    formSelector->layout()->addWidget(formSubLabel = new QLabel(formSelector));
-    form->setMinimum(1);
-    connect(form, SIGNAL(valueChanged(int)), SLOT(setMode(int)));
-    formSelector->hide();
+        connect(geometriesView, SIGNAL(clicked(QModelIndex)), SLOT(listPatrol(QModelIndex)));
 
-    connect(geometriesView, SIGNAL(clicked(QModelIndex)), SLOT(listPatrol(QModelIndex)));
+        this->setStretchFactor((enabledItems & MACChart ? 1 : 0) + (enabledItems & MeshPane ? 1 : 0),1);
+    }
+
+    for (int i(0); i != count(); ++i) {
+        handle(i)->setLayout(new QHBoxLayout);
+        QFrame* spl = new QFrame(handle(i));
+        spl->setFrameShape(QFrame::VLine);
+        spl->setFrameShadow(QFrame::Sunken);
+        handle(i)->layout()->setMargin(0);
+        handle(i)->layout()->addWidget(spl);
+    }
 }
 
 void Viewer::listPatrol(QModelIndex i) {
@@ -85,33 +100,49 @@ void Viewer::addModel() {
     }
     Application::project()->pushMesh(forAdd);
     setMesh(forAdd);
-    geometriesView->reset();
+    if (geometriesView) {
+        geometriesView->reset();
+    }
 }
 
-void Viewer::setMesh(Geometry *g) {
-    geometryWidget->setData(g);
+void Viewer::setMesh(const Geometry *g) {
+    if (geometryWidget) {
+        geometryWidget->setData(g);
+    }
     try {
-        const GeometryForm& full(dynamic_cast<GeometryForm&>(*g));
-        formSelector->show();
+        const GeometryForm& full(dynamic_cast<const GeometryForm&>(*g));
         setMode(1);
-        if (!full.getMac().empty()) {
-            macChart->setData(full.getMac());
+        if (formSelector) {
+            formSelector->show();
+            form->setMaximum(full.modesCount());
         }
-        form->setMaximum(full.modesCount());
+        if (macChart && !full.getMac().empty()) {
+            macChart->setData(full.getMac());
+            macChart->show();
+        }
     } catch (const std::bad_cast&) {
-        formSelector->hide();
+        if (formSelector) {
+            formSelector->hide();
+        }
+        if (macChart) {
+            macChart->hide();
+        }
     }
 }
 
 void Viewer::resetListView()
 {
+    if (!geometriesView) {
+        setMesh(Application::project()->modelsList().front());
+        return;
+    }
     geometriesView->reset();
     geometriesView->setCurrentIndex(geometriesView->model()->index(0,0));
     listPatrol(geometriesView->model()->index(0,0));
 }
 
 void Viewer::setMode(int m) {
-    if (m != form->value()) {
+    if (form && m != form->value()) {
         form->setValue(m);
         return;
     }
@@ -122,11 +153,13 @@ void Viewer::setMode(int m) {
     --m;
     geometryWidget->setMode(m);
     const QVector<const Mesh*> g(geometryWidget->getData());
-    if (g.size() == 1 && dynamic_cast<const GeometryForm*>(g.first())) {
-        formSubLabel->setText(QString::number(dynamic_cast<const GeometryForm*>(g.first())->frequency(m))
-                              + ' ' + Application::identity()->hertz());
-    } else {
-        formSubLabel->setText("");
+    if (formSubLabel) {
+        if (g.size() == 1 && dynamic_cast<const GeometryForm*>(g.first())) {
+            formSubLabel->setText(QString::number(dynamic_cast<const GeometryForm*>(g.first())->frequency(m))
+                                  + ' ' + Application::identity()->hertz());
+        } else {
+            formSubLabel->setText("");
+        }
     }
 
     if (colorizeBundle) {

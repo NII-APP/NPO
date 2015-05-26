@@ -8,7 +8,7 @@
 #include <QVBoxLayout>
 #include "application.h"
 #include "project.h"
-#include "engine/relationdialog.h"
+#include "relationdialog.h"
 #include "engine/CGL/ccolumnchart.h"
 
 class TruncationWizard : public QDialog
@@ -39,13 +39,13 @@ class TruncationWizard::Preview : public QWidget {
     Q_OBJECT
 
     QComboBox* selector;
-    GeometryWidget* screen;
+    Viewer* screen;
     std::vector<GeometryForm* const> meshes;
 public:
     Preview(Qt::ToolBarArea area, QWidget* parent = 0)
         : QWidget(parent)
         , selector(new QComboBox(this))
-        , screen(new GeometryWidget(this))
+        , screen(new Viewer(this, Viewer::MeshPane | Viewer::FormSpinner | Viewer::AnimationPane))
     {
         this->setLayout(new QVBoxLayout);
         foreach (Geometry* const g, Application::project()->modelsList()) {
@@ -83,7 +83,7 @@ private slots:
     {
         GeometryForm* c(current());
 
-        screen->setModel(c);
+        screen->setMesh(c);
 
         emit meshSelected(c);
 

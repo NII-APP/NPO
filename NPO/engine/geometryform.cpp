@@ -297,12 +297,10 @@ void GeometryForm::estimateMAC()
 
 float GeometryForm::MAC(const GeometryForm *a, const GeometryForm *b, int i, int j)
 {
-#ifndef QT_NO_DEBUG
-    qDebug() << "estimate MAC";
-#endif
     if (i >= a->forms.size() || j >= b->forms.size() || a->forms[i].form().size() != b->forms[j].form().size())
     {
 #ifndef QT_NO_DEBUG
+        qDebug() << "estimate MAC";
         qDebug()  << "\tSizes conflict "
                   << i << " >= " << a->forms.size() << " || "
                   << j << " >= " << b->forms.size() << " || "

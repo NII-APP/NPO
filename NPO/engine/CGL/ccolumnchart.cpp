@@ -29,7 +29,7 @@ void CColumnChart::setData(const CMatrix& d) {
 }
 
 void CColumnChart::paintCGL() {
-    qreal x0(0.5 * (data.width() - size));
+    qreal x0 = abs(0.5 * static_cast<int>(data.width() - size));
     qreal y0(0.5 * (data.height() - size));
     for (int i(0); i != data.width(); ++i) {
         for (int j(0); j != data.height(); ++j) {

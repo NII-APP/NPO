@@ -7,13 +7,13 @@
 #include "engine/CGL/ccolumnchart.h"
 #include <QSpinBox>
 #include <QLabel>
-class MeshScene;
+class MeshPlace;
 class Geometry;
 
 class Viewer : public QSplitter
 {
     Q_OBJECT
-    MeshScene* geometryWidget;
+    MeshPlace* geometryWidget;
     QListView* geometriesView;
     CGL::CColumnChart* macChart;
 
@@ -24,14 +24,16 @@ class Viewer : public QSplitter
 
     bool colorizeBundle;
 
+public:
     enum EnapledItems {
-        MAC_chart,
-        Geometry_widget,
-        Models_list
+        MACChart = 0x1,
+        MeshPane = 0x2,
+        MeshList = 0x4,
+        AnimationPane = 0x8,
+        FormSpinner = 0x10
     };
 
-public:
-    explicit Viewer(QWidget *parent = 0);
+    explicit Viewer(QWidget *parent = 0, unsigned enabledItems = 0xFF);
     ~Viewer();
 
 signals:
@@ -40,7 +42,7 @@ public slots:
     void addModel();
     void resetListView();
     void setMode(int);
-    void setMesh(Geometry* g);
+    void setMesh(const Geometry *g);
 private slots:
     void listPatrol(QModelIndex);
 };

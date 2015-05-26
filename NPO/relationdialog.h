@@ -4,8 +4,8 @@
 #include <QDialog>
 #include <QEventLoop>
 #include <QtAlgorithms>
-#include "geometrypair.h"
-#include "geometrywidget.h"
+#include "engine/geometrypair.h"
+#include "viewer.h"
 #include <QFrame>
 #include <QLabel>
 #include <QPushButton>
@@ -24,8 +24,8 @@ class RelationDialog : public QWidget
     Labels  rightL;
     int maxW;
 
-    GeometryWidget* leftF;
-    GeometryWidget* rightF;
+    Viewer* leftF;
+    Viewer* rightF;
     QFrame* leftP;
     QFrame* rightP;
     QLabel* title1;
@@ -49,7 +49,7 @@ class RelationDialog : public QWidget
     bool eventFilter(QObject *, QEvent *);
 
     void bgUpdate();
-    void popupConfig(QFrame *&, GeometryWidget *&, const GeometryForm &v);
+    void popupConfig(QFrame *&, Viewer *&, const GeometryForm &v);
 
     void mouseMoveEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);

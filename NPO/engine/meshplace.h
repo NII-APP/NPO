@@ -21,7 +21,8 @@ public:
     MeshPlace(QWidget* parent = 0);
     ~MeshPlace();
 
-    void setData(const Mesh *model);
+    void setData(const Mesh* model);
+    void setData(const Mesh& model) { setData(&model); }
     void setData(const QVector<const Mesh*>& model);
     void setMode(const int);
     QVector<const Mesh*> getData() const;

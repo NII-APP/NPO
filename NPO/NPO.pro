@@ -17,7 +17,7 @@ TEMPLATE = app
 SOURCES += main.cpp \
     engine/animationoptions.cpp \
     engine/geometrywidget.cpp \
-    engine/relationdialog.cpp \
+    relationdialog.cpp \
     engine/CGL/carray.cpp \
     engine/CGL/cexpression.cpp \
     engine/CGL/cgl.cpp \
@@ -66,13 +66,12 @@ SOURCES += main.cpp \
     engine/CGL/cdimensionarray.cpp \
     engine/CGL/cdimensioninterval.cpp \
     engine/CGL/c2dchartaxis.cpp \
-    engine/meshplace.cpp \
-    engine/meshscene.cpp
+    engine/meshplace.cpp
 
 HEADERS += \
     engine/animationoptions.h \
     engine/geometrywidget.h \
-    engine/relationdialog.h \
+    relationdialog.h \
     engine/CGL/carray.h \
     engine/CGL/cexpression.h \
     engine/CGL/cgl.h \
@@ -120,8 +119,7 @@ HEADERS += \
     engine/CGL/cdimensionarray.h \
     engine/CGL/cdimensioninterval.h \
     engine/CGL/c2dchartaxis.h \
-    engine/meshplace.h \
-    engine/meshscene.h
+    engine/meshplace.h
 
 OTHER_FILES += \
     summator.vert

@@ -4,6 +4,7 @@
 #include "project.h"
 #include <QEventLoop>
 #include <QSplitter>
+#include <QScreen>
 
 TruncationWizard::TruncationWizard(QWidget *parent)
     : QDialog(parent)
@@ -28,6 +29,10 @@ TruncationWizard::TruncationWizard(QWidget *parent)
 
     current = 0;
     previewPatrol();
+
+    main->setStretchFactor(0, 3);
+    main->setStretchFactor(1, 1);
+    main->setStretchFactor(2, 3);
 }
 
 TruncationWizard::~TruncationWizard()
@@ -40,7 +45,9 @@ GeometryPair* TruncationWizard::exec(QWidget* parent)
     QEventLoop* loop(new QEventLoop(parent));
     TruncationWizard* w(new TruncationWizard(0));
     loop->connect(w, SIGNAL(finished(int)), SLOT(quit()));
+    w->resize(QApplication::screens().first()->size() - QSize(400,400));
     w->show();
+    w->setModal(false);
     loop->exec();
     return w->current;
 }
