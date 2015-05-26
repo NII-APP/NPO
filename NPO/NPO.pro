@@ -57,7 +57,6 @@ SOURCES += main.cpp \
     truncationtab.cpp \
     truncationwizard.cpp \
     maintabbar.cpp \
-    engine/pyParse/BDFEntity.cpp \
     engine/geometryobsoleteparse.cpp \
     engine/CGL/c2dchart.cpp \
     engine/CGL/c2dchartplace.cpp \
@@ -111,7 +110,7 @@ HEADERS += \
     truncationtab.h \
     truncationwizard.h \
     maintabbar.h \
-    engine/pyParse/BDFEntity.h \
+     \
     engine/CGL/c2dchart.h \
     engine/CGL/c2dchartplace.h \
     engine/CGL/cchartdata.h \
@@ -120,6 +119,12 @@ HEADERS += \
     engine/CGL/cdimensioninterval.h \
     engine/CGL/c2dchartaxis.h \
     engine/meshplace.h
+
+exists( engine/pyParse/BDFEntity.cpp ) {
+    message( "Configuring with new parser" )
+    SOURCES += engine/pyParse/BDFEntity.cpp
+    HEADERS += engine/pyParse/BDFEntity.h
+}
 
 OTHER_FILES += \
     summator.vert
