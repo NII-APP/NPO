@@ -777,25 +777,30 @@ void Geometry::scaleTo(double v) {
 
 std::vector<int> Geometry::truncationIndexVector(const Geometry& a, const Geometry& b)
 {
+    qDebug() << "truncationIndexVector start";
+
     const CGL::Vertexes& am(a.vertexes);
     const CGL::Vertexes& bm(b.vertexes);
     int aDimension(static_cast<int>(am.length()));
     int bDimension(static_cast<int>(bm.length()));
-    CGL::Matrix dest(bDimension, aDimension);
+    CGL::Matrix dest(aDimension, bDimension);
+
     for (int i(0); i != bDimension; ++i) {
         for (int j = 0; j != aDimension; ++j) {
             dest[i][j] = (am(j) - bm(i)).lengthSquared();
         }
     }
+
     std::vector<int> numbers(bDimension, 0);
     for (int i(0); i != bDimension; ++i) {
-        for (int j(1); j != aDimension; ++j) {
+        for (int j(0); j != aDimension; ++j) {
             if (dest[i][j] < dest[i][numbers.at(i)] && a.isTraced.testBit(j)) {
                 numbers[i] = j;
             }
         }
     }
 
+    qDebug() << "truncationIndexVector end";
     return numbers;
 }
 

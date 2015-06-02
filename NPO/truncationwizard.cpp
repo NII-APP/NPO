@@ -54,6 +54,7 @@ GeometryPair* TruncationWizard::exec(QWidget* parent)
 
 void TruncationWizard::previewPatrol()
 {
+    qDebug() << "previewPatrol start";
     delete current;
     if (first->current() && second->current()) {
         current = new GeometryPair(first->current(), second->current());
@@ -62,4 +63,5 @@ void TruncationWizard::previewPatrol()
     } else {
         current = 0;
     }
+    qDebug() << "previewPatrol end";
 }

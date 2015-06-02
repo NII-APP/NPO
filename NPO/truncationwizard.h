@@ -81,10 +81,9 @@ signals:
 private slots:
     void selectorPatrol()
     {
+        qDebug()<<"selectorPatrol start";
         GeometryForm* c(current());
-
         screen->setMesh(c);
-
         emit meshSelected(c);
 
         const Project::Geometries& m(Application::project()->modelsList());
@@ -93,6 +92,7 @@ private slots:
             ++i;
         }
         emit meshSelected(i < m.size() ? i : -1);
+        qDebug()<<"selectorPatrol end";
     }
 };
 

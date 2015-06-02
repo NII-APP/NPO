@@ -358,13 +358,13 @@ QDataStream& operator >> (QDataStream& s, GeometryForm& g) {
 
 GeometryForm* GeometryForm::truncation(const GeometryForm& a, const GeometryForm& b)
 {
-    //make copy from experemental form geometry
+    //make copy from the second mech form geometry
     GeometryForm* result(new GeometryForm(static_cast<const Geometry&>(b)));
     result->formFile = "truncated";
-    //selecti vertexes in theory form which will be associate with exteprimental form
+    //select vertexes in  the first mech form which will be associate with the second mech form
     std::vector<int> interrelations(Geometry::truncationIndexVector(a, b));
-
     //and now just copy the form values from theory
+    // a.form.size()
     result->forms.resize(a.forms.size());
     Forms::iterator receiver(result->forms.begin());
     for (Forms::const_iterator source(a.forms.begin()), end(a.forms.end()); source != end; ++source, ++receiver) {
@@ -377,6 +377,7 @@ GeometryForm* GeometryForm::truncation(const GeometryForm& a, const GeometryForm
             truncatedForm(i) = theoryForm(*interrelation);
         }
     }
+
     result->extremums = a.extremums;
     result->defoultMagnitude = a.defoultMagnitude;
     result->preMac = a.preMac;

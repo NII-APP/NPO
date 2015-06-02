@@ -24,6 +24,8 @@ RelationDialog::RelationDialog(GeometryPair *forEdit, QWidget *parent)
 }
 
 void RelationDialog::setPair(GeometryPair* p) {
+    qDebug() << "setPair start";
+
     pair = p;
     leftL.resize(pair->theory()->modesCount());
     rightL.resize(pair->practic()->modesCount());
@@ -52,6 +54,8 @@ void RelationDialog::setPair(GeometryPair* p) {
         }
     }
     bgUpdate();
+
+    qDebug() << "setPair end";
 }
 
 void RelationDialog::bgUpdate()
@@ -278,7 +282,9 @@ void RelationDialog::mousePressEvent(QMouseEvent *)
         }
         else
         {
-            *qFind(relation().begin(), relation().end(), underToggle) = -1;
+            GeometryPair::Relation::iterator elem(qFind(relation().begin(), relation().end(), underToggle));
+            if (elem != relation().end())
+                *elem = -1;
             source = QPoint(this->width() - this->contentsMargins().right() - maxW - 24, rightCapacity * (underToggle + .5f) + 20);
         }
     }

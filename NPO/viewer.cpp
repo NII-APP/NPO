@@ -108,6 +108,8 @@ void Viewer::addModel() {
 void Viewer::setMesh(const Geometry *g) {
     if (geometryWidget) {
         geometryWidget->setData(g);
+    } else {
+        return;
     }
     try {
         const GeometryForm& full(dynamic_cast<const GeometryForm&>(*g));
