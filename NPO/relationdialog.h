@@ -42,6 +42,7 @@ class RelationDialog : public QWidget
     QPoint tracking;
 
     void bildLabels(Labels&, GeometryForm &);
+    void renderLabels();
 
     void resizeEvent(QResizeEvent *);
     void paintEvent(QPaintEvent *);
@@ -62,7 +63,8 @@ public:
     static void run(GeometryPair* forEdit, QWidget* parent = 0);
     
 signals:
-    
+    void updateMac(const GeometryPair::Relation&);
+
 public slots:
 
     void showForm(QObject *w);

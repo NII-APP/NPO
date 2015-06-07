@@ -24,25 +24,26 @@ RelationDialog::RelationDialog(GeometryPair *forEdit, QWidget *parent)
 }
 
 void RelationDialog::setPair(GeometryPair* p) {
-    qDebug() << "setPair start";
-
     pair = p;
-    leftL.resize(pair->theory()->modesCount());
-    rightL.resize(pair->practic()->modesCount());
+
     this->setContentsMargins(10, 0, 10, 0);
+
     bildLabels(leftL, *pair->theory());
     bildLabels(rightL, *pair->practic());
+
     foreach (QLabel* l, leftL)
         l->resize(maxW, l->height());
     foreach (QLabel* l, rightL)
         l->resize(maxW, l->height());
 
-    this->setMinimumSize(maxW * 2 + 120, leftL.first()->height() * (leftL.size() > rightL.size() ? leftL.size() : rightL.size()));
-    this->resize(this->minimumWidth() + 200, 650);
-    QPalette p(this->palette());
-    p.setColor(QPalette::Background, QColor(0xFF,0xFF,0xFF));
-    this->setPalette(p);
+    //this->setMinimumSize(maxW * 2 + 200, leftL.first()->height() * (leftL.size() > rightL.size() ? leftL.size() : rightL.size()));
+    //this->resize(this->minimumWidth(), this->minimumHeight());
+    
+    QPalette palette(this->palette());
+    palette.setColor(QPalette::Background, QColor(0x00,0x00,0xFF));
+    this->setPalette(palette);
     this->setMouseTracking(true);
+
 
     popupConfig(leftP, leftF, *pair->theory());
     popupConfig(rightP, rightF, *pair->practic());
@@ -54,8 +55,6 @@ void RelationDialog::setPair(GeometryPair* p) {
         }
     }
     bgUpdate();
-
-    qDebug() << "setPair end";
 }
 
 void RelationDialog::bgUpdate()
@@ -94,9 +93,15 @@ void RelationDialog::popupConfig(QFrame*& p, Viewer *&f, const GeometryForm& v)
 
 void RelationDialog::bildLabels(Labels &lbls, GeometryForm& g)
 {
+    for (auto& i: lbls) {
+        delete i;
+    }
+    lbls.resize(g.modesCount());
+
     QPalette p(this->palette());
     p.setBrush(QPalette::Light, QColor(0xFF,0xFF,0xFF));
     p.setBrush(QPalette::Dark, QColor(0x88,0x88,0x88));
+
     for (int i = 0; i != lbls.size(); ++i)
     {
         QLabel* l(new QLabel(QString(Application::identity()->formSelectorLabel() + " %1 (%2 " + Application::identity()->hertz() + ")").arg(QString::number(i + 1), QString::number(g.frequency(i))),this));
@@ -112,6 +117,27 @@ void RelationDialog::bildLabels(Labels &lbls, GeometryForm& g)
         if (maxW < l->sizeHint().width())
             maxW = l->sizeHint().width();
     }
+
+    renderLabels();
+}
+
+void RelationDialog::renderLabels()
+{
+    leftCapacity = (this->height() - 20) * 1.0f / leftL.size();
+    rightCapacity = (this->height() - 20) * 1.0f / rightL.size();
+    float myH(leftL.isEmpty() ? 0 : leftL.first()->height() / 2.);
+    for (int i(0); i != leftL.size(); ++i)
+    {
+        leftL[i]->move(this->contentsMargins().left(), leftCapacity * (i + .5f) - myH + 20);
+        leftL[i]->show();
+    }
+    for (int i(0); i != rightL.size(); ++i)
+    {
+        rightL[i]->move(this->width() - this->contentsMargins().right() - maxW, rightCapacity * (i + .5f) - myH + 20);
+        rightL[i]->show();
+    }
+
+    this->update();
 }
 
 bool RelationDialog::eventFilter(QObject* o, QEvent* e)
@@ -159,20 +185,11 @@ void RelationDialog::resizeEvent(QResizeEvent*)
 {
     title1->move(this->contentsMargins().left(),5);
     title2->move(this->width() - this->contentsMargins().right() - maxW, 5);
-    leftCapacity = (this->height() - 20) * 1.0f / leftL.size();
-    rightCapacity = (this->height() - 20) * 1.0f / rightL.size();
-    float myH(leftL.isEmpty() ? 0 : leftL.first()->height() / 2.);
-    for (int i(0); i != leftL.size(); ++i)
-    {
-        leftL[i]->move(this->contentsMargins().left(), leftCapacity * (i + .5f) - myH + 20);
-    }
-    for (int i(0); i != rightL.size(); ++i)
-    {
-        rightL[i]->move(this->width() - this->contentsMargins().right() - maxW, rightCapacity * (i + .5f) - myH + 20);
-    }
+    renderLabels();
 }
 
-void RelationDialog::paintEvent(QPaintEvent * e)
+
+void RelationDialog::paintEvent(QPaintEvent *)
 {
     if (!pair) {
         return;
@@ -188,8 +205,8 @@ void RelationDialog::paintEvent(QPaintEvent * e)
     pen.setCapStyle(Qt::RoundCap);
     pen.setJoinStyle(Qt::RoundJoin);
     p.setPen(pen);
-    //p.fillRect(e->rect(), QColor(rand() % 0x100, rand() % 0x100, rand() % 0x100));
-    p.fillRect(e->rect(), QColor(0xFF, 0xFF, 0xFF));
+    //p.fillRect(this->rect(), QColor(rand() % 0x100, rand() % 0x100, rand() % 0x100));
+    p.fillRect(this->rect(), QColor(0xFF, 0xFF, 0xFF));
     for (int i = 0; i != relation().size(); ++i)
     {
         if (relation()[i] >= 0)
@@ -287,6 +304,7 @@ void RelationDialog::mousePressEvent(QMouseEvent *)
                 *elem = -1;
             source = QPoint(this->width() - this->contentsMargins().right() - maxW - 24, rightCapacity * (underToggle + .5f) + 20);
         }
+        emit updateMac(relation());
     }
     else if (underToggle >= 0 && underLeftToggle != lineingLeft)
     {
@@ -302,11 +320,15 @@ void RelationDialog::mousePressEvent(QMouseEvent *)
             relation()[lineingState] = underToggle;
         }
         lineingState = -1;
+
+        emit updateMac(relation());
     }
     else if (lineingState >= 0)
     {
         lineingState = -1;
+        emit updateMac(relation());
     }
+
     bgUpdate();
     updateLines();
 }

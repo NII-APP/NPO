@@ -64,8 +64,7 @@ int CParse::integer()
     bool flag = *d == '-';
     *d += flag;
 
-    while (*d >= '0' && *d <= '9')
-    {
+    while (*d >= '0' && *d <= '9') {
         num *= 10;
         num += *d - '0';
         ++d;
