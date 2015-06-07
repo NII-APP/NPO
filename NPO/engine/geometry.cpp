@@ -777,8 +777,6 @@ void Geometry::scaleTo(double v) {
 
 std::vector<int> Geometry::truncationIndexVector(const Geometry& a, const Geometry& b)
 {
-    qDebug() << "truncationIndexVector start";
-
     const CGL::Vertexes& am(a.vertexes);
     const CGL::Vertexes& bm(b.vertexes);
     int aDimension(static_cast<int>(am.length()));
@@ -799,8 +797,6 @@ std::vector<int> Geometry::truncationIndexVector(const Geometry& a, const Geomet
             }
         }
     }
-
-    qDebug() << "truncationIndexVector end";
     return numbers;
 }
 

@@ -3,7 +3,7 @@
 #include <map>
 #include "geometryform.h"
 
-class GeometryPair : std::pair<GeometryForm* const, GeometryForm* const>
+class GeometryPair: std::pair<GeometryForm* const, GeometryForm* const>
 {
 public:
     typedef std::vector<int> Relation;
@@ -22,6 +22,10 @@ public:
 
     void createTuncationForm();
     GeometryPair(GeometryForm *theory, GeometryForm *practic);
+
+    void makeMac(const Relation& r);
+    void makeMac(const GeometryForm*, const GeometryForm*);
+
 };
 
 #endif // GEOMETRYPAIR_H

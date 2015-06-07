@@ -33,6 +33,12 @@ public:
 
 private slots:
     void previewPatrol();
+
+public slots:
+    void newMac(const GeometryPair::Relation& r) {
+        current->makeMac(r);
+        chart->setData(current->getMac());
+    }
 };
 
 class TruncationWizard::Preview : public QWidget {
@@ -81,7 +87,6 @@ signals:
 private slots:
     void selectorPatrol()
     {
-        qDebug()<<"selectorPatrol start";
         GeometryForm* c(current());
         screen->setMesh(c);
         emit meshSelected(c);
@@ -91,8 +96,7 @@ private slots:
         while (m.at(i) != c && m.size() > i) {
             ++i;
         }
-        emit meshSelected(i < m.size() ? i : -1);
-        qDebug()<<"selectorPatrol end";
+        //emit meshSelected(i < m.size() ? i : -1);
     }
 };
 

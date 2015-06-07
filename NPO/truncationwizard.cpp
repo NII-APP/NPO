@@ -25,14 +25,17 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     chart = new CGL::CColumnChart(main);
     main->addWidget(chart);
     this->layout()->addWidget(main);
-    this->resize(500,500);
+    //this->resize(500,500);
+
+    connect(relation, SIGNAL(updateMac(const GeometryPair::Relation&)),
+            this, SLOT(newMac(const GeometryPair::Relation&)));
 
     current = 0;
     previewPatrol();
 
-    main->setStretchFactor(0, 3);
-    main->setStretchFactor(1, 1);
-    main->setStretchFactor(2, 3);
+    main->setStretchFactor(0, 1);
+    main->setStretchFactor(1, 2);
+    main->setStretchFactor(2, 1);
 }
 
 TruncationWizard::~TruncationWizard()
@@ -45,7 +48,7 @@ GeometryPair* TruncationWizard::exec(QWidget* parent)
     QEventLoop* loop(new QEventLoop(parent));
     TruncationWizard* w(new TruncationWizard(0));
     loop->connect(w, SIGNAL(finished(int)), SLOT(quit()));
-    w->resize(QApplication::screens().first()->size() - QSize(400,400));
+    w->resize(QApplication::screens().first()->size() - QSize(200,200));
     w->show();
     w->setModal(false);
     loop->exec();
@@ -54,7 +57,6 @@ GeometryPair* TruncationWizard::exec(QWidget* parent)
 
 void TruncationWizard::previewPatrol()
 {
-    qDebug() << "previewPatrol start";
     delete current;
     if (first->current() && second->current()) {
         current = new GeometryPair(first->current(), second->current());
@@ -63,5 +65,4 @@ void TruncationWizard::previewPatrol()
     } else {
         current = 0;
     }
-    qDebug() << "previewPatrol end";
 }
