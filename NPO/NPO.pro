@@ -110,7 +110,6 @@ HEADERS += \
     truncationtab.h \
     truncationwizard.h \
     maintabbar.h \
-     \
     engine/CGL/c2dchart.h \
     engine/CGL/c2dchartplace.h \
     engine/CGL/cchartdata.h \
