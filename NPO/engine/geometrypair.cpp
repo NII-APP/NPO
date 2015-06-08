@@ -67,8 +67,9 @@ void GeometryPair::makeMac(const GeometryPair::Relation& r)
     mac.resize(minSize, minSize);
     for (int i = 0; i != mac.height(); ++i) {
         for (int j = 0; j != r.size(); ++j) {
-            if (r[j] == -1) continue;
-            mac[i][j] = GeometryForm::MAC(second, truncated, relation[j], i);
+            if (r[j] != -1) {
+                mac[i][j] = GeometryForm::MAC(second, truncated, relation[j], i);
+            }
         }
     }
 }
