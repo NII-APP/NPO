@@ -4,7 +4,7 @@
 #include <QSplitter>
 #include <QModelIndex>
 #include <QListView>
-#include "engine/CGL/ccolumnchart.h"
+#include "c3dcolumnchart.h"
 #include <QSpinBox>
 #include <QLabel>
 class MeshPlace;
@@ -15,7 +15,7 @@ class Viewer : public QSplitter
     Q_OBJECT
     MeshPlace* geometryWidget;
     QListView* geometriesView;
-    CGL::CColumnChart* macChart;
+    CGL::C3dColumnChart* macChart;
 
     QFrame* formSelector;
     QLabel* formLabel;

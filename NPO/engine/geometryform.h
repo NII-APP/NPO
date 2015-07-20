@@ -2,8 +2,8 @@
 #define GEOMETRYFORM_H
 #include "geometry.h"
 #include "form.h"
-#include "CGL/cgl.h"
-#include "CGL/cparse.h"
+#include "cgl.h"
+#include "cparse.h"
 
 class GeometryForm : public Geometry
 {

@@ -22,7 +22,7 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     main->addWidget(selectors);
     relation = new RelationDialog(0, main);
     main->addWidget(relation);
-    chart = new CGL::CColumnChart(main);
+    chart = new CGL::C3dColumnChart(main);
     main->addWidget(chart);
     this->layout()->addWidget(main);
     //this->resize(500,500);

@@ -8,12 +8,22 @@
 
 namespace CGL {
 
-class CChartData : public std::vector<std::shared_ptr<const CDimension>>
+class CMatrix;
+typedef std::vector<std::shared_ptr<const CDimension>> SharedDimension;
+
+class CChartData : public SharedDimension
 {
     QString title;
 public:
     typedef QList<CChartData> ChartDataList;
     CChartData(const QString& name = QString());
+    CChartData(const CChartData& op);
+    CChartData& operator= (const CChartData& op)
+    {
+        title = op.title;
+        *(static_cast<SharedDimension*>(this)) = op;
+        return *this;
+    }
     ~CChartData();
 
     void push_back(const CDimension* const val);

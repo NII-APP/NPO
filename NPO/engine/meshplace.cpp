@@ -3,6 +3,8 @@
 
 MeshPlace::MeshPlace(QWidget *parent)
     : CGLWidget(parent)
+    , k(2.0f)
+    , currentMode(-1)
 {
     shader = nullptr;
 }
@@ -68,6 +70,17 @@ void MeshPlace::setData(const QVector<const Mesh*>& models)
 
 void MeshPlace::paintCGL()
 {
+#ifndef NDEBUG
+    if (!meshes.isEmpty() && currentMode >= 0) {
+        const MeshModes* m(static_cast<const MeshModes*>(meshes.first()->mesh()));
+        const CGL::CVertexes& f(m->mode(currentMode).form());
+        CParallelepiped p(f(0));
+        for (int i(0); i != f.length();++i) {
+            p.include(f(i) * k);
+        }
+        debugSpace(p + this->scene());
+    }
+#endif
     for (MeshBuffer* item : meshes) {
         item->bind();
         item->mesh()->render();
@@ -105,6 +118,7 @@ MeshPlace::MeshBuffer::MeshBuffer(const Mesh* data, QOpenGLShaderProgram* shader
 }
 
 void MeshPlace::setMode(const int m) {
+    currentMode = m;
     for (MeshBuffer* mesh : meshes) {
         mesh->setCurrentMode(m);
     }
@@ -128,4 +142,15 @@ QVector<const Mesh*> MeshPlace::getData() const
         result.push_back(b->mesh());
     }
     return result;
+}
+
+void MeshPlace::wheelEvent(QWheelEvent * e) {
+    if (e->modifiers() & Qt::CTRL) {
+        k *= e->delta() > 0 ? 0.8 : 1.2;
+        shader->setUniformValue("k", k);
+        this->repaint();
+    }
+    else {
+        CGLWidget::wheelEvent(e);
+    }
 }

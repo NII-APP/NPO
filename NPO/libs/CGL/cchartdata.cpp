@@ -1,4 +1,5 @@
 #include "cchartdata.h"
+#include "cmatrix.h"
 
 namespace CGL {
 
@@ -20,5 +21,8 @@ void CChartData::push_back(const std::shared_ptr<const CDimension>& val)
 {
     std::vector<std::shared_ptr<const CDimension>>::push_back(val);
 }
+
+CChartData::CChartData(const CChartData& op)
+    : SharedDimension(op), title(op.title) { }
 
 }

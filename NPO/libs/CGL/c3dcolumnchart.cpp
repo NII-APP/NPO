@@ -1,20 +1,20 @@
-#include "ccolumnchart.h"
+#include "c3dcolumnchart.h"
 
 namespace CGL {
 
-const qreal CColumnChart::REGILAR_MARGIN = 0.2;
+const qreal C3dColumnChart::REGILAR_MARGIN = 0.2;
 
-CColumnChart::CColumnChart(QWidget* parent)
+C3dColumnChart::C3dColumnChart(QWidget* parent)
     : C3dChart(parent)
 {
 }
 
-CColumnChart::~CColumnChart()
+C3dColumnChart::~C3dColumnChart()
 {
 
 }
 
-void CColumnChart::setData(const CMatrix& d) {
+void C3dColumnChart::setData(const CMatrix& d) {
     data = d;
     if (data.empty()) {
         return;
@@ -25,14 +25,15 @@ void CColumnChart::setData(const CMatrix& d) {
     scale = RealScale(RealRange(r.getMin(),  r.getMax()), RealRange(0.0, size));
     this->scene() = CParallelepiped(0.0, size, 0.0, size, 0.0, size);
     color.setDomain(RealRange(r.getMin(), r.getMax()));
-    this->safelyUpdate();
+    qDebug() << this->scene();
+    this->update();
 }
 
-void CColumnChart::paintCGL() {
+void C3dColumnChart::paintCGL() {
     qreal x0 = abs(0.5 * static_cast<int>(data.width() - size));
     qreal y0(0.5 * (data.height() - size));
-    for (int i(0); i != data.width(); ++i) {
-        for (int j(0); j != data.height(); ++j) {
+    for (int i(0); i != data.height(); ++i) {
+        for (int j(0); j != data.width(); ++j) {
             QRgb c(color(data[i][j]) | 0xFF000000);
             glColor4ubv(static_cast<unsigned char*>(static_cast<void*>(&c)));
             drowParallelepiped(CParallelepiped(x0 + i + REGILAR_MARGIN, x0 + i + 1 - REGILAR_MARGIN,
@@ -42,7 +43,7 @@ void CColumnChart::paintCGL() {
     }
 }
 
-void CColumnChart::drowParallelepiped(const CParallelepiped& p) {
+void C3dColumnChart::drowParallelepiped(const CParallelepiped& p) {
     QVector3D a(p.xMin(), p.yMin(), p.zMin());
     QVector3D b(p.xMax(), p.yMin(), p.zMin());
     QVector3D c(p.xMax(), p.yMax(), p.zMin());

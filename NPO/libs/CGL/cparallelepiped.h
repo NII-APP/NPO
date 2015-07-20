@@ -78,6 +78,7 @@ public:
     operator QRectF() const { return QRectF(xMin(),yMax(),width(), height()); }
 
     CParallelepiped& operator +=(const CParallelepiped& e);
+    CParallelepiped operator + (const CParallelepiped& e) const;
     CParallelepiped& operator |=(const CParallelepiped& e) { return *this += e; }
     bool operator ==(const QVector3D& v) const;
     bool operator !=(const QVector3D& v) const;

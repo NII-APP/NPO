@@ -57,6 +57,7 @@ public:
 
     size_t width() const { return wid; }
     size_t height() const { return m.size(); }
+    size_t size() const { return data.size(); }
     bool empty() const { return data.empty(); }
 
     friend QDebug operator<< (QDebug out, const CMatrix &obj);

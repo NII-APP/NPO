@@ -206,7 +206,7 @@ void RelationDialog::paintEvent(QPaintEvent *)
     pen.setJoinStyle(Qt::RoundJoin);
     p.setPen(pen);
     //p.fillRect(this->rect(), QColor(rand() % 0x100, rand() % 0x100, rand() % 0x100));
-    p.fillRect(this->rect(), QColor(0xFF, 0xFF, 0xFF));
+    p.fillRect(this->rect(), QColor(0xF0, 0xF0, 0xF0));
     for (int i = 0; i != relation().size(); ++i)
     {
         if (relation()[i] >= 0)

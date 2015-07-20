@@ -1,7 +1,7 @@
 #ifndef FORM_H
 #define FORM_H
-#include "CGL/cgl.h"
-#include "CGL/cvertexes.h"
+#include "cgl.h"
+#include "cvertexes.h"
 
 class QDataStream;
 

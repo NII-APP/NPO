@@ -23,7 +23,7 @@ Viewer::Viewer(QWidget *parent, unsigned enabledItems)
     , colorizeBundle(true)
 {
     if (enabledItems & MACChart) {
-        macChart = new CGL::CColumnChart(this);
+        macChart = new CGL::C3dColumnChart(this);
         this->addWidget(macChart);
         this->setStretchFactor(0,5);
     }

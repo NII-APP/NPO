@@ -1,6 +1,6 @@
 #ifndef GEOMETRYWIDGET_H
 #define GEOMETRYWIDGET_H
-#include "CGL/cglwidget.h"
+#include "cglwidget.h"
 #include "geometryform.h"
 #include "animationoptions.h"
 #include <functional>

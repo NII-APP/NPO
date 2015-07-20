@@ -1,6 +1,6 @@
 #include "form.h"
 #include <QDataStream>
-#include "CGL/cgl.h"
+#include "cgl.h"
 
 Form::Form()
 {

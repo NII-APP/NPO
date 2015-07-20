@@ -83,6 +83,18 @@ CParallelepiped& CParallelepiped::operator +=(const CParallelepiped& e)
     return *this;
 }
 
+CParallelepiped CParallelepiped::operator + (const CParallelepiped& e) const
+{
+    CParallelepiped cnt(*this);
+    cnt.includeX(e.xMin());
+    cnt.includeX(e.xMax());
+    cnt.includeY(e.yMin());
+    cnt.includeY(e.yMax());
+    cnt.includeZ(e.zMin());
+    cnt.includeZ(e.zMax());
+    return cnt;
+}
+
 bool CParallelepiped::operator ==(const QVector3D& v) const {
     return v.x() >= xL && v.x() <= xP && v.y() >= yL && v.y() <= yP && v.z() >= zL && v.z() <= zP;
 }

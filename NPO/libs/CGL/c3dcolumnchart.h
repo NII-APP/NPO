@@ -1,5 +1,5 @@
-#ifndef CCOLUMNCHART_H
-#define CCOLUMNCHART_H
+#ifndef C3DCOLUMNCHART_H
+#define C3DCOLUMNCHART_H
 
 #include "c3dchart.h"
 #include "cmatrix.h"
@@ -8,7 +8,9 @@
 
 namespace CGL {
 
-class CColumnChart : public C3dChart
+class CChartData;
+
+class C3dColumnChart : public C3dChart
 {
     static const qreal REGILAR_MARGIN;
 
@@ -19,9 +21,10 @@ class CColumnChart : public C3dChart
 
     static void drowParallelepiped(const CParallelepiped&);
 public:
-    CColumnChart(QWidget* parent = 0);
-    ~CColumnChart();
+    C3dColumnChart(QWidget* parent = 0);
+    ~C3dColumnChart();
 
+    //void setData(const CChartData&);
     void setData(const CMatrix&);
 
     void paintCGL();
@@ -29,4 +32,4 @@ public:
 
 }
 
-#endif // CCOLUMNCHART_H
+#endif // C3DCOLUMNCHART_H

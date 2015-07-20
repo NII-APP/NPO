@@ -1,13 +1,13 @@
 #include "geometry.h"
 #include <iostream>
-#include "CGL/cparse.h"
+#include "cparse.h"
 #include <algorithm>
 #include "core/quad.h"
 #include "core/tetra.h"
 #include "core/tria.h"
 #include "core/lines.h"
 #include "core/hexa.h"
-#include "CGL/cgl.h"
+#include "cgl.h"
 #include "conio.h"
 #include <QFile>
 #include <QTextStream>
@@ -104,7 +104,7 @@ void Geometry::estimateBox()
     }
 }
 
-#ifdef BDFENTITY_H
+#ifdef PyBDF
 void Geometry::scarfUp(PyParse::BDFEntity& entity) {
     qint32 size;
     entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(qint32));
@@ -119,7 +119,7 @@ bool Geometry::readBDF(const QString &fileName)
     qDebug() << "BDF parsing";
     QTime loop(QTime::currentTime());
 #endif
-#ifndef BDFENTITY_H
+#ifndef PyBDF
     obsoleteBDFParser(fileName);
 #else
     scarfUp(PyParse::BDFEntity(fileName, QApplication::topLevelWidgets().first()));

@@ -13,24 +13,10 @@ TARGET = NPO
 
 TEMPLATE = app
 
-
 SOURCES += main.cpp \
     engine/animationoptions.cpp \
     engine/geometrywidget.cpp \
     relationdialog.cpp \
-    engine/CGL/carray.cpp \
-    engine/CGL/cexpression.cpp \
-    engine/CGL/cgl.cpp \
-    engine/CGL/cglwidget.cpp \
-    engine/CGL/cinterval.cpp \
-    engine/CGL/clabel.cpp \
-    engine/CGL/cmatrix.cpp \
-    engine/CGL/cparallelepiped.cpp \
-    engine/CGL/cparse.cpp \
-    engine/CGL/crange.cpp \
-    engine/CGL/cvertexes.cpp \
-    engine/CGL/cylindercoordinatesystem.cpp \
-    engine/CGL/rectangularcoordinatesystem.cpp \
     engine/form.cpp \
     engine/geometry.cpp \
     engine/geometryform.cpp \
@@ -50,40 +36,40 @@ SOURCES += main.cpp \
     mainwindow.cpp \
     geometriesmodel.cpp \
     viewer.cpp \
-    engine/CGL/ccolumnchart.cpp \
-    engine/CGL/c3dchart.cpp \
-    engine/CGL/cscale.cpp \
-    engine/CGL/ccolorscale.cpp \
     truncationtab.cpp \
     truncationwizard.cpp \
     maintabbar.cpp \
     engine/geometryobsoleteparse.cpp \
-    engine/CGL/c2dchart.cpp \
-    engine/CGL/c2dchartplace.cpp \
-    engine/CGL/cchartdata.cpp \
-    engine/CGL/cdimension.cpp \
-    engine/CGL/cdimensionarray.cpp \
-    engine/CGL/cdimensioninterval.cpp \
-    engine/CGL/c2dchartaxis.cpp \
-    engine/meshplace.cpp
+    engine/meshplace.cpp \
+    libs/CGL/c2dchart.cpp \
+    libs/CGL/c2dchartaxis.cpp \
+    libs/CGL/c2dchartplace.cpp \
+    libs/CGL/c3dchart.cpp \
+    libs/CGL/c3dcolumnchart.cpp \
+    libs/CGL/carray.cpp \
+    libs/CGL/cchartdata.cpp \
+    libs/CGL/ccolorscale.cpp \
+    libs/CGL/cdimension.cpp \
+    libs/CGL/cdimensionarray.cpp \
+    libs/CGL/cdimensioninterval.cpp \
+    libs/CGL/cexpression.cpp \
+    libs/CGL/cgl.cpp \
+    libs/CGL/cglwidget.cpp \
+    libs/CGL/cinterval.cpp \
+    libs/CGL/clabel.cpp \
+    libs/CGL/cmatrix.cpp \
+    libs/CGL/cparallelepiped.cpp \
+    libs/CGL/cparse.cpp \
+    libs/CGL/crange.cpp \
+    libs/CGL/cscale.cpp \
+    libs/CGL/cvertexes.cpp \
+    libs/CGL/cylindercoordinatesystem.cpp \
+    libs/CGL/rectangularcoordinatesystem.cpp
 
 HEADERS += \
     engine/animationoptions.h \
     engine/geometrywidget.h \
     relationdialog.h \
-    engine/CGL/carray.h \
-    engine/CGL/cexpression.h \
-    engine/CGL/cgl.h \
-    engine/CGL/cglwidget.h \
-    engine/CGL/cinterval.h \
-    engine/CGL/clabel.h \
-    engine/CGL/cmatrix.h \
-    engine/CGL/cparallelepiped.h \
-    engine/CGL/cparse.h \
-    engine/CGL/crange.h \
-    engine/CGL/cvertexes.h \
-    engine/CGL/cylindercoordinatesystem.h \
-    engine/CGL/rectangularcoordinatesystem.h \
     engine/form.h \
     engine/geometry.h \
     engine/geometryform.h \
@@ -103,26 +89,43 @@ HEADERS += \
     mainwindow.h \
     geometriesmodel.h \
     viewer.h \
-    engine/CGL/ccolumnchart.h \
-    engine/CGL/c3dchart.h \
-    engine/CGL/cscale.h \
-    engine/CGL/ccolorscale.h \
     truncationtab.h \
     truncationwizard.h \
     maintabbar.h \
-    engine/CGL/c2dchart.h \
-    engine/CGL/c2dchartplace.h \
-    engine/CGL/cchartdata.h \
-    engine/CGL/cdimension.h \
-    engine/CGL/cdimensionarray.h \
-    engine/CGL/cdimensioninterval.h \
-    engine/CGL/c2dchartaxis.h \
-    engine/meshplace.h
+    engine/meshplace.h \
+    libs/CGL/c2dchart.h \
+    libs/CGL/c2dchartaxis.h \
+    libs/CGL/c2dchartplace.h \
+    libs/CGL/c3dchart.h \
+    libs/CGL/c3dcolumnchart.h \
+    libs/CGL/carray.h \
+    libs/CGL/cchartdata.h \
+    libs/CGL/ccolorscale.h \
+    libs/CGL/cdimension.h \
+    libs/CGL/cdimensionarray.h \
+    libs/CGL/cdimensioninterval.h \
+    libs/CGL/cexpression.h \
+    libs/CGL/cgl.h \
+    libs/CGL/cglwidget.h \
+    libs/CGL/cinterval.h \
+    libs/CGL/clabel.h \
+    libs/CGL/cmatrix.h \
+    libs/CGL/cparallelepiped.h \
+    libs/CGL/cparse.h \
+    libs/CGL/crange.h \
+    libs/CGL/cscale.h \
+    libs/CGL/cvertexes.h \
+    libs/CGL/cylindercoordinatesystem.h \
+    libs/CGL/rectangularcoordinatesystem.h
+
+
+INCLUDEPATH += libs/CGL
 
 exists( engine/pyParse/BDFEntity.cpp ) {
     message( "Configuring with new parser" )
     SOURCES += engine/pyParse/BDFEntity.cpp
     HEADERS += engine/pyParse/BDFEntity.h
+    DEFINES += "PyBDF"
 }
 
 OTHER_FILES += \

@@ -1,7 +1,11 @@
 #include "application.h"
 #include "mainwindow.h"
-#include "engine/CGL/cmatrix.h"
+#include "cmatrix.h"
 #include <QDebug>
+#include "c2dchart.h"
+#include "cdimensionarray.h"
+#include "cdimensioninterval.h"
+
 
 int main(int argc, char *argv[])
 {

@@ -2,14 +2,14 @@
 #define GEOMETRY_H
 #include <QFile>
 #include <QTextStream>
-#include "CGL/cparallelepiped.h"
+#include "cparallelepiped.h"
 #include <QtAlgorithms>
 #include <QBitArray>
 #include <QTime>
 #include <QTimer>
 #include <QGLWidget>
 #include "animationoptions.h"
-#include "CGL/cgl.h"
+#include "cgl.h"
 #include "core/finitelement.h"
 #include "core/shell.h"
 #include <QStack>
@@ -19,7 +19,9 @@
 #include "core/material.h"
 #include <QMatrix3x3>
 #include "form.h"
-//#include "pyParse/BDFEntity.h"
+#ifdef PyBDF
+#include "pyParse/BDFEntity.h"
+#endif
 
 using namespace core;
 
@@ -81,7 +83,7 @@ private:
 
     void colorizeFromArray(const CGL::CArray& v) const;
 
-#ifndef BDFENTITY_H
+#ifndef PyBDF
     void obsoleteBDFParser(const QString &);
 #else
     void scarfUp(PyParse::BDFEntity &entity);

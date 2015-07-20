@@ -1,11 +1,12 @@
 #ifndef MESHPLACE_H
 #define MESHPLACE_H
 
-#include "CGL/cglwidget.h"
+#include "cglwidget.h"
 #include "geometryform.h"
 #include <QOpenGLBuffer>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
+#include <QWheelEvent>
 
 class MeshPlace : public CGLWidget
 {
@@ -13,6 +14,10 @@ class MeshPlace : public CGLWidget
     typedef QVector<MeshBuffer*> MeshBuffers;
     MeshBuffers meshes;
     QOpenGLShaderProgram* shader;
+    float k;
+    int currentMode;
+
+    void wheelEvent(QWheelEvent * event);
 
 protected:
     void initializeCGL();

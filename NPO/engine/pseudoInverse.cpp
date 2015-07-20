@@ -3,7 +3,7 @@
 #include <conio.h>
 #include <iostream>
 #include <math.h>
-#include "CGL/cgl.h"
+#include "cgl.h"
 using namespace std;
 
 #include "QDebug"

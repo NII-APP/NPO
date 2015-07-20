@@ -9,7 +9,7 @@
 #include "application.h"
 #include "project.h"
 #include "relationdialog.h"
-#include "engine/CGL/ccolumnchart.h"
+#include "c3dcolumnchart.h"
 
 class TruncationWizard : public QDialog
 {
@@ -21,7 +21,7 @@ class TruncationWizard : public QDialog
 
     RelationDialog* relation;
 
-    CGL::CColumnChart* chart;
+    CGL::C3dColumnChart* chart;
 
     GeometryPair* current;
 
