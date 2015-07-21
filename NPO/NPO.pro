@@ -13,6 +13,21 @@ TARGET = NPO
 
 TEMPLATE = app
 
+include(../CGL/CGL.pri)
+
+CONFIG(debug, debug|release): {
+OBJECTS_DIR = $$PWD/../build/debug/main/obj
+TARGET = main_d
+}
+else: {
+OBJECTS_DIR = $$PWD/../build/release/main/obj
+TARGET = main
+}
+DESTDIR = $$PWD/../binaries
+RCC_DIR = $$PWD/../build/main/rcc
+UI_DIR = $$PWD/../build/main/ui
+MOC_DIR = $$PWD/../build/main/moc
+
 SOURCES += main.cpp \
     engine/animationoptions.cpp \
     engine/geometrywidget.cpp \
@@ -40,31 +55,7 @@ SOURCES += main.cpp \
     truncationwizard.cpp \
     maintabbar.cpp \
     engine/geometryobsoleteparse.cpp \
-    engine/meshplace.cpp \
-    libs/CGL/c2dchart.cpp \
-    libs/CGL/c2dchartaxis.cpp \
-    libs/CGL/c2dchartplace.cpp \
-    libs/CGL/c3dchart.cpp \
-    libs/CGL/c3dcolumnchart.cpp \
-    libs/CGL/carray.cpp \
-    libs/CGL/cchartdata.cpp \
-    libs/CGL/ccolorscale.cpp \
-    libs/CGL/cdimension.cpp \
-    libs/CGL/cdimensionarray.cpp \
-    libs/CGL/cdimensioninterval.cpp \
-    libs/CGL/cexpression.cpp \
-    libs/CGL/cgl.cpp \
-    libs/CGL/cglwidget.cpp \
-    libs/CGL/cinterval.cpp \
-    libs/CGL/clabel.cpp \
-    libs/CGL/cmatrix.cpp \
-    libs/CGL/cparallelepiped.cpp \
-    libs/CGL/cparse.cpp \
-    libs/CGL/crange.cpp \
-    libs/CGL/cscale.cpp \
-    libs/CGL/cvertexes.cpp \
-    libs/CGL/cylindercoordinatesystem.cpp \
-    libs/CGL/rectangularcoordinatesystem.cpp
+    engine/meshplace.cpp
 
 HEADERS += \
     engine/animationoptions.h \
@@ -92,34 +83,8 @@ HEADERS += \
     truncationtab.h \
     truncationwizard.h \
     maintabbar.h \
-    engine/meshplace.h \
-    libs/CGL/c2dchart.h \
-    libs/CGL/c2dchartaxis.h \
-    libs/CGL/c2dchartplace.h \
-    libs/CGL/c3dchart.h \
-    libs/CGL/c3dcolumnchart.h \
-    libs/CGL/carray.h \
-    libs/CGL/cchartdata.h \
-    libs/CGL/ccolorscale.h \
-    libs/CGL/cdimension.h \
-    libs/CGL/cdimensionarray.h \
-    libs/CGL/cdimensioninterval.h \
-    libs/CGL/cexpression.h \
-    libs/CGL/cgl.h \
-    libs/CGL/cglwidget.h \
-    libs/CGL/cinterval.h \
-    libs/CGL/clabel.h \
-    libs/CGL/cmatrix.h \
-    libs/CGL/cparallelepiped.h \
-    libs/CGL/cparse.h \
-    libs/CGL/crange.h \
-    libs/CGL/cscale.h \
-    libs/CGL/cvertexes.h \
-    libs/CGL/cylindercoordinatesystem.h \
-    libs/CGL/rectangularcoordinatesystem.h
+    engine/meshplace.h
 
-
-INCLUDEPATH += libs/CGL
 
 exists( engine/pyParse/BDFEntity.cpp ) {
     message( "Configuring with new parser" )

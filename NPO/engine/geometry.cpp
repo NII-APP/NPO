@@ -106,6 +106,7 @@ void Geometry::estimateBox()
 
 #ifdef PyBDF
 void Geometry::scarfUp(PyParse::BDFEntity& entity) {
+    return;
     qint32 size;
     entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(qint32));
     vertexes.resize(size, 0.0f);

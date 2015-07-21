@@ -9,7 +9,7 @@
 namespace CGL {
 
 class CMatrix;
-typedef std::vector<std::shared_ptr<const CDimension>> SharedDimension;
+typedef std::vector<std::shared_ptr<const CDimension> > SharedDimension;
 
 class CChartData : public SharedDimension
 {
@@ -17,13 +17,6 @@ class CChartData : public SharedDimension
 public:
     typedef QList<CChartData> ChartDataList;
     CChartData(const QString& name = QString());
-    CChartData(const CChartData& op);
-    CChartData& operator= (const CChartData& op)
-    {
-        title = op.title;
-        *(static_cast<SharedDimension*>(this)) = op;
-        return *this;
-    }
     ~CChartData();
 
     void push_back(const CDimension* const val);
