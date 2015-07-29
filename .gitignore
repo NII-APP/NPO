@@ -7,5 +7,4 @@ binaries**/
 *.txt
 *.pro
 *.psd
-py**/
 obsolete/

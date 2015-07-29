@@ -110,17 +110,18 @@ void Geometry::scarfUp(PyParse::BDFEntity& entity) {
     qDebug() << "\tPyNastran parser";
 #endif
     qint32 size;
-    entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(qint32));
+    entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(size));
     vertexes.resize(size, 0.0f);
     entity.waitForReadyRead();
     entity.read(static_cast<char*>(static_cast<void*>(vertexes.data())), size * sizeof(float));
 
+    //import the vertexes data
     entity.waitForReadyRead();
-    entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(qint32));\
+    entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(size));
     trace.resize(size + 1);
     entity.waitForReadyRead();
-    entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(qint32));\
-    //size = 100;
+    entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(size));
+    //import the trace information
     for (int i(0); i != size; ++i) {
         int id;
         entity.waitForReadyRead();
@@ -128,6 +129,7 @@ void Geometry::scarfUp(PyParse::BDFEntity& entity) {
         entity.waitForReadyRead();
         trace[id] = FinitElement::load(entity);\
     }
+    /// @todo add import of shell and matherials data
 }
 #endif
 

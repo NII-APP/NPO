@@ -88,6 +88,7 @@ FinitElement* FinitElement::load(QIODevice& in) {
 
     in.waitForReadyRead(1000);
     FinitElement* v(resolveType(type));
+    //if it's unknown type
     if (type == BushType || type == BarType || v == nullptr) {
         quint32 shell;
         in.read(static_cast<char*>(static_cast<void*>(&shell)), sizeof(shell));
@@ -95,11 +96,8 @@ FinitElement* FinitElement::load(QIODevice& in) {
         in.waitForReadyRead(1000);
         in.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(size));
         in.waitForReadyRead(1000);
-        QByteArray m = in.read(size * sizeof(quint32));
-        QVector<int> m2(size);
-        for (int i(0); i != size; ++i) {
-            m2[i] = static_cast<int*>(static_cast<void*>(m.data()))[i];
-        }
+        //just to skip...
+        in.read(size * sizeof(quint32));
         return v;
     }
 
@@ -112,6 +110,7 @@ FinitElement* FinitElement::load(QIODevice& in) {
     v->resize(size);
     in.waitForReadyRead(1000);
     in.read(static_cast<char*>(static_cast<void*>(v->begin())), v->size() * sizeof(quint32));
+
     return v;
 }
 
