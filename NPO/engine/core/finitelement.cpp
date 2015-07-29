@@ -9,6 +9,7 @@
 #include <cassert>
 #include <vector>
 #include <QBitArray>
+#include <QIODevice>
 
 namespace core {
 
@@ -47,37 +48,70 @@ void FinitElement::fillTraced(QBitArray & a) const {
     }
 }
 
+FinitElement* FinitElement::resolveType(int type) {
+
+    switch (type) {
+    case LinesType:
+        return new Lines;
+    case QuadType:
+        return new Quad;
+    case TetraType:
+        return new Tetra;
+    case HexaType:
+        return new Hexa;
+    case TriaType:
+        return new Tria;
+    case BushType: case BarType:
+        return nullptr;
+    default:
+        return nullptr;
+    }
+}
+
 FinitElement* FinitElement::load(QDataStream& in) {
     quint32 type;
     in >> type;
 
-    FinitElement* v;
-    switch (type) {
-    case LinesType:
-        v = new Lines;
-        break;
-    case QuadType:
-        v = new Quad;
-        break;
-    case TetraType:
-        v = new Tetra;
-        break;
-    case HexaType:
-        v = new Hexa;
-        break;
-    case TriaType:
-        v = new Tria;
-        break;
-    case BushType: case BarType: {
+    FinitElement* v(resolveType(type));
+    if (type == BushType || type == BarType) {
         quint32 size;
         in >> size;
         in.skipRawData(size * sizeof(quint32));
     }
-        break;
-    default:        
-        return nullptr;
-    }
     in >> *v;
+    return v;
+}
+
+FinitElement* FinitElement::load(QIODevice& in) {
+    quint32 type;
+    in.read(static_cast<char*>(static_cast<void*>(&type)), sizeof(type));
+
+    in.waitForReadyRead(1000);
+    FinitElement* v(resolveType(type));
+    if (type == BushType || type == BarType || v == nullptr) {
+        quint32 shell;
+        in.read(static_cast<char*>(static_cast<void*>(&shell)), sizeof(shell));
+        quint32 size;
+        in.waitForReadyRead(1000);
+        in.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(size));
+        in.waitForReadyRead(1000);
+        QByteArray m = in.read(size * sizeof(quint32));
+        QVector<int> m2(size);
+        for (int i(0); i != size; ++i) {
+            m2[i] = static_cast<int*>(static_cast<void*>(m.data()))[i];
+        }
+        return v;
+    }
+
+    quint32 shell;
+    in.read(static_cast<char*>(static_cast<void*>(&shell)), sizeof(shell));
+    v->setShell(shell);
+    quint32 size;
+    in.waitForReadyRead(1000);
+    in.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(size));
+    v->resize(size);
+    in.waitForReadyRead(1000);
+    in.read(static_cast<char*>(static_cast<void*>(v->begin())), v->size() * sizeof(quint32));
     return v;
 }
 

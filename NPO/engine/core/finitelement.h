@@ -3,6 +3,7 @@
 #include <QtGlobal>
 class QBitArray;
 class QDataStream;
+class QIODevice;
 
 namespace core {
 
@@ -10,6 +11,8 @@ namespace core {
 class FinitElement
 {
     quint32 shellIndex;
+
+    static FinitElement* resolveType(int type);
 public:
     /// data which stored in this enum used in python part
     enum FinitElementType {
@@ -39,7 +42,8 @@ public:
     */
     void fillTraced(QBitArray&) const;
     /// allocate the element of specified (in data stream) type and read data for it
-    static FinitElement* load(QDataStream&);
+    static FinitElement* load(QIODevice &);
+    static FinitElement* load(QDataStream& in);
     virtual const quint32* nodes() const = 0;
     virtual quint32* nodes() = 0;
     virtual quint32 nodesCount() const = 0;

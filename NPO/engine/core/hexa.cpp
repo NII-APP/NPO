@@ -37,6 +37,8 @@ void Hexa::getTraced(QBitArray& b) const {
     b.setBit(n[3]);
     b.setBit(n[4]);
     b.setBit(n[5]);
+    b.setBit(n[6]);
+    b.setBit(n[7]);
 }
 
 void Hexa::render() const {

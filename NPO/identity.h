@@ -52,9 +52,10 @@ public:
     QString choseSaveFile() const;
     QMessageBox::StandardButton choseIsSaveQuestion() const;
 
-    void messageCantOpen() const;
-    void messageObsoleteProgram() const;
-    void messageWrongProFile() const;
+    void messageCantStartPython(const QString &fName) const;
+    void messageCantOpen(const QString &fName) const;
+    void messageObsoleteProgram(const QString &fName) const;
+    void messageWrongProFile(const QString &fName) const;
 
     QString menuFileName() const;
     QList<QAction*> menuFileActions(QObject* parent, const Relations& = Relations()) const;

@@ -19,7 +19,7 @@ public:
 \
     const quint32* nodes() const { return n; }
     quint32* nodes() { return n; }
-    quint32 nodesCount() const { return 6; }
+    quint32 nodesCount() const { return 8; }
 };
 
 

@@ -11,6 +11,83 @@
 #include <QDir>
 #include <QFileDevice>
 
+#include <QVBoxLayout>
+#include <QTimer>
+#include <QFrame>
+#include <QLabel>
+#include <QDebug>
+#include <QBoxLayout>
+
+namespace {
+class Status : public QFrame {
+    void selfPosition() {
+        this->move(QPoint(this->nativeParentWidget()->width() - this->width(),
+                          this->nativeParentWidget()->height() - this->height()));
+    }
+
+    void resizeEvent(QResizeEvent *) {
+        selfPosition();
+    }
+    bool eventFilter(QObject * o, QEvent * e) {
+        if (o == nativeParentWidget() && e->type() == QEvent::Resize) {
+            selfPosition();
+        }
+        return false;
+    }
+
+public:
+    Status(QWidget* parent) : QFrame(parent) {
+        this->setLayout(new QVBoxLayout(this));
+        this->setAutoFillBackground(true);
+        parent->installEventFilter(this);
+        this->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    }
+    void push(QWidget* w) {
+        w->setParent(this);
+        this->layout()->addWidget(w);
+        this->show();
+        qDebug() << size();
+        this->resize(this->layout()->sizeHint());
+        qDebug() << size();
+    }
+    void push(const QString& s) {
+        push(new QLabel(s, this));
+    }
+    void clear() {
+        int i(this->layout()->count());
+        while (i) {
+            --i;
+            if (dynamic_cast<QWidgetItem*>(this->layout()->itemAt(i)))
+                delete static_cast<QWidgetItem*>(this->layout()->itemAt(i))->widget();
+        }
+        this->hide();
+    }
+    void insertBefore(QWidget* which, QWidget* before) {
+        int i(0);
+        while (i < this->layout()->count() && dynamic_cast<QWidgetItem*>(this->layout()->itemAt(i)) && static_cast<QWidgetItem*>(this->layout()->itemAt(i))->widget() != before) {
+            ++i;
+        }
+        static_cast<QBoxLayout*>(this->layout())->insertWidget(i, which);
+        this->show();
+    }
+};
+}
+
+void MainWindow::statusPush(QWidget* w) {
+    static_cast<Status*>(status)->push(w);
+}
+
+void MainWindow::statusClear() {
+    static_cast<Status*>(status)->clear();
+}
+void MainWindow::statusPush(const QString& s) {
+    static_cast<Status*>(status)->push(s);
+}
+
+void MainWindow::statusInsertBefore(QWidget* which, QWidget* before) {
+    static_cast<Status*>(status)->insertBefore(which, before);
+}
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     this->setCentralWidget(new TabWidget(this));
@@ -35,15 +112,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     fileMenu->addActions(Application::identity()->menuFileActions(fileMenu, relations));
 
     //just for simply debug
-    if (!QDir("../").entryList(QStringList() << "*.pro").isEmpty()) {
-        load("../" + QDir("../").entryList(QStringList() << "*.pro").first());
+    QStringList pro(QDir("../").entryList(QStringList() << "*.pro"));
+    int i(pro.size());
+    while (i) {
+        --i;
+        if (!Project::isOwnProject("../" + pro[i])) {
+            pro.removeAt(i);
+        }
     }
+    if (!pro.isEmpty()) {
+        load("../" + pro.first());
+    }
+
+    status = new Status(this->centralWidget());
+    status->hide();
 }
 
 MainWindow::~MainWindow()
 {
 
 }
+#include "engine/pyParse/BDFEntity.h"
 
 void MainWindow::load(const QString& location) {
     try {
@@ -52,14 +141,17 @@ void MainWindow::load(const QString& location) {
     } catch (QFileDevice::FileError error) {
         switch (error) {
         case QFileDevice::OpenError:
-            Application::identity()->messageCantOpen();
+            Application::identity()->messageCantOpen(location);
             break;
         case QFileDevice::ReadError:
-            Application::identity()->messageWrongProFile();
+            Application::identity()->messageWrongProFile(location);
+            break;
+        case QFileDevice::FatalError:
+            Application::identity()->messageCantStartPython(PyParse::BDFEntity::py());
             break;
         case QFileDevice::ResourceError:
         default:
-            Application::identity()->messageObsoleteProgram();
+            Application::identity()->messageObsoleteProgram(location);
             break;
         }
         return;
@@ -83,7 +175,7 @@ void MainWindow::open() {
     if (Project::isOwnProject(name)) {
         load(name);
     } else {
-        Application::identity()->messageWrongProFile();
+        Application::identity()->messageWrongProFile(name);
     }
 }
 

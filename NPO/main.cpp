@@ -15,5 +15,6 @@ int main(int argc, char *argv[])
     MainWindow window;
     window.showMaximized();
 
+    a.setMainWindow(&window);
     return a.exec();
 }

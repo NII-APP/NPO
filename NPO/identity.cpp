@@ -10,7 +10,9 @@
 #include <QJsonArray>
 #include <QFileDialog>
 #include <QMessageBox>
-//#include "engine/pyParse/BDFEntity.h"
+#ifdef PyBDF
+#include "engine/pyParse/BDFEntity.h"
+#endif
 
 const unsigned Identity::PROGRAM_VERSION = 2;
 
@@ -19,7 +21,7 @@ Identity::Identity()
     , topLavelParent(0)
 {
     Q_ASSERT(!language().isEmpty());
-#ifdef BDFENTITY_H
+#ifdef PyBDF
     Q_ASSERT(configuration.contains("py"));
     PyParse::BDFEntity::py(configuration["py"].toString());
     Q_ASSERT(configuration.contains("BDFParse"));
@@ -47,8 +49,14 @@ const QJsonObject Identity::readConfig() {
 }
 
 QJsonValue Identity::at(const QString & name) const {
-    Q_ASSERT(configuration.contains(name));
-    return configuration[name];
+    QStringList keys(name.split('/'));
+    QJsonValue node(configuration[keys.first()].toObject());
+    keys.removeFirst();
+    while (!keys.isEmpty() && node.isObject() && node.toObject().contains(keys.first())) {
+        node = node.toObject()[keys.first()];
+        keys.removeFirst();
+    }
+    return node;
 }
 
 QString Identity::geometryWidgetNoDataImage() const {
@@ -176,28 +184,36 @@ QMessageBox::StandardButton Identity::choseIsSaveQuestion() const {
             QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel));
 }
 
-void Identity::messageWrongProFile() const {
+void Identity::messageWrongProFile(const QString &fName) const {
     Q_ASSERT(configuration.contains("cant open") && configuration["cant open"].isObject());
     QJsonObject q(configuration["cant open"].toObject());
     Q_ASSERT(q.contains("text " + language()));
     QMessageBox::warning(QApplication::topLevelWidgets().first(), q["title " + language()].toString(),
-            q["text " + language()].toString());
+            q["text " + language()].toString().arg(fName));
 }
 
-void Identity::messageCantOpen() const {
+void Identity::messageCantStartPython(const QString &fName) const {
+    Q_ASSERT(configuration.contains("cant start python") && configuration["cant start python"].isObject());
+    QJsonObject q(configuration["cant start python"].toObject());
+    Q_ASSERT(q.contains("text " + language()));
+    QMessageBox::warning(QApplication::topLevelWidgets().first(), q["title " + language()].toString(),
+            q["text " + language()].toString().arg(fName));
+}
+
+void Identity::messageCantOpen(const QString &fName) const {
     Q_ASSERT(configuration.contains("wrong file") && configuration["wrong file"].isObject());
     QJsonObject q(configuration["wrong file"].toObject());
     Q_ASSERT(q.contains("text " + language()));
     QMessageBox::warning(QApplication::topLevelWidgets().first(), q["title " + language()].toString(),
-            q["text " + language()].toString());
+            q["text " + language()].toString().arg(fName));
 }
 
-void Identity::messageObsoleteProgram() const {
+void Identity::messageObsoleteProgram(const QString& fName) const {
     Q_ASSERT(configuration.contains("obsolete program") && configuration["obsolete program"].isObject());
     QJsonObject q(configuration["obsolete program"].toObject());
     Q_ASSERT(q.contains("text " + language()));
     QMessageBox::warning(QApplication::topLevelWidgets().first(), q["title " + language()].toString(),
-            q["text " + language()].toString());
+            q["text " + language()].toString().arg(fName));
 }
 
 QString Identity::execOpenFileNameDialog(const QJsonObject& config) const {

@@ -106,11 +106,28 @@ void Geometry::estimateBox()
 
 #ifdef PyBDF
 void Geometry::scarfUp(PyParse::BDFEntity& entity) {
-    return;
+#ifndef QT_NO_DEBUG
+    qDebug() << "\tPyNastran parser";
+#endif
     qint32 size;
     entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(qint32));
     vertexes.resize(size, 0.0f);
+    entity.waitForReadyRead();
     entity.read(static_cast<char*>(static_cast<void*>(vertexes.data())), size * sizeof(float));
+
+    entity.waitForReadyRead();
+    entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(qint32));\
+    trace.resize(size + 1);
+    entity.waitForReadyRead();
+    entity.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(qint32));\
+    //size = 100;
+    for (int i(0); i != size; ++i) {
+        int id;
+        entity.waitForReadyRead();
+        Q_ASSERT(entity.read(static_cast<char*>(static_cast<void*>(&id)), sizeof(id)) == sizeof(id));
+        entity.waitForReadyRead();
+        trace[id] = FinitElement::load(entity);\
+    }
 }
 #endif
 
@@ -126,6 +143,7 @@ bool Geometry::readBDF(const QString &fileName)
     scarfUp(PyParse::BDFEntity(fileName, QApplication::topLevelWidgets().first()));
 #endif
 
+    name = (file = fileName).split('/').last();
     estimateTraced();
     estimateBox();
     modelType = Theory;
@@ -540,7 +558,7 @@ bool operator==(const Geometry &l, const Geometry &r)
     }
 
     if (l.systems.size() != r.systems.size()){
-#ifdef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG
         qDebug() << "\tsystems size " << l.systems.size() << " " << r.systems.size();
 #endif
         return false;
@@ -550,14 +568,14 @@ bool operator==(const Geometry &l, const Geometry &r)
     auto systemRight = r.systems.begin();
     for (size_t i = 0; i < l.systems.size(); ++i) {
         if (systemLeft.key() != systemRight.key()){
-#ifdef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG
             qDebug() << "\tmaterials key " << i << " " << systemLeft.key() << " " << systemRight.key();
 #endif
             return false;
         }
 
         if (!(systemLeft.value()->operator==(*systemRight.value()))) {
-#ifdef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG
              qDebug() << "\tmaterials value " << i;
 #endif
             return false;
@@ -568,14 +586,14 @@ bool operator==(const Geometry &l, const Geometry &r)
     }
 
     if (l.shells.size() != r.shells.size()){
-#ifdef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG
         qDebug() << "\tshells size " << l.shells.size() << " " << r.shells.size();
 #endif
         return false;
     }
     for (size_t i = 0; i < l.shells.size(); ++i) {
         if (!(l.shells[i] == r.shells[i])) {
-#ifdef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG
             qDebug() << "\tshells i " << i;
 #endif
             return false;
@@ -583,14 +601,14 @@ bool operator==(const Geometry &l, const Geometry &r)
     }
 
     if (l.materials.size() != r.materials.size()){
-#ifdef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG
         qDebug() << "\tmaterials size " << l.materials.size() << " " << r.materials.size();
 #endif
         return false;
     }
     for (size_t i = 0; i < l.materials.size(); ++i) {
         if (!(l.materials[i] == r.materials[i])) {
-#ifdef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG
             qDebug() << "\tmaterials i " << i;
 #endif
             return false;
@@ -598,14 +616,14 @@ bool operator==(const Geometry &l, const Geometry &r)
     }
 
     if (l.links.size() != r.links.size()){
-#ifdef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG
         qDebug() << "\tlinks size " << l.links.size() << " " << r.links.size();
 #endif
         return false;
     }
     for (size_t i = 0; i < l.links.size(); ++i) {
         if ((l.links[i] != r.links[i])) {
-#ifdef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG
             qDebug() << "\tlinks i " << i;
 #endif
             return false;
@@ -614,12 +632,12 @@ bool operator==(const Geometry &l, const Geometry &r)
     if ((l.sqre == r.sqre) && (l.isTraced == r.isTraced) && (l.markedNodes == r.markedNodes) &&
             (l.measurment == r.measurment) && (l.file == r.file) && (l.modelType == r.modelType) &&
             (l.vertexes == r.vertexes) && (l.colors == r.colors)) {
-#ifdef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG
             qDebug() << "meses is equal";
 #endif
         return true;
     }
-#ifdef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG
             qDebug() << "some of meshes isn't identity";
 #endif
     return false;

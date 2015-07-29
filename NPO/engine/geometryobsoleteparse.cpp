@@ -4,8 +4,11 @@
 #include "core/tria.h"
 #include "core/hexa.h"
 
-#ifndef BDFENTITY_H
+#ifndef PyBDF
 void Geometry::obsoleteBDFParser(const QString& fileName) {
+#ifndef QT_NO_DEBUG
+    qDebug() << "\tobsolete parser";
+#endif
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;

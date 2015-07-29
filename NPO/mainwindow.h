@@ -6,13 +6,14 @@
 class QTabBar;
 class QSplitter;
 class QTabWidget;
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    //from where project was be loaded or saved at last time
+    //from where project was be loaded or saved in last time
     QString disposed;
+
+    QWidget* status;
 
     class TabWidget : public QTabWidget {
     public:
@@ -33,6 +34,10 @@ public slots:
     void save();
     void saveAs();
     void open();
+    void statusPush(QWidget*);
+    void statusPush(const QString &);
+    void statusInsertBefore(QWidget* which, QWidget* before);
+    void statusClear();
 };
 
 #endif // MAINWINDOW_H

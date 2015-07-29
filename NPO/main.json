@@ -1,6 +1,6 @@
 {
     "py" : "C:/Python34/python.exe",
-    "BDFParse" : "../readBDF.py",
+    "BDFParse" : "../NPO/readBDF.py",
     "language": "rus",
     "file menu" : {
         "rus" : "Файл",
@@ -72,21 +72,37 @@
     "hertz eng" : "Hz",
     "hertz rus" : "Гц",
     "cant open" : {
-        "text rus" : "Не удалось открыть файл для чтеиия",
-        "text eng" : "Can't open file for reading",
+        "text rus" : "Не удалось открыть для чтеиия файл \"%1\"",
+        "text eng" : "Can't read file \"%1\"",
         "title rus" : "Возникла ошибка при открытии файла",
         "title eng" : "File error"
     },
+    "cant start python" : {
+        "text rus" : "Не удалось запустить модуль PyNastran \"%1\"",
+        "text eng" : "Can't start PyNastran module \"%1\"",
+        "title rus" : "Структурная ошибка приложения",
+        "title eng" : "Program error"
+    },
     "wrong file" : {
-        "text rus" : "Файл не является проектом, поддерживаемым данным приложением",
-        "text eng" : "Can't open this file as a projecto of this application",
+        "text rus" : "Файл \"%1\" не является проектом, поддерживаемым данным приложением",
+        "text eng" : "Can't open this file \"%1\" as a projecto of this application",
         "title rus" : "Возникла ошибка при открытии файла",
         "title eng" : "File error"
     },
     "obsolete program" : {
-        "text rus" : "Проект создан в более новой версии приложения",
-        "text eng" : "This project was saved in newer sersion of application",
+        "text rus" : "Проект \"%1\" создан в более новой версии приложения",
+        "text eng" : "Project \"%1\" was saved in newer sersion of application",
         "title rus" : "Возникла ошибка при открытии файла",
         "title eng" : "File error"
+    },
+    "import progress dialog" : {
+        "program start rus" : "Запуск модуля pyNastran...",
+        "program start eng" : "Start the pyNastran...",
+        "open file rus" : "Открытие файла \"%1\"...",
+        "open file eng" : "File \"%1\"...",
+        "parsing rus" : "Разбор файла...",
+        "parsing eng" : "Parsing...",
+        "transmit rus" : "Передача данных...",
+        "transmit eng" : "Transmit the data..."
     }
 }

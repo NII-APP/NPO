@@ -3,6 +3,7 @@
 #include <QString>
 #include "project.h"
 #include "identity.h"
+#include "mainwindow.h"
 
 Application::Application(int argc, char** argv)
     : QApplication(argc, argv)
@@ -24,3 +25,4 @@ const Identity* Application::identity() { return static_cast<Application*>(qApp)
 
 Project* Application::project() { return static_cast<Application*>(qApp)->pro; }
 
+MainWindow* Application::mainWindow() { return static_cast<Application*>(qApp)->window; }

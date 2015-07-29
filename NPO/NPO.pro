@@ -90,7 +90,7 @@ exists( engine/pyParse/BDFEntity.cpp ) {
     message( "Configuring with new parser" )
     SOURCES += engine/pyParse/BDFEntity.cpp
     HEADERS += engine/pyParse/BDFEntity.h
-    DEFINES += "PyBDF"
+#    DEFINES += "PyBDF"
 }
 
 OTHER_FILES += \
