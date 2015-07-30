@@ -21,27 +21,33 @@ writeInt(max(mesh.elements.keys()))
 writeInt(len(mesh.elements))
 for i, element in mesh.elements.items():
     writeInt(i)
-    if element.type.upper() == 'CQUAD4':
-        assert len(element.nodeIDs()) == 4
+    cropLimit = len(element.nodeIDs())
+    if 'CQUAD' in element.type.upper():
+        cropLimit = 4
         writeInt(1)
-    elif element.type.upper() == 'QTETRA3':
-        assert len(element.nodeIDs()) == 4
+    elif 'CTETRA' in element.type.upper():
+        cropLimit = 4
         writeInt(2)
-    elif element.type.upper() == 'CTRIA3':
-        assert len(element.nodeIDs()) == 3
+    elif 'CTRIA' in element.type.upper():
+        cropLimit = 3
         writeInt(4)
-    elif element.type.upper() == 'CBAR':
+    elif 'CBAR' in element.type.upper():
+        cropLimit = 0
         writeInt(6)
-    elif element.type.upper() == 'CBUSH':
+    elif 'CBUSH' in element.type.upper():
+        cropLimit = 0
         writeInt(5)
-    elif element.type.upper() == 'CHEXA':
-        assert len(element.nodeIDs()) == 8
+    elif 'CHEXA' in element.type.upper():
+        cropLimit = 8
         writeInt(3)
-    elif element.type.upper() == 'RBE2':
+    elif 'RBE' in element.type.upper():
+        cropLimit = 0
         writeInt(-1)
     else:
         writeInt(-1)
+        cropLimit = 0
         #assert 'convertor fail'
     writeInt(element.Pid())#it's a shell
-    writeInt(len(element.nodeIDs()))
-    write(numpy.array(element.nodeIDs(), dtype=numpy.int32).tobytes())
+    writeInt(cropLimit)
+    if cropLimit:
+        write(numpy.array(element.nodeIDs(), dtype=numpy.int32)[:cropLimit].tobytes())
