@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/codes">
+        <file>summator.vert</file>
+        <file>meshSummator.vert</file>
+    </qresource>
+</RCC>
