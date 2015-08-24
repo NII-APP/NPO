@@ -24,7 +24,7 @@ public:
     MeshPair(FEM *theory, FEM *practic);
 
     void makeMac(const Relation& r);
-    void makeMac(const FEM*, const FEM*);
+    void makeMac(const EigenModes&, const EigenModes&);
 
 };
 

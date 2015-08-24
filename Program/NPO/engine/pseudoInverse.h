@@ -5,7 +5,8 @@
 #include <conio.h>
 #include <iostream>
 using namespace std;
-#include "eigenmodes.h"
+class FEM;
+class CArray;
 
 class MethodInvMat
 {
@@ -16,7 +17,7 @@ public:
     ~MethodInvMat();
     int PseudoInversion();
     double Round10 (double value);
-    int GetMatrix(MeshForm *form);
+    int GetMatrix(FEM *form);
 
 public:
     int clear0();
@@ -25,7 +26,7 @@ public:
     int Inversion(double **matrixIn);
     int DotTranspose(double **);
     int Dot(double ** A, double ** B);
-    CGL::CArray calculateE();
+    CArray calculateE();
     double max(double* A, int n);
     double min(double* A, int n);
     double ** matrix;

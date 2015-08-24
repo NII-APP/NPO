@@ -90,7 +90,7 @@ private:
     void estimateBox();
     void estimateQuadTraceBufer();
 
-    void colorizeFromArray(const CGL::CArray& v) const;
+    void colorizeFromArray(const CArray& v) const;
 
     void nativeBDFParser(const QString &);
     void scarfUp(PyParse::BDFEntity &entity);
@@ -123,17 +123,17 @@ public:
     //reading that formsts
     bool readBDF(const QString &fileName);
     bool readUNV(const QString &fileName);
-    void layToBDF(const QString& source, const QString& dest, const CGL::CArray &dE, const int difference);
+    void layToBDF(const QString& source, const QString& dest, const CArray &dE, const int difference);
     static void usePythonParser() { usePyParser = true; }
     static void useNativeParser() { usePyParser = false; }
 
     //estimate colors value as form interpolation in range [red : green : blue]
     void colorize(const CGL::CVertexes& v, const QString& mes = "") const;
-    void colorize(const CGL::CArray& v, const QString& mes = "") const;
+    void colorize(const CArray& v, const QString& mes = "") const;
     void colorize(int i) const {
         try { colorize(modes.at(i).form()); } catch (const std::out_of_range&) { qDebug() << "ext catch"; }
     }
-    void colorizeElements(const CGL::CArray &v, const QString& mes = "") const;
+    void colorizeElements(const CArray &v, const QString& mes = "") const;
 
     //rendering
     void render() const;
@@ -170,13 +170,13 @@ public:
     void alignZero();
     //vertexes *= double
     void scaleTo(double);
-    CGL::CArray extractElasticityModulus();
+    CArray extractElasticityModulus();
 
     //a + b...
     static FEM composition(const FEM &, const FEM &, const QVector<int> &relation);
 
     static std::vector<int> truncationIndexVector(const FEM& from, const FEM& to);
-    static FEM truncation(const FEM& a, const FEM& b);
+    static FEM* truncation(const FEM& a, const FEM& b);
 
     friend QDataStream& operator << (QDataStream&, const FEM&);
     friend QDataStream& operator >> (QDataStream&, FEM&);

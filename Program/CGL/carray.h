@@ -3,8 +3,6 @@
 #include <vector>
 #include "crange.h"
 
-namespace CGL {
-
 class CArray : public std::vector<double>
 {
 public:
@@ -17,7 +15,5 @@ public:
 
     void grade(int count);
 };
-
-}
 
 #endif // CARRAY_H

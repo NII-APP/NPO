@@ -7,13 +7,13 @@
 #include "c3dcolumnchart.h"
 #include <QSpinBox>
 #include <QLabel>
-class MeshPlace;
-class Mesh;
+class FEM;
+class FEMWidget;
 
 class Viewer : public QSplitter
 {
     Q_OBJECT
-    MeshPlace* geometryWidget;
+    FEMWidget* geometryWidget;
     QListView* geometriesView;
     CGL::C3dColumnChart* macChart;
 
@@ -39,12 +39,12 @@ public:
 signals:
 
 public slots:
-    void addModel();
-    void resetListView();
-    void setMode(int);
-    void setMesh(const FEM *g);
+    void addModel() {}
+    void resetListView() {}
+    void setMode(int) {}
+    void setMesh(const FEM *g) {}
 private slots:
-    void listPatrol(QModelIndex);
+    void listPatrol(QModelIndex) {}
 };
 
 #endif // VIEWER_H

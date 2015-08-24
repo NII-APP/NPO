@@ -45,7 +45,7 @@ class TruncationWizard::Preview : public QWidget {
 
     QComboBox* selector;
     Viewer* screen;
-    std::vector<MeshForm* const> meshes;
+    std::vector<FEM* const> meshes;
 public:
     Preview(Qt::ToolBarArea area, QWidget* parent = 0)
         : QWidget(parent)
@@ -53,11 +53,10 @@ public:
         , screen(new Viewer(this, Viewer::MeshPane | Viewer::FormSpinner | Viewer::AnimationPane))
     {
         this->setLayout(new QVBoxLayout);
-        foreach (Mesh* const g, Application::project()->modelsList()) {
-            MeshForm* const item(dynamic_cast<MeshForm*>(g));
-            if (item && item->modesCount()) {
-                meshes.push_back(item);
-                selector->addItem(item->getName());
+        foreach (FEM* const g, Application::project()->modelsList()) {
+            if (!g->getModes().empty()) {
+                meshes.push_back(g);
+                selector->addItem(g->getName());
             }
         }
         if (Qt::BottomToolBarArea == area) {
@@ -74,28 +73,28 @@ public:
         selectorPatrol();
     }
 
-    MeshForm* current() const
+    FEM* current() const
     {
         return selector->currentIndex() < meshes.size() && selector->currentIndex() >= 0
                 ? meshes.at(selector->currentIndex()) : 0;
     }
 signals:
     void meshSelected(int id);
-    void meshSelected(MeshForm*);
+    void meshSelected(FEM*);
 
 private slots:
     void selectorPatrol()
     {
-        MeshForm* c(current());
+        FEM* c(current());
         screen->setMesh(c);
         emit meshSelected(c);
 
-        const Project::Geometries& m(Application::project()->modelsList());
+        const Project::Models& m(Application::project()->modelsList());
         int i(0);
         while (m.at(i) != c && m.size() > i) {
             ++i;
         }
-        //emit meshSelected(i < m.size() ? i : -1);
+        emit meshSelected(i < m.size() ? i : -1);
     }
 };
 

@@ -2,7 +2,7 @@
 #include "application.h"
 #include "project.h"
 #include "identity.h"
-#include "eigenmodes.h"
+#include "fem.h"
 
 GeometriesModel::GeometriesModel(QObject* parent)
     : QAbstractListModel(parent)
@@ -26,13 +26,9 @@ QVariant GeometriesModel::data(const QModelIndex &index, int role) const {
     if (index.row() >= Application::project()->modelsList().size()) {
         return Application::identity()->geometriesModelAdd();
     }
-    return QVariant(mesh(index)->getName());
+    return QVariant(QString::number(index.row()));
 }
 
-MeshForm* GeometriesModel::mesh(const QModelIndex &index) {
-    if (index.row() >= Application::project()->modelsList().size() || index.row() < 0) {
-        return 0;
-    } else {
-        return static_cast<MeshForm*>(Application::project()->modelsList().at(index.row()));
-    }
+FEM * GeometriesModel::mesh(const QModelIndex &index) {
+    return 0;
 }

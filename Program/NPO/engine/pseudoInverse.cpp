@@ -5,6 +5,8 @@
 #include <math.h>
 #include "cgl.h"
 using namespace std;
+#include <fem.h>
+#include <carray.h>
 
 #include "QDebug"
 
@@ -16,12 +18,12 @@ MethodInvMat::MethodInvMat()
 }
 MethodInvMat::~MethodInvMat()
 {}
-int MethodInvMat::GetMatrix(MeshForm* model)
+int MethodInvMat::GetMatrix(FEM *model)
 {
-    CGL::CArray elasticy(model->extractElasticityModulus());
+    CArray elasticy(model->extractElasticityModulus());
    // qDebug() << "create mega matrux";
     int sizeElem = static_cast<int>(model->elements().size());
-    int sizeMode = static_cast<int>(model->modes().size());
+    int sizeMode = static_cast<int>(model->getModes().size());
 
     qDebug() << "sizeElem ==" << sizeElem;
     qDebug() << "sizeMode ==" << sizeMode;
@@ -37,14 +39,14 @@ int MethodInvMat::GetMatrix(MeshForm* model)
     frequency = new double[sizeMode];
     frequencyExp = new double[sizeMode];
 
-    Modes& forms(model->modes());
+    const EigenModes& forms(model->getModes());
 
     //qDebug() << "memory alocated" << sizeElem << "rows and" << sizeMode << "columns";
     //qDebug() << "forms size =" << forms.size() << "forms first size" << forms.front().power().size();
 
     for (int i = 0; i < sizeElem; ++i) {
         for (int j = 0; j < sizeMode; ++j) {
-            matrix[j][i] =  forms[j].power()[i] / (elasticy[i] ? elasticy[i] : 1.0);
+            matrix[j][i] =  forms.at(j).strainEnergy()[i] / (elasticy[i] ? elasticy[i] : 1.0);
         }
     }
 
@@ -238,7 +240,7 @@ int MethodInvMat::PseudoInversion()
     return 0;
 }
 
-CGL::CArray MethodInvMat::calculateE()
+CArray MethodInvMat::calculateE()
 {
     deltaE = new double[row];
     double tempFrec;
@@ -253,7 +255,7 @@ CGL::CArray MethodInvMat::calculateE()
         }
     }
 
-    CGL::CArray result(deltaE, row);
+    CArray result(deltaE, row);
 
     qDebug() << result.estimateRange();
 
@@ -325,7 +327,7 @@ int MethodInvMat::discreteArray(double* arrayIn, int sizeArray, int discrete)
     double* arrayDistance;
     arrayDiscrete = new double[discrete];
     arrayDistance = new double[discrete];
-    CGL::IndexRange range(CGL::CArray(arrayIn, sizeArray).estimateRangeIndex());
+    IndexRange range(CArray(arrayIn, sizeArray).estimateRangeIndex());
     max = range.getMax();
     min = range.getMin();
     step = (max - min)/(discrete+1);

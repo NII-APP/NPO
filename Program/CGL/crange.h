@@ -5,8 +5,6 @@
 #include <limits>
 #include <QDebug>
 
-namespace CGL {
-
 template <typename T>
 class CRange : public QPair<T, T>
 {
@@ -86,7 +84,7 @@ public:
     operator CRange<double>() const { return CRange<double>(getMin(), getMax()); }
 
     bool operator ==(const RealRange& op) const { return op.getMin() == getMin() && op.getMax() == op.getMax(); }
-    bool operator !=(const RealRange& op) const { return op.getMin() != getMin() && op.getMax() != op.getMax(); }
+    bool operator !=(const RealRange& op) const { return op.getMin() != getMin() || op.getMax() != op.getMax(); }
 
     RealRange& flatProof() {
         if (range()) {
@@ -103,7 +101,5 @@ public:
 };
 typedef CRange<int> IndexRange;
 
-
-}
 
 #endif // CRANGE_H

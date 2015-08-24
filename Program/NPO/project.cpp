@@ -15,7 +15,7 @@ Project::~Project()
     qDeleteAll(geometries.begin(), geometries.end());
 }
 
-void Project::pushMesh(Mesh* g) {
+void Project::pushMesh(FEM * const g) {
     someModified = true;
     geometries.push_back(g);
 }

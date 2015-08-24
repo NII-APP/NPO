@@ -33,7 +33,7 @@ public:
     const Models& modelsList() const { return geometries; }
     const MeshPairs& pairsList() const { return pairs; }
     bool isModified() { return someModified; }
-    void pushMesh(Mesh*);
+    void pushMesh(FEM* const);
 
     static bool isOwnProject(const QString& filename);
     void save(const QString& filename);

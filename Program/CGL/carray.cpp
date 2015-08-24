@@ -4,7 +4,6 @@
 #include <QDataStream>
 #include <cmath>
 #endif // QT_VERSION
-namespace CGL {
 
 CArray::CArray(int size, double val) : std::vector<double>(size, val) { }
 
@@ -59,4 +58,3 @@ void CArray::grade(int count) {
 }
 
 
-}

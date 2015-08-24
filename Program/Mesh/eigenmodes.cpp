@@ -188,7 +188,7 @@ void EigenModes::readF06(const QString& fileName)
         f.skipRow();
         f.skipRow();
         int mode(f.integer() - 1);
-        CGL::CArray& v(operator[](mode).strainEnergy());
+        CArray& v(operator[](mode).strainEnergy());
         f.skipRow();
         f.skipRow();
         f.skipRow();

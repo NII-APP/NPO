@@ -1,15 +1,16 @@
 #include "geometrypair.h"
+#include "eigenmodes.h"
 
 MeshPair::MeshPair(FEM *theory, FEM *practic)
-    : std::pair<MeshForm* const, MeshForm* const>(theory, practic)
+    : std::pair<FEM* const, FEM* const>(theory, practic)
 {
     first->alignZero();
     second->alignZero();
     second->scaleTo(first->box().size());
-    truncated = MeshForm::truncation(*first, *second);
+    truncated = FEM::truncation(*first, *second);
 
     //estimate mac
-    makeMac(practic, truncated);
+    makeMac(practic->getModes(), truncated->getModes());
 
     //estimate relations
     relation.clear();
@@ -42,12 +43,12 @@ MeshPair::MeshPair(FEM *theory, FEM *practic)
     }
 }
 
-void MeshPair::makeMac(const FEM *practic, const FEM *truncated)
+void MeshPair::makeMac(const EigenModes &practic, const EigenModes &truncated)
 {
-    mac.resize(practic->modesCount(), truncated->modesCount());
+    mac.resize(practic.size(), truncated.size());
     for (int i = 0; i != mac.height(); ++i) {
         for (int j = 0; j != mac.width(); ++j) {
-            mac[i][j] = MeshForm::MAC(practic, truncated, j, i);
+            mac[i][j] = EigenModes::MAC(practic.at(j), truncated.at(i));
         }
     }
 }
@@ -61,14 +62,14 @@ void MeshPair::makeMac(const MeshPair::Relation& r)
         }
     }
 
-    size_t minSize = std::min(truncated->modesCount(), second->modesCount());
+    size_t minSize = std::min(truncated->getModes().size(), second->getModes().size());
     minSize = std::min(relationLength, minSize);
 
     mac.resize(minSize, minSize);
     for (int i = 0; i != mac.height(); ++i) {
         for (int j = 0; j != r.size(); ++j) {
             if (r[j] != -1) {
-                mac[i][j] = MeshForm::MAC(second, truncated, relation[j], i);
+                mac[i][j] = EigenModes::MAC(second->getModes().at(relation.at(j)), truncated->getModes().at(i));
             }
         }
     }

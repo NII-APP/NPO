@@ -9,7 +9,7 @@ class EigenMode
 {
     float freq;//frequency
     CGL::CVertexes formVal;
-    CGL::CArray strainVal;//strain energy.
+    CArray strainVal;//strain energy.
     CGL::CVertexes bandVal;//some rocket science by finit elements
     float pMac;
 
@@ -29,8 +29,8 @@ public:
 
     CGL::CVertexes& form() { return formVal; }
     const CGL::CVertexes& form() const { return formVal; }
-    CGL::CArray& strainEnergy() { return strainVal; }
-    const CGL::CArray& strainEnergy() const { return strainVal; }
+    CArray& strainEnergy() { return strainVal; }
+    const CArray& strainEnergy() const { return strainVal; }
     CGL::CVertexes& band() { return bandVal; }
     const CGL::CVertexes& band() const { return bandVal; }
 

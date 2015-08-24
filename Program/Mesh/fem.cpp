@@ -437,7 +437,7 @@ void FEM::renderSelectLabel(int vertex) const {
     glEnd();
 }
 
-void FEM::colorize(const CGL::CArray &v, const QString& mes) const
+void FEM::colorize(const CArray &v, const QString& mes) const
 {
     if (static_cast<int>(v.size()) != vertexes.length()) {
         colors.resize(0);
@@ -448,10 +448,10 @@ void FEM::colorize(const CGL::CArray &v, const QString& mes) const
     colorizeFromArray(v);
 }
 
-void FEM::colorizeFromArray(const CGL::CArray& v) const
+void FEM::colorizeFromArray(const CArray& v) const
 {
 
-    CGL::RealRange range(v.estimateRange());
+    RealRange range(v.estimateRange());
 
     range.flatProof();
 
@@ -463,7 +463,7 @@ void FEM::colorizeFromArray(const CGL::CArray& v) const
 
     colors.resize(v.size() * 3);
     CGL::Colors::iterator i(colors.begin());
-    for (CGL::CArray::const_iterator it(v.begin()), end(v.end()); it != end; ++it)
+    for (CArray::const_iterator it(v.begin()), end(v.end()); it != end; ++it)
     {
         const float z(*it - minV);
         unsigned char r, g, b;
@@ -489,7 +489,7 @@ void FEM::colorizeFromArray(const CGL::CArray& v) const
     }
 }
 
-void FEM::colorizeElements(const CGL::CArray &v, const QString& mes) const
+void FEM::colorizeElements(const CArray &v, const QString& mes) const
 {
     if (v.size() != static_cast<size_t>(trace.size())) {
         return;
@@ -498,8 +498,8 @@ void FEM::colorizeElements(const CGL::CArray &v, const QString& mes) const
 
     colorizeFromArray(v);
 }
-CGL::CArray FEM::extractElasticityModulus() {
-    CGL::CArray elasticyModulus(static_cast<int>(trace.size()));
+CArray FEM::extractElasticityModulus() {
+    CArray elasticyModulus(static_cast<int>(trace.size()));
 
     for (int i = 0; i != elasticyModulus.size(); ++i) {
         if (trace.at(i)) {
@@ -517,7 +517,7 @@ void FEM::colorize(const CGL::CVertexes &v, const QString& mes) const
 {
     measurment = mes;
 
-    CGL::RealRange range(v.estimateRange().flatProof());
+    RealRange range(v.estimateRange().flatProof());
 
     const float height(range.range());
     const float heightp2(height / 2.0f);
@@ -851,12 +851,12 @@ std::vector<int> FEM::truncationIndexVector(const FEM& a, const FEM& b)
 }
 
 
-void FEM::layToBDF(const QString& source, const QString& dest, const CGL::CArray& dE, const int difference)
+void FEM::layToBDF(const QString& source, const QString& dest, const CArray& dE, const int difference)
 {
     Materials newMat;
     newMat.resize(difference, materials.at(1));
 
-    std::map<CGL::CArray::value_type, int> find;
+    std::map<CArray::value_type, int> find;
 
     int k(0);
     for (int i(0); i != dE.size(); ++i) {
@@ -986,27 +986,26 @@ void FEM::layToBDF(const QString& source, const QString& dest, const CGL::CArray
     result.write(begin);
 }
 
-FEM FEM::truncation(const FEM& a, const FEM& b) {
+FEM* FEM::truncation(const FEM& a, const FEM& b) {
     //make copy from the second mech form geometry
-    FEM result;
+    FEM* result = new FEM;
 
-    CGL::CVertexes vertexes;
-    result.trace = b.trace;
-    result.sqre = b.sqre;
-    result.isTraced = b.isTraced;
-    result.markedNodes = b.markedNodes;
-    result.name = "truncated(" + a.name + " x " + b.name + ")";
-    result.shells = b.shells;
-    result.materials = b.materials;
-    result.UNVTransformations = b.UNVTransformations;
+    result->trace = b.trace;
+    result->sqre = b.sqre;
+    result->isTraced = b.isTraced;
+    result->markedNodes = b.markedNodes;
+    result->name = "truncated(" + a.name + " x " + b.name + ")";
+    result->shells = b.shells;
+    result->materials = b.materials;
+    result->UNVTransformations = b.UNVTransformations;
 
-    result.file = result.modes.file = "truncated";
+    result->file = result->modes.file = "truncated";
     //select vertexes in  the first mech form which will be associate with the second mech form
     std::vector<int> interrelations(FEM::truncationIndexVector(a, b));
     //and now just copy the form values from theory
     // a.form.size()
-    result.modes.resize(a.modes.size());
-    EigenModes::iterator receiver(result.modes.begin());
+    result->modes.resize(a.modes.size());
+    EigenModes::iterator receiver(result->modes.begin());
     for (EigenModes::const_iterator source(a.modes.begin()), end(a.modes.end()); source != end; ++source, ++receiver) {
         receiver->setFrequency(source->frequency());
         const CGL::CVertexes& theoryForm(source->form());
@@ -1020,7 +1019,7 @@ FEM FEM::truncation(const FEM& a, const FEM& b) {
         receiver->updatePreMac();
     }
 
-    result.modes.estimateMAC();
+    result->modes.estimateMAC();
 
     return result;
 }
