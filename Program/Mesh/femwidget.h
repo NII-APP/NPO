@@ -72,6 +72,7 @@ public:
 
 class FEMWidget::AnimationOptions
 {
+///@todo introduce QSharedData inheritance
     float magnitude;
     float frequency;//hz
     QTime initialTime;

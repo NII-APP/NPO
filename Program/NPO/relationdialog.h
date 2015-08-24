@@ -41,7 +41,7 @@ class RelationDialog : public QWidget
     QPoint source;
     QPoint tracking;
 
-    void bildLabels(Labels&, FEM &);
+    void buildLabels(Labels&, FEM &);
     void renderLabels();
 
     void resizeEvent(QResizeEvent *);

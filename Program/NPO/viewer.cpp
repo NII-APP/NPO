@@ -105,7 +105,7 @@ void Viewer::addModel() {
     }
 }
 
-void Viewer::setMesh(const Mesh *g) {
+void Viewer::setMesh(const FEM *g) {
     if (geometryWidget) {
         geometryWidget->setData(g);
     } else {

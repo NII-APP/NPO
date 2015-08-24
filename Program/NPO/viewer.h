@@ -42,7 +42,7 @@ public slots:
     void addModel();
     void resetListView();
     void setMode(int);
-    void setMesh(const Mesh *g);
+    void setMesh(const FEM *g);
 private slots:
     void listPatrol(QModelIndex);
 };

@@ -28,8 +28,8 @@ void RelationDialog::setPair(MeshPair* p) {
 
     this->setContentsMargins(10, 0, 10, 0);
 
-    bildLabels(leftL, *pair->theory());
-    bildLabels(rightL, *pair->practic());
+    buildLabels(leftL, *pair->theory());
+    buildLabels(rightL, *pair->practic());
 
     foreach (QLabel* l, leftL)
         l->resize(maxW, l->height());

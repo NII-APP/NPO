@@ -5,6 +5,7 @@ binaries**/
 **.f06
 **.unv
 *.txt
-*.pro
 *.psd
+/*.pro
+WidgetSplitter/
 obsolete/
