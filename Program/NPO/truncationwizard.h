@@ -44,13 +44,13 @@ class TruncationWizard::Preview : public QWidget {
     Q_OBJECT
 
     QComboBox* selector;
-    Viewer* screen;
+    ViewerTab* screen;
     std::vector<FEM* const> meshes;
 public:
     Preview(Qt::ToolBarArea area, QWidget* parent = 0)
         : QWidget(parent)
         , selector(new QComboBox(this))
-        , screen(new Viewer(this, Viewer::MeshPane | Viewer::FormSpinner | Viewer::AnimationPane))
+        , screen(new ViewerTab(this))
     {
         this->setLayout(new QVBoxLayout);
         foreach (FEM* const g, Application::project()->modelsList()) {

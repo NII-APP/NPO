@@ -39,7 +39,7 @@
     "tab pair rus" : "Модальные пары",
     "tab pair icon" : ":/media/images/pair.png",
     "geometries model add rus" : "Добавить модель . . .",
-    "geometries model add eng" : "Add mesh . . .",
+    "geometries model add eng" : "Add FEM . . .",
     "geometry widget no data image" : ":/media/images/hill.png",
     "form selector label eng" : "Mode",
     "form selector label rus" : "Форма",
@@ -104,5 +104,17 @@
         "parsing eng" : "Parsing...",
         "transmit rus" : "Передача данных...",
         "transmit eng" : "Transmit the data..."
+    },
+    "viewer model" : {
+    	"mac rus" : "МАК",
+    	"mac eng" : "MAC",
+    	"vertexes rus" : "Узлы (%1)",
+    	"vertexes eng" : "Nodes (%1)",
+    	"modes rus" : "Собственные формы (%1)",
+    	"modes eng" : "Eigen modes (%1)",
+    	"import rus" : "Импортировать собственные формы...",
+    	"import eng" : "Import eigen modes...",
+    	"identification rus" : "Идентифицировать собственные формы...",
+    	"identification eng" : "Eigen modes import..."
     }
 }

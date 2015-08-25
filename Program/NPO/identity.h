@@ -12,14 +12,17 @@
 #include <QList>
 #include <QMessageBox>
 
+#include "viewermodel.h"
+
 class Identity
 {
 public:
     typedef QPair<QObject*, const char*> Acceptor;
     typedef QMultiMap<QString, Acceptor> Relations;
 private:
-    QWidget* topLavelParent;
     const QJsonObject configuration;
+    const QJsonObject viewerModel;
+    QWidget* topLavelParent;
 
     static const QJsonObject readConfig();
     QJsonValue at(const QString&) const;
@@ -51,6 +54,8 @@ public:
     QString choseProjectFile() const;
     QString choseSaveFile() const;
     QMessageBox::StandardButton choseIsSaveQuestion() const;
+
+    QString vieverModelValues(ViewerModel::ModelRow v, int n = 0) const;
 
     void messageCantStartPython() const;
     void messageCantOpen(const QString &fName) const;

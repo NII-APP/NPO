@@ -77,14 +77,14 @@ void RelationDialog::bgUpdate()
     }
 }
 
-void RelationDialog::popupConfig(QFrame*& p, Viewer *&f, const FEM &v)
+void RelationDialog::popupConfig(QFrame*& p, ViewerTab *&f, const FEM &v)
 {
     p = new QFrame(this, Qt::Popup);
     p->setContentsMargins(0,0,0,0);
     p->setFrameStyle(QFrame::Plain | QFrame::StyledPanel);
     p->setLineWidth(1);
     p->setFixedSize(maxW, maxW);
-    f = new Viewer(p, Viewer::MeshPane);
+    f = new ViewerTab(p);
     f->setMesh(&v);
     p->setLayout(new QHBoxLayout(p));
     p->layout()->setMargin(0);

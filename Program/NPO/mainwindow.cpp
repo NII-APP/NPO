@@ -1,22 +1,23 @@
 #include "mainwindow.h"
-#include "viewer.h"
-#include "application.h"
-#include <QMenuBar>
-#include "identity.h"
-#include "project.h"
-#include <QMessageBox>
-#include <QTabWidget>
-#include "truncationtab.h"
-#include "maintabbar.h"
-#include <QDir>
-#include <QFileDevice>
-
 #include <QVBoxLayout>
 #include <QTimer>
 #include <QFrame>
 #include <QLabel>
 #include <QDebug>
 #include <QBoxLayout>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QTabWidget>
+#include <QDir>
+#include <QFileDevice>
+#include "application.h"
+#include "identity.h"
+#include "project.h"
+#include "viewertab.h"
+#include "truncationtab.h"
+#include "maintabbar.h"
+#include "viewertab.h"
+
 
 namespace {
 class Status : public QFrame {
@@ -91,10 +92,10 @@ void MainWindow::statusInsertBefore(QWidget* which, QWidget* before) {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     this->setCentralWidget(new TabWidget(this));
-    Viewer* cnt;
+    ViewerTab* cnt;
     static_cast<TabWidget*>(centralWidget())->setTabBar(new MainTabBar(this->centralWidget()));
     static_cast<QTabWidget*>(centralWidget())->setTabPosition(QTabWidget::West);
-    static_cast<QTabWidget*>(centralWidget())->addTab(cnt = new Viewer(this),
+    static_cast<QTabWidget*>(centralWidget())->addTab(cnt = new ViewerTab(this),
                     Application::identity()->tabViewIcon(), Application::identity()->tabView());
     static_cast<QTabWidget*>(centralWidget())->addTab(new TruncationTab(this),
                     Application::identity()->tabPairIcon(), Application::identity()->tabPair());

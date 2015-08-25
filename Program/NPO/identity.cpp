@@ -13,11 +13,13 @@
 #ifdef PyBDF
 #include "BDFEntity.h"
 #endif
+#include "viewermodel.h"
 
 const unsigned Identity::PROGRAM_VERSION = 2;
 
 Identity::Identity()
     : configuration(readConfig())
+    , viewerModel(configuration["viewer model"].toObject())
     , topLavelParent(0)
 {
     Q_ASSERT(!language().isEmpty());
@@ -239,6 +241,21 @@ QString Identity::execSaveFileNameDialog(const QJsonObject& config) const {
         caption = config["caption " + language()].toString();
     }
     return QFileDialog::getSaveFileName(QApplication::topLevelWidgets().first(), caption, QString(), filter);
+}
+
+QString Identity::vieverModelValues(ViewerModel::ModelRow v, int n) const {
+    switch (v) {
+    case ViewerModel::Vertexes:
+        return viewerModel["vertexes " + language()].toString().arg(n);
+    case ViewerModel::Modes:
+        return viewerModel["modes " + language()].toString().arg(n);
+    case ViewerModel::ImportModes:
+        return viewerModel["import " + language()].toString().arg(n);
+    case ViewerModel::ModesIdentification:
+        return viewerModel["identification " + language()].toString().arg(n);
+    case ViewerModel::MAC:
+        return viewerModel["mac " + language()].toString().arg(n);
+    }
 }
 
 Identity::~Identity()

@@ -38,10 +38,11 @@ SOURCES += main.cpp \
     project.cpp \
     mainwindow.cpp \
     geometriesmodel.cpp \
-    viewer.cpp \
     truncationtab.cpp \
     truncationwizard.cpp \
-    maintabbar.cpp
+    maintabbar.cpp \
+    viewertab.cpp \
+    viewermodel.cpp
 
 HEADERS += \
     relationdialog.h \
@@ -52,10 +53,11 @@ HEADERS += \
     project.h \
     mainwindow.h \
     geometriesmodel.h \
-    viewer.h \
     truncationtab.h \
     truncationwizard.h \
-    maintabbar.h
+    maintabbar.h \
+    viewertab.h \
+    viewermodel.h
 
 exists( engine/pyParse/BDFEntity.cpp ) {
     message( "Configuring with new parser" )
