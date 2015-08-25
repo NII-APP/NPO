@@ -6,7 +6,7 @@
 #include "cdimensionarray.h"
 #include "cdimensioninterval.h"
 #include <QDir>
-
+#include <femwidget.h>
 
 int main(int argc, char *argv[])
 {

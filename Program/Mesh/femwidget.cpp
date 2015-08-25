@@ -85,8 +85,8 @@ void FEMWidget::paintCGL()
 {
     QTime now(QTime::currentTime());
 #ifndef NDEBUG
-    float k(static_cast<GLfloat>(meshes.first()->fem()->getBox().size() / 10.0f * meshes.first()->getCurrentDefoultMagnitude() * animation->now(now)));
     if (!meshes.isEmpty() && currentMode >= 0) {
+        float k(static_cast<GLfloat>(meshes.first()->fem()->getBox().size() / 10.0f * meshes.first()->getCurrentDefoultMagnitude() * animation->now(now)));
         const CGL::CVertexes& f(meshes.first()->fem()->getModes()[currentMode].form());
         CParallelepiped p(f(0));
         for (int i(0); i != f.length();++i) {
@@ -121,7 +121,7 @@ FEMWidget::MeshBuffer::MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader,
     vertex.bind();
     vertex.allocate(vertexSize + colorsSize + vertexSize);
     vertex.write(0, static_cast<const void*>(data->getNodes().data()), vertexSize);
-    vertex.write(vertexSize, static_cast<const void*>(data->getColors().data()), data->getColors().size());
+    vertex.write(vertexSize, static_cast<const void*>(data->getColors().data()), static_cast<int>(data->getColors().size()));
     shader->setAttributeBuffer("in_Position", GL_FLOAT, 0, 3);
     shader->enableAttributeArray("in_Position");
 
@@ -166,7 +166,7 @@ void FEMWidget::MeshBuffer::uploadMode() {
 void FEMWidget::MeshBuffer::uploadColors() {
     array->bind();
     vertex.bind();
-    vertex.write(vertexSize, static_cast<const void*>(self->getColors().data()), self->getColors().size() * sizeof(char));
+    vertex.write(vertexSize, static_cast<const void*>(self->getColors().data()), static_cast<int>(self->getColors().size() * sizeof(char)));
     array->release();
 }
 void FEMWidget::MeshBuffer::uploadVertexes() {
