@@ -11,6 +11,8 @@
 
 class FEMWidget : public CGLWidget
 {
+    Q_OBJECT
+
     class MeshBuffer;
 public:
     class AnimationOptions;
@@ -41,7 +43,12 @@ public:
 
     void reloadColors(const FEM* forWho);
 public slots:
-    void setMode(const int);
+    void setMode(int);
+    void setMagnitude(double);
+    void setFrequency(double);
+    void stop();
+    void pause();
+    void play();
 };
 
 class FEMWidget::MeshBuffer : public QObject

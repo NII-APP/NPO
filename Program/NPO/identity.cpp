@@ -3,6 +3,7 @@
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QFile>
+#include <QSvgRenderer>
 #include "application.h"
 #ifndef QT_NO_DEBUG
 #include <QDebug>
@@ -10,6 +11,7 @@
 #include <QJsonArray>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QPainter>
 #ifdef PyBDF
 #include "BDFEntity.h"
 #endif
@@ -261,5 +263,14 @@ QString Identity::vieverModelValues(ViewerModel::ModelRow v, int n) const {
 Identity::~Identity()
 {
 
+}
+
+QIcon Identity::fromSvg(const QString& fname) {
+    QSvgRenderer svgRenderer(fname);
+    QPixmap pix(svgRenderer.defaultSize());
+    pix.fill(Qt::transparent);
+    QPainter pixPainter( &pix );
+    svgRenderer.render(&pixPainter);
+    return QIcon(pix);
 }
 

@@ -1,17 +1,20 @@
 #ifndef FEMVIEWERFREQUENCYINPUT_H
 #define FEMVIEWERFREQUENCYINPUT_H
 
-#include <QWidget>
+#include "femviewer.h"
 #include <cscale.h>
+#include <QFrame>
 
 class QDoubleSpinBox;
 class QSlider;
 
-class FEMViewerFrequencyInput : public QWidget {
+class FEMViewer::FEMViewerFrequencyInput : public QFrame {
     Q_OBJECT
+
+    void changeEvent(QEvent * e);
 public:
     typedef CScale<int, double> ToRealScale;
-    explicit FEMViewerFrequencyInput(QWidget* parent = 0);
+    explicit FEMViewer::FEMViewerFrequencyInput(QWidget* parent = 0);
 signals:
     void valueChanged(double val);
 public slots:

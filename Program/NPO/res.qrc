@@ -10,8 +10,11 @@
         <file>images/view.png</file>
         <file>images/pair.png</file>
         <file>images/busy.gif</file>
+        <file>images/pause-512px.svg</file>
+        <file>images/play-512px.svg</file>
+        <file>images/stop-512px.svg</file>
     </qresource>
-    <qresource lang="css" prefix="/css">
+    <qresource prefix="/css" lang="css">
         <file>css.css</file>
     </qresource>
     <qresource prefix="/json">

@@ -5,22 +5,39 @@
 
 class QToolBar;
 class FEMWidget;
+class FEM;
+class QAction;
 
 class FEMViewer : public QWidget
 {
     Q_OBJECT
 
+    class FEMViewerModeInput;
+    class FEMViewerFrequencyInput;
+    class FEMViewerMagnitudeInput;
+
     FEMWidget* const femWidget;
     QToolBar* const toolbox;
+    FEMViewerModeInput* const mode;
+    FEMViewerFrequencyInput* const frequency;
+    FEMViewerMagnitudeInput* const magnitude;
+    QList<QAction*> animationActions;
 
     bool eventFilter(QObject *, QEvent *);
 
     void resizeEvent(QResizeEvent*);
     void leaveEvent(QEvent *);
+
+    void paintEvent(QPaintEvent *);
+
+    QSize sizeHint() const;
 public:
     struct FEMViewerState;
 
     FEMViewer(QWidget* parent = 0);
+
+    void setModel(const FEM*) const;
+    const FEM* getModel() const;
 
 signals:
 

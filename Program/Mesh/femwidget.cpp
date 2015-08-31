@@ -133,11 +133,31 @@ FEMWidget::MeshBuffer::MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader,
     array->release();
 }
 
-void FEMWidget::setMode(const int m) {
+void FEMWidget::setMode(int m) {
     currentMode = m;
     for (MeshBuffer* mesh : meshes) {
         mesh->setCurrentMode(m);
     }
+}
+
+void FEMWidget::setMagnitude(double v) {
+    animation->setMagnitude(v);
+}
+
+void FEMWidget::setFrequency(double v) {
+    animation->setFrequency(v);
+}
+
+void FEMWidget::stop() {
+
+}
+
+void FEMWidget::pause() {
+
+}
+
+void FEMWidget::play() {
+
 }
 
 void FEMWidget::MeshBuffer::setCurrentMode(int form) {

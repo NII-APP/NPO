@@ -1,44 +1,63 @@
-#include "femviewerfrequencyinput.h"
+#include "FEMViewerFrequencyInput.h"
 #include <QDoubleSpinBox>
 #include <QSlider>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QEvent>
 
-const FEMViewerFrequencyInput::ToRealScale FEMViewerFrequencyInput::SLIDER_SCALE =
-        FEMViewerFrequencyInput::ToRealScale(FEMViewerFrequencyInput::ToRealScale::InRange(0, 99),
-                                             FEMViewerFrequencyInput::ToRealScale::OutRange(0.2, 5.0));
+const FEMViewer::FEMViewerFrequencyInput::ToRealScale FEMViewer::FEMViewerFrequencyInput::SLIDER_SCALE =
+        FEMViewer::FEMViewerFrequencyInput::ToRealScale(FEMViewer::FEMViewerFrequencyInput::ToRealScale::InRange(0, 10000),
+                                             FEMViewer::FEMViewerFrequencyInput::ToRealScale::OutRange(0.2, 5.0));
 
-FEMViewerFrequencyInput::FEMViewerFrequencyInput(QWidget* parent)
-    : QWidget(parent)
+FEMViewer::FEMViewerFrequencyInput::FEMViewerFrequencyInput(QWidget* parent)
+    : QFrame(parent)
     , numeric(new QDoubleSpinBox(this))
     , slider(new QSlider(Qt::Horizontal, this)) {
     this->setLayout(new QHBoxLayout(this));
-    this->layout()->addWidget(new QLabel(this->parent()->tr("Frequency"), this));
+    this->layout()->addWidget(new QLabel(this->parent()->parent()->tr("Frequency"), this));
     this->layout()->addWidget(slider);
     this->layout()->addWidget(numeric);
     numeric->setMinimum(SLIDER_SCALE.getRange().getMin());
-    numeric->setMaximum(SLIDER_SCALE.getRange().getMax());
+    numeric->setMaximum(SLIDER_SCALE.getRange().getMax() * 3);
+    slider->setSingleStep(1);
+    slider->setMinimum(SLIDER_SCALE.getDomain().getMin());
+    slider->setMaximum(SLIDER_SCALE.getDomain().getMax());
+    numeric->setSingleStep(0.01);
     connect(slider, SIGNAL(valueChanged(int)), SLOT(holdSlider(int)));
     connect(numeric, SIGNAL(valueChanged(double)), SLOT(holdSpinner(double)));
+    this->setEnabled(false);
 }
 
-void FEMViewerFrequencyInput::setValue(double v) {
+void FEMViewer::FEMViewerFrequencyInput::setValue(double v) {
     numeric->setValue(v);
 }
 
-void FEMViewerFrequencyInput::holdSlider(int v) {
-    qDebug() << "slider" << SLIDER_SCALE(v) << numeric->value() << v << SLIDER_SCALE;
+void FEMViewer::FEMViewerFrequencyInput::holdSlider(int v) {
     if (SLIDER_SCALE(v) != numeric->value()) {
+        numeric->blockSignals(true);
         numeric->setValue(SLIDER_SCALE(v));
+        numeric->blockSignals(false);
         emit valueChanged(SLIDER_SCALE(v));
     }
 }
 
-void FEMViewerFrequencyInput::holdSpinner(double v) {
-    qDebug() << "spinner" << SLIDER_SCALE[v] << numeric->value() << SLIDER_SCALE;
+void FEMViewer::FEMViewerFrequencyInput::holdSpinner(double v) {
     if (SLIDER_SCALE[v] != slider->value()) {
+        slider->blockSignals(true);
         slider->setValue(SLIDER_SCALE[v]);
+        slider->blockSignals(false);
         emit valueChanged(v);
+    }
+}
+
+
+void FEMViewer::FEMViewerFrequencyInput::changeEvent(QEvent * e) {
+    if (e->type() == QEvent::EnabledChange) {
+        for (auto& i : this->children()) {
+            if (dynamic_cast<QWidget*>(i)) {
+                static_cast<QWidget*>(i)->setEnabled(this->isEnabled());
+            }
+        }
     }
 }
 

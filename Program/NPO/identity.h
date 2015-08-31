@@ -64,6 +64,8 @@ public:
 
     QString menuFileName() const;
     QList<QAction*> menuFileActions(QObject* parent, const Relations& = Relations()) const;
+
+    static QIcon fromSvg(const QString& fname);
 };
 
 #endif // IDENTITY_H

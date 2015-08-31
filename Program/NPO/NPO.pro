@@ -5,7 +5,7 @@
 #
 #-------------------------------------------------
 
-QT       += core opengl gui
+QT       += core opengl gui svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -44,7 +44,9 @@ SOURCES += main.cpp \
     viewermodel.cpp \
     viewerview.cpp \
     femviewer.cpp \
-    femviewerfrequencyinput.cpp
+    femviewerfrequencyinput.cpp \
+    femviewermodeinput.cpp \
+    femviewermagnitudeinput.cpp
 
 HEADERS += \
     relationdialog.h \
@@ -61,7 +63,9 @@ HEADERS += \
     viewermodel.h \
     viewerview.h \
     femviewer.h \
-    femviewerfrequencyinput.h
+    femviewerfrequencyinput.h \
+    femviewermodeinput.h \
+    femviewermagnitudeinput.h
 
 exists( engine/pyParse/BDFEntity.cpp ) {
     message( "Configuring with new parser" )
