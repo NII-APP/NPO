@@ -1,22 +1,35 @@
 #ifndef FEMVIEWER_H
 #define FEMVIEWER_H
 
-#include <femwidget.h>
-#include <QToolBox>
+#include <QWidget>
 
-class FEMViewer : public FEMWidget
+class QToolBar;
+class FEMWidget;
+
+class FEMViewer : public QWidget
 {
-    QToolBox* const toolbox;
+    Q_OBJECT
 
-    void resizeCGL(int, int);
-    void mouseMoveEvent(QMouseEvent *);
+    FEMWidget* const femWidget;
+    QToolBar* const toolbox;
+
+    bool eventFilter(QObject *, QEvent *);
+
+    void resizeEvent(QResizeEvent*);
     void leaveEvent(QEvent *);
 public:
+    struct FEMViewerState;
+
     FEMViewer(QWidget* parent = 0);
 
 signals:
 
 public slots:
 };
+
+struct FEMViewerState {
+
+};
+
 
 #endif // FEMVIEWER_H

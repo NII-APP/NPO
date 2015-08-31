@@ -7,6 +7,7 @@
 #include "cdimensioninterval.h"
 #include <QDir>
 #include <femwidget.h>
+#include "femviewer.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,9 +19,11 @@ int main(int argc, char *argv[])
     fmt.setSamples(2);
     QGLFormat::setDefaultFormat(fmt);
 
-    MainWindow window;
+    /*MainWindow window;
+    window.showMaximized();*/
+    FEMViewer window;
     window.showMaximized();
 
-    a.setMainWindow(&window);
+    //a.setMainWindow(&window);
     return a.exec();
 }

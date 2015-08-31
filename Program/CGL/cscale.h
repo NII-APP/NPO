@@ -2,8 +2,6 @@
 #define CSCALE_H
 #include "crange.h"
 
-namespace CGL {
-
 template <typename In, typename Out>
 class CScale
 {
@@ -21,9 +19,9 @@ public:
     ~CScale() {}
 
     //direct transformation
-    virtual Out operator ()(const In& op) const { return range.getMin() + (op - domain.getMin()) / domain.range() * range.range(); }
+    virtual Out operator ()(const In& op) const { return range.getMin() + (op - domain.getMin()) * range.range() / domain.range(); }
     //reverse transformation
-    virtual In operator [](const Out& op) const { return domain.getMin() + (op - range.getMin()) / range.range() * domain.range(); }
+    virtual In operator [](const Out& op) const { return domain.getMin() + (op - range.getMin()) * domain.range() / range.range(); }
 
     const OutRange& getRange() const { return range; }
     const InRange& getDomain() const { return domain; }
@@ -31,8 +29,12 @@ public:
     void setDomain(const InRange& v) { domain = v; }
 };
 
+template <typename T1, typename T2>
+QDebug operator<<(QDebug out, CScale<T1, T2> s) {
+    return out << "CScale{ in" << s.getDomain() << ", out" << s.getRange() << "}";
+}
+
 typedef CScale<qreal, qreal> RealScale;
 
-}
 
 #endif // CSCALE_H
