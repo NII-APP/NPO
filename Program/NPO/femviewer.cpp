@@ -23,6 +23,10 @@ FEMViewer::FEMViewer(QWidget* parent)
     , mode(new FEMViewerModeInput(this, toolbox))
     , frequency(new FEMViewerFrequencyInput(toolbox))
     , magnitude(new FEMViewerMagnitudeInput(toolbox))
+    , pause(Identity::fromSvg(":/media/images/pause-512px.svg"))
+    , play(Identity::fromSvg(":/media/images/play-512px.svg"))
+    , run(new QAction(pause, tr("pause"),toolbox))
+    , stop(new QAction(Identity::fromSvg(":/media/images/stop-512px.svg"), tr("pause"),toolbox))
 {
     femWidget->setVisible(false);
     femWidget->move(0,0);
@@ -34,12 +38,16 @@ FEMViewer::FEMViewer(QWidget* parent)
     toolbox->setVisible(false);
     toolbox->layout()->setMargin(0);
 
+    magnitude->setValue(femWidget->getAnimationOptions()->getMagnitude());
     connect(magnitude, SIGNAL(valueChanged(double)), femWidget, SLOT(setMagnitude(double)));
+    connect(femWidget, SIGNAL(magnitudeChanged(double)), magnitude, SLOT(setValue(double)));
     toolbox->addWidget(magnitude);
 
     toolbox->addSeparator();
 
+    frequency->setValue(femWidget->getAnimationOptions()->getFrequency());
     connect(frequency, SIGNAL(valueChanged(double)), femWidget, SLOT(setFrequency(double)));
+    connect(femWidget, SIGNAL(frequencyChanged(double)), frequency, SLOT(setValue(double)));
     toolbox->addWidget(frequency);
 
     toolbox->addSeparator();
@@ -49,14 +57,28 @@ FEMViewer::FEMViewer(QWidget* parent)
 
     toolbox->addSeparator();
 
-    animationActions << toolbox->addAction(Identity::fromSvg(QString(":/media/images/play-512px.svg")), tr("play"), femWidget, SLOT(play()));
-    animationActions << toolbox->addAction(Identity::fromSvg(QString(":/media/images/pause-512px.svg")), tr("pause"), femWidget, SLOT(pause()));
-    animationActions << toolbox->addAction(Identity::fromSvg(QString(":/media/images/stop-512px.svg")), tr("stop"), femWidget, SLOT(stop()));
-    for (QAction* i: animationActions) {
-        i->setDisabled(true);
-    }
+    stop->setCheckable(true);
+    run->setDisabled(true);
+    stop->setDisabled(true);
+    toolbox->addActions(QList<QAction*>() << run << stop);
+    this->connect(run, SIGNAL(triggered(bool)), SLOT(runTrigger()));
+    this->connect(stop, SIGNAL(toggled(bool)), SLOT(stopTrigger(bool)));
 
     toolbox->adjustSize();
+}
+
+void FEMViewer::runTrigger() {
+    if (femWidget->getAnimationOptions()->isPaused()) {
+        femWidget->getAnimationOptions()->play();
+        run->setIcon(pause);
+    } else {
+        femWidget->getAnimationOptions()->pause();
+        run->setIcon(play);
+    }
+}
+
+void FEMViewer::stopTrigger(bool v) {
+    femWidget->getAnimationOptions()->setMagnitude(1.0f * !v);
 }
 
 QSize FEMViewer::sizeHint() const {
@@ -94,10 +116,8 @@ void FEMViewer::setModel(const FEM* m) const {
     mode->updateValueBounds();
     frequency->setEnabled(m && !m->getModes().empty());
     magnitude->setEnabled(m && !m->getModes().empty());
-    for (QAction* i: animationActions) {
-        i->setDisabled(m && !m->getModes().empty());
-    }
-
+    run->setEnabled(m && !m->getModes().empty());
+    stop->setEnabled(m && !m->getModes().empty());
 }
 
 const FEM* FEMViewer::getModel() const {

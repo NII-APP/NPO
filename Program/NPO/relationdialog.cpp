@@ -85,7 +85,7 @@ void RelationDialog::popupConfig(QFrame*& p, ViewerTab *&f, const FEM &v)
     p->setLineWidth(1);
     p->setFixedSize(maxW, maxW);
     f = new ViewerTab(p);
-    f->setMesh(&v);
+    f->setModel(&v);
     p->setLayout(new QHBoxLayout(p));
     p->layout()->setMargin(0);
     p->layout()->addWidget(f);

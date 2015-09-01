@@ -7,10 +7,13 @@ class FEM;
 class FEMWidget;
 #include <QModelIndex>
 
+class FEMViewer;
+
 class ViewerTab : public QSplitter
 {
     Q_OBJECT
-    ViewerView* femView;
+    ViewerView* const femView;
+    FEMViewer* const femWidget;
 
 public:
     enum EnapledItems {
@@ -27,10 +30,10 @@ public:
 signals:
 
 public slots:
-    void addModel() {}
+    void addModel();
     void resetListView() {}
     void setMode(int) {}
-    void setMesh(const FEM *) {}
+    void setModel(const FEM *);
 private slots:
     void listPatrol(QModelIndex);
 };

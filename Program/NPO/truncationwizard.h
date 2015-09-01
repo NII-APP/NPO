@@ -86,7 +86,7 @@ private slots:
     void selectorPatrol()
     {
         FEM* c(current());
-        screen->setMesh(c);
+        screen->setModel(c);
         emit meshSelected(c);
 
         const Project::Models& m(Application::project()->modelsList());

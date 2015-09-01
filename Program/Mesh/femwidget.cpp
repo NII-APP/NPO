@@ -84,17 +84,6 @@ void FEMWidget::setData(const QList<const FEM *> &models)
 void FEMWidget::paintCGL()
 {
     QTime now(QTime::currentTime());
-#ifndef NDEBUG
-    if (!meshes.isEmpty() && currentMode >= 0) {
-        float k(static_cast<GLfloat>(meshes.first()->fem()->getBox().size() / 10.0f * meshes.first()->getCurrentDefoultMagnitude() * animation->now(now)));
-        const CGL::CVertexes& f(meshes.first()->fem()->getModes()[currentMode].form());
-        CParallelepiped p(f(0));
-        for (int i(0); i != f.length();++i) {
-            p.include(f(i) * k);
-        }
-        debugSpace(p + this->scene());
-    }
-#endif
     for (MeshBuffer* item : meshes) {
         item->bind();
         shader->setUniformValue("k", static_cast<GLfloat>(item->fem()->getBox().size() / 10.0f * item->getCurrentDefoultMagnitude() * animation->now(now)));
@@ -148,16 +137,12 @@ void FEMWidget::setFrequency(double v) {
     animation->setFrequency(v);
 }
 
-void FEMWidget::stop() {
-
-}
-
 void FEMWidget::pause() {
-
+    animation->pause();
 }
 
 void FEMWidget::play() {
-
+    animation->play();
 }
 
 void FEMWidget::MeshBuffer::setCurrentMode(int form) {
@@ -208,10 +193,12 @@ QList<const FEM *> FEMWidget::getData() const
 void FEMWidget::wheelEvent(QWheelEvent * e) {
     if (e->modifiers() & Qt::CTRL) {
         animation->multMagnitude(e->delta() > 0 ? 0.8 : 1.2);
+        magnitudeChanged(animation->getMagnitude());
         this->repaint();
     }
     if (e->modifiers() & Qt::ALT) {
         animation->multFrequency(e->delta() > 0 ? 0.8 : 1.2);
+        frequencyChanged(animation->getFrequency());
         this->repaint();
     }
     if (!(e->modifiers() & (Qt::ALT | Qt::CTRL))) {
@@ -224,6 +211,7 @@ FEMWidget::AnimationOptions::AnimationOptions(FEMWidget *parent)
     , frequency(1.0f)
     , initialTime(QTime::currentTime())
     , initialPhase(0.0f)
+    , pauseFrequency(std::numeric_limits<float>::quiet_NaN())
 {
     parents.push_back(parent);
 }

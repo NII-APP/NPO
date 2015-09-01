@@ -42,11 +42,13 @@ public:
     QList<const FEM*> getData() const;
 
     void reloadColors(const FEM* forWho);
+signals:
+    void magnitudeChanged(double);
+    void frequencyChanged(double);
 public slots:
     void setMode(int);
     void setMagnitude(double);
     void setFrequency(double);
-    void stop();
     void pause();
     void play();
 };
@@ -68,7 +70,7 @@ public:
     const FEM* fem() const { return self; }
     void setCurrentMode(int form);
     int getCurrentMode() const { return mode; }
-    float getCurrentDefoultMagnitude() const { return self->getModes().at(mode).defoultMagnitude(); }
+    float getCurrentDefoultMagnitude() const { try { return self->getModes().at(mode).defoultMagnitude(); } catch(...) { return 0.0f; } }
     double getDefaultMagnitude() const;
 
     void uploadMode();
@@ -85,6 +87,7 @@ class FEMWidget::AnimationOptions
     QTime initialTime;
     float initialPhase;
     QList<const FEMWidget*> parents;
+    float pauseFrequency;//store frequency before pausing
 
     static const float doublePi;
 public:
@@ -94,6 +97,22 @@ public:
     float getFrequency() const { return frequency; }
     void setMagnitude(float v) { magnitude = v; }
     void setFrequency(float v);
+    bool isPaused() const {
+        return pauseFrequency == pauseFrequency;
+    }
+
+    void pause() {
+        if (pauseFrequency != pauseFrequency) {
+            pauseFrequency = frequency;
+            setFrequency(0.0f);
+        }
+    }
+    void play() {
+        if (pauseFrequency == pauseFrequency) {
+            setFrequency(pauseFrequency);
+            pauseFrequency = std::numeric_limits<float>::quiet_NaN();
+        }
+    }
 
     void multMagnitude(float v) { setMagnitude(magnitude * v); }
     void multFrequency(float v) { setFrequency(frequency * v); }

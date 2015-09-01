@@ -19,11 +19,9 @@ int main(int argc, char *argv[])
     fmt.setSamples(2);
     QGLFormat::setDefaultFormat(fmt);
 
-    /*MainWindow window;
-    window.showMaximized();*/
-    FEMViewer window;
+    MainWindow window;
     window.showMaximized();
 
-    //a.setMainWindow(&window);
+    a.setMainWindow(&window);
     return a.exec();
 }
