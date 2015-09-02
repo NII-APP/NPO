@@ -5,7 +5,7 @@
 #include "application.h"
 #include "project.h"
 
-#define NO_VIEWERMODEL_DEBUG
+//#define NO_VIEWERMODEL_DEBUG
 
 ViewerModel::ViewerModel(Project * p, QObject* parent)
     : QAbstractItemModel(parent)
@@ -49,13 +49,20 @@ QModelIndex ViewerModel::index(int row, int column, const QModelIndex &parent) c
     qDebug() << "index" << row << parent;
 #endif
     if (isRootIndex(parent)) {
+#ifndef NO_VIEWERMODEL_DEBUG
+        qDebug() << "\ttopLevel" << createIndex(row, column, (quintptr)0);
+#endif
         //if it's a first-level item the number of model is a row
         return createIndex(row, column, (quintptr)0);
     }
     //innerId is the dark magic!
     //when it's a first level of model information it's just a model id + 1
     //when it's a second level of model information the first 4 bytes is a model index. second 4 bytes is a row of first information level
-    return createIndex(row, column, (parent.internalId() << 32) & (parent.row() + 1));
+#ifndef NO_VIEWERMODEL_DEBUG
+    qDebug() << "\tinner"
+             << static_cast<quintptr>(parent.internalId() << 32) << static_cast<quintptr>(parent.row() + 1);
+#endif
+    return createIndex(row, column, static_cast<quintptr>(parent.internalId() << 32) | static_cast<quintptr>(parent.row() + 1));
 }
 
 QModelIndex	ViewerModel::parent(const QModelIndex & index) const {
@@ -74,22 +81,37 @@ QModelIndex	ViewerModel::parent(const QModelIndex & index) const {
 int	ViewerModel::columnCount(const QModelIndex &) const { return 1; }
 int	ViewerModel::rowCount(const QModelIndex & i) const {
 #ifndef NO_VIEWERMODEL_DEBUG
-    qDebug() << "rowCount";
+    qDebug() << "rowCount" << i;
 #endif
     if (isRootIndex(i)) {
+#ifndef NO_VIEWERMODEL_DEBUG
+        qDebug() << "\troot" << static_cast<int>(__project->modelsList().size() + 1);
+#endif
         return static_cast<int>(__project->modelsList().size() + 1);
     }
     if (isTopIndex(i)) {
         try {
+#ifndef NO_VIEWERMODEL_DEBUG
+            qDebug() << "\ttop" <<  (__project->modelsList().at(i.row())->getModes().empty() ? WithoutModes : WithModes);
+#endif
             return __project->modelsList().at(i.row())->getModes().empty() ? WithoutModes : WithModes;
         } catch (...) {
+#ifndef NO_VIEWERMODEL_DEBUG
+            qDebug() << "\ttopReject";
+#endif
             return 0;
         }
     }
     switch (modelRole(i)) {
     case Modes:
+#ifndef NO_VIEWERMODEL_DEBUG
+            qDebug() << "\tmodes";
+#endif
         return static_cast<int>(__project->modelsList().at(modelId(i))->getModes().size());
     default:
+#ifndef NO_VIEWERMODEL_DEBUG
+            qDebug() << "\tenother";
+#endif
         return 0;
     }
 }
