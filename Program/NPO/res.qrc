@@ -13,8 +13,9 @@
         <file>images/pause-512px.svg</file>
         <file>images/play-512px.svg</file>
         <file>images/stop-512px.svg</file>
+        <file>images/list-add-512px.svg</file>
     </qresource>
-    <qresource prefix="/css" lang="css">
+    <qresource lang="css" prefix="/css">
         <file>css.css</file>
     </qresource>
     <qresource prefix="/json">

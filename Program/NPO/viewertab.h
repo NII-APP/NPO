@@ -31,11 +31,11 @@ signals:
 
 public slots:
     void addModel();
+    void addModes(int meshId);
     void resetListView() {}
-    void setMode(int) {}
+    void setMode(int);
     void setModel(const FEM *);
-private slots:
-    void listPatrol(QModelIndex);
+    void setModel(int id);
 };
 
 #endif // VIEWERTAB_H

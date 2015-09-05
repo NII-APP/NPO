@@ -21,6 +21,7 @@ public:
     int getValue() const;
     void setValue(int value);
     void updateValueBounds();
+    void updateValueBounds(int modesCount);
 signals:
     void valueChanged(int);
 

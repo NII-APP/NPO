@@ -23,13 +23,15 @@ private:
         WithModes = 3,
         WithoutModes = 4
     };
+public:
     static bool isRootIndex(const QModelIndex&);
     static bool isTopIndex(const QModelIndex&);
     static bool isInfoIndex(const QModelIndex&);
     ModelRow modelRole(const QModelIndex&) const;
+    ModelRow modelRole(const int row, const int model) const;
     static int modelId(const QModelIndex&);
+    static int toRow(ModelRow);
 
-public:
     ViewerModel(Project*, QObject* parent = 0);
 
     QModelIndex index(int row, int column, const QModelIndex &parent) const;

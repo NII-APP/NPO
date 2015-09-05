@@ -19,8 +19,12 @@ ViewerTab::ViewerTab(QWidget *parent)
 {
     femView->setModel(new ViewerModel(Application::project(), this));
     this->connect(femView, SIGNAL(addModelPressed()), SLOT(addModel()));
+    this->connect(femView, SIGNAL(currentModelChanged(int)), SLOT(setModel(int)));
+    this->connect(femView, SIGNAL(importModesPressed(int)), SLOT(addModes(int)));
+    this->connect(femView, SIGNAL(currentModeChanged(int, int)), SLOT(setMode(int)));
     this->addWidget(femView);
     this->addWidget(femWidget);
+    this->setSizes(QList<int>() << 200 << 1000);
 }
 
 ViewerTab::~ViewerTab()
@@ -44,4 +48,26 @@ void ViewerTab::setModel(const FEM* model) {
     femWidget->setModel(model);
 }
 
-void ViewerTab::listPatrol(QModelIndex) {}
+void ViewerTab::setModel(int id) {
+    qDebug() << "set model" << id;
+    try {
+        setModel(Application::project()->modelsList().at(id));
+    } catch(...) {
+        Q_ASSERT("setModel invalid id");
+    }
+}
+
+void ViewerTab::setMode(int v) {
+    femWidget->setMode(v);
+}
+
+void ViewerTab::addModes(int meshId) {
+    FEM* const fem(Application::project()->modelsList().at(meshId));
+    QString file(Application::identity()->choseModesFile());
+    if (!QFile::exists(file)) {
+        return;
+    }
+    fem->read(file);
+    femWidget->updateToolBar();
+    femView->reset();
+}

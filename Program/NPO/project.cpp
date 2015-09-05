@@ -51,7 +51,7 @@ void Project::save(const QString &filename)
     out << Identity::PROGRAM_VERSION;
     out << geometries.size();
     for (size_t i = 0; i < geometries.size(); ++i ){
-        out << geometries.at(i);
+        out << *geometries.at(i);
     }
     /// @todo save/load pairs
 #ifndef QT_NO_DEBUG
@@ -101,6 +101,7 @@ void Project::load(const QString &filename)
     geometries.clear();
     for (size_t i = 0; i < size; ++i) {
         FEM* g(new FEM);
+        qDebug() << "init fem reader";
         in >> *g;
         geometries.push_back(g);
     }

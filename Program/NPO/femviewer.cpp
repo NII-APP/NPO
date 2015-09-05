@@ -26,7 +26,7 @@ FEMViewer::FEMViewer(QWidget* parent)
     , pause(Identity::fromSvg(":/media/images/pause-512px.svg"))
     , play(Identity::fromSvg(":/media/images/play-512px.svg"))
     , run(new QAction(pause, tr("pause"),toolbox))
-    , stop(new QAction(Identity::fromSvg(":/media/images/stop-512px.svg"), tr("pause"),toolbox))
+    , stop(new QAction(Identity::fromSvg(":/media/images/stop-512px.svg"), tr("stop"),toolbox))
 {
     femWidget->setVisible(false);
     femWidget->move(0,0);
@@ -47,6 +47,7 @@ FEMViewer::FEMViewer(QWidget* parent)
 
     frequency->setValue(femWidget->getAnimationOptions()->getFrequency());
     connect(frequency, SIGNAL(valueChanged(double)), femWidget, SLOT(setFrequency(double)));
+    connect(frequency, SIGNAL(valueChanged(double)), this, SLOT(runEnable()));
     connect(femWidget, SIGNAL(frequencyChanged(double)), frequency, SLOT(setValue(double)));
     toolbox->addWidget(frequency);
 
@@ -70,15 +71,24 @@ FEMViewer::FEMViewer(QWidget* parent)
 void FEMViewer::runTrigger() {
     if (femWidget->getAnimationOptions()->isPaused()) {
         femWidget->getAnimationOptions()->play();
+        run->setText(tr("run"));
         run->setIcon(pause);
     } else {
         femWidget->getAnimationOptions()->pause();
+        run->setText(tr("pause"));
         run->setIcon(play);
+    }
+}
+void FEMViewer::runEnable() {
+    if (femWidget->getAnimationOptions()->isPaused()) {
+        femWidget->getAnimationOptions()->play();
+        run->setIcon(pause);
     }
 }
 
 void FEMViewer::stopTrigger(bool v) {
-    femWidget->getAnimationOptions()->setMagnitude(1.0f * !v);
+    run->setDisabled(v);
+    femWidget->getAnimationOptions()->setMagnitude(magnitude->getValue() * !v);
 }
 
 QSize FEMViewer::sizeHint() const {
@@ -111,13 +121,29 @@ void FEMViewer::paintEvent(QPaintEvent *) {
 }
 
 void FEMViewer::setModel(const FEM* m) const {
+    qDebug() << "setModel";
     femWidget->setVisible(m);
     femWidget->setData(m);
+    updateToolBar();
+
+    femWidget->resize(this->size());
+}
+
+void FEMViewer::setMode(const int m) {
+    femWidget->setMode(m);
+}
+
+void FEMViewer::updateToolBar() const {
+    qDebug() << "updateToolBar";
     mode->updateValueBounds();
-    frequency->setEnabled(m && !m->getModes().empty());
-    magnitude->setEnabled(m && !m->getModes().empty());
-    run->setEnabled(m && !m->getModes().empty());
-    stop->setEnabled(m && !m->getModes().empty());
+    bool isHaveModes(false);
+    for (const FEM* i : femWidget->getData()) {
+        isHaveModes = isHaveModes || (i && !i->getModes().empty());
+    }
+    frequency->setEnabled(isHaveModes);
+    magnitude->setEnabled(isHaveModes);
+    run->setEnabled(isHaveModes);
+    stop->setEnabled(isHaveModes);
 }
 
 const FEM* FEMViewer::getModel() const {

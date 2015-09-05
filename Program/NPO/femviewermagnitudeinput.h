@@ -16,6 +16,7 @@ class FEMViewer::FEMViewerMagnitudeInput : public QFrame
 public:
     explicit FEMViewer::FEMViewerMagnitudeInput(QWidget *parent = 0);
 
+    double getValue() const;
 signals:
     void valueChanged(double val);
 public slots:

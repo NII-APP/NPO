@@ -44,13 +44,16 @@ public:
 
     void setModel(const FEM*) const;
     const FEM* getModel() const;
+    void setMode(const int m);
 
 signals:
 
 public slots:
+    void updateToolBar() const;
 
 private slots:
     void runTrigger();
+    void runEnable();
     void stopTrigger(bool);
 };
 

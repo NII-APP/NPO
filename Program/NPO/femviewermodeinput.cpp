@@ -21,7 +21,7 @@ FEMViewer::FEMViewerModeInput::FEMViewerModeInput(FEMViewer *viewer, QWidget* pa
 
     this->connect(value, SIGNAL(valueChanged(int)), SLOT(holdValue(int)));
 
-    updateValueBounds();
+    updateValueBounds(0);
 }
 
 
@@ -39,13 +39,18 @@ void FEMViewer::FEMViewerModeInput::holdValue(int v) {
 }
 
 void FEMViewer::FEMViewerModeInput::updateValueBounds() {
-    if (static_cast<FEMViewer*>(this->parentViewer)->getModel() == nullptr || static_cast<FEMViewer*>(this->parentViewer)->getModel()->getModes().empty()) {
+    updateValueBounds(static_cast<int>(static_cast<FEMViewer*>(this->parentViewer)->getModel()->getModes().size()));
+}
+
+void FEMViewer::FEMViewerModeInput::updateValueBounds(int modesCount) {
+    if (modesCount <= 0) {
         this->setDisabled(true);
     } else {
         this->setDisabled(false);
         value->setMinimum(1);
-        value->setMaximum(static_cast<int>(static_cast<FEMViewer*>(this->parentViewer)->getModel()->getModes().size()));
+        value->setMaximum(modesCount);
     }
+
 }
 
 void FEMViewer::FEMViewerModeInput::changeEvent(QEvent * e) {

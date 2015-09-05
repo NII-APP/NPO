@@ -36,6 +36,10 @@ void FEMViewer::FEMViewerMagnitudeInput::changeEvent(QEvent * e) {
     }
 }
 
+double FEMViewer::FEMViewerMagnitudeInput::getValue() const {
+    return SLIDER_SCALE(slider->value());
+}
+
 void FEMViewer::FEMViewerMagnitudeInput::setValue(double val) {
     slider->setValue(SLIDER_SCALE[val]);
 }

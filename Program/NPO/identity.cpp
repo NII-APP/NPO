@@ -252,12 +252,13 @@ QString Identity::vieverModelValues(ViewerModel::ModelRow v, int n) const {
     case ViewerModel::Modes:
         return viewerModel["modes " + language()].toString().arg(n);
     case ViewerModel::ImportModes:
-        return viewerModel["import " + language()].toString().arg(n);
+        return viewerModel["import " + language()].toString();
     case ViewerModel::ModesIdentification:
-        return viewerModel["identification " + language()].toString().arg(n);
+        return viewerModel["identification " + language()].toString();
     case ViewerModel::MAC:
-        return viewerModel["mac " + language()].toString().arg(n);
+        return viewerModel["mac " + language()].toString();
     }
+    return "Something wrong";
 }
 
 Identity::~Identity()
