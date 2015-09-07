@@ -5,8 +5,9 @@
 #include <QGraphicsProxyWidget>
 #include <QOpenGLContext>
 #include <QSizeF>
-
-namespace CGL {
+#include <QEventLoop>
+#include "cdimensioninterval.h"
+#include "cdimensionarray.h"
 
 const QFont C2dChart::TITLE_FONT = QFont("Tahoma", 20);
 const QFont C2dChart::LABELS_FONT = QFont("Tahoma", 14);
@@ -151,4 +152,23 @@ void C2dChart::resizeEvent(QResizeEvent*) {
     yLabel->setPos(0, scene()->height() - margins.bottom() - chart->height() / 2.0 + yLabel->boundingRect().width() / 2.0);
 }
 
+
+void C2dChart::closeEvent(QCloseEvent *) {
+    emit closed();
+}
+
+
+void C2dChart::showArray(const CArray& m) {
+    C2dChart chart;
+    CChartData data;
+    data.push_back(new CDimensionInterval(CGL::CInterval(0.0, 1.0 * m.size() - 1.0, m.size())));
+    data.push_back(new CDimensionArray(m));
+    chart.setData(data);
+
+    QEventLoop* loop(new QEventLoop(&chart));
+    loop->connect(&chart, SIGNAL(closed()), SLOT(quit()));
+
+    chart.show();
+
+    loop->exec();
 }

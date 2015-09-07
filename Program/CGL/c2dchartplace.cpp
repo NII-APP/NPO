@@ -3,8 +3,6 @@
 #include <QVector3D>
 #include "cinterval.h"
 
-namespace CGL {
-
 C2dChartPlace::C2dChartPlace(QWidget* parent)
     : QGLWidget(parent)
     , viewPort(0.0, 0.0, 0.0, 0.0)
@@ -134,7 +132,7 @@ void C2dChartPlace::setData(const CChartData::ChartDataList& val)
         this->initializeGL();
     }
     int wholeSize(0);
-    for (CGL::CChartData item : val) {
+    for (CChartData item : val) {
         Q_ASSERT(item.size() >= 2);
         Q_ASSERT(item[0]->size() == item[0]->size());
         wholeSize += item[0]->size();
@@ -144,7 +142,7 @@ void C2dChartPlace::setData(const CChartData::ChartDataList& val)
     bariers.clear();
     bariers.push_back(0);
     viewPort = QRectF(QPointF(val[0][0]->operator[](0), val[0][1]->operator[](0)), QSizeF(0.0, 0.0));
-    for (CGL::CChartData item : val) {
+    for (CChartData item : val) {
         const CDimension& d1(*item[0]);
         const CDimension& d2(*item[1]);
 
@@ -200,7 +198,7 @@ qreal C2dChartPlace::viewStep(qreal range, int limOfSteps)
     return 0.0;
 }
 
-CInterval C2dChartPlace::gridInterval(int h, qreal l, qreal r) const
+CGL::CInterval C2dChartPlace::gridInterval(int h, qreal l, qreal r) const
 {
     const int steps(static_cast<int>(h / gridStep));
     if (steps <= 0) {
@@ -218,24 +216,23 @@ CInterval C2dChartPlace::gridInterval(int h, qreal l, qreal r) const
     return CInterval(min, max, static_cast<int>((max - min) / step + 1.5));
 }
 
-CInterval C2dChartPlace::xGridInterval() const
+CGL::CInterval C2dChartPlace::xGridInterval() const
 {
     return gridInterval(this->width(), viewPort.left(), viewPort.right());
 }
 
-CInterval C2dChartPlace::yGridInterval() const
+CGL::CInterval C2dChartPlace::yGridInterval() const
 {
     return gridInterval(this->height(), viewPort.bottom(), viewPort.top());
 }
 
-CInterval C2dChartPlace::xGridInterval(qreal w) const
+CGL::CInterval C2dChartPlace::xGridInterval(qreal w) const
 {
     return gridInterval(w, viewPort.left(), viewPort.right());
 }
 
-CInterval C2dChartPlace::yGridInterval(qreal h) const
+CGL::CInterval C2dChartPlace::yGridInterval(qreal h) const
 {
     return gridInterval(h, viewPort.bottom(), viewPort.top());
 }
 
-}

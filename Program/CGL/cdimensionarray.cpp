@@ -2,8 +2,6 @@
 #include "cdimensioninterval.h"
 #include <memory>
 
-namespace CGL {
-
 CDimensionArray::CDimensionArray()
 {
 
@@ -19,7 +17,5 @@ CDimensionArray::CDimensionArray(const CArray& m, const QString& name)
 
 CDimensionArray::~CDimensionArray()
 {
-
-}
 
 }

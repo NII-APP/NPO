@@ -4,15 +4,13 @@
 #include <QString>
 #include "cinterval.h"
 
-namespace CGL {
-
 class CDimensionInterval : public CDimension
 {
-    CInterval value;
+    CGL::CInterval value;
     QString label;
 public:
     CDimensionInterval();
-    CDimensionInterval(const CInterval& data, const QString name = QString());
+    CDimensionInterval(const CGL::CInterval& data, const QString name = QString());
     ~CDimensionInterval();
 
     const QString& getLabel() const { return label; }
@@ -23,7 +21,5 @@ public:
 
     RealRange getRange() const { return RealRange(value.first(), value.last()); }
 };
-
-}
 
 #endif // CDIMENSIONINTERVAL_H

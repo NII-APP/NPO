@@ -8,8 +8,6 @@
   It must be a pure abstract class but it's impossible to add their to shared pointers vector((
 */
 
-namespace CGL {
-
 class CDimension
 {
 public:
@@ -28,7 +26,5 @@ public:
 
     typedef double ValueType;
 };
-
-}
 
 #endif // CDIMENSION_H

@@ -9,7 +9,7 @@
 #include <QGraphicsView>
 #include "c2dchartaxis.h"
 
-namespace CGL {
+class CArray;
 
 class C2dChart : public QGraphicsView
 {
@@ -29,6 +29,7 @@ private:
     C2dChartPlace* chart;
 
     void resizeEvent(QResizeEvent*);
+    void closeEvent(QCloseEvent *);
 
 public:
     C2dChart(QWidget* parent = 0);
@@ -46,8 +47,12 @@ public:
     QString getYLabel() const;
 
     ~C2dChart();
+
+    static void showArray(const CArray&);
+
+signals:
+    void closed();
 };
 
-}
 
 #endif // C2DCHART_H

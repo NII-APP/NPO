@@ -47,5 +47,6 @@ QDataStream& operator >> (QDataStream& out, CInterval& i);
 QDebug operator << (QDebug out, const CInterval& i);
 
 }
+using CGL::CInterval;
 
 #endif // CINTERVAL_H

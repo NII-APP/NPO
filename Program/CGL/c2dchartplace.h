@@ -9,6 +9,7 @@
 namespace CGL {
 
 class CInterval;
+}
 
 class C2dChartPlace : public QGLWidget
 {
@@ -22,7 +23,7 @@ class C2dChartPlace : public QGLWidget
     IndexArray bariers;
 
     static qreal viewStep(qreal length, int limOfSteps);
-    CInterval gridInterval(int h, qreal l, qreal r) const;
+    CGL::CInterval gridInterval(int h, qreal l, qreal r) const;
 public:
     C2dChartPlace(QWidget* parent = 0);
     ~C2dChartPlace();
@@ -36,16 +37,14 @@ public:
     void resizeGL(int w, int h);
     void paintGL();
 
-    CInterval xGridInterval() const;
-    CInterval yGridInterval() const;
-    CInterval xGridInterval(qreal w) const;
-    CInterval yGridInterval(qreal h) const;
+    CGL::CInterval xGridInterval() const;
+    CGL::CInterval yGridInterval() const;
+    CGL::CInterval xGridInterval(qreal w) const;
+    CGL::CInterval yGridInterval(qreal h) const;
     void setGridStep(qreal val) { gridStep = val; }
 
 signals:
     void viewPortChanged(QRectF);
 };
-
-}
 
 #endif // C2DCHARTPLACE_H

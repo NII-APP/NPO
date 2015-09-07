@@ -227,7 +227,7 @@ void CGLWidget::menuHandling(QAction *a)
         rotateMatrix.rotate(90,0,0,1);
         break;
     case 2:
-        rotateMatrix.rotate(90,0,1,0);
+        rotateMatrix.rotate(90,1,0,0);
         break;
     case 3:
         rotateMatrix.rotate(-45,1,0,0);

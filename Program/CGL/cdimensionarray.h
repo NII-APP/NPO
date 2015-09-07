@@ -4,8 +4,6 @@
 #include "carray.h"
 #include <memory>
 
-namespace CGL {
-
 class CDimensionInterval;
 
 class CDimensionArray : public CDimension
@@ -31,7 +29,5 @@ public:
 
     void push_back(const double& v) { range.include(v); nodes.push_back(v); }
 };
-
-}
 
 #endif // CDIMENSIONARRAY_H

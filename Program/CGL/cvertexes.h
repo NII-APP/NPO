@@ -25,4 +25,6 @@ public:
 };
 }
 
+using CGL::CVertexes;
+
 #endif // VERTEXES_H

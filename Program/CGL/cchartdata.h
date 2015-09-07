@@ -6,7 +6,6 @@
 #include "cdimension.h"
 #include "crange.h"
 
-namespace CGL {
 
 class CMatrix;
 typedef std::vector<std::shared_ptr<const CDimension> > SharedDimension;
@@ -27,6 +26,5 @@ public:
     RealRange range(int i) const { return at(i).get()->getRange(); }
 };
 
-}
 
 #endif // CCHARTDATA_H

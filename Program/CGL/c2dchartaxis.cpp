@@ -3,9 +3,6 @@
 #include <QSizeF>
 #include "cscale.h"
 
-namespace CGL {
-
-
 const qreal C2dChartAxis::Ticket::TAIL_LENGHT = 5.0;
 const qreal C2dChartAxis::Ticket::TAIL_MARGIN = 2.0;
 
@@ -31,7 +28,7 @@ qreal C2dChartAxis::commendableAxisWeight(const QFont& font, QPaintDevice* paint
     return commendableTicketSize(font, paintdevice).height() + Ticket::TAIL_LENGHT + Ticket::TAIL_MARGIN;
 }
 
-qreal C2dChartAxis::implementation(const QPointF& topleft, const CInterval& tickValues, QPaintDevice *forMetric)
+qreal C2dChartAxis::implementation(const QPointF& topleft, const CGL::CInterval& tickValues, QPaintDevice *forMetric)
 {
     RealScale scale(range, domain);
     this->setPos(topleft);
@@ -75,7 +72,6 @@ qreal C2dChartAxis::implementation(const QPointF& topleft, const CInterval& tick
     case Qt::TopEdge:
         border->setLine(domain.getMax(), commendableTicketSize(font, forMetric).height() + Ticket::TAIL_MARGIN + Ticket::TAIL_LENGHT,
                         domain.getMin(), commendableTicketSize(font, forMetric).height() + Ticket::TAIL_MARGIN + Ticket::TAIL_LENGHT);
-        qDebug() << "line" << border->line();
         break;
     }
 
@@ -147,5 +143,4 @@ void C2dChartAxis::setFont(const QFont& val)
 QRectF C2dChartAxis::Ticket::boundingRect() const {
     return QRectF(this->pos(), QSizeF(text->boundingRect().width() + (TAIL_LENGHT + TAIL_MARGIN) * +!!(edge & (Qt::LeftEdge | Qt::RightEdge)),
                                       text->boundingRect().height() + (TAIL_LENGHT + TAIL_MARGIN) * +!!(edge & (Qt::TopEdge | Qt::BottomEdge))));
-}
 }

@@ -12,6 +12,8 @@ class CChartData;
 
 class C3dColumnChart : public C3dChart
 {
+    Q_OBJECT
+
     static const qreal REGILAR_MARGIN;
 
     CMatrix data;
@@ -20,6 +22,7 @@ class C3dColumnChart : public C3dChart
     CColorScale color;
 
     static void drowParallelepiped(const CParallelepiped&);
+    void closeEvent(QCloseEvent *);
 public:
     C3dColumnChart(QWidget* parent = 0);
     ~C3dColumnChart();
@@ -28,6 +31,11 @@ public:
     void setData(const CMatrix&);
 
     void paintCGL();
+
+    static void showMatrix(const CMatrix& m);
+
+signals:
+    void closed();
 };
 
 }

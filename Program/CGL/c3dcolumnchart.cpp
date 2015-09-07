@@ -1,4 +1,5 @@
 #include "c3dcolumnchart.h"
+#include <QEventLoop>
 
 namespace CGL {
 
@@ -25,7 +26,6 @@ void C3dColumnChart::setData(const CMatrix& d) {
     scale = RealScale(RealRange(r.getMin(),  r.getMax()), RealRange(0.0, size));
     this->scene() = CParallelepiped(0.0, size, 0.0, size, 0.0, size);
     color.setDomain(RealRange(r.getMin(), r.getMax()));
-    qDebug() << this->scene();
     this->update();
 }
 
@@ -91,6 +91,23 @@ void C3dColumnChart::drowParallelepiped(const CParallelepiped& p) {
     glVertex3fv(static_cast<float*>(static_cast<void*>(&c)));
     glVertex3fv(static_cast<float*>(static_cast<void*>(&b)));
     glEnd();
+}
+
+
+void C3dColumnChart::closeEvent(QCloseEvent *) {
+    emit closed();
+}
+
+void C3dColumnChart::showMatrix(const CMatrix& m) {
+    C3dColumnChart chart;
+    chart.setData(m);
+
+    QEventLoop* loop(new QEventLoop(&chart));
+    loop->connect(&chart, SIGNAL(closed()), SLOT(quit()));
+
+    chart.show();
+
+    loop->exec();
 }
 
 }

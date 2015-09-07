@@ -9,7 +9,6 @@
 #include <QGraphicsLineItem>
 #include "cinterval.h"
 
-namespace CGL {
 
 class C2dChartAxis : public QGraphicsItemGroup
 {
@@ -61,6 +60,5 @@ public:
     virtual QRectF 	boundingRect() const;
 };
 
-}
 
 #endif // C2DCHARTAXIS_H
