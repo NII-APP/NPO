@@ -4,6 +4,9 @@
 #include "project.h"
 #include "identity.h"
 #include "mainwindow.h"
+#include <QSettings>
+
+const QString Application::projectNameKey = "project/location";
 
 Application::Application(int argc, char** argv)
     : QApplication(argc, argv)
@@ -13,6 +16,9 @@ Application::Application(int argc, char** argv)
     QFile css(":/css/css.css");
     css.open(QFile::ReadOnly);
     this->setStyleSheet(QString(css.readAll()));
+    this->setOrganizationName(self->organizationName());
+    this->setOrganizationDomain(self->organizationDomain());
+    this->setApplicationName(self->applicationName());
 }
 
 Application::~Application()

@@ -69,6 +69,7 @@ void EigenModes::readTXT(const QString &fileName)
             break;
         case 'x': default:
             orientation = QVector3D(1.0f,0.0f,0.0f);
+            break;
         }
 
         f += 4;
@@ -85,7 +86,7 @@ void EigenModes::readTXT(const QString &fileName)
               //       << v * current * QVector3D(1.,1.,0.);
             //forms[i].form().push_vector_back(QVector3D(sin(angle) * v, cos(angle) * v, 0.0));
             //qDebug() << v << '*' << current * QVector3D(1.0,1.0,0.0) << '=' << v * current * QVector3D(1.,1.,0.) << angle / acos(-1.0) * 180;
-            operator[](i).form().push_vector_back(f.real() * orientation);
+            at(i).form().push_vector_back(f.real() * orientation);
         }
         f.skipRow();
         ++j;

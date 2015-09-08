@@ -47,6 +47,7 @@ signals:
     void frequencyChanged(double);
 public slots:
     void setMode(int);
+    void colorize(int);
     void setMagnitude(double);
     void setFrequency(double);
     void pause();
@@ -72,6 +73,7 @@ public:
     int getCurrentMode() const { return mode; }
     float getCurrentDefoultMagnitude() const { try { return self->getModes().at(mode).defoultMagnitude(); } catch(...) { return 0.0f; } }
     double getDefaultMagnitude() const;
+    void colorize(int);
 
     void uploadMode();
     void uploadColors();

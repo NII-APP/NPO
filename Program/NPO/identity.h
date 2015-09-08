@@ -46,6 +46,10 @@ public:
     QString geometryWidgetNoDataImage() const;
     QString tabView() const;
     QString tabPair() const;
+    QString mainWindowTitle() const;
+    QString organizationName() const;
+    QString organizationDomain() const;
+    QString applicationName() const;
     QIcon tabViewIcon() const;
     QIcon tabPairIcon() const;
 

@@ -21,6 +21,8 @@ public:
     static MainWindow* mainWindow();
     static const Identity* identity();
     static Project *project();
+
+    static const QString projectNameKey;
 };
 
 #endif // APPLICATION_H

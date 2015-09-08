@@ -121,7 +121,6 @@ void FEMViewer::paintEvent(QPaintEvent *) {
 }
 
 void FEMViewer::setModel(const FEM* m) const {
-    qDebug() << "setModel";
     femWidget->setVisible(m);
     femWidget->setData(m);
     updateToolBar();
@@ -134,7 +133,6 @@ void FEMViewer::setMode(const int m) {
 }
 
 void FEMViewer::updateToolBar() const {
-    qDebug() << "updateToolBar";
     mode->updateValueBounds();
     bool isHaveModes(false);
     for (const FEM* i : femWidget->getData()) {
@@ -144,6 +142,10 @@ void FEMViewer::updateToolBar() const {
     magnitude->setEnabled(isHaveModes);
     run->setEnabled(isHaveModes);
     stop->setEnabled(isHaveModes);
+}
+
+void FEMViewer::colorize(int m) {
+    femWidget->colorize(m);
 }
 
 const FEM* FEMViewer::getModel() const {

@@ -149,6 +149,22 @@ QString Identity::tabPair() const {
     Q_ASSERT(configuration.contains("tab pair " + language()));
     return configuration["tab pair " + language()].toString();
 }
+QString Identity::mainWindowTitle() const {
+    Q_ASSERT(configuration.contains("main window title " + language()));
+    return configuration["main window title " + language()].toString();
+}
+QString Identity::organizationName() const {
+    Q_ASSERT(configuration.contains("organization name " + language()));
+    return configuration["organization name " + language()].toString();
+}
+QString Identity::organizationDomain() const {
+    Q_ASSERT(configuration.contains("organization domain " + language()));
+    return configuration["organization domain " + language()].toString();
+}
+QString Identity::applicationName() const {
+    Q_ASSERT(configuration.contains("application name " + language()));
+    return configuration["application name " + language()].toString();
+}
 
 QIcon Identity::tabViewIcon() const {
     Q_ASSERT(configuration.contains("tab view icon"));

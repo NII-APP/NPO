@@ -1,11 +1,24 @@
 {
     "py" : "C:/Python34/python.exe",
     "BDFParse" : "../../NPO/readBDF.py",
+    "main window title rus" : "ModalView %1[*]",
+    "organization name eng" : "simmetrics",
+    "organization name rus" : "simmetrics",
+    "organization domain eng" : "simmetrics.ru",
+    "organization domain rus" : "simmetrics.ru",
+    "application name eng" : "ModalView",
+    "application name rus" : "ModalView",
     "language": "rus",
     "file menu" : {
         "rus" : "Файл",
         "eng" : "File",
         "items" : [
+            {
+                "signal" : "close",
+                "rus" : "Закрыть текущий проект",
+                "eng" : "Close current project",
+                "hotkey" : "ctrl+n"
+            },
             {
                 "signal" : "open",
                 "rus" : "Открыть проект",
@@ -106,7 +119,7 @@
         "transmit eng" : "Transmit the data..."
     },
     "viewer model" : {
-    	"mac rus" : "МАК",
+        "mac rus" : "МАC",
     	"mac eng" : "MAC",
     	"vertexes rus" : "Узлы (%1)",
     	"vertexes eng" : "Nodes (%1)",

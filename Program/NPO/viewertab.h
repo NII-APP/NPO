@@ -5,6 +5,7 @@
 class ViewerView;
 class FEM;
 class FEMWidget;
+class ViewerNode;
 #include <QModelIndex>
 
 class FEMViewer;
@@ -13,7 +14,8 @@ class ViewerTab : public QSplitter
 {
     Q_OBJECT
     ViewerView* const femView;
-    FEMViewer* const femWidget;
+    /// @todo wrap the ViewerNode to SplitCascade
+    ViewerNode* const cascadeNode;
 
 public:
     enum EnapledItems {

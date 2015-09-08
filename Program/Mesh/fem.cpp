@@ -126,14 +126,13 @@ void FEM::estimateBox()
 }
 
 void FEM::coordinateSystemImplimentation() {
-    //*
     for (CoordinateLinks::const_iterator l(linksPoint.begin()), end(linksPoint.end()); l != end; ++l) {
         if (systems.contains(l->first)) {
             for (EigenModes::iterator i(modes.begin()); i != modes.end(); ++i) {
                 systems[l->first]->toGlobal(i->form()(l->second));
             }
         }
-    }//*/
+    }
 }
 
 void FEM::scarfUp(PyParse::BDFEntity& entity) {

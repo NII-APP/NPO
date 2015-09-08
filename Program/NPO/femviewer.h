@@ -49,6 +49,7 @@ public:
 signals:
 
 public slots:
+    void colorize(int);
     void updateToolBar() const;
 
 private slots:

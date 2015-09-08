@@ -7,6 +7,8 @@
 
 QT       += core opengl gui svg
 
+RC_ICONS += "images/Bez_imeni-1.ico"
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = NPO
@@ -46,7 +48,8 @@ SOURCES += main.cpp \
     femviewer.cpp \
     femviewerfrequencyinput.cpp \
     femviewermodeinput.cpp \
-    femviewermagnitudeinput.cpp
+    femviewermagnitudeinput.cpp \
+    viewernode.cpp
 
 HEADERS += \
     relationdialog.h \
@@ -65,7 +68,8 @@ HEADERS += \
     femviewer.h \
     femviewerfrequencyinput.h \
     femviewermodeinput.h \
-    femviewermagnitudeinput.h
+    femviewermagnitudeinput.h \
+    viewernode.h
 
 exists( engine/pyParse/BDFEntity.cpp ) {
     message( "Configuring with new parser" )

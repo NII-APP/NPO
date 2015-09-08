@@ -129,6 +129,12 @@ void FEMWidget::setMode(int m) {
     }
 }
 
+void FEMWidget::colorize(int m) {
+    for (MeshBuffer* i : meshes) {
+        i->colorize(m);
+    }
+}
+
 void FEMWidget::setMagnitude(double v) {
     animation->setMagnitude(v);
 }
@@ -162,6 +168,13 @@ void FEMWidget::reloadColors(const FEM* w) {
     (*b)->uploadColors();
 }
 
+void FEMWidget::MeshBuffer::colorize(int m) {
+    if (m >= 0 && m < self->getModes().size()) {
+        self->colorize(m);
+        uploadColors();
+    }
+}
+
 void FEMWidget::MeshBuffer::uploadMode() {
     array->bind();
     vertex.bind();
@@ -189,6 +202,7 @@ QList<const FEM *> FEMWidget::getData() const
     }
     return result;
 }
+
 
 void FEMWidget::wheelEvent(QWheelEvent * e) {
     if (e->modifiers() & Qt::CTRL) {

@@ -10,6 +10,7 @@
 #include <QTabWidget>
 #include <QDir>
 #include <QFileDevice>
+#include <QSettings>
 #include "application.h"
 #include "identity.h"
 #include "project.h"
@@ -47,9 +48,7 @@ public:
         w->setParent(this);
         this->layout()->addWidget(w);
         this->show();
-        qDebug() << size();
         this->resize(this->layout()->sizeHint());
-        qDebug() << size();
     }
     void push(const QString& s) {
         push(new QLabel(s, this));
@@ -108,23 +107,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     relations.insert("save", Identity::Acceptor(this, SLOT(save())));
     relations.insert("save as", Identity::Acceptor(this, SLOT(saveAs())));
     relations.insert("open", Identity::Acceptor(this, SLOT(open())));
+    relations.insert("close", Identity::Acceptor(this, SLOT(close())));
     relations.insert("import", Identity::Acceptor(cnt, SLOT(addModel())));
     QMenu* fileMenu(this->menuBar()->addMenu(Application::identity()->menuFileName()));
     fileMenu->addActions(Application::identity()->menuFileActions(fileMenu, relations));
 
-    //just for simply debug
-    QStringList pro(QDir("../../../").entryList(QStringList() << "*.pro"));
-    int i(pro.size());
-    while (i) {
-        --i;
-        if (!Project::isOwnProject("../../../" + pro[i])) {
-            pro.removeAt(i);
-        }
-    }
-    qDebug() << pro;
-    if (!pro.isEmpty()) {
-        load("../../../" + pro.first());
-    }
+    this->setWindowTitle(Application::identity()->mainWindowTitle().arg(""));
+
+    load(QSettings().value("project/location").value<QString>());
 
     status = new Status(this->centralWidget());
     status->hide();
@@ -136,9 +126,15 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::load(const QString& location) {
+    if (!Project::isOwnProject(location)) {
+        if (!location.isEmpty()) {
+            Application::identity()->messageWrongProFile(location);
+        }
+        return;
+    }
     try {
         Application::project()->load(location);
-        disposed = location;
+        saveProjectLocation(location);
     } catch (QFileDevice::FileError error) {
         switch (error) {
         case QFileDevice::OpenError:
@@ -157,8 +153,17 @@ void MainWindow::load(const QString& location) {
         }
         return;
     }
+    this->setWindowTitle(Application::identity()->mainWindowTitle().arg(location.split('/').last()));
+    QSettings().setValue(Application::projectNameKey, location);
 
     emit porjectLoaded();
+}
+
+void MainWindow::saveProjectLocation(const QString& v) const {
+    QSettings().setValue(Application::projectNameKey, v);
+}
+QString MainWindow::projectLocation() const {
+    return QSettings().value(Application::projectNameKey).toString();
 }
 
 void MainWindow::open() {
@@ -172,26 +177,21 @@ void MainWindow::open() {
             break;
         }
     }
-    QString name(Application::identity()->choseProjectFile());
-    if (Project::isOwnProject(name)) {
-        load(name);
-    } else {
-        Application::identity()->messageWrongProFile(name);
-    }
+    load(Application::identity()->choseProjectFile());
 }
 
 void MainWindow::saveAs() {
     QString where(Application::identity()->choseSaveFile());
     if (!where.isEmpty()) {
-        disposed = where;
+        saveProjectLocation(where);
         save();
     }
 }
 
 void MainWindow::save() {
-    if (disposed.isEmpty()) {
+    if (projectLocation().isEmpty()) {
         saveAs();
         return;
     }
-    Application::project()->save(disposed);
+    Application::project()->save(projectLocation());
 }

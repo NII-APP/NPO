@@ -131,7 +131,7 @@ public:
     void colorize(const CGL::CVertexes& v, const QString& mes = "") const;
     void colorize(const CArray& v, const QString& mes = "") const;
     void colorize(int i) const {
-        try { colorize(modes.at(i).form()); } catch (const std::out_of_range&) { qDebug() << "ext catch"; }
+        try { colorize(modes.at(i).form()); } catch (const std::out_of_range&) { Q_ASSERT("colorize model mode id fail"); }
     }
     void colorizeElements(const CArray &v, const QString& mes = "") const;
 
