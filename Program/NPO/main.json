@@ -78,10 +78,6 @@
     },
     "can't save file rus" : "Невозможно открыть файл для записи (отказано в доступе)",
     "can't save file eng" : "Can't open file for writing (acces denied)",
-    "is save" : {
-        "text eng" : "Save changes before closing?",
-        "text rus" : "Сохранить изменения перед закрытием?"
-    },
     "hertz eng" : "Hz",
     "hertz rus" : "Гц",
     "cant open" : {
@@ -89,6 +85,12 @@
         "text eng" : "Can't read file \"%1\"",
         "title rus" : "Возникла ошибка при открытии файла",
         "title eng" : "File error"
+    },
+    "close modified" : {
+        "text rus" : "Вы хотите сохранить изменения в проекте?",
+        "text eng" : "Would you save the changes in project?",
+        "title rus" : "Сохранение изменений",
+        "title eng" : "Changes saving"
     },
     "cant start python" : {
         "text rus" : "Не удалось запустить модуль PyNastran \"%1\"",
@@ -119,8 +121,8 @@
         "transmit eng" : "Transmit the data..."
     },
     "viewer model" : {
-        "mac rus" : "МАC",
-    	"mac eng" : "MAC",
+        "mac rus" : "Aвто-МАC",
+        "mac eng" : "Auto-MAC",
     	"vertexes rus" : "Узлы (%1)",
     	"vertexes eng" : "Nodes (%1)",
     	"modes rus" : "Собственные формы (%1)",
@@ -129,5 +131,19 @@
     	"import eng" : "Import eigen modes...",
     	"identification rus" : "Идентифицировать собственные формы...",
     	"identification eng" : "Eigen modes import..."
+    },
+    "FEMViewer" : {
+        "frequency rus" : "Частота анимации",
+        "frequency eng" : "Animation frequency",
+        "magnitude rus" : "Амплитула анимации",
+        "magnitude eng" : "Animation magnitude",
+        "stop rus" : "Выключить анимацию",
+        "stop eng" : "Disable animation",
+        "play rus" : "Запустить",
+        "play eng" : "Play",
+        "pause rus" : "Пауза",
+        "pause eng" : "Pause",
+        "mode rus" : "Форма",
+        "mode eng" : "Mode"
     }
 }

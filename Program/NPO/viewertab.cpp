@@ -41,7 +41,7 @@ void ViewerTab::addModel() {
     }
     fem->read(bdf);
     setModel(fem);
-    Application::project()->pushModel(fem);
+    Application::nonConstProject()->pushModel(fem);
     femView->reset();
 }
 

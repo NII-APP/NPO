@@ -5,6 +5,9 @@
 #include <QLabel>
 #include <QEvent>
 
+#include "application.h"
+#include "identity.h"
+
 const FEMViewer::FEMViewerFrequencyInput::ToRealScale FEMViewer::FEMViewerFrequencyInput::SLIDER_SCALE =
         FEMViewer::FEMViewerFrequencyInput::ToRealScale(FEMViewer::FEMViewerFrequencyInput::ToRealScale::InRange(0, 10000),
                                              FEMViewer::FEMViewerFrequencyInput::ToRealScale::OutRange(0.2, 5.0));
@@ -14,7 +17,7 @@ FEMViewer::FEMViewerFrequencyInput::FEMViewerFrequencyInput(QWidget* parent)
     , numeric(new QDoubleSpinBox(this))
     , slider(new QSlider(Qt::Horizontal, this)) {
     this->setLayout(new QHBoxLayout(this));
-    this->layout()->addWidget(new QLabel(this->parent()->parent()->tr("Frequency"), this));
+    this->layout()->addWidget(new QLabel(Application::identity()->tr("frequency", "FEMViewer"), this));
     this->layout()->addWidget(slider);
     this->layout()->addWidget(numeric);
     numeric->setMinimum(SLIDER_SCALE.getRange().getMin());

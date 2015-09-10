@@ -5,7 +5,7 @@
 #include "application.h"
 #include "project.h"
 
-ViewerModel::ViewerModel(Project * p, QObject* parent)
+ViewerModel::ViewerModel(const Project * p, QObject* parent)
     : QAbstractItemModel(parent)
     , __project(p)
 {

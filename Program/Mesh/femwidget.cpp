@@ -153,6 +153,7 @@ void FEMWidget::play() {
 
 void FEMWidget::MeshBuffer::setCurrentMode(int form) {
     if (modes().size() > form && form >= 0) {
+        colorize(form);
         mode = form;
         array->bind();
         vertex.bind();

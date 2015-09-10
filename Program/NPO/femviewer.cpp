@@ -15,6 +15,8 @@
 #include "femviewermodeinput.h"
 #include "femviewermagnitudeinput.h"
 #include "identity.h"
+#include "application.h"
+#include "identity.h"
 
 FEMViewer::FEMViewer(QWidget* parent)
     : QWidget(parent)
@@ -25,8 +27,8 @@ FEMViewer::FEMViewer(QWidget* parent)
     , magnitude(new FEMViewerMagnitudeInput(toolbox))
     , pause(Identity::fromSvg(":/media/images/pause-512px.svg"))
     , play(Identity::fromSvg(":/media/images/play-512px.svg"))
-    , run(new QAction(pause, tr("pause"),toolbox))
-    , stop(new QAction(Identity::fromSvg(":/media/images/stop-512px.svg"), tr("stop"),toolbox))
+    , run(new QAction(pause, Application::identity()->tr("pause", "FEMViewer"),toolbox))
+    , stop(new QAction(Identity::fromSvg(":/media/images/stop-512px.svg"), Application::identity()->tr("stop", "FEMViewer"),toolbox))
 {
     femWidget->setVisible(false);
     femWidget->move(0,0);
@@ -71,11 +73,11 @@ FEMViewer::FEMViewer(QWidget* parent)
 void FEMViewer::runTrigger() {
     if (femWidget->getAnimationOptions()->isPaused()) {
         femWidget->getAnimationOptions()->play();
-        run->setText(tr("run"));
+        run->setText(Application::identity()->tr("play", "FEMViewer"));
         run->setIcon(pause);
     } else {
         femWidget->getAnimationOptions()->pause();
-        run->setText(tr("pause"));
+        run->setText(Application::identity()->tr("pause", "FEMViewer"));
         run->setIcon(play);
     }
 }

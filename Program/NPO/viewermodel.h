@@ -32,7 +32,7 @@ public:
     static int modelId(const QModelIndex&);
     static int toRow(ModelRow);
 
-    ViewerModel(Project*, QObject* parent = 0);
+    ViewerModel(const Project*, QObject* parent = 0);
 
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex	parent(const QModelIndex & index) const;
@@ -40,7 +40,7 @@ public:
     int	columnCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
 private:
-    Project* __project;
+    const Project* __project;
 };
 
 #endif // VIEWERMODEL_H

@@ -24,16 +24,15 @@ private:
         When the theory model start to change some, it's separate to enother
         position but first and second is just shared with geometries */
     MeshPairs pairs;
-    //is some data may be changed after last save or load
-    bool someModified;
 public:
     Project();
     ~Project();
 
     const Models& modelsList() const { return geometries; }
     const MeshPairs& pairsList() const { return pairs; }
-    bool isModified() { return someModified; }
     void pushModel(FEM* const);
+
+    int toId(const FEM* const val) const { return std::find(geometries.begin(), geometries.end(), val) - geometries.begin(); }
 
     static bool isOwnProject(const QString& filename);
     void save(const QString& filename);

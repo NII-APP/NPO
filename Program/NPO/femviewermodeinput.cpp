@@ -8,6 +8,9 @@
 #include <fem.h>
 #include <eigenmodes.h>
 
+#include "application.h"
+#include "identity.h"
+
 FEMViewer::FEMViewerModeInput::FEMViewerModeInput(FEMViewer *viewer, QWidget* parent)
     : QFrame(parent)
     , parentViewer(viewer)
@@ -15,7 +18,7 @@ FEMViewer::FEMViewerModeInput::FEMViewerModeInput(FEMViewer *viewer, QWidget* pa
     , value(new QSpinBox(this))
 {
     this->setLayout(new QHBoxLayout(this));
-    this->layout()->addWidget(new QLabel(parent->tr("Mode"), this));
+    this->layout()->addWidget(new QLabel(Application::identity()->tr("mode", "FEMViewer"), this));
     this->layout()->addWidget(value);
     this->layout()->addWidget(hzValue);
 
@@ -28,7 +31,7 @@ FEMViewer::FEMViewerModeInput::FEMViewerModeInput(FEMViewer *viewer, QWidget* pa
 void FEMViewer::FEMViewerModeInput::holdValue(int v) {
     try {
         if (static_cast<FEMViewer*>(this->parentViewer)->getModel()) {
-            hzValue->setText(parentViewer->tr("hz").arg(static_cast<FEMViewer*>(this->parentViewer)->getModel()->getModes().at(v).frequency()));
+            hzValue->setText(("%1 " + Application::identity()->tr("hertz")).arg(static_cast<FEMViewer*>(this->parentViewer)->getModel()->getModes().at(v).frequency()));
             emit valueChanged(getValue());
         } else {
             throw std::exception();

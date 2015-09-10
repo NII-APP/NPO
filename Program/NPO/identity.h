@@ -53,6 +53,8 @@ public:
     QIcon tabViewIcon() const;
     QIcon tabPairIcon() const;
 
+    QString tr(QString key, const QString& context = QString()) const;
+
     QString choseModelFile() const;
     QString choseModesFile() const;
     QString choseProjectFile() const;
@@ -65,6 +67,7 @@ public:
     void messageCantOpen(const QString &fName) const;
     void messageObsoleteProgram(const QString &fName) const;
     void messageWrongProFile(const QString &fName) const;
+    int messageUnsavedProject() const;
 
     QString menuFileName() const;
     QList<QAction*> menuFileActions(QObject* parent, const Relations& = Relations()) const;

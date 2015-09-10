@@ -20,7 +20,9 @@ public:
     void setMainWindow(MainWindow* w) { window = w; }
     static MainWindow* mainWindow();
     static const Identity* identity();
-    static Project *project();
+    static Project* nonConstProject();
+    static const Project* project();
+    static Project* clearProject();
 
     static const QString projectNameKey;
 };

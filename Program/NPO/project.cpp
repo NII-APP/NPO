@@ -6,17 +6,16 @@
 const QString Project::INSURANCE_ROW = "In vino veritas, in aqua sanitas";
 
 Project::Project()
- : someModified(false)
 {
 }
 
 Project::~Project()
 {
     qDeleteAll(geometries.begin(), geometries.end());
+    qDeleteAll(pairs.begin(), pairs.end());
 }
 
 void Project::pushModel(FEM * const g) {
-    someModified = true;
     geometries.push_back(g);
 }
 
@@ -57,9 +56,7 @@ void Project::save(const QString &filename)
 #ifndef QT_NO_DEBUG
     qDebug() << "Time to save: " << loop.msecsTo(QTime::currentTime()) / 1000 << " ms";
 #endif
-    file.close();
-
-    someModified = false;
+    file.close();;
 }
 
 void Project::load(const QString &filename)

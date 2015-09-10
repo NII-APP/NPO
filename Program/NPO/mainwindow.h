@@ -27,13 +27,13 @@ public:
     ~MainWindow();
 
 signals:
-    void porjectLoaded();
+    void projectLoaded();
 
 public slots:
     void save();
     void saveAs();
     void open();
-    void close();
+    void closePorject();
     void statusPush(QWidget*);
     void statusPush(const QString &);
     void statusInsertBefore(QWidget* which, QWidget* before);

@@ -90,6 +90,7 @@ void MainWindow::statusInsertBefore(QWidget* which, QWidget* before) {
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
+
     this->setCentralWidget(new TabWidget(this));
     ViewerTab* cnt;
     static_cast<TabWidget*>(centralWidget())->setTabBar(new MainTabBar(this->centralWidget()));
@@ -101,16 +102,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     static_cast<QTabWidget*>(centralWidget())->addTab(new QWidget(this),"");
     static_cast<QTabWidget*>(centralWidget())->setTabEnabled(2,false);
 
-    cnt->connect(this, SIGNAL(porjectLoaded()), SLOT(resetListView()));
+
+    cnt->connect(this, SIGNAL(projectLoaded()), SLOT(resetListView()));
 
     Identity::Relations relations;
     relations.insert("save", Identity::Acceptor(this, SLOT(save())));
     relations.insert("save as", Identity::Acceptor(this, SLOT(saveAs())));
     relations.insert("open", Identity::Acceptor(this, SLOT(open())));
-    relations.insert("close", Identity::Acceptor(this, SLOT(close())));
+    relations.insert("close", Identity::Acceptor(this, SLOT(closePorject())));
     relations.insert("import", Identity::Acceptor(cnt, SLOT(addModel())));
     QMenu* fileMenu(this->menuBar()->addMenu(Application::identity()->menuFileName()));
     fileMenu->addActions(Application::identity()->menuFileActions(fileMenu, relations));
+
 
     this->setWindowTitle(Application::identity()->mainWindowTitle().arg(""));
 
@@ -118,11 +121,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     status = new Status(this->centralWidget());
     status->hide();
+
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closePorject()));
+
 }
 
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::closePorject() {
+    if (this->isWindowModified()) {
+        if (Application::identity()->messageUnsavedProject() & QMessageBox::Yes) {
+            this->save();
+            Application::clearProject();
+            emit projectLoaded();
+            static_cast<QTabWidget*>(centralWidget())->setCurrentIndex(0);
+        }
+    }
 }
 
 void MainWindow::load(const QString& location) {
@@ -133,7 +150,7 @@ void MainWindow::load(const QString& location) {
         return;
     }
     try {
-        Application::project()->load(location);
+        Application::nonConstProject()->load(location);
         saveProjectLocation(location);
     } catch (QFileDevice::FileError error) {
         switch (error) {
@@ -156,7 +173,7 @@ void MainWindow::load(const QString& location) {
     this->setWindowTitle(Application::identity()->mainWindowTitle().arg(location.split('/').last()));
     QSettings().setValue(Application::projectNameKey, location);
 
-    emit porjectLoaded();
+    emit projectLoaded();
 }
 
 void MainWindow::saveProjectLocation(const QString& v) const {
@@ -167,7 +184,7 @@ QString MainWindow::projectLocation() const {
 }
 
 void MainWindow::open() {
-    while (Application::project()->isModified()) {
+    while (isWindowModified()) {
         QMessageBox::StandardButton todo(Application::identity()->choseIsSaveQuestion());
         if (todo == QMessageBox::Cancel) {
             return;
@@ -193,5 +210,6 @@ void MainWindow::save() {
         saveAs();
         return;
     }
-    Application::project()->save(projectLocation());
+    this->setWindowModified(false);
+    Application::nonConstProject()->save(projectLocation());
 }
