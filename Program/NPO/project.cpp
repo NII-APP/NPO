@@ -12,7 +12,9 @@ Project::Project()
 Project::~Project()
 {
     qDeleteAll(geometries.begin(), geometries.end());
+#ifdef FEMPAIR_H
     qDeleteAll(pairs.begin(), pairs.end());
+#endif
 }
 
 void Project::pushModel(FEM * const g) {
@@ -110,4 +112,3 @@ void Project::load(const QString &filename)
     qDebug() << "Time to load project: " << loop.msecsTo(QTime::currentTime()) << " ms";
 #endif
 }
-

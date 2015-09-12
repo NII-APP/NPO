@@ -81,6 +81,10 @@ void FEMWidget::setData(const QList<const FEM *> &models)
     }
 }
 
+void FEMWidget::drawUnityQuad() {
+    drawGradienQuad(0xd9dbdc, 0xd9dbdc, 0xa0aa9a, 0xa0aa9a);
+}
+
 void FEMWidget::paintCGL()
 {
     QTime now(QTime::currentTime());
@@ -92,6 +96,8 @@ void FEMWidget::paintCGL()
         item->release();
     }
     repaintLoop->start();
+    //to save background unity quad
+    shader->setUniformValue("k", 0.0f);
 }
 
 FEMWidget::MeshBuffer::MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader, QObject* parent)

@@ -20,6 +20,7 @@ FEMViewer::FEMViewerFrequencyInput::FEMViewerFrequencyInput(QWidget* parent)
     this->layout()->addWidget(new QLabel(Application::identity()->tr("frequency", "FEMViewer"), this));
     this->layout()->addWidget(slider);
     this->layout()->addWidget(numeric);
+    this->layout()->addWidget(new QLabel(Application::identity()->hertz()));
     numeric->setMinimum(SLIDER_SCALE.getRange().getMin());
     numeric->setMaximum(SLIDER_SCALE.getRange().getMax() * 3);
     slider->setSingleStep(1);

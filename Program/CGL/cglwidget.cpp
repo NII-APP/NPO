@@ -85,7 +85,7 @@ void CGLWidget::clear()
     glLoadIdentity();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    drawIdantityQuad();
+    drawUnityQuad();
 }
 
 void CGLWidget::loadRotate() {

@@ -7,6 +7,8 @@ class FEMViewer;
 class FEM;
 namespace CGL { class C3dColumnChart; }
 
+#define MAC_DISABLE
+
 class ViewerNode : public QSplitter
 {
     Q_OBJECT
@@ -23,7 +25,9 @@ public slots:
 
 private:
     FEMViewer* const __viewer;
+#ifndef MAC_DISABLE
     CGL::C3dColumnChart* const __macChart;
+#endif
 };
 
 #endif // VIEWERNODE_H

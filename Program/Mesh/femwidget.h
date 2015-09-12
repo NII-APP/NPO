@@ -30,6 +30,7 @@ private:
 protected:
     void initializeCGL();
     void paintCGL();
+    void drawUnityQuad();
 public:
     FEMWidget(QWidget* parent = 0);
     ~FEMWidget();

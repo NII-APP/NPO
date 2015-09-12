@@ -36,14 +36,14 @@ void C3dColumnChart::paintCGL() {
         for (int j(0); j != data.width(); ++j) {
             QRgb c(color(data[i][j]) | 0xFF000000);
             glColor4ubv(static_cast<unsigned char*>(static_cast<void*>(&c)));
-            drowParallelepiped(CParallelepiped(x0 + i + REGILAR_MARGIN, x0 + i + 1 - REGILAR_MARGIN,
+            drawParallelepiped(CParallelepiped(x0 + i + REGILAR_MARGIN, x0 + i + 1 - REGILAR_MARGIN,
                                                scale(data[i][j]), scale(0.0),
                                y0 + j + REGILAR_MARGIN, y0 + j + 1 - REGILAR_MARGIN));
         }
     }
 }
 
-void C3dColumnChart::drowParallelepiped(const CParallelepiped& p) {
+void C3dColumnChart::drawParallelepiped(const CParallelepiped& p) {
     QVector3D a(p.xMin(), p.yMin(), p.zMin());
     QVector3D b(p.xMax(), p.yMin(), p.zMin());
     QVector3D c(p.xMax(), p.yMax(), p.zMin());

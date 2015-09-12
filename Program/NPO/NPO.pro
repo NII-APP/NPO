@@ -78,8 +78,7 @@ exists( engine/pyParse/BDFEntity.cpp ) {
     DEFINES += "PyBDF"
 }
 
-OTHER_FILES += \
-    summator.vert
+OTHER_FILES +=
 
 RESOURCES += \
     res.qrc
@@ -87,4 +86,5 @@ RESOURCES += \
 DISTFILES += \
     css.css \
     main.json \
-    readBDF.py
+    readBDF.py \
+    meshSummator.vert

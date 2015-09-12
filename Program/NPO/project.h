@@ -6,7 +6,7 @@
 #include "identity.h"
 
 class FEM;
-class MeshPair;
+class FEMPair;
 class QString;
 class Identity;
 
@@ -14,7 +14,7 @@ class Project
 {
 public:
     typedef std::vector<FEM* const> Models;
-    typedef std::vector<MeshPair* const> MeshPairs;
+    typedef std::vector<FEMPair* const> MeshPairs;
 
     static const QString INSURANCE_ROW;
 private:

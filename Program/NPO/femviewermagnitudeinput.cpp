@@ -10,7 +10,7 @@
 
 namespace {
 typedef CScale<int, double> ToRealScale;
-static const ToRealScale SLIDER_SCALE = ToRealScale(ToRealScale::InRange(0, 1000), ToRealScale::OutRange(0.1, 5.0));
+static const ToRealScale SLIDER_SCALE = ToRealScale(ToRealScale::InRange(0, 1000), ToRealScale::OutRange(-5.0, 5.0));
 }
 
 FEMViewer::FEMViewerMagnitudeInput::FEMViewerMagnitudeInput(QWidget *parent)
