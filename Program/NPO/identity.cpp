@@ -203,11 +203,21 @@ QString Identity::applicationName() const {
 
 QIcon Identity::tabViewIcon() const {
     Q_ASSERT(configuration.contains("tab view icon"));
-    return QIcon(configuration["tab view icon"].toString());
+    QString ico(configuration["tab view icon"].toString());
+    if (ico.split('.').last() != "svg") {
+        return QIcon(ico);
+    } else {
+        return fromSvg(ico);
+    }
 }
 QIcon Identity::tabPairIcon() const {
     Q_ASSERT(configuration.contains("tab pair icon"));
-    return QIcon(configuration["tab pair icon"].toString());
+    QString ico(configuration["tab pair icon"].toString());
+    if (ico.split('.').last() != "svg") {
+        return QIcon(ico);
+    } else {
+        return fromSvg(ico);
+    }
 }
 
 QString Identity::choseModelFile() const {

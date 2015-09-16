@@ -228,11 +228,18 @@ const CGL::CMatrix& EigenModes::getMac() const {
 
 void EigenModes::estimateMAC()
 {
+#ifndef QT_NO_DEBUG
     std::clog << "Estimate auto MAC" << std::endl;
+    QTime start(QTime::currentTime());
+#endif
     mac = CGL::Matrix(size(), size());
     for (EigenModes::iterator it(begin()), end(end()); it != end; ++it) {
         it->updatePreMac();
     }
+#ifndef QT_NO_DEBUG
+    std::clog << "\tUpdare preMAC delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec" << std::endl;
+    start = QTime::currentTime();
+#endif
     for (int i(0); i != size(); ++i) {
         for (int j(0); j != size(); ++j) {
             if (i == j) {
@@ -247,6 +254,9 @@ void EigenModes::estimateMAC()
             }
         }
     }
+#ifndef QT_NO_DEBUG
+    std::clog << "\tautoMac delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec" << std::endl;
+#endif
 }
 
 float EigenModes::MAC(const EigenMode& a, const EigenMode& b)

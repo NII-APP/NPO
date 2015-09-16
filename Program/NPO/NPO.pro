@@ -49,7 +49,8 @@ SOURCES += main.cpp \
     femviewerfrequencyinput.cpp \
     femviewermodeinput.cpp \
     femviewermagnitudeinput.cpp \
-    viewernode.cpp
+    viewernode.cpp \
+    fempairviewer.cpp
 
 HEADERS += \
     relationdialog.h \
@@ -69,7 +70,8 @@ HEADERS += \
     femviewerfrequencyinput.h \
     femviewermodeinput.h \
     femviewermagnitudeinput.h \
-    viewernode.h
+    viewernode.h \
+    fempairviewer.h
 
 exists( engine/pyParse/BDFEntity.cpp ) {
     message( "Configuring with new parser" )

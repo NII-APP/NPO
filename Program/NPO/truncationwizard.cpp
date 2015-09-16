@@ -1,10 +1,12 @@
 #include "truncationwizard.h"
-#include "engine/geometrypair.h"
-#include "application.h"
-#include "project.h"
 #include <QEventLoop>
 #include <QSplitter>
 #include <QScreen>
+
+#include "engine/geometrypair.h"
+#include "application.h"
+#include "project.h"
+#include "femviewer.h"
 
 TruncationWizard::TruncationWizard(QWidget *parent)
     : QDialog(parent)
@@ -65,4 +67,49 @@ void TruncationWizard::previewPatrol()
     } else {
         current = 0;
     }
+}
+
+TruncationWizard::Preview::Preview(Qt::ToolBarArea area, QWidget* parent)
+    : QWidget(parent)
+    , selector(new QComboBox(this))
+    , screen(new FEMViewer(this))
+{
+    this->setLayout(new QVBoxLayout);
+    foreach (FEM* const g, Application::project()->modelsList()) {
+        if (!g->getModes().empty()) {
+            meshes.push_back(g);
+            selector->addItem(g->getName());
+        }
+    }
+    if (Qt::BottomToolBarArea == area) {
+        this->layout()->addWidget(screen);
+        this->layout()->addWidget(selector);
+        if (meshes.size() >= 2) {
+            selector->setCurrentIndex(1);
+        }
+    } else {
+        this->layout()->addWidget(selector);
+        this->layout()->addWidget(screen);
+    }
+    this->connect(selector, SIGNAL(currentIndexChanged(int)), SLOT(selectorPatrol()));
+    selectorPatrol();
+}
+
+FEM* TruncationWizard::Preview::current() const
+{
+    return selector->currentIndex() < meshes.size() && selector->currentIndex() >= 0
+            ? meshes.at(selector->currentIndex()) : 0;
+}
+
+void TruncationWizard::Preview::selectorPatrol() {
+    FEM* c(current());
+    screen->setModel(c);
+    emit meshSelected(c);
+
+    const Project::Models& m(Application::project()->modelsList());
+    int i(0);
+    while (m.at(i) != c && m.size() > i) {
+        ++i;
+    }
+    emit meshSelected(i < m.size() ? i : -1);
 }
