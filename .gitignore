@@ -1,3 +1,5 @@
+Program/**/*main.cpp
+**.gitignore
 **.user
 build**/
 binaries**/
