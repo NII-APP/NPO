@@ -71,13 +71,6 @@ QDataStream& operator>> (QDataStream&, CMatrix&);
 
 QDebug operator<< (QDebug out, const CMatrix &obj);
 
-
-
-
-
-
-
-
 }
 
 #endif // CMatrix_H

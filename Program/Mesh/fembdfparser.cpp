@@ -66,7 +66,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
             trace[id]->setShell(m);
             f.skipRow();
         } else if (type == "GRID") {
-            f += BORDER_FIELD_SIZE - type.length() - highAccuracy;
+            f += BORDER_FIELD_SIZE - static_cast<int>(type.length()) - highAccuracy;
             const int id(static_cast<int>(f.fixFloat(wordSize)));
             /*for example id have a value 5. it's mean values should
                 be stored in positions {15, 16, 17}. as a result size of 'values' must be >18=id * 3 + 3*/
@@ -109,7 +109,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
             shells[id] = Shell(id, matId, width, anyOther, someOneElse);
             f.skipRow();
         } else if (type == "CORD2R") {
-            f += BORDER_FIELD_SIZE - type.length() - (highAccuracy ? 1 : 0);
+            f += BORDER_FIELD_SIZE - static_cast<int>(type.length()) - (highAccuracy ? 1 : 0);
             const int id(f.fixFloat(wordSize));
             f += BORDER_FIELD_SIZE << (highAccuracy ? 1 : 0);
             float m[9];
@@ -135,7 +135,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
                                                                     QVector3D(m[3], m[4], m[5]),
                                                                     QVector3D(m[6], m[7], m[8])));
         } else if (type == "CORD2C") {
-            f += BORDER_FIELD_SIZE - type.length() - (highAccuracy ? 1 : 0);
+            f += BORDER_FIELD_SIZE - static_cast<int>(type.length()) - (highAccuracy ? 1 : 0);
             const int id(f.fixFloat(wordSize));
             f += BORDER_FIELD_SIZE << (highAccuracy ? 1 : 0);
             float m[9];

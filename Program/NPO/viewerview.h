@@ -15,6 +15,10 @@ signals:
     void currentModeChanged(int, int);
     void importModesPressed(int);
     void modesIdentificationPressed(int);
+    void MACPressed(int);
+
+public slots:
+    void update();
 
 public slots:
     void currentChanged(const QModelIndex & current, const QModelIndex & previous);

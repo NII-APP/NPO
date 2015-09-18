@@ -998,7 +998,8 @@ FEM* FEM::truncation(const FEM& a, const FEM& b) {
     result->materials = b.materials;
     result->UNVTransformations = b.UNVTransformations;
 
-    result->file = result->modes.file = "truncated";
+    result->file = "truncated";
+    result->modes.setFileName(result->file);
     //select vertexes in  the first mech form which will be associate with the second mech form
     std::vector<int> interrelations(FEM::truncationIndexVector(a, b));
     //and now just copy the form values from theory
@@ -1018,7 +1019,7 @@ FEM* FEM::truncation(const FEM& a, const FEM& b) {
         receiver->updatePreMac();
     }
 
-    result->modes.estimateMAC();
+    result->modes.estimateAutoMAC();
 
     return result;
 }
