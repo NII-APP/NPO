@@ -29,7 +29,7 @@ protected:
     QMenu* menu;
 
     void safelyUpdate() { update(); }//ну там всякие соображения... не придавайте значения... можно менять
-    virtual void drawIdantityQuad() { }
+    virtual void drawUnityQuad() { }
     void drawGradienQuad(const QRgb c1, const QRgb c2, const QRgb c3, const QRgb c4);
     void loadRotate();
 

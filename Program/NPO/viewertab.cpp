@@ -11,11 +11,12 @@
 #include "application.h"
 #include "project.h"
 #include "femviewer.h"
+#include "viewernode.h"
 
 ViewerTab::ViewerTab(QWidget *parent)
     : QSplitter(Qt::Horizontal, parent)
     , femView(new ViewerView(this))
-    , femWidget(new FEMViewer(this))
+    , cascadeNode(new ViewerNode(this))
 {
     femView->setModel(new ViewerModel(Application::project(), this));
     this->connect(femView, SIGNAL(addModelPressed()), SLOT(addModel()));
@@ -23,8 +24,8 @@ ViewerTab::ViewerTab(QWidget *parent)
     this->connect(femView, SIGNAL(importModesPressed(int)), SLOT(addModes(int)));
     this->connect(femView, SIGNAL(currentModeChanged(int, int)), SLOT(setMode(int)));
     this->addWidget(femView);
-    this->addWidget(femWidget);
-    this->setSizes(QList<int>() << 200 << 1000);
+    this->addWidget(cascadeNode);
+    this->setSizes(QList<int>() << 300 << 1000);
 }
 
 ViewerTab::~ViewerTab()
@@ -40,16 +41,15 @@ void ViewerTab::addModel() {
     }
     fem->read(bdf);
     setModel(fem);
-    Application::project()->pushModel(fem);
+    Application::nonConstProject()->pushModel(fem);
     femView->reset();
 }
 
 void ViewerTab::setModel(const FEM* model) {
-    femWidget->setModel(model);
+    cascadeNode->setModel(model);
 }
 
 void ViewerTab::setModel(int id) {
-    qDebug() << "set model" << id;
     try {
         setModel(Application::project()->modelsList().at(id));
     } catch(...) {
@@ -58,7 +58,7 @@ void ViewerTab::setModel(int id) {
 }
 
 void ViewerTab::setMode(int v) {
-    femWidget->setMode(v);
+    cascadeNode->setMode(v);
 }
 
 void ViewerTab::addModes(int meshId) {
@@ -68,6 +68,6 @@ void ViewerTab::addModes(int meshId) {
         return;
     }
     fem->read(file);
-    femWidget->updateToolBar();
+    cascadeNode->update();
     femView->reset();
 }

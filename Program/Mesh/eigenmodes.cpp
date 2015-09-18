@@ -69,6 +69,7 @@ void EigenModes::readTXT(const QString &fileName)
             break;
         case 'x': default:
             orientation = QVector3D(1.0f,0.0f,0.0f);
+            break;
         }
 
         f += 4;
@@ -85,7 +86,7 @@ void EigenModes::readTXT(const QString &fileName)
               //       << v * current * QVector3D(1.,1.,0.);
             //forms[i].form().push_vector_back(QVector3D(sin(angle) * v, cos(angle) * v, 0.0));
             //qDebug() << v << '*' << current * QVector3D(1.0,1.0,0.0) << '=' << v * current * QVector3D(1.,1.,0.) << angle / acos(-1.0) * 180;
-            operator[](i).form().push_vector_back(f.real() * orientation);
+            at(i).form().push_vector_back(f.real() * orientation);
         }
         f.skipRow();
         ++j;
@@ -227,11 +228,18 @@ const CGL::CMatrix& EigenModes::getMac() const {
 
 void EigenModes::estimateMAC()
 {
+#ifndef QT_NO_DEBUG
     std::clog << "Estimate auto MAC" << std::endl;
+    QTime start(QTime::currentTime());
+#endif
     mac = CGL::Matrix(size(), size());
     for (EigenModes::iterator it(begin()), end(end()); it != end; ++it) {
         it->updatePreMac();
     }
+#ifndef QT_NO_DEBUG
+    std::clog << "\tUpdare preMAC delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec" << std::endl;
+    start = QTime::currentTime();
+#endif
     for (int i(0); i != size(); ++i) {
         for (int j(0); j != size(); ++j) {
             if (i == j) {
@@ -246,6 +254,9 @@ void EigenModes::estimateMAC()
             }
         }
     }
+#ifndef QT_NO_DEBUG
+    std::clog << "\tautoMac delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec" << std::endl;
+#endif
 }
 
 float EigenModes::MAC(const EigenMode& a, const EigenMode& b)

@@ -21,7 +21,7 @@ class C3dColumnChart : public C3dChart
     RealScale scale;
     CColorScale color;
 
-    static void drowParallelepiped(const CParallelepiped&);
+    static void drawParallelepiped(const CParallelepiped&);
     void closeEvent(QCloseEvent *);
 public:
     C3dColumnChart(QWidget* parent = 0);

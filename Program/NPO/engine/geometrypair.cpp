@@ -2,11 +2,11 @@
 #include "eigenmodes.h"
 
 MeshPair::MeshPair(FEM *theory, FEM *practic)
-    : std::pair<FEM* const, FEM* const>(theory, practic)
+    : std::pair<const FEM* const, const FEM* const>(theory, practic)
 {
-    first->alignZero();
-    second->alignZero();
-    second->scaleTo(first->box().size());
+    theory->alignZero();
+    practic->alignZero();
+    practic->scaleTo(first->box().size());
     truncated = FEM::truncation(*first, *second);
 
     //estimate mac

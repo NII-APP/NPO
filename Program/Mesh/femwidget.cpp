@@ -81,6 +81,10 @@ void FEMWidget::setData(const QList<const FEM *> &models)
     }
 }
 
+void FEMWidget::drawUnityQuad() {
+    drawGradienQuad(0xd9dbdc, 0xd9dbdc, 0xa0aa9a, 0xa0aa9a);
+}
+
 void FEMWidget::paintCGL()
 {
     QTime now(QTime::currentTime());
@@ -92,6 +96,8 @@ void FEMWidget::paintCGL()
         item->release();
     }
     repaintLoop->start();
+    //to save background unity quad
+    shader->setUniformValue("k", 0.0f);
 }
 
 FEMWidget::MeshBuffer::MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader, QObject* parent)
@@ -129,6 +135,12 @@ void FEMWidget::setMode(int m) {
     }
 }
 
+void FEMWidget::colorize(int m) {
+    for (MeshBuffer* i : meshes) {
+        i->colorize(m);
+    }
+}
+
 void FEMWidget::setMagnitude(double v) {
     animation->setMagnitude(v);
 }
@@ -147,6 +159,7 @@ void FEMWidget::play() {
 
 void FEMWidget::MeshBuffer::setCurrentMode(int form) {
     if (modes().size() > form && form >= 0) {
+        colorize(form);
         mode = form;
         array->bind();
         vertex.bind();
@@ -160,6 +173,13 @@ void FEMWidget::reloadColors(const FEM* w) {
         ++b;
     }
     (*b)->uploadColors();
+}
+
+void FEMWidget::MeshBuffer::colorize(int m) {
+    if (m >= 0 && m < self->getModes().size()) {
+        self->colorize(m);
+        uploadColors();
+    }
 }
 
 void FEMWidget::MeshBuffer::uploadMode() {
@@ -189,6 +209,7 @@ QList<const FEM *> FEMWidget::getData() const
     }
     return result;
 }
+
 
 void FEMWidget::wheelEvent(QWheelEvent * e) {
     if (e->modifiers() & Qt::CTRL) {

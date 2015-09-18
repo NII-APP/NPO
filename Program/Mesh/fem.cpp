@@ -76,7 +76,7 @@ bool FEM::read(const QString &fileName) {
                     try {
                         s->toGlobal(m.form()(l.second));
                         s->toGlobal(m.band()(l.second));
-                    } catch (std::out_of_range&) { qDebug() << "except"; }
+                    } catch (std::out_of_range&) { qWarning() << "form or band of any mode haven't node " + l.second; }
                 };
             } else {
                 qDebug() << "doesn't exist" << l.first << "system!";
@@ -126,14 +126,13 @@ void FEM::estimateBox()
 }
 
 void FEM::coordinateSystemImplimentation() {
-    //*
     for (CoordinateLinks::const_iterator l(linksPoint.begin()), end(linksPoint.end()); l != end; ++l) {
         if (systems.contains(l->first)) {
             for (EigenModes::iterator i(modes.begin()); i != modes.end(); ++i) {
                 systems[l->first]->toGlobal(i->form()(l->second));
             }
         }
-    }//*/
+    }
 }
 
 void FEM::scarfUp(PyParse::BDFEntity& entity) {

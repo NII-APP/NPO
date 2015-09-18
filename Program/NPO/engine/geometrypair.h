@@ -3,7 +3,7 @@
 #include <map>
 #include "FEM.h"
 
-class MeshPair: std::pair<FEM* const, FEM* const>
+class MeshPair: std::pair<const FEM* const, const FEM* const>
 {
 public:
     typedef std::vector<int> Relation;
@@ -14,8 +14,8 @@ private:
 public:
     Relation& relations() { return relation; }
 
-    FEM* theory() { return first; }
-    FEM* practic() { return second; }
+    const FEM* theory() { return first; }
+    const FEM* practic() { return second; }
     FEM* truncation() { return truncated; }
 
     const CGL::CMatrix& getMac() const { return mac; }

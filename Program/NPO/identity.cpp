@@ -45,11 +45,46 @@ const QJsonObject Identity::readConfig() {
     QJsonDocument doc(QJsonDocument::fromJson(f.readAll(), errors));
     if (errors->errorString() != QString("no error occurred")) {
 #ifndef QT_NO_DEBUG
-        qDebug() << errors->errorString();
+        qFatal(QString("JSON error occured: " + errors->errorString()).toUtf8());
 #endif
-        Q_ASSERT("JSON error occured");
     }
     return doc.object();
+}
+
+QString Identity::tr(QString key, const QString& context) const {
+    key += ' ' + language();
+    if (context.isNull()) {
+        if (configuration.contains(key)) {
+            return configuration[key].toString();
+        } else {
+            qFatal(QString("configuration doesn't contain field \"" + key + '\"').toUtf8());
+            return QString();
+        }
+    } else {
+        QStringList route(context.split('/'));
+        if (configuration.contains(route.first())) {
+            QJsonObject node(configuration[route.first()].toObject());
+            if (route.size() != 1)  {
+                for (QStringList::const_iterator i(route.begin() + 1); i != route.end(); ++i) {
+                    if (node.contains(*i)) {
+                        node = node[*i].toObject();
+                    } else {
+                        qFatal(QString("configuration doesn't contain field \"" + context + '/' + key + '\"').toUtf8());
+                        return QString();
+                    }
+                }
+            }
+            if (node.contains(key)) {
+                return node[key].toString();
+            } else {
+                qFatal(QString("configuration doesn't contain field \"" + context + '/' + key + '\"').toUtf8());
+                return QString();
+            }
+        } else {
+            qFatal(QString("configuration doesn't contain field \"" + context + '/' + key + '\"').toUtf8());
+            return QString();
+        }
+    }
 }
 
 QJsonValue Identity::at(const QString & name) const {
@@ -149,14 +184,40 @@ QString Identity::tabPair() const {
     Q_ASSERT(configuration.contains("tab pair " + language()));
     return configuration["tab pair " + language()].toString();
 }
+QString Identity::mainWindowTitle() const {
+    Q_ASSERT(configuration.contains("main window title " + language()));
+    return configuration["main window title " + language()].toString();
+}
+QString Identity::organizationName() const {
+    Q_ASSERT(configuration.contains("organization name " + language()));
+    return configuration["organization name " + language()].toString();
+}
+QString Identity::organizationDomain() const {
+    Q_ASSERT(configuration.contains("organization domain " + language()));
+    return configuration["organization domain " + language()].toString();
+}
+QString Identity::applicationName() const {
+    Q_ASSERT(configuration.contains("application name " + language()));
+    return configuration["application name " + language()].toString();
+}
 
 QIcon Identity::tabViewIcon() const {
     Q_ASSERT(configuration.contains("tab view icon"));
-    return QIcon(configuration["tab view icon"].toString());
+    QString ico(configuration["tab view icon"].toString());
+    if (ico.split('.').last() != "svg") {
+        return QIcon(ico);
+    } else {
+        return fromSvg(ico);
+    }
 }
 QIcon Identity::tabPairIcon() const {
     Q_ASSERT(configuration.contains("tab pair icon"));
-    return QIcon(configuration["tab pair icon"].toString());
+    QString ico(configuration["tab pair icon"].toString());
+    if (ico.split('.').last() != "svg") {
+        return QIcon(ico);
+    } else {
+        return fromSvg(ico);
+    }
 }
 
 QString Identity::choseModelFile() const {
@@ -194,6 +255,14 @@ void Identity::messageWrongProFile(const QString &fName) const {
     Q_ASSERT(q.contains("text " + language()));
     QMessageBox::warning(QApplication::topLevelWidgets().first(), q["title " + language()].toString(),
             q["text " + language()].toString().arg(fName));
+}
+
+int Identity::messageUnsavedProject() const {
+    Q_ASSERT(configuration.contains("close modified") && configuration["close modified"].isObject());
+    QJsonObject q(configuration["close modified"].toObject());
+    Q_ASSERT(q.contains("text " + language()));
+    return QMessageBox::question(QApplication::topLevelWidgets().first(), q["title " + language()].toString(),
+            q["text " + language()].toString());
 }
 
 void Identity::messageCantStartPython() const {

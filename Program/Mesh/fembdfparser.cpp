@@ -28,7 +28,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
             highAccuracy = true;
             type.resize(type.size() - 1);
         }
-        const int wordSize(BORDER_FIELD_SIZE << highAccuracy);
+        const int wordSize(BORDER_FIELD_SIZE << (highAccuracy ? 1 : 0));
         if (type == "CQUAD4") {
             int id(f.integer());
             if (trace.size() <= id) {
@@ -109,9 +109,9 @@ void FEM::nativeBDFParser(const QString& fileName) {
             shells[id] = Shell(id, matId, width, anyOther, someOneElse);
             f.skipRow();
         } else if (type == "CORD2R") {
-            f += BORDER_FIELD_SIZE - type.length() - highAccuracy;
+            f += BORDER_FIELD_SIZE - type.length() - (highAccuracy ? 1 : 0);
             const int id(f.fixFloat(wordSize));
-            f += BORDER_FIELD_SIZE << highAccuracy;
+            f += BORDER_FIELD_SIZE << (highAccuracy ? 1 : 0);
             float m[9];
             m[0] = f.fixFloat(wordSize);
             m[1] = f.fixFloat(wordSize);

@@ -11,7 +11,7 @@
 
 
 int main(int argc, char *argv[])
-{
+{qDebug() << "2rfeWsdsde";
     Application a(argc, argv);
     setlocale(LC_ALL,"RUS");
 

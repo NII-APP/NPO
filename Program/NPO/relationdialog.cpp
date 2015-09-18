@@ -91,7 +91,7 @@ void RelationDialog::popupConfig(QFrame*& p, ViewerTab *&f, const FEM &v)
     p->layout()->addWidget(f);
 }
 
-void RelationDialog::buildLabels(Labels &lbls, FEM& g)
+void RelationDialog::buildLabels(Labels &lbls, const FEM& g)
 {
     for (auto& i: lbls) {
         delete i;

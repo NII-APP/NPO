@@ -5,9 +5,12 @@
 #include <QLabel>
 #include <QEvent>
 
+#include "application.h"
+#include "identity.h"
+
 namespace {
 typedef CScale<int, double> ToRealScale;
-static const ToRealScale SLIDER_SCALE = ToRealScale(ToRealScale::InRange(0, 1000), ToRealScale::OutRange(0.1, 5.0));
+static const ToRealScale SLIDER_SCALE = ToRealScale(ToRealScale::InRange(0, 1000), ToRealScale::OutRange(-5.0, 5.0));
 }
 
 FEMViewer::FEMViewerMagnitudeInput::FEMViewerMagnitudeInput(QWidget *parent)
@@ -15,7 +18,7 @@ FEMViewer::FEMViewerMagnitudeInput::FEMViewerMagnitudeInput(QWidget *parent)
     , slider(new QSlider(Qt::Horizontal, this))
 {
     this->setLayout(new QHBoxLayout(this));
-    this->layout()->addWidget(new QLabel(this->parent()->parent()->tr("Magnitude"), this));
+    this->layout()->addWidget(new QLabel(Application::identity()->tr("magnitude", "FEMViewer"), this));
     this->layout()->addWidget(slider);
 
     slider->setMinimum(SLIDER_SCALE.getDomain().getMin());
