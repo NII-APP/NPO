@@ -13,13 +13,6 @@ void ViewerView::currentChanged(const QModelIndex & current, const QModelIndex &
     if (this->model()->data(current) == Application::identity()->geometriesModelAdd()) {
         emit addModelPressed();
     }
-    auto goTop = [](const QModelIndex& i, const QAbstractItemModel* const m)->QModelIndex {
-        QModelIndex r(i);
-        while (!ViewerModel::isTopIndex(r) && !ViewerModel::isRootIndex(r)) {
-            r = m->parent(r);
-        }
-        return r;
-    };
     const int modelId(ViewerModel::modelId(current));
     if (modelId != ViewerModel::modelId(prew)) {
         emit currentModelChanged(modelId);
@@ -29,8 +22,14 @@ void ViewerView::currentChanged(const QModelIndex & current, const QModelIndex &
         emit importModesPressed(modelId);
     } else if (r == ViewerModel::ModesIdentification) {
         emit modesIdentificationPressed(modelId);
+    } else if (r == ViewerModel::MAC) {
+        emit MACPressed(modelId);
     }
     if (current.internalId() && !ViewerModel::isInfoIndex(current)) {
         emit currentModeChanged(current.row(), modelId);
     }
+}
+
+void ViewerView::update() {
+    this->reset();
 }

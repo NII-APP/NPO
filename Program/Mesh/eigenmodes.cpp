@@ -4,6 +4,10 @@
 #include <cparse.h>
 #include <QTime>
 #include <QFile>
+#include <QString>
+#ifndef QT_NO_DEBUG
+#include <QDebug>
+#endif
 
 EigenModes::EigenModes()
 { }
@@ -77,15 +81,6 @@ void EigenModes::readTXT(const QString &fileName)
             f.real();
             f.real();
             f.real();
-            ///operator[](i).form().push_vector_back(f.real() * orientation); it's still not have normal format... fix for every file
-            //double v(f.real());
-            //QVector3D current(nodes()(j));
-            //qreal angle(atan2(current.x(), current.y()));
-            //qreal angle((rand() % 180) / 180. * acos(-1.));
-            //qDebug() << "angle" << angle / acos(-1.) * 180 << QVector3D(cos(angle) * v, sin(angle) * v, 0.0)
-              //       << v * current * QVector3D(1.,1.,0.);
-            //forms[i].form().push_vector_back(QVector3D(sin(angle) * v, cos(angle) * v, 0.0));
-            //qDebug() << v << '*' << current * QVector3D(1.0,1.0,0.0) << '=' << v * current * QVector3D(1.,1.,0.) << angle / acos(-1.0) * 180;
             at(i).form().push_vector_back(f.real() * orientation);
         }
         f.skipRow();
@@ -93,8 +88,6 @@ void EigenModes::readTXT(const QString &fileName)
     }
     //UNVTransformation(forms);
 
-    estimateDefoultMagnitudes();
-    estimateMAC();
 #ifndef QT_NO_DEBUG
     std::clog << "\ttxt correctly parsed. " << at(0).form().length() <<
                  " vertexes in eign vector (" << loop.msecsTo(QTime::currentTime()) / 1000.0 << "ms )" << std::endl;
@@ -210,11 +203,12 @@ void EigenModes::readF06(const QString& fileName)
         f.skipRow();
     }
 
-    estimateMAC();
 #ifndef QT_NO_DEBUG
     std::clog << "\tFile correctly parse " << size() << " forms in " << (empty() ? std::numeric_limits<double>::quiet_NaN() : front().form().length()) << " nodes with each (" << loop.msecsTo(QTime::currentTime()) / 1000. << "ms)\n";
 #endif
 }
+
+
 
 void EigenModes::estimateDefoultMagnitudes() {
     for (EigenMode& i : *this) {
@@ -222,40 +216,50 @@ void EigenModes::estimateDefoultMagnitudes() {
     }
 }
 
-const CGL::CMatrix& EigenModes::getMac() const {
+const CGL::CMatrix& EigenModes::getMAC() const {
     return mac;
 }
 
-void EigenModes::estimateMAC()
-{
-#ifndef QT_NO_DEBUG
-    std::clog << "Estimate auto MAC" << std::endl;
-    QTime start(QTime::currentTime());
-#endif
+
+void EigenModes::MACEstimationPrepare() {
     mac = CGL::Matrix(size(), size());
     for (EigenModes::iterator it(begin()), end(end()); it != end; ++it) {
         it->updatePreMac();
     }
+}
+
+void EigenModes::estimateAutoMAC(int i, int j) {
+    if (i == j) {
+        mac[i][j] = 1.0;
+    } else if (i > j) {
+        mac[i][j] = mac[j][i];
+    } else {
+        float nm(0.0f);
+        const CGL::CVertexes::const_iterator end(operator[](i).form().end());
+        for (CGL::CVertexes::const_iterator it(operator[](i).form().begin()), it2(operator[](j).form().begin()); it != end; ++it, ++it2)
+            nm += *it * *it2;
+        mac[i][j] = nm * nm / operator[](i).preMac() / operator[](j).preMac();
+    }
+}
+
+void EigenModes::estimateAutoMAC()
+{
 #ifndef QT_NO_DEBUG
-    std::clog << "\tUpdare preMAC delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec" << std::endl;
+    qDebug() << "Estimate auto MAC";
+    QTime start(QTime::currentTime());
+#endif
+    MACEstimationPrepare();
+#ifndef QT_NO_DEBUG
+    qDebug() << "\tUpdare preMAC delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec";
     start = QTime::currentTime();
 #endif
     for (int i(0); i != size(); ++i) {
         for (int j(0); j != size(); ++j) {
-            if (i == j) {
-                mac[i][j] = 1.0;
-            } else {
-                float nm(0.0f);
-                const CGL::CVertexes::const_iterator end(operator[](i).form().end());
-                for (CGL::CVertexes::const_iterator it(operator[](i).form().begin()), it2(operator[](j).form().begin());
-                     it != end; ++it, ++it2)
-                    nm += *it * *it2;
-                mac[i][j] = nm * nm / operator[](i).preMac() / operator[](j).preMac();
-            }
+            estimateAutoMAC(i, j);
         }
     }
 #ifndef QT_NO_DEBUG
-    std::clog << "\tautoMac delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec" << std::endl;
+    qDebug() << "\tautoMac delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec";
 #endif
 }
 
@@ -293,7 +297,9 @@ QDataStream& operator >> (QDataStream& s, EigenModes& g) {
     EigenModes::size_type size;
     s >> size;
     g.resize(size);
-    qDebug() << "read size" << g.size();
+#ifndef QT_NO_DEBUG
+    qDebug() << "\tstart to read modes (" << g.size() << "PC )";
+#endif
     for (EigenModes::iterator i(g.begin()), end(g.end()); i != end; ++i) {
         s >> *i;
     }
@@ -302,3 +308,6 @@ QDataStream& operator >> (QDataStream& s, EigenModes& g) {
 #endif
     return s;
 }
+
+void EigenModes::setFileName(const QString& n) { file = n; }
+const QString& EigenModes::getFileName() const { return file; }

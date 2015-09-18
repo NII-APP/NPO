@@ -119,6 +119,7 @@ public:
     virtual void setName(const QString&);
 
     const EigenModes& getModes() const { return modes; }
+    EigenModes& getModes() { return modes; }
 
     //reading that formsts
     bool readBDF(const QString &fileName);

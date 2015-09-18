@@ -10,7 +10,7 @@
 #include "femviewer.h"
 
 int main(int argc, char *argv[])
-{qDebug() << "2rfeWsdsde";
+{qDebug() << "2rfeWsds78gde";
     Application a(argc, argv);
     setlocale(LC_ALL,"RUS");
 
