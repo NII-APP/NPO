@@ -13,8 +13,10 @@
         <file>images/play-512px.svg</file>
         <file>images/stop-512px.svg</file>
         <file>images/list-add-512px.svg</file>
+        <file>images/panel_pair.svg</file>
+        <file>images/plane_model.svg</file>
     </qresource>
-    <qresource lang="css" prefix="/css">
+    <qresource prefix="/css" lang="css">
         <file>css.css</file>
     </qresource>
     <qresource prefix="/json">
