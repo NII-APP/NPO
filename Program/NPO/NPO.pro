@@ -34,7 +34,6 @@ MOC_DIR = $$PWD/../build/main/moc
 SOURCES += main.cpp \
     relationdialog.cpp \
     engine/geometrypair.cpp \
-    engine/pseudoInverse.cpp \
     application.cpp \
     identity.cpp \
     project.cpp \
@@ -57,7 +56,6 @@ SOURCES += main.cpp \
 HEADERS += \
     relationdialog.h \
     engine/geometrypair.h \
-    engine/pseudoInverse.h \
     application.h \
     identity.h \
     project.h \
