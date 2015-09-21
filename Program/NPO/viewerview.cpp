@@ -7,6 +7,7 @@
 ViewerView::ViewerView(QWidget *parent)
     : QTreeView(parent)
 {
+    this->setFrameStyle(QFrame::NoFrame);
 }
 
 void ViewerView::currentChanged(const QModelIndex & current, const QModelIndex & prew) {
