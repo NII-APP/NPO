@@ -96,7 +96,7 @@ void RelationDialog::buildLabels(Labels &lbls, const FEM& g)
     for (auto& i: lbls) {
         delete i;
     }
-    lbls.resize(g.getModes().size());
+    lbls.resize(static_cast<int>(g.getModes().size()));
 
     QPalette p(this->palette());
     p.setBrush(QPalette::Light, QColor(0xFF,0xFF,0xFF));
