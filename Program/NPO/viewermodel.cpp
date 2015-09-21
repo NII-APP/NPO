@@ -9,7 +9,7 @@ ViewerModel::ViewerModel(const Project * p, QObject* parent)
     : QAbstractItemModel(parent)
     , __project(p)
 {
-    //Q_ASSERT(sizeof(quintptr) >= 8);
+    Q_ASSERT(sizeof(quintptr) >= 8);
 }
 
 bool ViewerModel::isRootIndex(const QModelIndex& i) {
