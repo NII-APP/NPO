@@ -182,9 +182,34 @@ CMatrix CMatrix::operator*(const CMatrix& matrix2) const {
     }
     return result;
 }
-
+CMatrix CMatrix::operator* (const CArray& vector) const {
+    Q_ASSERT(vector.size() == width());
+    if( vector.getOrientation() != CArray::Vertical ){
+         qDebug() << "Warning! The vector is not Vertical";
+    }
+    CMatrix result(1,height());
+    for(int i(0); i < height(); i++){
+        for(int j(0); j < width(); j++){
+            result[i][0] += m[i][j] * vector[j];
+            }
+        }
+    return result;
+}
+CMatrix operator* (const CArray& vector, const CMatrix& matrix){
+    Q_ASSERT(vector.size() == matrix.height());
+    if( vector.getOrientation() != CArray::Horizontal ){
+         qDebug() << "Warning! The vector is not Horizontal";
+    }
+    CMatrix result(matrix.width(),1);
+    for(int i(0); i < matrix.width(); i++){
+        for(int j(0); j < matrix.height(); j++){
+            result[0][i] += matrix[j][i] * vector[j];
+        }
+    }
+    return result;
+}
 CMatrix CMatrix::invers() const {
-    if ( height() != width()){
+    if (height() != width()){
     qDebug() << "Warning! The matrix is not square! \ninvers not available";
     return *this;
     }
@@ -229,7 +254,6 @@ CMatrix CMatrix::invers() const {
     }
     return matrixE;
 }
-
 CMatrix CMatrix::dotTranspose() const{
     CMatrix tempM(this->height(),this->height());
     for(int i(0); i < height(); i++){

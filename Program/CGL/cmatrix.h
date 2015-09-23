@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstddef>
 #include "crange.h"
+#include "carray.h"
 
 class QDebug;
 class QDataStream;
@@ -49,10 +50,9 @@ public:
     CMatrix pseudoInvers() const;
     CMatrix invers() const;
     CMatrix transpose() const;
-    CMatrix operator*(const CMatrix&) const;
+    CMatrix operator* (const CMatrix&) const;
+    CMatrix operator* (const CArray& vector) const;
     T det();
-
-
     void naNtoInf();
 
     size_t width() const { return wid; }
@@ -66,6 +66,7 @@ public:
     friend QDataStream& operator>> (QDataStream&, CMatrix&);
 };
 
+CMatrix operator* (const CArray&, const CMatrix&);
 QDataStream& operator<< (QDataStream&, const CMatrix&);
 QDataStream& operator>> (QDataStream&, CMatrix&);
 
@@ -74,3 +75,4 @@ QDebug operator<< (QDebug out, const CMatrix &obj);
 }
 
 #endif // CMatrix_H
+

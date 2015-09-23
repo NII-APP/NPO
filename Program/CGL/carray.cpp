@@ -5,14 +5,20 @@
 #include <cmath>
 #endif // QT_VERSION
 
-CArray::CArray(int size, double val) : std::vector<double>(size, val) { }
+CArray::CArray(int size, double val, Orientation orienataion)
+  : std::vector<double>(size, val)
+  , __orientation(orienataion){ }
 
 
-CArray::CArray(double* data, int size) : std::vector<double>(size) {
+CArray::CArray(double* data, int size, Orientation orienataion)
+  : std::vector<double>(size)
+  , __orientation(orienataion) {
     memcpy(this->data(), data, size * sizeof(double));
 }
 
-
+CArray::Orientation CArray::getOrientation() const { return __orientation; }
+void CArray::setOrientation(Orientation o) { __orientation = o; }
+void CArray::transpose() { __orientation = __orientation == Horizontal ? Vertical : Horizontal; }
 
 IndexRange CArray::estimateRangeIndex() const {
     IndexRange domain(0);

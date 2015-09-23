@@ -162,6 +162,9 @@ public:
     //elements
     std::vector<core::FinitElement*>& elements() { return trace; }
     const std::vector<core::FinitElement*>& elements() const { return trace; }
+    //synonyms for elements assess functions
+    std::vector<core::FinitElement*>& getElements() { return trace; }
+    const std::vector<core::FinitElement*>& getElements() const { return trace; }
 
     inline const QString& getMeasurment() { return measurment; }
     inline void setMeasurment(const QString& m) { measurment = m; }

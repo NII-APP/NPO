@@ -6,14 +6,26 @@
 class CArray : public std::vector<double>
 {
 public:
-    CArray(int size = 0, double val = 0.0f);
+    enum Orientation {
+        Horizontal,
+        Vertical
+    };
 
-    CArray(double* data, int size);
+    CArray(int size = 0, double val = 0.0f, Orientation orienataion = Horizontal);
+
+    CArray(double* data, int size, Orientation orienataion = Horizontal);
 
     RealRange estimateRange() const;
     IndexRange estimateRangeIndex() const;
 
     void grade(int count);
+
+    void transpose();
+    Orientation getOrientation() const;
+    void setOrientation(Orientation);
+
+private:
+    Orientation __orientation;
 };
 
 #endif // CARRAY_H
