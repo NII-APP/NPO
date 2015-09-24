@@ -130,7 +130,9 @@
     	"import rus" : "Импортировать собственные формы...",
     	"import eng" : "Import eigen modes...",
     	"identification rus" : "Идентифицировать собственные формы...",
-    	"identification eng" : "Eigen modes import..."
+        "identification eng" : "Eigen modes import...",
+        "models list eng" : "Avalible models",
+        "models list rus" : "Хранимые в проекте модели"
     },
     "FEMViewer" : {
         "frequency rus" : "Частота анимации",

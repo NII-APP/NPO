@@ -48,7 +48,7 @@ public:
         w->setParent(this);
         this->layout()->addWidget(w);
         this->show();
-        this->resize(this->layout()->sizeHint());
+        sizeUpdate();
     }
     void push(const QString& s) {
         push(new QLabel(s, this));
@@ -70,6 +70,9 @@ public:
         static_cast<QBoxLayout*>(this->layout())->insertWidget(i, which);
         this->show();
     }
+    void sizeUpdate() {
+        this->resize(this->layout()->sizeHint() + QSize(this->layout()->margin(), this->layout()->margin()));
+    }
 };
 }
 
@@ -82,6 +85,9 @@ void MainWindow::statusClear() {
 }
 void MainWindow::statusPush(const QString& s) {
     static_cast<Status*>(status)->push(s);
+}
+void MainWindow::statusSizeUpdate() {
+    static_cast<Status*>(status)->sizeUpdate();
 }
 
 void MainWindow::statusInsertBefore(QWidget* which, QWidget* before) {
@@ -123,7 +129,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     status->hide();
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closePorject()));
-
 }
 
 MainWindow::~MainWindow()

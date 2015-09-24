@@ -38,6 +38,7 @@ public slots:
     void statusPush(const QString &);
     void statusInsertBefore(QWidget* which, QWidget* before);
     void statusClear();
+    void statusSizeUpdate();
 };
 
 #endif // MAINWINDOW_H

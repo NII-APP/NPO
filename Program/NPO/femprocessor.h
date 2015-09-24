@@ -12,6 +12,7 @@
 
 class FEM;
 class QString;
+class QLabel;
 namespace CGL {
 class CMatrix;
 }
@@ -23,6 +24,7 @@ class FEMProcessor : public QObject
 
     FEM* const __model;
     QThread* const __t;
+    QLabel* const __progressWidget;
 
     class FEMWorker;
 public:
