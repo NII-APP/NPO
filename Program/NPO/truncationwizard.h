@@ -2,7 +2,7 @@
 #define TRUNCATIONWIZARD_H
 
 #include <QDialog>
-#include "engine/geometrypair.h"
+#include "engine/fempair.h"
 #include <QComboBox>
 #include <QVBoxLayout>
 #include "application.h"
@@ -22,19 +22,19 @@ class TruncationWizard : public QDialog
 
     CGL::C3dColumnChart* chart;
 
-    MeshPair* current;
+    FEMPair* current;
 
     TruncationWizard(QWidget* parent = 0);
     ~TruncationWizard();
 public:
 
-    static MeshPair* exec(QWidget* parent);
+    static FEMPair* exec(QWidget* parent);
 
 private slots:
     void previewPatrol();
 
 public slots:
-    void newMac(const MeshPair::Relation& r) {
+    void newMac(const FEMPair::Relation& r) {
         current->makeMac(r);
         chart->setData(current->getMac());
     }

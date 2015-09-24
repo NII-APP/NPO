@@ -33,12 +33,10 @@ MOC_DIR = $$PWD/../build/main/moc
 
 SOURCES += main.cpp \
     relationdialog.cpp \
-    engine/geometrypair.cpp \
     application.cpp \
     identity.cpp \
     project.cpp \
     mainwindow.cpp \
-    truncationtab.cpp \
     truncationwizard.cpp \
     maintabbar.cpp \
     viewertab.cpp \
@@ -49,18 +47,20 @@ SOURCES += main.cpp \
     femviewermodeinput.cpp \
     femviewermagnitudeinput.cpp \
     viewernode.cpp \
-    fempairviewer.cpp \
     femprocessor.cpp \
-    macdisplay.cpp
+    macdisplay.cpp \
+    pairstab.cpp \
+    pairsmodel.cpp \
+    pairviewer.cpp \
+    engine/fempair.cpp \
+    pairsview.cpp
 
 HEADERS += \
     relationdialog.h \
-    engine/geometrypair.h \
     application.h \
     identity.h \
     project.h \
     mainwindow.h \
-    truncationtab.h \
     truncationwizard.h \
     maintabbar.h \
     viewertab.h \
@@ -71,9 +71,13 @@ HEADERS += \
     femviewermodeinput.h \
     femviewermagnitudeinput.h \
     viewernode.h \
-    fempairviewer.h \
     femprocessor.h \
-    macdisplay.h
+    macdisplay.h \
+    pairstab.h \
+    pairsmodel.h \
+    pairviewer.h \
+    engine/fempair.h \
+    pairsview.h
 
 exists( engine/pyParse/BDFEntity.cpp ) {
     message( "Configuring with new parser" )

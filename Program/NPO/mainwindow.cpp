@@ -15,7 +15,7 @@
 #include "identity.h"
 #include "project.h"
 #include "viewertab.h"
-#include "truncationtab.h"
+#include "pairstab.h"
 #include "maintabbar.h"
 #include "viewertab.h"
 
@@ -98,18 +98,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
 
     this->setCentralWidget(new TabWidget(this));
-    ViewerTab* cnt;
+    ViewerTab* const cnt(new ViewerTab(centralWidget()));
     static_cast<TabWidget*>(centralWidget())->setTabBar(new MainTabBar(this->centralWidget()));
     static_cast<QTabWidget*>(centralWidget())->setTabPosition(QTabWidget::West);
-    static_cast<QTabWidget*>(centralWidget())->addTab(cnt = new ViewerTab(this),
-                    Application::identity()->tabViewIcon(), Application::identity()->tabView());
-    static_cast<QTabWidget*>(centralWidget())->addTab(new TruncationTab(this),
-                    Application::identity()->tabPairIcon(), Application::identity()->tabPair());
+    static_cast<QTabWidget*>(centralWidget())->addTab(cnt, Application::identity()->tabViewIcon(), Application::identity()->tabView());
+    static_cast<QTabWidget*>(centralWidget())->addTab(new PairsTab(centralWidget()), Application::identity()->tabPairIcon(), Application::identity()->tabPair());
     static_cast<QTabWidget*>(centralWidget())->addTab(new QWidget(this),"");
     static_cast<QTabWidget*>(centralWidget())->setTabEnabled(2,false);
 
-
-    cnt->connect(this, SIGNAL(projectLoaded()), SLOT(resetListView()));
+    cnt->connect(this, SIGNAL(projectLoaded()), SLOT(acceptNewProject()));
 
     Identity::Relations relations;
     relations.insert("save", Identity::Acceptor(this, SLOT(save())));
@@ -140,11 +137,11 @@ void MainWindow::closePorject() {
     if (this->isWindowModified()) {
         if (Application::identity()->messageUnsavedProject() & QMessageBox::Yes) {
             this->save();
-            Application::clearProject();
-            emit projectLoaded();
-            static_cast<QTabWidget*>(centralWidget())->setCurrentIndex(0);
         }
     }
+    static_cast<QTabWidget*>(centralWidget())->setCurrentIndex(0);
+    Application::clearProject();
+    emit projectLoaded();
 }
 
 void MainWindow::load(const QString& location) {
@@ -154,6 +151,7 @@ void MainWindow::load(const QString& location) {
         }
         return;
     }
+    closePorject();
     try {
         Application::nonConstProject()->load(location);
         saveProjectLocation(location);

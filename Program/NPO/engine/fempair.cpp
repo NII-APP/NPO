@@ -1,7 +1,7 @@
-#include "geometrypair.h"
+#include "fempair.h"
 #include "eigenmodes.h"
 
-MeshPair::MeshPair(FEM *theory, FEM *practic)
+FEMPair::FEMPair(FEM *theory, FEM *practic)
     : std::pair<const FEM* const, const FEM* const>(theory, practic)
 {
     theory->alignZero();
@@ -43,7 +43,7 @@ MeshPair::MeshPair(FEM *theory, FEM *practic)
     }
 }
 
-void MeshPair::makeMac(const EigenModes &practic, const EigenModes &truncated)
+void FEMPair::makeMac(const EigenModes &practic, const EigenModes &truncated)
 {
     mac.resize(practic.size(), truncated.size());
     for (int i = 0; i != mac.height(); ++i) {
@@ -53,7 +53,7 @@ void MeshPair::makeMac(const EigenModes &practic, const EigenModes &truncated)
     }
 }
 
-void MeshPair::makeMac(const MeshPair::Relation& r)
+void FEMPair::makeMac(const FEMPair::Relation& r)
 {
     size_t relationLength = 0;
     for (size_t i = 0; i < r.size(); ++i) {

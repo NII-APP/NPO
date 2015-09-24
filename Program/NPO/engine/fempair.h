@@ -1,9 +1,10 @@
-#ifndef GEOMETRYPAIR_H
-#define GEOMETRYPAIR_H
+#ifndef FEMPAIR_H
+#define FEMPAIR_H
 #include <map>
 #include "FEM.h"
 
-class MeshPair: std::pair<const FEM* const, const FEM* const>
+
+class FEMPair: std::pair<const FEM* const, const FEM* const>
 {
 public:
     typedef std::vector<int> Relation;
@@ -21,11 +22,11 @@ public:
     const CGL::CMatrix& getMac() const { return mac; }
 
     void createTuncationForm();
-    MeshPair(FEM *theory, FEM *practic);
+    FEMPair(FEM *theory, FEM *practic);
 
     void makeMac(const Relation& r);
     void makeMac(const EigenModes&, const EigenModes&);
 
 };
 
-#endif // GEOMETRYPAIR_H
+#endif // FEMPAIR_H

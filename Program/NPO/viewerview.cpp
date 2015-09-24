@@ -7,6 +7,7 @@
 ViewerView::ViewerView(QWidget *parent)
     : QTreeView(parent)
 {
+    this->setModel(new ViewerModel(Application::project(), this));
     this->setFrameStyle(QFrame::NoFrame);
 }
 
@@ -29,6 +30,12 @@ void ViewerView::currentChanged(const QModelIndex & current, const QModelIndex &
     if (current.internalId() && !ViewerModel::isInfoIndex(current)) {
         emit currentModeChanged(current.row(), modelId);
     }
+}
+
+ViewerModel* ViewerView::myModel() const { return static_cast<ViewerModel*>(model()); }
+void ViewerView::acceptNewProject() {
+    myModel()->setProject(Application::project());
+    this->reset();
 }
 
 void ViewerView::update() {

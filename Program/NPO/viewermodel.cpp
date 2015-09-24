@@ -205,3 +205,11 @@ QVariant ViewerModel::data(const QModelIndex & index, int role) const {
         return "Model id fail" + QString::number(modelId(index));
     }
 }
+
+void ViewerModel::setProject(const Project* p) {
+    __project = p;
+}
+
+const Project* ViewerModel::getProject() {
+    return __project;
+}

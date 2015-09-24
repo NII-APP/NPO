@@ -8,8 +8,9 @@ int main(int argc, char *argv[])
     setlocale(LC_ALL,"RUS");
 
     MainWindow window;
+    a.setMainWindow(&window);
+
     window.showMaximized();
 
-    a.setMainWindow(&window);
     return a.exec();
 }

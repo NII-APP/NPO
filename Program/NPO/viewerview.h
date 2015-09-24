@@ -3,9 +3,13 @@
 
 #include <QTreeView>
 
+class ViewerModel;
+
 class ViewerView : public QTreeView
 {
     Q_OBJECT
+private:
+    ViewerModel* myModel() const;
 public:
     ViewerView(QWidget* parent = 0);
 
@@ -19,6 +23,7 @@ signals:
 
 public slots:
     void update();
+    void acceptNewProject();
 
 public slots:
     void currentChanged(const QModelIndex & current, const QModelIndex & previous);

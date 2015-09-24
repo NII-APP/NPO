@@ -14,7 +14,7 @@ class Project
 {
 public:
     typedef std::vector<FEM* const> Models;
-    typedef std::vector<FEMPair* const> MeshPairs;
+    typedef std::vector<FEMPair* const> FEMPairs;
 
     static const QString INSURANCE_ROW;
 private:
@@ -23,13 +23,13 @@ private:
     /*geometry pairs. Copy a geometry but store the pointer of geometry.
         When the theory model start to change some, it's separate to enother
         position but first and second is just shared with geometries */
-    MeshPairs pairs;
+    FEMPairs pairs;
 public:
     Project();
     ~Project();
 
     const Models& modelsList() const { return geometries; }
-    const MeshPairs& pairsList() const { return pairs; }
+    const FEMPairs& pairsList() const { return pairs; }
     void pushModel(FEM* const);
 
     int toId(const FEM* const val) const { return std::find(geometries.begin(), geometries.end(), val) - geometries.begin(); }

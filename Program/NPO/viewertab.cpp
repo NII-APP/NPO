@@ -22,7 +22,6 @@ ViewerTab::ViewerTab(QWidget *parent)
     , femView(new ViewerView(this))
     , cascadeNode(new ViewerNode(this))
 {
-    femView->setModel(new ViewerModel(Application::project(), this));
     this->connect(femView, SIGNAL(addModelPressed()), SLOT(addModel()));
     this->connect(femView, SIGNAL(currentModelChanged(int)), SLOT(setModel(int)));
     this->connect(femView, SIGNAL(importModesPressed(int)), SLOT(addModes(int)));
@@ -107,6 +106,13 @@ void ViewerTab::setModel(int id) {
 
 void ViewerTab::setMode(int v) {
     cascadeNode->setMode(v);
+}
+
+void ViewerTab::acceptNewProject() {
+    femView->acceptNewProject();
+    qDebug() << Application::project()->modelsList().empty();
+    qDebug() << (Application::project()->modelsList().empty() ? nullptr : Application::project()->modelsList().front());
+    setModel(Application::project()->modelsList().empty() ? nullptr : Application::project()->modelsList().front());
 }
 
 void ViewerTab::addModes(int meshId) {
