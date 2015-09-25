@@ -6,11 +6,15 @@
 class QTabBar;
 class QSplitter;
 class QTabWidget;
+class ViewerTab;
+class PairsTab;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    QWidget* status;
+    QWidget* const __status;
+    ViewerTab* const __modelsGUI;
+    PairsTab* const __pairsGUI;
 
     class TabWidget : public QTabWidget {
     public:

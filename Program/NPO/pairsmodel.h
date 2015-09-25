@@ -17,7 +17,7 @@ public:
     QModelIndex parent(const QModelIndex &child) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
 
-    void setProject(const Project*);
+    void setProject(const Project* const);
     const Project* getProject() const;
 
 private:

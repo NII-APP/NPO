@@ -10,10 +10,17 @@ class PairsView : public QTreeView
     Q_OBJECT
     PairModel* myModel() const;
 
+    void mousePressEvent(QMouseEvent *event);
+
+    void setModel(QAbstractItemModel *model) { QTreeView::setModel(model);  }
 public:
     explicit PairsView(QWidget *parent = 0);
 
-    void setProject(const Project*);
+signals:
+    void addPairPressed();
+
+public slots:
+    void acceptNewProject();
 };
 
 #endif // PAIRSVIEW_H

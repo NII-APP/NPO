@@ -39,9 +39,9 @@ class Status : public QFrame {
 
 public:
     Status(QWidget* parent) : QFrame(parent) {
+        this->hide();
         this->setLayout(new QVBoxLayout(this));
         this->setAutoFillBackground(true);
-        parent->installEventFilter(this);
         this->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     }
     void push(QWidget* w) {
@@ -77,43 +77,47 @@ public:
 }
 
 void MainWindow::statusPush(QWidget* w) {
-    static_cast<Status*>(status)->push(w);
+    static_cast<Status*>(__status)->push(w);
 }
 
 void MainWindow::statusClear() {
-    static_cast<Status*>(status)->clear();
+    static_cast<Status*>(__status)->clear();
 }
 void MainWindow::statusPush(const QString& s) {
-    static_cast<Status*>(status)->push(s);
+    static_cast<Status*>(__status)->push(s);
 }
 void MainWindow::statusSizeUpdate() {
-    static_cast<Status*>(status)->sizeUpdate();
+    static_cast<Status*>(__status)->sizeUpdate();
 }
 
 void MainWindow::statusInsertBefore(QWidget* which, QWidget* before) {
-    static_cast<Status*>(status)->insertBefore(which, before);
+    static_cast<Status*>(__status)->insertBefore(which, before);
 }
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , __status(new Status(this->centralWidget()))
+    , __modelsGUI(new ViewerTab(centralWidget()))
+    , __pairsGUI(new PairsTab(centralWidget()))
 {
-
+    this->installEventFilter(__status);
     this->setCentralWidget(new TabWidget(this));
-    ViewerTab* const cnt(new ViewerTab(centralWidget()));
     static_cast<TabWidget*>(centralWidget())->setTabBar(new MainTabBar(this->centralWidget()));
     static_cast<QTabWidget*>(centralWidget())->setTabPosition(QTabWidget::West);
-    static_cast<QTabWidget*>(centralWidget())->addTab(cnt, Application::identity()->tabViewIcon(), Application::identity()->tabView());
-    static_cast<QTabWidget*>(centralWidget())->addTab(new PairsTab(centralWidget()), Application::identity()->tabPairIcon(), Application::identity()->tabPair());
+    static_cast<QTabWidget*>(centralWidget())->addTab(__modelsGUI, Application::identity()->tabViewIcon(), Application::identity()->tabView());
+    static_cast<QTabWidget*>(centralWidget())->addTab(__pairsGUI, Application::identity()->tabPairIcon(), Application::identity()->tabPair());
     static_cast<QTabWidget*>(centralWidget())->addTab(new QWidget(this),"");
     static_cast<QTabWidget*>(centralWidget())->setTabEnabled(2,false);
 
-    cnt->connect(this, SIGNAL(projectLoaded()), SLOT(acceptNewProject()));
+    __modelsGUI->connect(this, SIGNAL(projectLoaded()), SLOT(acceptNewProject()));
+    __pairsGUI->connect(this, SIGNAL(projectLoaded()), SLOT(acceptNewProject()));
 
     Identity::Relations relations;
     relations.insert("save", Identity::Acceptor(this, SLOT(save())));
     relations.insert("save as", Identity::Acceptor(this, SLOT(saveAs())));
     relations.insert("open", Identity::Acceptor(this, SLOT(open())));
     relations.insert("close", Identity::Acceptor(this, SLOT(closePorject())));
-    relations.insert("import", Identity::Acceptor(cnt, SLOT(addModel())));
+    relations.insert("import", Identity::Acceptor(__modelsGUI, SLOT(addModel())));
     QMenu* fileMenu(this->menuBar()->addMenu(Application::identity()->menuFileName()));
     fileMenu->addActions(Application::identity()->menuFileActions(fileMenu, relations));
 
@@ -121,9 +125,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setWindowTitle(Application::identity()->mainWindowTitle().arg(""));
 
     load(QSettings().value("project/location").value<QString>());
-
-    status = new Status(this->centralWidget());
-    status->hide();
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closePorject()));
 }

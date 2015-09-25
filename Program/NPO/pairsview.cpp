@@ -1,4 +1,8 @@
 #include "pairsview.h"
+
+#include <QMouseEvent>
+#include <QDebug>
+
 #include "pairsmodel.h"
 #include "project.h"
 #include "application.h"
@@ -13,7 +17,14 @@ PairModel* PairsView::myModel() const {
     return static_cast<PairModel*>(model());
 }
 
-void PairsView::setProject(const Project* p) {
-    myModel()->setProject(p);
+void PairsView::acceptNewProject() {
+    myModel()->setProject(Application::project());
     this->update(QModelIndex());
+}
+
+void PairsView::mousePressEvent(QMouseEvent *event) {
+    QTreeView::mousePressEvent(event);
+    if (model()->data(this->indexAt(event->pos())) == Application::identity()->tr("add item", "pair tab/model")) {
+        emit addPairPressed();
+    }
 }

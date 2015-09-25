@@ -100,7 +100,7 @@ void ViewerTab::setModel(int id) {
     try {
         setModel(Application::project()->modelsList().at(id));
     } catch(...) {
-        Q_ASSERT("setModel invalid id");
+        qFatal("setModel invalid id");
     }
 }
 
@@ -110,8 +110,6 @@ void ViewerTab::setMode(int v) {
 
 void ViewerTab::acceptNewProject() {
     femView->acceptNewProject();
-    qDebug() << Application::project()->modelsList().empty();
-    qDebug() << (Application::project()->modelsList().empty() ? nullptr : Application::project()->modelsList().front());
     setModel(Application::project()->modelsList().empty() ? nullptr : Application::project()->modelsList().front());
 }
 

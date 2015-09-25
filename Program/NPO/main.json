@@ -120,6 +120,7 @@
         "transmit rus" : "Передача данных...",
         "transmit eng" : "Transmit the data..."
     },
+    "add item" : ":/media/images/list-add-512px.svg",
     "viewer model" : {
         "mac rus" : "Aвто-МАC",
         "mac eng" : "Auto-MAC",
@@ -143,8 +144,8 @@
             "item eng" : "Pair #%0",
             "MAC rus" : "МАC",
             "MAC eng" : "МАC",
-            "add item rus" : "Добавить пару...",
-            "add item eng" : "Add new pair...",
+            "add item rus" : "Добавить пару . . .",
+            "add item eng" : "Add new pair . . .",
             "project is null rus" : "Не обнаружен проект для отображения",
             "project is null eng" : "Project toesn't suggested"
         }

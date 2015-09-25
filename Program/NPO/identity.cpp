@@ -330,9 +330,49 @@ QString Identity::vieverModelValues(ViewerModel::ModelRow v, int n) const {
     return "Something wrong";
 }
 
-Identity::~Identity()
-{
+QIcon Identity::icon(const QString &from) const {
+    QStringList context(from.split('/'));
+    const QString key(context.last());
+    context.pop_back();
+    QString ico;
+    if (context.empty()) {
+        if (configuration.contains(key)) {
+            ico = configuration[key].toString();
+        } else {
+            qFatal(QString("configuration doesn't contain field \"" + key + '\"').toUtf8());
+            return QIcon();
+        }
+    } else {
+        const QStringList& route(context);
+        if (configuration.contains(route.first())) {
+            QJsonObject node(configuration[route.first()].toObject());
+            if (route.size() != 1)  {
+                for (QStringList::const_iterator i(route.begin() + 1); i != route.end(); ++i) {
+                    if (node.contains(*i)) {
+                        node = node[*i].toObject();
+                    } else {
+                        qFatal(QString("configuration doesn't contain field \"" + from + '\"').toUtf8());
+                        return QIcon();
+                    }
+                }
+            }
+            if (node.contains(key)) {
+                ico = node[key].toString();
+            } else {
+                qFatal(QString("configuration doesn't contain field \"" + from + '\"').toUtf8());
+                return QIcon();
+            }
+        } else {
+            qFatal(QString("configuration doesn't contain field \"" + from + '\"').toUtf8());
+            return QIcon();
+        }
+    }
 
+    if (ico.split('.').last() != "svg") {
+        return QIcon(ico);
+    } else {
+        return fromSvg(ico);
+    }
 }
 
 QIcon Identity::fromSvg(const QString& fname) {
@@ -342,5 +382,10 @@ QIcon Identity::fromSvg(const QString& fname) {
     QPainter pixPainter( &pix );
     svgRenderer.render(&pixPainter);
     return QIcon(pix);
+}
+
+Identity::~Identity()
+{
+
 }
 

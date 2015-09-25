@@ -72,6 +72,7 @@ public:
     QString menuFileName() const;
     QList<QAction*> menuFileActions(QObject* parent, const Relations& = Relations()) const;
 
+    QIcon icon(const QString& from) const;
     static QIcon fromSvg(const QString& fname);
 };
 

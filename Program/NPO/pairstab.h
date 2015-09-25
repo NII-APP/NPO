@@ -11,6 +11,10 @@ class PairsTab : public QSplitter
 public:
     explicit PairsTab(QWidget *parent = 0);
 
+public slots:
+    void acceptNewProject();
+    void addPair();
+
 private:
     PairsView* const __view;
     PairViewer* const __viewer;

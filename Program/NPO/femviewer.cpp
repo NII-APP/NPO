@@ -123,13 +123,9 @@ void FEMViewer::paintEvent(QPaintEvent *) {
 }
 
 void FEMViewer::setModel(const FEM* m) const {
-    qDebug() << m << 1;
     femWidget->setVisible(m);
-    qDebug() << m << 2;
     femWidget->setData(m);
-    qDebug() << m << 3;
     updateToolBar();
-    qDebug() << m << 4;
 
     femWidget->resize(this->size());
 }
