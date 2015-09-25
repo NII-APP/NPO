@@ -42,6 +42,10 @@ void ViewerView::mousePressEvent(QMouseEvent* e) {
     }
 }
 
+void ViewerView::updateCurrentModel() {
+    QTreeView::update(myModel()->index(ViewerModel::modelId(this->currentIndex()), 0, QModelIndex()));
+}
+
 ViewerModel* ViewerView::myModel() const { return static_cast<ViewerModel*>(model()); }
 void ViewerView::acceptNewProject() {
     myModel()->setProject(Application::project());

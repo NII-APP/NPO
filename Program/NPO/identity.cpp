@@ -52,39 +52,7 @@ const QJsonObject Identity::readConfig() {
 }
 
 QString Identity::tr(QString key, const QString& context) const {
-    key += ' ' + language();
-    if (context.isNull()) {
-        if (configuration.contains(key)) {
-            return configuration[key].toString();
-        } else {
-            qFatal(QString("configuration doesn't contain field \"" + key + '\"').toUtf8());
-            return QString();
-        }
-    } else {
-        QStringList route(context.split('/'));
-        if (configuration.contains(route.first())) {
-            QJsonObject node(configuration[route.first()].toObject());
-            if (route.size() != 1)  {
-                for (QStringList::const_iterator i(route.begin() + 1); i != route.end(); ++i) {
-                    if (node.contains(*i)) {
-                        node = node[*i].toObject();
-                    } else {
-                        qFatal(QString("configuration doesn't contain field \"" + context + '/' + key + '\"').toUtf8());
-                        return QString();
-                    }
-                }
-            }
-            if (node.contains(key)) {
-                return node[key].toString();
-            } else {
-                qFatal(QString("configuration doesn't contain field \"" + context + '/' + key + '\"').toUtf8());
-                return QString();
-            }
-        } else {
-            qFatal(QString("configuration doesn't contain field \"" + context + '/' + key + '\"').toUtf8());
-            return QString();
-        }
-    }
+    return resolveKey((context.isEmpty() ? "" : context + '/') + key + ' ' + language()).toString();
 }
 
 QJsonValue Identity::at(const QString & name) const {
@@ -330,17 +298,16 @@ QString Identity::vieverModelValues(ViewerModel::ModelRow v, int n) const {
     return "Something wrong";
 }
 
-QIcon Identity::icon(const QString &from) const {
+QVariant Identity::resolveKey(const QString& from) const {
     QStringList context(from.split('/'));
     const QString key(context.last());
     context.pop_back();
-    QString ico;
     if (context.empty()) {
         if (configuration.contains(key)) {
-            ico = configuration[key].toString();
+            return configuration[key];
         } else {
             qFatal(QString("configuration doesn't contain field \"" + key + '\"').toUtf8());
-            return QIcon();
+            return QVariant();
         }
     } else {
         const QStringList& route(context);
@@ -351,23 +318,26 @@ QIcon Identity::icon(const QString &from) const {
                     if (node.contains(*i)) {
                         node = node[*i].toObject();
                     } else {
-                        qFatal(QString("configuration doesn't contain field \"" + from + '\"').toUtf8());
-                        return QIcon();
+                        qFatal(QString("configuration doesn't contain field \"" + from + "\' (the object \"" + *i + "\" doesn't exist)").toUtf8());
+                        return QVariant();
                     }
                 }
             }
             if (node.contains(key)) {
-                ico = node[key].toString();
+                return node[key];
             } else {
-                qFatal(QString("configuration doesn't contain field \"" + from + '\"').toUtf8());
-                return QIcon();
+                qFatal(QString("configuration doesn't contain field \"" + from + "\' (the key \"" + key + "\" doesn't exist)").toUtf8());
+                return QVariant();
             }
         } else {
-            qFatal(QString("configuration doesn't contain field \"" + from + '\"').toUtf8());
-            return QIcon();
+            qFatal(QString("configuration doesn't contain field \"" + from + "\' (the object \"" + route.first() + "\" doesn't exist)").toUtf8());
+            return QVariant();
         }
     }
+}
 
+QIcon Identity::icon(const QString &from) const {
+    const QString ico(resolveKey(from).toString());
     if (ico.split('.').last() != "svg") {
         return QIcon(ico);
     } else {

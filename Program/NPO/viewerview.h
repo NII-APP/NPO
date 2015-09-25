@@ -25,6 +25,7 @@ signals:
 
 public slots:
     void update();
+    void updateCurrentModel();
     void acceptNewProject();
 };
 

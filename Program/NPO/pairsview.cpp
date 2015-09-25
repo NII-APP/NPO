@@ -10,6 +10,7 @@
 PairsView::PairsView(QWidget *parent) : QTreeView(parent)
 {
     this->setModel(new PairModel(this));
+    myModel()->setProject(Application::project());
     this->setFrameStyle(QFrame::NoFrame);
 }
 

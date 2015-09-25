@@ -96,12 +96,13 @@ void MainWindow::statusInsertBefore(QWidget* which, QWidget* before) {
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , __status(new Status(this->centralWidget()))
+    , __status(new Status(0))
     , __modelsGUI(new ViewerTab(centralWidget()))
     , __pairsGUI(new PairsTab(centralWidget()))
 {
     this->installEventFilter(__status);
     this->setCentralWidget(new TabWidget(this));
+    __status->setParent(this->centralWidget());
     static_cast<TabWidget*>(centralWidget())->setTabBar(new MainTabBar(this->centralWidget()));
     static_cast<QTabWidget*>(centralWidget())->setTabPosition(QTabWidget::West);
     static_cast<QTabWidget*>(centralWidget())->addTab(__modelsGUI, Application::identity()->tabViewIcon(), Application::identity()->tabView());

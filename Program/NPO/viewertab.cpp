@@ -49,7 +49,7 @@ void ViewerTab::showMAC(int id) {
     MACs.insert(model, chart);
 
     connect(chart, SIGNAL(closed()), chart, SLOT(deleteLater()));
-    connect(chart, SIGNAL(closed()), this, SLOT(fogiveMACWidget()));
+    connect(chart, SIGNAL(closed()), this, SLOT(forgetMACWidget()));
     if (processors.contains(model)) {
         connect(processors[model], SIGNAL(MACUpdated()), this, SLOT(updateMACWidget()));
     }
@@ -63,17 +63,19 @@ void ViewerTab::updateMACWidget() {
         return;
     }
     FEM* model(processors.key(sender));
-    MACs[model]->setData(model->getModes().getMAC());
+    if (MACs.contains(model)) {
+        MACs[model]->setData(model->getModes().getMAC());
+    }
 }
 
-void ViewerTab::fogiveMACWidget() {
+void ViewerTab::forgetMACWidget() {
     MACDisplay* sender(dynamic_cast<MACDisplay*>(QObject::sender()));
     FEM* p(MACs.key(sender, nullptr));
     if (p) {
         MACs.remove(p);
     }
 }
-void ViewerTab::fogiveFEMProcessor() {
+void ViewerTab::forgetFEMProcessor() {
     FEM* p(processors.key(dynamic_cast<FEMProcessor*>(QObject::sender()), nullptr));
     if (p) {
         processors.remove(p);
@@ -118,15 +120,15 @@ void ViewerTab::addModes(int meshId) {
     if (!QFile::exists(file)) {
         return;
     }
-    FEM* model(Application::project()->modelsList().at(meshId));
+    FEM* model(Application::nonConstProject()->modelsList().at(meshId));
     FEMProcessor* p(new FEMProcessor(model, this));
     connect(p, SIGNAL(modelReaded()), cascadeNode, SLOT(update()));
-    connect(p, SIGNAL(modelReaded()), femView, SLOT(update()));
+    connect(p, SIGNAL(modelReaded()), femView, SLOT(updateCurrentModel()));
     connect(p, SIGNAL(finished()), p, SLOT(deleteLater()));
-    connect(p, SIGNAL(finished()), this, SLOT(fogiveFEMProcessor()));
+    connect(p, SIGNAL(finished()), this, SLOT(forgetFEMProcessor()));
     processors.insert(model, p);
     if (MACs.contains(model)) {
-        connect(p, SIGNAL(MACUpdated(const CGL::CMatrix&)), MACs[model], SLOT(setData(const CGL::CMatrix&)));
+        connect(p, SIGNAL(MACUpdated()), this, SLOT(updateMACWidget()));
     }
     p->read(file);
 }

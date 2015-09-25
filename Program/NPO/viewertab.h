@@ -50,8 +50,8 @@ public slots:
     void showMAC(int id);
 
 private slots:
-    void fogiveMACWidget();
-    void fogiveFEMProcessor();
+    void forgetMACWidget();
+    void forgetFEMProcessor();
     void updateMACWidget();
 };
 
