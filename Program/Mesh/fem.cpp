@@ -58,7 +58,9 @@ FEM::FEM(const FEM& g)
 
 bool FEM::read(const QString &fileName) {
     const QString format(fileName.split('.').last());
-    if (!format.compare("BDF", Qt::CaseInsensitive)) {
+    qDebug() << fileName;
+    if (!format.compare("BDF", Qt::CaseInsensitive) || !format.compare("dat", Qt::CaseInsensitive)) {
+        qDebug() << "dat";
         this->readBDF(fileName);
         return true;
     } else if (!format.compare("UNV", Qt::CaseInsensitive)) {

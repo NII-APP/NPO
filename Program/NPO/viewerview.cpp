@@ -6,6 +6,7 @@
 #include "application.h"
 #include "identity.h"
 #include "viewermodel.h"
+#include "project.h"
 
 ViewerView::ViewerView(QWidget *parent)
     : QTreeView(parent)
@@ -16,7 +17,7 @@ ViewerView::ViewerView(QWidget *parent)
 
 void ViewerView::currentChanged(const QModelIndex & current, const QModelIndex & prew) {
     const int modelId(ViewerModel::modelId(current));
-    if (modelId != ViewerModel::modelId(prew)) {
+    if (modelId != ViewerModel::modelId(prew) && modelId < myModel()->getProject()->modelsList().size()) {
         emit currentModelChanged(modelId);
     }
     if (current.internalId() && !ViewerModel::isInfoIndex(current)) {
