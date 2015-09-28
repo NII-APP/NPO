@@ -1,12 +1,12 @@
 #include "fempair.h"
 #include "eigenmodes.h"
 
-FEMPair::FEMPair(FEM *theory, FEM *practic)
+FEMPair::FEMPair(const FEM *theory, const FEM *practic)
     : std::pair<const FEM* const, const FEM* const>(theory, practic)
 {
-    theory->alignZero();
-    practic->alignZero();
-    practic->scaleTo(first->box().size());
+    //theory->alignZero();
+    //practic->alignZero();
+    //practic->scaleTo(first->box().size());
     truncated = FEM::truncation(*first, *second);
 
     //estimate mac

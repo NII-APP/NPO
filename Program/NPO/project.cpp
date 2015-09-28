@@ -17,6 +17,14 @@ Project::~Project()
 #endif
 }
 
+Project::ConstModels Project::modelsList() const {
+    ConstModels m(geometries.size());
+    for (int i(0); i != m.size(); ++i) {
+        m[i] = geometries[i];
+    }
+    return m;
+}
+
 void Project::pushModel(FEM * const g) {
     geometries.push_back(g);
 }
@@ -100,7 +108,6 @@ void Project::load(const QString &filename)
     geometries.clear();
     for (size_t i = 0; i < size; ++i) {
         FEM* g(new FEM);
-        qDebug() << "init fem reader";
         in >> *g;
         geometries.push_back(g);
     }

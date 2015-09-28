@@ -22,7 +22,7 @@ public:
     const CGL::CMatrix& getMac() const { return mac; }
 
     void createTuncationForm();
-    FEMPair(FEM *theory, FEM *practic);
+    FEMPair(const FEM *theory, const FEM *practic);
 
     void makeMac(const Relation& r);
     void makeMac(const EigenModes&, const EigenModes&);

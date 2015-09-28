@@ -20,10 +20,10 @@ class ViewerTab : public QSplitter
     ViewerNode* const cascadeNode;
 
     //you can see MAC when it still not estimated. this map allow to find coresponding widget to update it
-    typedef QMap<FEM*, MACDisplay*> MACMap;
+    typedef QMap<const FEM*, MACDisplay*> MACMap;
     MACMap MACs;
 
-    typedef QMap<FEM*, FEMProcessor*> FEMProcessors;
+    typedef QMap<const FEM*, FEMProcessor*> FEMProcessors;
     FEMProcessors processors;
 
 public:

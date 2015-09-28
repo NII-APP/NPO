@@ -38,7 +38,7 @@ ViewerTab::~ViewerTab()
 }
 
 void ViewerTab::showMAC(int id) {
-    FEM* const model(Application::project()->modelsList().at(id));
+    const FEM* const model(Application::project()->modelsList().at(id));
     MACMap::iterator i(MACs.find(model));
     if (i != MACs.end()) {
         i.value()->raise();
@@ -62,7 +62,7 @@ void ViewerTab::updateMACWidget() {
     if (sender == nullptr) {
         return;
     }
-    FEM* model(processors.key(sender));
+    const FEM* const model(processors.key(sender));
     if (MACs.contains(model)) {
         MACs[model]->setData(model->getModes().getMAC());
     }
@@ -70,13 +70,13 @@ void ViewerTab::updateMACWidget() {
 
 void ViewerTab::forgetMACWidget() {
     MACDisplay* sender(dynamic_cast<MACDisplay*>(QObject::sender()));
-    FEM* p(MACs.key(sender, nullptr));
+    const FEM* const p(MACs.key(sender, nullptr));
     if (p) {
         MACs.remove(p);
     }
 }
 void ViewerTab::forgetFEMProcessor() {
-    FEM* p(processors.key(dynamic_cast<FEMProcessor*>(QObject::sender()), nullptr));
+    const FEM* const p(processors.key(dynamic_cast<FEMProcessor*>(QObject::sender()), nullptr));
     if (p) {
         processors.remove(p);
     }
@@ -89,9 +89,9 @@ void ViewerTab::addModel() {
         return;
     }
     fem->read(bdf);
-    setModel(fem);
     Application::nonConstProject()->pushModel(fem);
-    femView->reset();
+    femView->update();
+    femView->setCurrentIndex(femView->model()->index(Application::project()->modelsList().size() - 1, 0));
 }
 
 void ViewerTab::setModel(const FEM* model) {

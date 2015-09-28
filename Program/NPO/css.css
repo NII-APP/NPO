@@ -3,9 +3,9 @@ MainWindow {
 }
 
 QSplitter::handle {
-background :qlineargradient(spread:pad, x1:0.993909, y1:0.455, x2:0, y2:0.511, stop:0 rgba(172, 172, 172, 255), stop:1 rgba(255, 255, 255, 255));
-width: 5px; /* when vertical */
-height: 5px; /* when horizontal */
+background : rgba(172, 172, 172, 255);
+width: 2px; /* when vertical */
+height: 2px; /* when horizontal */
 
 border-radius: 2px;
 }

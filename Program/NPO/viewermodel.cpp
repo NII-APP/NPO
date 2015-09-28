@@ -198,7 +198,7 @@ QVariant ViewerModel::data(const QModelIndex & index, int role) const {
         const FEM* const mesh(__project->modelsList().at(modelId(index)));
         if (isInfoIndex(index)) {
             ModelRow r(modelRole(index));
-                return Application::identity()->vieverModelValues(r, static_cast<int>(r == Modes ? mesh->getModes().size() : mesh->getNodes().size()));
+                return Application::identity()->vieverModelValues(r, static_cast<int>(r == Modes ? mesh->getModes().size() : mesh->getNodes().length()));
         }
         return Application::identity()->formSelectorLabel().arg(QString::number(index.row() + 1), QString::number(mesh->getModes().at(index.row()).frequency()));
     } catch (...) {

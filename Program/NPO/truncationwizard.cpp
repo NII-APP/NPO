@@ -75,7 +75,7 @@ TruncationWizard::Preview::Preview(Qt::ToolBarArea area, QWidget* parent)
     , screen(new FEMViewer(this))
 {
     this->setLayout(new QVBoxLayout);
-    foreach (FEM* const g, Application::project()->modelsList()) {
+    foreach (const FEM* const g, Application::project()->modelsList()) {
         if (!g->getModes().empty()) {
             meshes.push_back(g);
             selector->addItem(g->getName());
@@ -95,18 +95,18 @@ TruncationWizard::Preview::Preview(Qt::ToolBarArea area, QWidget* parent)
     selectorPatrol();
 }
 
-FEM* TruncationWizard::Preview::current() const
+const FEM* TruncationWizard::Preview::current() const
 {
     return selector->currentIndex() < meshes.size() && selector->currentIndex() >= 0
             ? meshes.at(selector->currentIndex()) : 0;
 }
 
 void TruncationWizard::Preview::selectorPatrol() {
-    FEM* c(current());
+    const FEM* c(current());
     screen->setModel(c);
     emit meshSelected(c);
 
-    const Project::Models& m(Application::project()->modelsList());
+    const Project::ConstModels& m(Application::project()->modelsList());
     int i(0);
     while (m.at(i) != c && m.size() > i) {
         ++i;

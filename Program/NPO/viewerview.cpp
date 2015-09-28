@@ -53,5 +53,5 @@ void ViewerView::acceptNewProject() {
 }
 
 void ViewerView::update() {
-    this->reset();
+    QTreeView::reset();
 }

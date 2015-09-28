@@ -14,6 +14,7 @@ class Project
 {
 public:
     typedef std::vector<FEM* const> Models;
+    typedef std::vector<const FEM* const> ConstModels;
     typedef std::vector<FEMPair* const> FEMPairs;
 
     static const QString INSURANCE_ROW;
@@ -28,7 +29,8 @@ public:
     Project();
     ~Project();
 
-    const Models& modelsList() const { return geometries; }
+    ConstModels modelsList() const;
+    Models& modelsList() { return geometries; }
     const FEMPairs& pairsList() const { return pairs; }
     void pushModel(FEM* const);
 
