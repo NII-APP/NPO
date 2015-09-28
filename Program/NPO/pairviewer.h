@@ -11,8 +11,10 @@ class PairViewer : public QWidget
 public:
     explicit PairViewer(QWidget *parent = 0);
 
+    void setData(const FEMPair* const);
+
 private:
-    FEMPair* __data;
+    const FEMPair* __data;
 };
 
 #endif // PAIRVIEWER_H
