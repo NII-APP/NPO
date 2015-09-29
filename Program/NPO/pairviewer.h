@@ -1,11 +1,11 @@
 #ifndef PAIRVIEWER_H
 #define PAIRVIEWER_H
 
-#include <QWidget>
+#include <femwidget.h>
 
 class FEMPair;
 
-class PairViewer : public QWidget
+class PairViewer : public FEMWidget
 {
     Q_OBJECT
 public:

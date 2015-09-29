@@ -68,17 +68,23 @@ void FEMWidget::setData(const FEM* model)
 
 void FEMWidget::setData(const QList<const FEM *> &models)
 {
+    qDebug() << "setData" << meshes.size();
     qDeleteAll(meshes);
+    qDebug() << 'a';
     meshes.clear();
     if (!shader) {
         this->initializeGL();
     }
 
+    qDebug() << 'b';
     this->makeCurrent();
     scene() = CParallelepiped();
+    qDebug() << 'c';
     for (auto model : models) {
+        qDebug() << 'd';
         meshes.push_back(new MeshBuffer(model, shader, this));
 
+        qDebug() << 'e';
         scene() |= model->getBox();
     }
 }

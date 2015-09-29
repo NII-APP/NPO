@@ -28,8 +28,8 @@ void RelationDialog::setPair(FEMPair *p) {
 
     this->setContentsMargins(10, 0, 10, 0);
 
-    buildLabels(leftL, *pair->theory());
-    buildLabels(rightL, *pair->practic());
+    buildLabels(leftL, *pair->base());
+    buildLabels(rightL, *pair->truncated());
 
     foreach (QLabel* l, leftL)
         l->resize(maxW, l->height());
@@ -45,8 +45,8 @@ void RelationDialog::setPair(FEMPair *p) {
     this->setMouseTracking(true);
 
 
-    popupConfig(leftP, leftF, *pair->theory());
-    popupConfig(rightP, rightF, *pair->practic());
+    popupConfig(leftP, leftF, *pair->base());
+    popupConfig(rightP, rightF, *pair->truncated());
 
     if (relation().size() != leftL.size()) {
         relation().resize(leftL.size());

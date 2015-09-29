@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 
     Application::nonConstProject()->load(QSettings().value("project/location").value<QString>());
 
+    qDebug() << "V";
     PairViewer vMeansVendetta;
     vMeansVendetta.setData(new FEMPair(Application::project()->modelsList().front(), Application::project()->modelsList().at(1)));
     vMeansVendetta.show();
