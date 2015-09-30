@@ -29,6 +29,7 @@ private:
     static QList<QAction*> toActions(const QJsonArray &menu, QObject* parent, const Relations & relations = Relations());
     QString execOpenFileNameDialog(const QJsonObject& config) const;
     QString execSaveFileNameDialog(const QJsonObject& config) const;
+    QVariant resolveKey(const QString& from) const;
 public:
     Identity();
     ~Identity();
@@ -72,6 +73,7 @@ public:
     QString menuFileName() const;
     QList<QAction*> menuFileActions(QObject* parent, const Relations& = Relations()) const;
 
+    QIcon icon(const QString& from) const;
     static QIcon fromSvg(const QString& fname);
 };
 

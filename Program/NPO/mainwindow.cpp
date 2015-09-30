@@ -15,7 +15,7 @@
 #include "identity.h"
 #include "project.h"
 #include "viewertab.h"
-#include "truncationtab.h"
+#include "pairstab.h"
 #include "maintabbar.h"
 #include "viewertab.h"
 
@@ -39,16 +39,16 @@ class Status : public QFrame {
 
 public:
     Status(QWidget* parent) : QFrame(parent) {
+        this->hide();
         this->setLayout(new QVBoxLayout(this));
         this->setAutoFillBackground(true);
-        parent->installEventFilter(this);
         this->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     }
     void push(QWidget* w) {
         w->setParent(this);
         this->layout()->addWidget(w);
         this->show();
-        this->resize(this->layout()->sizeHint());
+        sizeUpdate();
     }
     void push(const QString& s) {
         push(new QLabel(s, this));
@@ -70,47 +70,55 @@ public:
         static_cast<QBoxLayout*>(this->layout())->insertWidget(i, which);
         this->show();
     }
+    void sizeUpdate() {
+        this->resize(this->layout()->sizeHint() + QSize(this->layout()->margin(), this->layout()->margin()));
+    }
 };
 }
 
 void MainWindow::statusPush(QWidget* w) {
-    static_cast<Status*>(status)->push(w);
+    static_cast<Status*>(__status)->push(w);
 }
 
 void MainWindow::statusClear() {
-    static_cast<Status*>(status)->clear();
+    static_cast<Status*>(__status)->clear();
 }
 void MainWindow::statusPush(const QString& s) {
-    static_cast<Status*>(status)->push(s);
+    static_cast<Status*>(__status)->push(s);
+}
+void MainWindow::statusSizeUpdate() {
+    static_cast<Status*>(__status)->sizeUpdate();
 }
 
 void MainWindow::statusInsertBefore(QWidget* which, QWidget* before) {
-    static_cast<Status*>(status)->insertBefore(which, before);
+    static_cast<Status*>(__status)->insertBefore(which, before);
 }
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , __status(new Status(0))
+    , __modelsGUI(new ViewerTab(centralWidget()))
+    , __pairsGUI(new PairsTab(centralWidget()))
 {
-
+    this->installEventFilter(__status);
     this->setCentralWidget(new TabWidget(this));
-    ViewerTab* cnt;
+    __status->setParent(this->centralWidget());
     static_cast<TabWidget*>(centralWidget())->setTabBar(new MainTabBar(this->centralWidget()));
     static_cast<QTabWidget*>(centralWidget())->setTabPosition(QTabWidget::West);
-    static_cast<QTabWidget*>(centralWidget())->addTab(cnt = new ViewerTab(this),
-                    Application::identity()->tabViewIcon(), Application::identity()->tabView());
-    static_cast<QTabWidget*>(centralWidget())->addTab(new TruncationTab(this),
-                    Application::identity()->tabPairIcon(), Application::identity()->tabPair());
+    static_cast<QTabWidget*>(centralWidget())->addTab(__modelsGUI, Application::identity()->tabViewIcon(), Application::identity()->tabView());
+    static_cast<QTabWidget*>(centralWidget())->addTab(__pairsGUI, Application::identity()->tabPairIcon(), Application::identity()->tabPair());
     static_cast<QTabWidget*>(centralWidget())->addTab(new QWidget(this),"");
     static_cast<QTabWidget*>(centralWidget())->setTabEnabled(2,false);
 
-
-    cnt->connect(this, SIGNAL(projectLoaded()), SLOT(resetListView()));
+    __modelsGUI->connect(this, SIGNAL(projectLoaded()), SLOT(acceptNewProject()));
+    __pairsGUI->connect(this, SIGNAL(projectLoaded()), SLOT(acceptNewProject()));
 
     Identity::Relations relations;
     relations.insert("save", Identity::Acceptor(this, SLOT(save())));
     relations.insert("save as", Identity::Acceptor(this, SLOT(saveAs())));
     relations.insert("open", Identity::Acceptor(this, SLOT(open())));
     relations.insert("close", Identity::Acceptor(this, SLOT(closePorject())));
-    relations.insert("import", Identity::Acceptor(cnt, SLOT(addModel())));
+    relations.insert("import", Identity::Acceptor(__modelsGUI, SLOT(addModel())));
     QMenu* fileMenu(this->menuBar()->addMenu(Application::identity()->menuFileName()));
     fileMenu->addActions(Application::identity()->menuFileActions(fileMenu, relations));
 
@@ -119,11 +127,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     load(QSettings().value("project/location").value<QString>());
 
-    status = new Status(this->centralWidget());
-    status->hide();
-
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closePorject()));
-
 }
 
 MainWindow::~MainWindow()
@@ -135,11 +139,11 @@ void MainWindow::closePorject() {
     if (this->isWindowModified()) {
         if (Application::identity()->messageUnsavedProject() & QMessageBox::Yes) {
             this->save();
-            Application::clearProject();
-            emit projectLoaded();
-            static_cast<QTabWidget*>(centralWidget())->setCurrentIndex(0);
         }
     }
+    static_cast<QTabWidget*>(centralWidget())->setCurrentIndex(0);
+    Application::clearProject();
+    emit projectLoaded();
 }
 
 void MainWindow::load(const QString& location) {
@@ -149,6 +153,7 @@ void MainWindow::load(const QString& location) {
         }
         return;
     }
+    closePorject();
     try {
         Application::nonConstProject()->load(location);
         saveProjectLocation(location);

@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QEventLoop>
 #include <QtAlgorithms>
-#include "engine/geometrypair.h"
+#include "engine/fempair.h"
 #include "viewertab.h"
 #include <QFrame>
 #include <QLabel>
@@ -16,8 +16,8 @@ class RelationDialog : public QWidget
     const QImage toggleOn;
     const QImage toggleOff;
 
-    MeshPair* pair;
-    MeshPair::Relation& relation() const { return pair->relations(); }
+    FEMPair* pair;
+    FEMPair::Relation& relation() const { return pair->relations(); }
 
     typedef QVector<QLabel*> Labels;
     Labels  leftL;
@@ -58,12 +58,12 @@ class RelationDialog : public QWidget
     void updateLines();
 
 public:
-    RelationDialog(MeshPair* forEdit, QWidget *parent = 0);
-    void setPair(MeshPair* p);
-    static void run(MeshPair* forEdit, QWidget* parent = 0);
+    RelationDialog(FEMPair* forEdit, QWidget *parent = 0);
+    void setPair(FEMPair* p);
+    static void run(FEMPair *forEdit, QWidget* parent = 0);
     
 signals:
-    void updateMac(const MeshPair::Relation&);
+    void updateMac(const FEMPair::Relation&);
 
 public slots:
 

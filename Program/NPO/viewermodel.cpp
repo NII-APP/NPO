@@ -9,7 +9,8 @@ ViewerModel::ViewerModel(const Project * p, QObject* parent)
     : QAbstractItemModel(parent)
     , __project(p)
 {
-    qDebug() << sizeof(quintptr);
+    qDebug() << "AAAaaAAaA>>>>>>>>>>>>>>>>>>>>> CMOTPu!!!";
+    qDebug() << sizeof(quintptr);\
     Q_ASSERT(sizeof(quintptr) >= 8);
 }
 
@@ -170,6 +171,13 @@ int	ViewerModel::rowCount(const QModelIndex & i) const {
     }
 }
 
+QVariant ViewerModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    if (role == Qt::DisplayRole) {
+        return Application::identity()->tr("models list", "viewer model");
+    }
+    return QVariant();
+}
+
 QVariant ViewerModel::data(const QModelIndex & index, int role) const {
     if (role != Qt::DisplayRole) {
         if (role == Qt::DecorationRole && isTopIndex(index) && __project->modelsList().size() == index.row()) {
@@ -192,10 +200,18 @@ QVariant ViewerModel::data(const QModelIndex & index, int role) const {
         const FEM* const mesh(__project->modelsList().at(modelId(index)));
         if (isInfoIndex(index)) {
             ModelRow r(modelRole(index));
-                return Application::identity()->vieverModelValues(r, static_cast<int>(r == Modes ? mesh->getModes().size() : mesh->getNodes().size()));
+                return Application::identity()->vieverModelValues(r, static_cast<int>(r == Modes ? mesh->getModes().size() : mesh->getNodes().length()));
         }
         return Application::identity()->formSelectorLabel().arg(QString::number(index.row() + 1), QString::number(mesh->getModes().at(index.row()).frequency()));
     } catch (...) {
         return "Model id fail" + QString::number(modelId(index));
     }
+}
+
+void ViewerModel::setProject(const Project* p) {
+    __project = p;
+}
+
+const Project* ViewerModel::getProject() {
+    return __project;
 }

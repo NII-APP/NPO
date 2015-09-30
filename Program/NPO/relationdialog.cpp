@@ -6,7 +6,7 @@
 #include "application.h"
 #include "identity.h"
 
-RelationDialog::RelationDialog(MeshPair *forEdit, QWidget *parent)
+RelationDialog::RelationDialog(FEMPair *forEdit, QWidget *parent)
   : QWidget(parent)
   , toggleOff(":/media/images/togleOff.png")
   , toggleOn(":/media/images/togleOn.png")
@@ -23,7 +23,7 @@ RelationDialog::RelationDialog(MeshPair *forEdit, QWidget *parent)
 {
 }
 
-void RelationDialog::setPair(MeshPair* p) {
+void RelationDialog::setPair(FEMPair *p) {
     pair = p;
 
     this->setContentsMargins(10, 0, 10, 0);
@@ -96,7 +96,7 @@ void RelationDialog::buildLabels(Labels &lbls, const FEM& g)
     for (auto& i: lbls) {
         delete i;
     }
-    lbls.resize(g.getModes().size());
+    lbls.resize(static_cast<int>(g.getModes().size()));
 
     QPalette p(this->palette());
     p.setBrush(QPalette::Light, QColor(0xFF,0xFF,0xFF));
@@ -292,14 +292,11 @@ void RelationDialog::mousePressEvent(QMouseEvent *)
     {
         lineingState = underToggle;
         lineingLeft = underLeftToggle;
-        if (underLeftToggle)
-        {
+        if (underLeftToggle) {
             relation()[underToggle] = -1;
             source = QPoint(this->contentsMargins().left() + maxW + 24, leftCapacity * (underToggle + .5f) + 20);
-        }
-        else
-        {
-            MeshPair::Relation::iterator elem(qFind(relation().begin(), relation().end(), underToggle));
+        } else {
+            FEMPair::Relation::iterator elem(qFind(relation().begin(), relation().end(), underToggle));
             if (elem != relation().end())
                 *elem = -1;
             source = QPoint(this->width() - this->contentsMargins().right() - maxW - 24, rightCapacity * (underToggle + .5f) + 20);
@@ -314,7 +311,7 @@ void RelationDialog::mousePressEvent(QMouseEvent *)
         }
         else
         {
-            MeshPair::Relation::iterator esc(qFind(relation().begin(), relation().end(), underToggle));
+            FEMPair::Relation::iterator esc(qFind(relation().begin(), relation().end(), underToggle));
             if (esc != relation().end())
                 *esc = -1;
             relation()[lineingState] = underToggle;
@@ -333,7 +330,7 @@ void RelationDialog::mousePressEvent(QMouseEvent *)
     updateLines();
 }
 
-void RelationDialog::run(MeshPair* forEdit, QWidget* parent)
+void RelationDialog::run(FEMPair* forEdit, QWidget* parent)
 {
     QEventLoop* l(new QEventLoop(parent));
     RelationDialog* dialog(new RelationDialog(forEdit, parent));

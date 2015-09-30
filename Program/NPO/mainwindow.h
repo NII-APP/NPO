@@ -6,11 +6,15 @@
 class QTabBar;
 class QSplitter;
 class QTabWidget;
+class ViewerTab;
+class PairsTab;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    QWidget* status;
+    QWidget* const __status;
+    ViewerTab* const __modelsGUI;
+    PairsTab* const __pairsGUI;
 
     class TabWidget : public QTabWidget {
     public:
@@ -38,6 +42,7 @@ public slots:
     void statusPush(const QString &);
     void statusInsertBefore(QWidget* which, QWidget* before);
     void statusClear();
+    void statusSizeUpdate();
 };
 
 #endif // MAINWINDOW_H

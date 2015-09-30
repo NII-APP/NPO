@@ -1,4 +1,3 @@
-Program/**/*main.cpp
 **.gitignore
 **.user
 build**/
@@ -11,3 +10,6 @@ binaries**/
 /*.pro
 WidgetSplitter/
 obsolete/
+Program/cglDebug/**
+Program/cgldebug.pro
+**/Thumbs.db

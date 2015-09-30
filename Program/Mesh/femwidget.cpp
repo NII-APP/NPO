@@ -59,9 +59,11 @@ void FEMWidget::setData(const FEM* model)
         this->initializeGL();
     }
 
-    this->makeCurrent();
-    meshes << new MeshBuffer(model, shader, this);
-    scene() = model->getBox();
+    if (model) {
+        this->makeCurrent();
+        meshes << new MeshBuffer(model, shader, this);
+        scene() = model->getBox();
+    }
 }
 
 void FEMWidget::setData(const QList<const FEM *> &models)

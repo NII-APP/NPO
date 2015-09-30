@@ -3,9 +3,15 @@
 
 #include <QTreeView>
 
+class ViewerModel;
+
 class ViewerView : public QTreeView
 {
     Q_OBJECT
+    void mousePressEvent(QMouseEvent*);
+    void currentChanged(const QModelIndex & current, const QModelIndex & previous);
+private:
+    ViewerModel* myModel() const;
 public:
     ViewerView(QWidget* parent = 0);
 
@@ -19,9 +25,8 @@ signals:
 
 public slots:
     void update();
-
-public slots:
-    void currentChanged(const QModelIndex & current, const QModelIndex & previous);
+    void updateCurrentModel();
+    void acceptNewProject();
 };
 
 #endif // VIEWERVIEW_H

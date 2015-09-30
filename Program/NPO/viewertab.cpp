@@ -22,7 +22,6 @@ ViewerTab::ViewerTab(QWidget *parent)
     , femView(new ViewerView(this))
     , cascadeNode(new ViewerNode(this))
 {
-    femView->setModel(new ViewerModel(Application::project(), this));
     this->connect(femView, SIGNAL(addModelPressed()), SLOT(addModel()));
     this->connect(femView, SIGNAL(currentModelChanged(int)), SLOT(setModel(int)));
     this->connect(femView, SIGNAL(importModesPressed(int)), SLOT(addModes(int)));
@@ -39,7 +38,7 @@ ViewerTab::~ViewerTab()
 }
 
 void ViewerTab::showMAC(int id) {
-    FEM* const model(Application::project()->modelsList().at(id));
+    const FEM* const model(Application::project()->modelsList().at(id));
     MACMap::iterator i(MACs.find(model));
     if (i != MACs.end()) {
         i.value()->raise();
@@ -50,7 +49,7 @@ void ViewerTab::showMAC(int id) {
     MACs.insert(model, chart);
 
     connect(chart, SIGNAL(closed()), chart, SLOT(deleteLater()));
-    connect(chart, SIGNAL(closed()), this, SLOT(fogiveMACWidget()));
+    connect(chart, SIGNAL(closed()), this, SLOT(forgetMACWidget()));
     if (processors.contains(model)) {
         connect(processors[model], SIGNAL(MACUpdated()), this, SLOT(updateMACWidget()));
     }
@@ -63,19 +62,21 @@ void ViewerTab::updateMACWidget() {
     if (sender == nullptr) {
         return;
     }
-    FEM* model(processors.key(sender));
-    MACs[model]->setData(model->getModes().getMAC());
+    const FEM* const model(processors.key(sender));
+    if (MACs.contains(model)) {
+        MACs[model]->setData(model->getModes().getMAC());
+    }
 }
 
-void ViewerTab::fogiveMACWidget() {
+void ViewerTab::forgetMACWidget() {
     MACDisplay* sender(dynamic_cast<MACDisplay*>(QObject::sender()));
-    FEM* p(MACs.key(sender, nullptr));
+    const FEM* const p(MACs.key(sender, nullptr));
     if (p) {
         MACs.remove(p);
     }
 }
-void ViewerTab::fogiveFEMProcessor() {
-    FEM* p(processors.key(dynamic_cast<FEMProcessor*>(QObject::sender()), nullptr));
+void ViewerTab::forgetFEMProcessor() {
+    const FEM* const p(processors.key(dynamic_cast<FEMProcessor*>(QObject::sender()), nullptr));
     if (p) {
         processors.remove(p);
     }
@@ -88,9 +89,9 @@ void ViewerTab::addModel() {
         return;
     }
     fem->read(bdf);
-    setModel(fem);
     Application::nonConstProject()->pushModel(fem);
-    femView->reset();
+    femView->update();
+    femView->setCurrentIndex(femView->model()->index(Application::project()->modelsList().size() - 1, 0));
 }
 
 void ViewerTab::setModel(const FEM* model) {
@@ -101,7 +102,7 @@ void ViewerTab::setModel(int id) {
     try {
         setModel(Application::project()->modelsList().at(id));
     } catch(...) {
-        Q_ASSERT("setModel invalid id");
+        qFatal("setModel invalid id");
     }
 }
 
@@ -109,20 +110,25 @@ void ViewerTab::setMode(int v) {
     cascadeNode->setMode(v);
 }
 
+void ViewerTab::acceptNewProject() {
+    femView->acceptNewProject();
+    setModel(Application::project()->modelsList().empty() ? nullptr : Application::project()->modelsList().front());
+}
+
 void ViewerTab::addModes(int meshId) {
     QString file(Application::identity()->choseModesFile());
     if (!QFile::exists(file)) {
         return;
     }
-    FEM* model(Application::project()->modelsList().at(meshId));
+    FEM* model(Application::nonConstProject()->modelsList().at(meshId));
     FEMProcessor* p(new FEMProcessor(model, this));
     connect(p, SIGNAL(modelReaded()), cascadeNode, SLOT(update()));
-    connect(p, SIGNAL(modelReaded()), femView, SLOT(update()));
+    connect(p, SIGNAL(modelReaded()), femView, SLOT(updateCurrentModel()));
     connect(p, SIGNAL(finished()), p, SLOT(deleteLater()));
-    connect(p, SIGNAL(finished()), this, SLOT(fogiveFEMProcessor()));
+    connect(p, SIGNAL(finished()), this, SLOT(forgetFEMProcessor()));
     processors.insert(model, p);
     if (MACs.contains(model)) {
-        connect(p, SIGNAL(MACUpdated(const CGL::CMatrix&)), MACs[model], SLOT(setData(const CGL::CMatrix&)));
+        connect(p, SIGNAL(MACUpdated()), this, SLOT(updateMACWidget()));
     }
     p->read(file);
 }

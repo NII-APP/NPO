@@ -3,7 +3,7 @@
 #include <QSplitter>
 #include <QScreen>
 
-#include "engine/geometrypair.h"
+#include "engine/fempair.h"
 #include "application.h"
 #include "project.h"
 #include "femviewer.h"
@@ -29,8 +29,8 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     this->layout()->addWidget(main);
     //this->resize(500,500);
 
-    connect(relation, SIGNAL(updateMac(const MeshPair::Relation&)),
-            this, SLOT(newMac(const MeshPair::Relation&)));
+    connect(relation, SIGNAL(updateMac(const FEMPair::Relation&)),
+            this, SLOT(newMac(const FEMPair::Relation&)));
 
     current = 0;
     previewPatrol();
@@ -45,7 +45,7 @@ TruncationWizard::~TruncationWizard()
 
 }
 
-MeshPair* TruncationWizard::exec(QWidget* parent)
+FEMPair* TruncationWizard::exec(QWidget* parent)
 {
     QEventLoop* loop(new QEventLoop(parent));
     TruncationWizard* w(new TruncationWizard(0));
@@ -61,7 +61,7 @@ void TruncationWizard::previewPatrol()
 {
     delete current;
     if (first->current() && second->current()) {
-        current = new MeshPair(first->current(), second->current());
+        current = new FEMPair(first->current(), second->current());
         relation->setPair(current);
         chart->setData(current->getMac());
     } else {
@@ -75,7 +75,7 @@ TruncationWizard::Preview::Preview(Qt::ToolBarArea area, QWidget* parent)
     , screen(new FEMViewer(this))
 {
     this->setLayout(new QVBoxLayout);
-    foreach (FEM* const g, Application::project()->modelsList()) {
+    foreach (const FEM* const g, Application::project()->modelsList()) {
         if (!g->getModes().empty()) {
             meshes.push_back(g);
             selector->addItem(g->getName());
@@ -95,18 +95,18 @@ TruncationWizard::Preview::Preview(Qt::ToolBarArea area, QWidget* parent)
     selectorPatrol();
 }
 
-FEM* TruncationWizard::Preview::current() const
+const FEM* TruncationWizard::Preview::current() const
 {
     return selector->currentIndex() < meshes.size() && selector->currentIndex() >= 0
             ? meshes.at(selector->currentIndex()) : 0;
 }
 
 void TruncationWizard::Preview::selectorPatrol() {
-    FEM* c(current());
+    const FEM* c(current());
     screen->setModel(c);
     emit meshSelected(c);
 
-    const Project::Models& m(Application::project()->modelsList());
+    const Project::ConstModels& m(Application::project()->modelsList());
     int i(0);
     while (m.at(i) != c && m.size() > i) {
         ++i;

@@ -5,6 +5,7 @@
 #include "identity.h"
 #include "mainwindow.h"
 #include <QSettings>
+#include <QGLFormat>
 
 const QString Application::projectNameKey = "project/location";
 
@@ -20,6 +21,11 @@ Application::Application(int argc, char** argv)
     this->setOrganizationName(self->organizationName());
     this->setOrganizationDomain(self->organizationDomain());
     this->setApplicationName(self->applicationName());
+
+    QGLFormat fmt(QGLFormat::defaultFormat());
+    fmt.setSampleBuffers(true);
+    fmt.setSamples(2);
+    QGLFormat::setDefaultFormat(fmt);
 }
 
 Application::~Application()

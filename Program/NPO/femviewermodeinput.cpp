@@ -42,7 +42,8 @@ void FEMViewer::FEMViewerModeInput::holdValue(int v) {
 }
 
 void FEMViewer::FEMViewerModeInput::updateValueBounds() {
-    updateValueBounds(static_cast<int>(static_cast<FEMViewer*>(this->parentViewer)->getModel()->getModes().size()));
+    const FEM* const m(static_cast<FEMViewer*>(this->parentViewer)->getModel());
+    updateValueBounds(m ? static_cast<int>(m->getModes().size()) : 0);
 }
 
 void FEMViewer::FEMViewerModeInput::updateValueBounds(int modesCount) {
