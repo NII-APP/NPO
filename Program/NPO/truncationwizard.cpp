@@ -19,8 +19,8 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     QSplitter* selectors(new QSplitter(Qt::Vertical, main));
     selectors->addWidget(first);
     selectors->addWidget(second);
-    connect(first, SIGNAL(meshSelected(MeshForm*)), SLOT(previewPatrol()));
-    connect(second, SIGNAL(meshSelected(MeshForm*)), SLOT(previewPatrol()));
+    connect(first, SIGNAL(meshSelected()), SLOT(previewPatrol()));
+    connect(second, SIGNAL(meshSelected()), SLOT(previewPatrol()));
     main->addWidget(selectors);
     relation = new RelationDialog(0, main);
     main->addWidget(relation);
