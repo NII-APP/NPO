@@ -104,7 +104,7 @@ void RelationDialog::buildLabels(Labels &lbls, const FEM& g)
 
     for (int i = 0; i != lbls.size(); ++i)
     {
-        QLabel* l(new QLabel(QString(Application::identity()->formSelectorLabel() + " %1 (%2 " + Application::identity()->hertz() + ")").arg(QString::number(i + 1), QString::number(g.getModes().at(i).frequency())),this));
+        QLabel* l(new QLabel(Application::identity()->tr("form selector label").arg(QString::number(i + 1), QString::number(g.getModes().at(i).frequency())),this));
         l->resize(l->sizeHint());
         l->setFrameStyle(QFrame::Plain | QFrame::StyledPanel);
         l->setLineWidth(1);
