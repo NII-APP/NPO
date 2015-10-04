@@ -9,41 +9,37 @@ ViewerModel::ViewerModel(const Project * p, QObject* parent)
     : QAbstractItemModel(parent)
     , __project(p)
 {
-    qDebug() << "AAAaaAAaA>>>>>>>>>>>>>>>>>>>>> CMOTPu!!!";
-    qDebug() << sizeof(quintptr);\
-    Q_ASSERT(sizeof(quintptr) >= 8);
+    Q_ASSERT(sizeof(quintptr) >= 4);
 }
 
 bool ViewerModel::isRootIndex(const QModelIndex& i) {
-    return i.row() == -1 && i.column() == -1;
+    return i.row() == -1 && i.column() == -1 && !i.internalId();
 }
 bool ViewerModel::isTopIndex(const QModelIndex& i) {
-    return !i.internalId();
+    return !i.internalId() && !isRootIndex(i);
 }
 bool ViewerModel::isInfoIndex(const QModelIndex& i) {
-    return i.internalId() && !(i.internalId() >> 32);
+    return i.internalId() && !(i.internalId() >> 16);
 }
 ViewerModel::ModelRow ViewerModel::modelRole(const int row, const int model) const {
     switch (row) {
     case 0:
         return Vertexes;
     case 1:
-        return MAC;
-    case 2:
         try {
-            return __project->modelsList().at(model)->getModes().empty() ? ImportModes : Modes;
+            return __project->modelsList().at(model)->getModes().empty() ? ImportModes : MAC;
         } catch (...) {
 #ifdef VIEWERMODEL_DEBUG
             qDebug() << model << "value fail";
 #endif
             return WrongId;
         }
-    case 3:
+    case 2:
         try {
-            return __project->modelsList().at(model)->getModes().empty() ? ModesIdentification : WrongId;
+            return __project->modelsList().at(model)->getModes().empty() ? ModesIdentification : Modes;
         } catch (...) {
 #ifdef VIEWERMODEL_DEBUG
-        qDebug() << model << "value fail two";
+            qDebug() << model << "value fail";
 #endif
             return WrongId;
         }
@@ -52,8 +48,8 @@ ViewerModel::ModelRow ViewerModel::modelRole(const int row, const int model) con
 }
 
 ViewerModel::ModelRow ViewerModel::modelRole(const QModelIndex& i) const {
-    if (i.internalId() >> 32) {
-        return static_cast<ModelRow>(i.internalId() >> 32);
+    if (i.internalId() >> 16) {
+        return static_cast<ModelRow>(i.internalId() >> 16);
     } else if (isInfoIndex(i)) {
         return modelRole(i.row(), modelId(i));
     }
@@ -64,12 +60,10 @@ int ViewerModel::toRow(ModelRow r) {
     switch (r) {
     case Vertexes:
         return 0;
-    case MAC:
+    case MAC: case ImportModes:
         return 1;
-    case ImportModes: case Modes:
+    case Modes: case ModesIdentification: default:
         return 2;
-    case ModesIdentification: default:
-        return 3;
     }
 }
 
@@ -77,12 +71,12 @@ int ViewerModel::modelId(const QModelIndex& i) {
     if (isRootIndex(i)) {
         return -1;
     }
-    return isTopIndex(i) ? i.row() : (i.internalId() & 0xFFFFFFFF) - 1;
+    return isTopIndex(i) ? i.row() : (i.internalId() & 0xFFFF) - 1;
 }
 
 QModelIndex ViewerModel::index(int row, int column, const QModelIndex &parent) const {
 #ifdef VIEWERMODEL_DEBUG
-    qDebug() << "index" << row << parent;
+    qDebug() << "index" << row << parent << parent.internalId();
 #endif
     if (isRootIndex(parent)) {
 #ifdef VIEWERMODEL_DEBUG
@@ -90,14 +84,20 @@ QModelIndex ViewerModel::index(int row, int column, const QModelIndex &parent) c
 #endif
         //if it's a first-level item the number of model is a row
         return createIndex(row, column, (quintptr)0);
-    } else
-        //otherwice innerId is the black magic!
-        if (isInfoIndex(parent)) {
-        //first 4 bytes is a row of first information level. second 4 bytes is a model index
-            return createIndex(row, column, parent.internalId() | (static_cast<quintptr>(modelRole(parent.row(), modelId(parent))) << 32));
     } else {
-        //first 4 bytes is a null, second 4 bytes still a model index
-        return createIndex(row, column, parent.row() + 1);
+        //otherwice innerId is the black magic!
+        //last 4 bytes separated for two parts: first two bytes is a row in model information, last two - model id
+        if (isInfoIndex(parent)) {
+#ifdef VIEWERMODEL_DEBUG
+            qDebug() << "create second depance lavel" << parent << QString::number(parent.internalId() | (static_cast<quintptr>(modelRole(parent.row(), modelId(parent))) << 16), 16);
+#endif
+            return createIndex(row, column, parent.internalId() | (static_cast<quintptr>(modelRole(parent.row(), modelId(parent))) << 16));
+        } else {
+#ifdef VIEWERMODEL_DEBUG
+            qDebug() << "create first depance lavel" << parent.row() + 1 << parent;
+#endif
+            return createIndex(row, column, parent.row() + 1);
+        }
     }
 }
 
@@ -119,9 +119,9 @@ QModelIndex	ViewerModel::parent(const QModelIndex & index) const {
         return createIndex(modelId(index), 0);
     } else {
 #ifdef VIEWERMODEL_DEBUG
-        qDebug() << "\tinfo" << createIndex(toRow(modelRole(index)), 0, index.internalId() & 0xFFFFFFFF);
+        qDebug() << "\tinfo" << createIndex(toRow(modelRole(index)), 0, index.internalId() & 0xFFFF);
 #endif
-        return createIndex(toRow(modelRole(index)), 0, index.internalId() & 0xFFFFFFFF);
+        return createIndex(toRow(modelRole(index)), 0, index.internalId() & 0xFFFF);
     }
 }
 
@@ -150,6 +150,9 @@ int	ViewerModel::rowCount(const QModelIndex & i) const {
         }
     }
     if (!isInfoIndex(i)) {
+#ifdef VIEWERMODEL_DEBUG
+            qDebug() << "\tinModes" << 0;
+#endif
         return 0;
     }
     switch (modelRole(i)) {
@@ -200,10 +203,28 @@ QVariant ViewerModel::data(const QModelIndex & index, int role) const {
         const FEM* const mesh(__project->modelsList().at(modelId(index)));
         if (isInfoIndex(index)) {
             ModelRow r(modelRole(index));
-                return Application::identity()->vieverModelValues(r, static_cast<int>(r == Modes ? mesh->getModes().size() : mesh->getNodes().length()));
+            static const QString vertexesStr(Application::identity()->tr("vertexes", "viewer model"));
+            static const QString modesStr(Application::identity()->tr("modes", "viewer model"));
+            static const QString importStr(Application::identity()->tr("import", "viewer model"));
+            static const QString identificationStr(Application::identity()->tr("identification", "viewer model"));
+            static const QString macStr(Application::identity()->tr("mac", "viewer model"));
+            switch (r) {
+            case ViewerModel::Vertexes:
+                return vertexesStr.arg(mesh->getNodes().length());
+            case ViewerModel::Modes:
+                return modesStr.arg(mesh->getModes().size());
+            case ViewerModel::ImportModes:
+                return importStr;
+            case ViewerModel::ModesIdentification:
+                return identificationStr;
+            case ViewerModel::MAC:
+                return macStr;
+            }
+            return "something wrong";
         }
         return Application::identity()->formSelectorLabel().arg(QString::number(index.row() + 1), QString::number(mesh->getModes().at(index.row()).frequency()));
     } catch (...) {
+        qFatal((QString("model id fail 0x") + QString::number(index.internalId(), 16) + ' ' + QString::number(modelId(index))).toLocal8Bit());
         return "Model id fail" + QString::number(modelId(index));
     }
 }

@@ -13,3 +13,4 @@ obsolete/
 Program/cglDebug/**
 Program/cgldebug.pro
 **/Thumbs.db
+Program/debug**
