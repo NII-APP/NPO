@@ -21,7 +21,6 @@ public:
     typedef QMultiMap<QString, Acceptor> Relations;
 private:
     const QJsonObject configuration;
-    const QJsonObject viewerModel;
     QWidget* topLavelParent;
 
     static const QJsonObject readConfig();
@@ -61,8 +60,6 @@ public:
     QString choseProjectFile() const;
     QString choseSaveFile() const;
     QMessageBox::StandardButton choseIsSaveQuestion() const;
-
-    QString vieverModelValues(ViewerModel::ModelRow v, int n = 0) const;
 
     void messageCantStartPython() const;
     void messageCantOpen(const QString &fName) const;
