@@ -161,7 +161,7 @@ void C2dChart::closeEvent(QCloseEvent *) {
 void C2dChart::showArray(const CArray& m) {
     C2dChart chart;
     CChartData data;
-    data.push_back(new CDimensionInterval(CGL::CInterval(0.0, 1.0 * m.size() - 1.0, m.size())));
+    data.push_back(new CDimensionInterval(CGL::CInterval(0.0, static_cast<int>(1.0 * m.size() - 1.0, m.size()))));
     data.push_back(new CDimensionArray(m));
     chart.setData(data);
 

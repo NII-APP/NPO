@@ -80,14 +80,16 @@ void C2dChartPlace::paintGL()
         glEnd();
     }
 
-    static const QRgb defoultColorsCludge[] = { 0x880000FF, 0x008800FF, 0x000088FF,
-                                                0x888800FF, 0x880088FF, 0x008888FF,
-                                                0x88FFFFFF, 0xFF88FFFF, 0xFFFF88FF,
-                                                0x8888FFFF, 0x88FF88FF, 0xFF8888FF };
+    static const QRgb defoultColorsCludge[] = { 0xFF880000, 0xFF008800, 0xFF000088,
+                                                0xFF888800, 0xFF880088, 0xFF008888,
+                                                0xFF88FFFF, 0xFFFF88FF, 0xFFFFFF88,
+                                                0xFF8888FF, 0xFF88FF88, 0xFFFF8888 };
     vArray->bind();
-    for (int i(1); i != bariers.size(); ++i) {
-        glColor3ubv(static_cast<const GLubyte*>(static_cast<const void*>(defoultColorsCludge + i)));
-        glDrawArrays(GL_LINE_STRIP, bariers.at(i - 1), bariers.at(i) - bariers.at(i - 1));
+    if (!bariers.empty()) {
+        for (int i(1); i != bariers.size(); ++i) {
+            glColor3ubv(static_cast<const GLubyte*>(static_cast<const void*>(defoultColorsCludge + i)));
+            glDrawArrays(GL_LINE_STRIP, bariers.at(i - 1), bariers.at(i) - bariers.at(i - 1));
+        }
     }
     vArray->release();
 }
@@ -142,7 +144,7 @@ void C2dChartPlace::setData(const CChartData::ChartDataList& val)
     bariers.clear();
     bariers.push_back(0);
     viewPort = QRectF(QPointF(val[0][0]->operator[](0), val[0][1]->operator[](0)), QSizeF(0.0, 0.0));
-    for (CChartData item : val) {
+    for (const CChartData& item : val) {
         const CDimension& d1(*item[0]);
         const CDimension& d2(*item[1]);
 

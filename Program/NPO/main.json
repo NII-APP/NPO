@@ -164,5 +164,25 @@
         "pause eng" : "Pause",
         "mode rus" : "Форма",
         "mode eng" : "Mode"
+    },
+
+    "modes identification wizard" : {
+        "select file eng" : "File",
+        "select file rus" : "Файл",
+        "accept eng" : "Accept",
+        "accept rus" : "Принять",
+        "cancel eng" : "Cancel",
+        "cancel rus" : "Отмена",
+        "file dialog" : {
+            "caption eng" : "Select file with amplitude-response curves",
+            "caption rus" : "Укажите файл результатов испытаний",
+            "filter" : "Universal File Format(*.unv)"
+        },
+        "open file icon" : ":/media/images/open.png",
+        "orientation icon" : ":/media/images/orientation.png",
+        "open file tooltip eng" : "Chose file",
+        "open file tooltip rus" : "Указать файл",
+        "orientation tooltip eng" : "Change splitter orientation",
+        "orientation tooltip rus" : "Изменить направление разделителя"
     }
 }
