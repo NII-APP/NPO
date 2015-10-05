@@ -2,6 +2,7 @@
 #include "cvertexes.h"
 #include <QVector3D>
 #include "cinterval.h"
+#include "cchartdatalist.h"
 
 C2dChartPlace::C2dChartPlace(QWidget* parent)
     : QGLWidget(parent)
@@ -127,14 +128,14 @@ void C2dChartPlace::setData(const CChartData& val) {
     bariers.push_back(d1.size());
 }
 
-void C2dChartPlace::setData(const CChartData::ChartDataList& val)
+void C2dChartPlace::setData(const CChartDataList &val)
 {
     this->makeCurrent();
     if (!vShader) {
         this->initializeGL();
     }
     int wholeSize(0);
-    for (CChartData item : val) {
+    for (const CChartData& item : val) {
         Q_ASSERT(item.size() >= 2);
         Q_ASSERT(item[0]->size() == item[0]->size());
         wholeSize += item[0]->size();

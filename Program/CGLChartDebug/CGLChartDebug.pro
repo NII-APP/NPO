@@ -9,8 +9,7 @@ TEMPLATE = app
 SUBDIRS += \
     ../CGL/CGL.pro
 
-DISTFILES += \
-    ../CGL/CGL.pri
+DISTFILES +=
 
 HEADERS += \
     ../CGL/c2dchart.h \
@@ -38,7 +37,9 @@ HEADERS += \
     ../CGL/cylindercoordinatesystem.h \
     ../CGL/rectangularcoordinatesystem.h \
     ../NPO/engine/afr.h \
-    ../NPO/engine/afrarray.h
+    ../NPO/engine/afrarray.h \
+    ../CGL/cchartdatalist.h \
+    ../CGL/cslider.h
 
 SOURCES += \
     ../CGL/c2dchart.cpp \
@@ -67,4 +68,6 @@ SOURCES += \
     ../CGL/rectangularcoordinatesystem.cpp \
     main.cpp \
     ../NPO/engine/afr.cpp \
-    ../NPO/engine/afrarray.cpp
+    ../NPO/engine/afrarray.cpp \
+    ../CGL/cchartdatalist.cpp \
+    ../CGL/cslider.cpp

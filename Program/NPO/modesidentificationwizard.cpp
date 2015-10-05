@@ -95,7 +95,7 @@ void ModesIdentificationWizard::ManualController::setAFR(QString filename) {
     __afr = new AFRArray;
     __afr->read(filename);
 
-    CChartData::ChartDataList data;
+    CChartDataList data;
     if (false) {
         for (int i(0); i != __afr->size(); ++i) {
             const AFR& single(__afr->at(i));
@@ -117,7 +117,7 @@ void ModesIdentificationWizard::ManualController::setAFR(QString filename) {
             }
         }
     } else {
-        const AFR single(__afr->avarage());
+        const AFR single(__afr->average());
         data.push_back(CChartData());
         CChartData& real(data.last());
         data.push_back(CChartData());

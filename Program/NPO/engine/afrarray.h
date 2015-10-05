@@ -13,7 +13,9 @@ public:
     ~AFRArray();
 
     void read(const QString& filename, int nodesCount = 0);
-    AFR avarage() const;
+    AFR average() const;
+
+    void toChartData(const AFR&);
 };
 
 #endif // AFRARRAY_H

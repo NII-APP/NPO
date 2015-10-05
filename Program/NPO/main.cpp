@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 /*    MainWindow window;
     a.setMainWindow(&window);*/
     FEM* fem(new FEM);
-    fem->read("C:\\Users\\BOPOHOB\\Downloads\\geom_Aaron.unv");
+    fem->read("C:\\Users\\username\\Downloads\\geom_Aaron.unv");
     ModesIdentificationWizard::identifyModes(fem);
 
 

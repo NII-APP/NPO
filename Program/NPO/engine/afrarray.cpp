@@ -4,8 +4,8 @@
 #include <QByteArray>
 #include <QDebug>
 
-#include <cparse.h>
-//#include "../../CGL/cparse.h"
+//#include <cparse.h>
+#include "../../CGL/cparse.h"
 #include <complex>
 
 #include "afr.h"
@@ -78,13 +78,14 @@ void AFRArray::read(const QString& filename, int nodesCount) {
             while (!p.testPrew("    -1")) {
                 p.skipRow();
             }
+            std::sort(array.begin(), array.end(), [](const FrequencyMagnitude& a, const FrequencyMagnitude& b)->bool{ return a.frequency < b.frequency; });
         }
         Q_ASSERT(p.testPrew("    -1"));
         p.skipRow();
     }
 }
 
-AFR AFRArray::avarage() const {
+AFR AFRArray::average() const {
     //first array should be empty
     if (this->size() < 2) {
         return AFR();
@@ -94,11 +95,12 @@ AFR AFRArray::avarage() const {
         return result;
     }
     int i(2);
-    for (; i != this->size(); ++i) {
+    for (; i != 52; ++i) {
         const AFR& one(this->at(i));
         AFR::iterator acceptor(result.begin());
         for (AFR::const_iterator it(one.begin()); it != one.end(); ++it, ++acceptor) {
-            acceptor->amplitude += it->amplitude;
+            acceptor->amplitude += std::complex<double>(fabs(it->amplitude.real()), fabs(it->amplitude.imag()));
+            //acceptor->amplitude += it->amplitude;
         }
     }
     const double k(i - 1);

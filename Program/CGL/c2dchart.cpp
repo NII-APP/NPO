@@ -8,6 +8,8 @@
 #include <QEventLoop>
 #include "cdimensioninterval.h"
 #include "cdimensionarray.h"
+#include "cchartdatalist.h"
+#include "cslider.h"
 
 const QFont C2dChart::TITLE_FONT = QFont("Tahoma", 20);
 const QFont C2dChart::LABELS_FONT = QFont("Tahoma", 14);
@@ -33,7 +35,7 @@ C2dChart::C2dChart(QWidget* parent)
 
 C2dChart::~C2dChart()
 {
-
+    qDeleteAll(sliders);
 }
 
 void C2dChart::setData(const CChartData& newData) {
@@ -41,7 +43,7 @@ void C2dChart::setData(const CChartData& newData) {
     addData(newData);
 }
 
-void C2dChart::setData(const CChartData::ChartDataList& newData) {
+void C2dChart::setData(const CChartDataList& newData) {
     data.clear();
     addData(newData);
 }
@@ -62,7 +64,7 @@ void C2dChart::addData(const CChartData& newData) {
     chart->setData(data);
 }
 
-void C2dChart::addData(const CChartData::ChartDataList &d) {
+void C2dChart::addData(const CChartDataList &d) {
     for (const CChartData& newData: d) {
         Q_ASSERT(newData.size() == 2);
         Q_ASSERT(newData[0]->size() == newData[1]->size());
@@ -115,6 +117,13 @@ void C2dChart::resizeEvent(QResizeEvent*) {
         title->hide();
     }
 
+    if (!sliders.empty()) {
+        margins += QMarginsF(0.0,
+                             (**std::max_element(sliders.begin(), sliders.end(),[](const CSlider* s1, const CSlider* s2)->bool{ return s1->topLabelHeight() > s2->topLabelHeight(); } )).topLabelHeight(),
+                             0.0,
+                             0.0);
+    }
+
     if (!xLabel->text().isEmpty()) {
         xLabel->show();
         margins += QMarginsF(0.0, 0.0, 0.0, xLabel->boundingRect().height());
@@ -150,6 +159,12 @@ void C2dChart::resizeEvent(QResizeEvent*) {
                    scene()->height() - xLabel->boundingRect().height());
 
     yLabel->setPos(0, scene()->height() - margins.bottom() - chart->height() / 2.0 + yLabel->boundingRect().width() / 2.0);
+
+    for (CSlider* s : sliders) {
+        s->setRange(xAxis->getRange());
+        s->setGeometry(chart->geometry());
+        s->update();
+    }
 }
 
 
@@ -171,4 +186,11 @@ void C2dChart::showArray(const CArray& m) {
     chart.show();
 
     loop->exec();
+}
+
+void C2dChart::addSlider(CSlider* s) {
+    s->setGeometry(chart->geometry());
+    s->setRange(xAxis->getRange());
+    this->scene()->addItem(s);
+    sliders << s;
 }

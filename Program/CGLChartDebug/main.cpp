@@ -4,18 +4,21 @@
 #include "../NPO/engine/afr.h"
 #include "../NPO/engine/afrarray.h"
 #include "../CGL/cdimensionarray.h"
+#include "../CGL/cchartdatalist.h"
+#include "../CGL/cslider.h"
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
 
     C2dChart chart;
 
+
     AFRArray afr;
-    afr.read("C:\\Users\\BOPOHOB\\Downloads\\FRF_10.unv");
+    afr.read("C:\\Users\\username\\Downloads\\FRF_10.unv");
 
     AFRArray* __afr(&afr);
-    CChartData::ChartDataList data;
-    const AFR single(__afr->avarage());
+    CChartDataList data;
+    const AFR single(__afr->average());
     if (!single.empty()) {
         data.push_back(CChartData());
         CChartData& top(data.last());
@@ -33,6 +36,10 @@ int main(int argc, char** argv) {
         y->updateRange();
     }
     chart.setData(data);
+
+    CSlider* const slider(new CSlider);
+    slider->setLabelTemplate("%1 hz");
+    chart.addSlider(slider);
 
     chart.show();
 
