@@ -16,6 +16,7 @@
 #include <c3dcolumnchart.h>
 #include <fem.h>
 #include "macdisplay.h"
+#include "modesidentificationwizard.h"
 
 ViewerTab::ViewerTab(QWidget *parent)
     : QSplitter(Qt::Horizontal, parent)
@@ -27,6 +28,7 @@ ViewerTab::ViewerTab(QWidget *parent)
     this->connect(femView, SIGNAL(importModesPressed(int)), SLOT(addModes(int)));
     this->connect(femView, SIGNAL(currentModeChanged(int, int)), SLOT(setMode(int)));
     this->connect(femView, SIGNAL(MACPressed(int)), SLOT(showMAC(int)));
+    this->connect(femView, SIGNAL(modesIdentificationPressed(int)), SLOT(identificateModes(int)));
     this->addWidget(femView);
     this->addWidget(cascadeNode);
     this->setSizes(QList<int>() << 300 << 1000);
@@ -55,6 +57,13 @@ void ViewerTab::showMAC(int id) {
     }
 
     chart->show();
+}
+
+void ViewerTab::identificateModes(int meshId) {
+    qDebug() << "ident";
+    FEM* fem(Application::nonConstProject()->modelsList().at(meshId));
+    fem->read("C:\\Users\\username\\Downloads\\METEORIT.txt");
+    ModesIdentificationWizard::identifyModes(fem);
 }
 
 void ViewerTab::updateMACWidget() {

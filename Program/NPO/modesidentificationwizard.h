@@ -11,6 +11,7 @@ class FEMViewer;
 class C2dChart;
 class QSplitter;
 class AFRArray;
+class QTableWidget;
 
 class ModesIdentificationWizard : public QDialog
 {
@@ -36,8 +37,23 @@ private:
 };
 
 class ModesIdentificationWizard::MethodSelector : public QWidget {
+    class Signboard;
 public:
-    explicit ModesIdentificationWizard::MethodSelector(QWidget* parent) : QWidget(parent) { this->setMaximumWidth(0);}
+    explicit ModesIdentificationWizard::MethodSelector(QWidget* parent);
+private:
+    QTableWidget* const __resultsTable;
+    QList<Signboard*> __methods;
+};
+
+class ModesIdentificationWizard::MethodSelector::Signboard : public QWidget {
+public:
+    explicit ModesIdentificationWizard::MethodSelector::Signboard(QWidget* parent);
+
+    void setTitle(const QString&);
+    QWidget* getBoard();
+private:
+    QWidget* __board;
+    QPushButton* __title;
 };
 
 class ModesIdentificationWizard::ManualController : public QWidget {

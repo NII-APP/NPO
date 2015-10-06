@@ -7,6 +7,9 @@
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QSplitter>
+#include <QTableWidget>
+#include <QFormLayout>
+#include <QSpinBox>
 
 #include <fem.h>
 #include <c2dchart.h>
@@ -61,6 +64,52 @@ ModesIdentificationWizard::~ModesIdentificationWizard()
 
 }
 
+ModesIdentificationWizard::MethodSelector::MethodSelector(QWidget* parent)
+    : QWidget(parent)
+    , __resultsTable(new QTableWidget(this))
+{
+    this->setLayout(new QVBoxLayout);
+    this->layout()->addWidget(new QLabel("<h2>Идентификация параметров</h2>", this));
+    Signboard* const first(new Signboard(this));
+    first->setTitle("Метод выделения тона");
+    Signboard* const second(new Signboard(this));
+    second->setTitle("Метод полиномиальной аппроксимации");
+    QWidget* const w(second->getBoard());
+    QFormLayout* l(new QFormLayout);
+    l->addRow(tr("Порядок модели:"), new QSpinBox(w));
+    l->addRow(tr("Допуск на частоту:"), new QSpinBox(w));
+    l->addRow(tr("Допуск на демпфирование:"), new QSpinBox(w));
+    w->setLayout(l);
+    Signboard* const third(new Signboard(this));
+    third->setTitle("Метод сингулярного разложения");
+    __methods << first << second << third;
+    for (Signboard* i : __methods) {
+        this->layout()->addWidget(i);
+    }
+    static_cast<QVBoxLayout*>(this->layout())->addStretch(200);
+    this->layout()->addWidget(__resultsTable);
+
+    __resultsTable->setColumnCount(3);
+    __resultsTable->setRowCount(4);
+    __resultsTable->setItem(0,0, new QTableWidgetItem("Номер формы"));
+    __resultsTable->setItem(0,1, new QTableWidgetItem("Частота [Гц]"));
+    __resultsTable->setItem(0,2, new QTableWidgetItem("Демпифрование [%]"));
+    __resultsTable->setItem(1,0, new QTableWidgetItem("1"));
+    __resultsTable->setItem(1,1, new QTableWidgetItem("24"));
+    __resultsTable->setItem(1,2, new QTableWidgetItem("0.3"));
+    __resultsTable->setItem(2,0, new QTableWidgetItem("2"));
+    __resultsTable->setItem(2,1, new QTableWidgetItem("45"));
+    __resultsTable->setItem(2,2, new QTableWidgetItem("0.5"));
+    __resultsTable->setItem(3,0, new QTableWidgetItem("3"));
+    __resultsTable->setItem(3,1, new QTableWidgetItem("220"));
+    __resultsTable->setItem(3,2, new QTableWidgetItem("0.4"));
+    __resultsTable->setFixedHeight(160);
+
+    this->layout()->addWidget(new QPushButton("Экспорт форм", this));
+
+    this->setFixedWidth(335);
+}
+
 ModesIdentificationWizard::ManualController::ManualController(const FEM* const model, QWidget* parent)
     : QWidget(parent)
     , __splitter(new QSplitter(this))
@@ -81,8 +130,10 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
     __splitter->addWidget(__viewer);
     __viewer->setModel(model);
     __splitter->addWidget(__chart);
-    __splitter->setStretchFactor(0, 3);
-    __splitter->setStretchFactor(1, 10);
+    __splitter->setStretchFactor(__splitter->indexOf(__viewer), 300);
+    __splitter->setStretchFactor(__splitter->indexOf(__chart), 200);
+    __splitter->setHandleWidth(3);
+    __splitter->handle(0)->setAutoFillBackground(false);
 
 
     this->setLayout(new QVBoxLayout);
@@ -154,9 +205,11 @@ void ModesIdentificationWizard::ManualController::setAFR(QString filename) {
         yIm->updateRange();
         xAbs->updateRange();
         yAbs->updateRange();
-        absolute.setTitle("Йа Графег!");
-        xAbs->setLabel("Йа частота!");
-        yAbs->setLabel("Йа АМплеТуда!");
+        absolute.setTitle(Application::identity()->tr("title", "modes identification wizard/chart"));
+        xAbs->setLabel(Application::identity()->tr("xLabel", "modes identification wizard/chart"));
+        yAbs->setLabel(Application::identity()->tr("yLabel", "modes identification wizard/chart"));
+        data.removeFirst();
+        data.removeFirst();
 
     }
     __chart->setData(data);
@@ -186,6 +239,23 @@ void ModesIdentificationWizard::identifyModes(const FEM* who, QWidget* parent) {
     loop->exec();
 
     delete w;
+}
+
+ModesIdentificationWizard::MethodSelector::Signboard::Signboard(QWidget* parent)
+    : QWidget(parent)
+    , __board(new QWidget(this))
+    , __title(new QPushButton(this))
+{
+    this->setLayout(new QVBoxLayout);
+    this->layout()->addWidget(__title);
+    this->layout()->addWidget(__board);
+}
+
+void ModesIdentificationWizard::MethodSelector::Signboard::setTitle(const QString& t) {
+    __title->setText(t);
+}
+QWidget* ModesIdentificationWizard::MethodSelector::Signboard::getBoard() {
+    return __board;
 }
 
 void ModesIdentificationWizard::ManualController::FileInput::keyPressEvent(QKeyEvent * e) {

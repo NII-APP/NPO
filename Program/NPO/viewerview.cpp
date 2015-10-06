@@ -33,6 +33,7 @@ void ViewerView::mousePressEvent(QMouseEvent* e) {
     }
 
     const ViewerModel::ModelRow r(static_cast<ViewerModel*>(model())->modelRole(current));
+    qDebug() << r;
     if (r == ViewerModel::ImportModes) {
         emit importModesPressed(modelId);
     } else if (r == ViewerModel::ModesIdentification) {

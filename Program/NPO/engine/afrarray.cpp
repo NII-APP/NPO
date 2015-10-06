@@ -95,7 +95,7 @@ AFR AFRArray::average() const {
         return result;
     }
     int i(2);
-    for (; i != 52; ++i) {
+    for (; i != this->size(); ++i) {
         const AFR& one(this->at(i));
         AFR::iterator acceptor(result.begin());
         for (AFR::const_iterator it(one.begin()); it != one.end(); ++it, ++acceptor) {

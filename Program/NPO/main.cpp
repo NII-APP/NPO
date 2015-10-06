@@ -8,22 +8,17 @@
 
 #include "modesidentificationwizard.h"
 #include <fem.h>
+#include "femviewer.h"
 
 int main(int argc, char *argv[])
 {
     Application a(argc, argv);
     setlocale(LC_ALL,"RUS");
 
-/*    MainWindow window;
-    a.setMainWindow(&window);*/
-    FEM* fem(new FEM);
-    fem->read("C:\\Users\\username\\Downloads\\geom_Aaron.unv");
-    ModesIdentificationWizard::identifyModes(fem);
+    MainWindow window;
+    a.setMainWindow(&window);
 
+    window.showMaximized();
 
-    //window.showMaximized();
-
-    a.quit();
-    return 0;
     return a.exec();
 }

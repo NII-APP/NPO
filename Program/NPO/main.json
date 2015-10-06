@@ -183,6 +183,14 @@
         "open file tooltip eng" : "Chose file",
         "open file tooltip rus" : "Указать файл",
         "orientation tooltip eng" : "Change splitter orientation",
-        "orientation tooltip rus" : "Изменить направление разделителя"
+        "orientation tooltip rus" : "Изменить направление разделителя",
+        "chart" : {
+            "xLabel eng" : "Frequency [Hz]",
+            "xLabel rus" : "Частота [Гц]",
+            "yLabel rus" : "Амплитуда",
+            "yLabel eng" : "Amplitude",
+            "title eng" : "Amplitude-frequency response",
+            "title rus" : "Амплитудно-частотная характеристика"
+        }
     }
 }
