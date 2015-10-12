@@ -1,12 +1,15 @@
 #include "afrarray.h"
 
+#include <complex>
+
 #include <QFile>
 #include <QByteArray>
 #include <QDebug>
 
-//#include <cparse.h>
-#include "../../CGL/cparse.h"
-#include <complex>
+#include <cparse.h>
+//#include "../../CGL/cparse.h"
+#include <cchartdatalist.h>
+#include <cchartdata.h>
 
 #include "afr.h"
 
@@ -108,5 +111,15 @@ AFR AFRArray::average() const {
         i->amplitude /= k;
     }
 
+    return result;
+}
+
+CChartDataList AFRArray::toChartData(unsigned interalParts) const {
+    CChartDataList result;
+    for (const AFR& single : *this) {
+        if (!single.empty() && &single != &at(52)) {
+            result.append(single.toChartData(interalParts));
+        }
+    }
     return result;
 }

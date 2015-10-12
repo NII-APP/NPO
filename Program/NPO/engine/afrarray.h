@@ -5,6 +5,7 @@
 
 class QString;
 class AFR;
+class CChartDataList;
 
 class AFRArray : public std::vector<AFR>
 {
@@ -15,7 +16,7 @@ public:
     void read(const QString& filename, int nodesCount = 0);
     AFR average() const;
 
-    void toChartData(const AFR&);
+    CChartDataList toChartData(unsigned interalParts = 0x7) const;
 };
 
 #endif // AFRARRAY_H

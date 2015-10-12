@@ -129,6 +129,7 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
 
     __splitter->addWidget(__viewer);
     __viewer->setModel(model);
+    __chart->setGridStep(70);
     __splitter->addWidget(__chart);
     __splitter->setStretchFactor(__splitter->indexOf(__viewer), 300);
     __splitter->setStretchFactor(__splitter->indexOf(__chart), 200);
@@ -145,73 +146,11 @@ void ModesIdentificationWizard::ManualController::setAFR(QString filename) {
     delete __afr;
     __afr = new AFRArray;
     __afr->read(filename);
+    CChartDataList data(__afr->toChartData());
 
-    CChartDataList data;
-    if (false) {
-        for (int i(0); i != __afr->size(); ++i) {
-            const AFR& single(__afr->at(i));
-            if (!single.empty()) {
-                data.push_back(CChartData());
-                CChartData& top(data.last());
-                CDimensionArray* x(new CDimensionArray(static_cast<int>(single.size())));
-                CDimensionArray* y(new CDimensionArray(static_cast<int>(single.size())));
-                double* xIt(x->data());
-                double* yIt(y->data());
-                for (AFR::const_iterator it(single.begin()); it != single.end(); ++it, ++xIt, ++yIt) {
-                    *xIt = it->frequency;
-                    *yIt = abs(it->amplitude);
-                }
-                top.push_back(x);
-                top.push_back(y);
-                x->updateRange();
-                y->updateRange();
-            }
-        }
-    } else {
-        const AFR single(__afr->average());
-        data.push_back(CChartData());
-        CChartData& real(data.last());
-        data.push_back(CChartData());
-        CChartData& im(data.last());
-        data.push_back(CChartData());
-        CChartData& absolute(data.last());
-        CDimensionArray* xRe(new CDimensionArray(static_cast<int>(single.size())));
-        CDimensionArray* yRe(new CDimensionArray(static_cast<int>(single.size())));
-        CDimensionArray* xIm(new CDimensionArray(static_cast<int>(single.size())));
-        CDimensionArray* yIm(new CDimensionArray(static_cast<int>(single.size())));
-        CDimensionArray* xAbs(new CDimensionArray(static_cast<int>(single.size())));
-        CDimensionArray* yAbs(new CDimensionArray(static_cast<int>(single.size())));
-        double* xReIt(xRe->data());
-        double* yReIt(yRe->data());
-        double* xImIt(xIm->data());
-        double* yImIt(yIm->data());
-        double* xAbsIt(xAbs->data());
-        double* yAbsIt(yAbs->data());
-        for (AFR::const_iterator it(single.begin()); it != single.end(); ++it, ++xReIt, ++yReIt, ++xImIt, ++yImIt, ++xAbsIt, ++yAbsIt) {
-            *xReIt = *xImIt = *xAbsIt = it->frequency;
-            *yAbsIt = abs(it->amplitude);
-            *yReIt = it->amplitude.real();
-            *yImIt = it->amplitude.imag();
-        }
-        real.push_back(xRe);
-        real.push_back(yRe);
-        im.push_back(xIm);
-        im.push_back(yIm);
-        absolute.push_back(xAbs);
-        absolute.push_back(yAbs);
-        xRe->updateRange();
-        yRe->updateRange();
-        xIm->updateRange();
-        yIm->updateRange();
-        xAbs->updateRange();
-        yAbs->updateRange();
-        absolute.setTitle(Application::identity()->tr("title", "modes identification wizard/chart"));
-        xAbs->setLabel(Application::identity()->tr("xLabel", "modes identification wizard/chart"));
-        yAbs->setLabel(Application::identity()->tr("yLabel", "modes identification wizard/chart"));
-        data.removeFirst();
-        data.removeFirst();
-
-    }
+    data.setChartTitle(Application::identity()->tr("title", "modes identification wizard/chart"));
+    data.setDimensionTitle(Application::identity()->tr("xLabel", "modes identification wizard/chart"), 0);
+    data.setDimensionTitle(Application::identity()->tr("yLabel", "modes identification wizard/chart"), 1);
     __chart->setData(data);
 }
 

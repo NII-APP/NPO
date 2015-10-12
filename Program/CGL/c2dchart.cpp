@@ -65,6 +65,15 @@ void C2dChart::addData(const CChartData& newData) {
 }
 
 void C2dChart::addData(const CChartDataList &d) {
+    if (!d.getChartTitle().isNull()) {
+        title->setText(d.getChartTitle());
+    }
+    if (!d.getDimensionTitle(0).isNull()) {
+        xLabel->setText(d.getDimensionTitle(0));
+    }
+    if (!d.getDimensionTitle(1).isNull()) {
+        yLabel->setText(d.getDimensionTitle(1));
+    }
     for (const CChartData& newData: d) {
         Q_ASSERT(newData.size() == 2);
         Q_ASSERT(newData[0]->size() == newData[1]->size());

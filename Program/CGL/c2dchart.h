@@ -53,6 +53,8 @@ public:
 
     void addSlider(CSlider*);
 
+    void setGridStep(qreal val) { chart->setGridStep(val); }
+
     ~C2dChart();
 
     static void showArray(const CArray&);
