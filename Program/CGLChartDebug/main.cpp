@@ -40,6 +40,11 @@ int main(int argc, char** argv) {
     CSlider* const slider(new CSlider);
     slider->setLabelTemplate("%1 hz");
     chart.addSlider(slider);
+    CSlider* const slider2(new CSlider);
+    slider2->setDragable(0);
+    slider2->setPosition(42.8);
+    slider2->setColor(Qt::gray);
+    chart.addSlider(slider2);
 
     chart.show();
 

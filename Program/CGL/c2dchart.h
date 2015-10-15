@@ -13,6 +13,7 @@
 
 class CArray;
 class CSlider;
+class CSliders;
 
 class C2dChart : public QGraphicsView
 {
@@ -21,6 +22,7 @@ private:
     static const QFont TITLE_FONT;
     static const QFont LABELS_FONT;
     static const QFont TICKETS_FONT;
+    static const int SLIDER_DRAG_RADIUS;
 
     CChartDataList data;
     QGraphicsSimpleTextItem* title;
@@ -31,10 +33,14 @@ private:
 
     C2dChartPlace* chart;
 
-    QList<CSlider*> sliders;
+    CSliders sliders;
+    CSlider* haulage;
+    QPoint prevPos;
 
     void resizeEvent(QResizeEvent*);
     void closeEvent(QCloseEvent *);
+    void mouseMoveEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent* event);
 
 public:
     C2dChart(QWidget* parent = 0);
@@ -58,6 +64,9 @@ public:
     ~C2dChart();
 
     static void showArray(const CArray&);
+
+public slots:
+    void update();
 
 signals:
     void closed();

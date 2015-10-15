@@ -17,14 +17,16 @@ const QFont C2dChart::TICKETS_FONT = QFont("Tahoma", 11);
 
 C2dChart::C2dChart(QWidget* parent)
     : QGraphicsView(parent)
+    , haulage(nullptr)
 {
     this->setScene(new QGraphicsScene(this));
     title = scene()->addSimpleText(QString(), TITLE_FONT);
     xLabel = scene()->addSimpleText(QString(), LABELS_FONT);
     yLabel = scene()->addSimpleText(QString(), LABELS_FONT);
     yLabel->setRotation(-90);
-    chart = new C2dChartPlace(this);
+    chart = new C2dChartPlace(sliders, haulage, this);
     chart->setGridStep(C2dChartAxis::commendableTicketSize(TICKETS_FONT, this).width() * 2.0);
+    this->connect(chart, SIGNAL(viewPortChanged(QRectF)), SLOT(update()));
     this->scene()->addItem(yAxis = new C2dChartAxis(Qt::LeftEdge, 0));
     this->scene()->addItem(xAxis = new C2dChartAxis(Qt::BottomEdge, 0));
 
@@ -115,6 +117,10 @@ QString C2dChart::getYLabel() const {
 }
 
 void C2dChart::resizeEvent(QResizeEvent*) {
+    update();
+}
+
+void C2dChart::update() {
     QMarginsF margins(0.0, 0.0, 2.0, 0.0);
     scene()->setSceneRect(QRectF(QPointF(0.0, 0.0), QSizeF(this->size())));
 
@@ -181,6 +187,28 @@ void C2dChart::closeEvent(QCloseEvent *) {
     emit closed();
 }
 
+void C2dChart::mouseMoveEvent(QMouseEvent* event) {
+    const auto x(event->x());
+    if (event->buttons() && haulage) {
+        const int delta(event->x() - prevPos.x());
+        prevPos = event->pos();
+        haulage->setPixelPosition(haulage->getPixelPosition() + delta);
+        haulage->update();
+        chart->update();
+        return;
+    }
+
+    this->setCursor(sliders.findNear(x) ? Qt::SizeHorCursor : Qt::ArrowCursor);
+}
+
+void C2dChart::mousePressEvent(QMouseEvent* event) {
+    prevPos = event->pos();
+    CSlider* const s(sliders.findNear(event->x()));
+    if (s) {
+        haulage = s;
+        sliders.setCurrent(haulage);
+    }
+}
 
 void C2dChart::showArray(const CArray& m) {
     C2dChart chart;
@@ -202,4 +230,7 @@ void C2dChart::addSlider(CSlider* s) {
     s->setRange(xAxis->getRange());
     this->scene()->addItem(s);
     sliders << s;
+    if (sliders.getCurrent() == nullptr) {
+        sliders.setCurrent(s);
+    }
 }

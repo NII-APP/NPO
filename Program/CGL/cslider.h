@@ -34,14 +34,21 @@ public:
     QGraphicsPolygonItem* getLabelBar();
     QGraphicsTextItem* getLabelText();
     QGraphicsLineItem* getLine();
+    void setColor(const QColor&);
+    const QColor &getColor() const;
 
-    double getPosition() const;
+    qreal getPosition() const;
     void setPosition(const qreal&);
+    qreal getPixelPosition() const;
+    void setPixelPosition(const qreal&);
+
 
     int topLabelHeight() const;
     int bottomLabelheight() const;
 
+
     void update();
+
 private:
     ///area in real coordinates where the slider may be dragable
     RealRange __purview;
@@ -51,12 +58,25 @@ private:
     double __position;
     bool __dragable;
     QString __labelTemplate;
+    QColor __color;
 
     QGraphicsPolygonItem* const __labelBar;
     QGraphicsPolygonItem* const __bottomArrow;
     QGraphicsPolygonItem* const __topArrow;
     QGraphicsTextItem* const __labelText;
     QGraphicsLineItem* const __line;
+};
+
+class CSliders : public QList<CSlider*> {
+    static const int SLIDER_DRAG_RADIUS;
+public:
+    CSliders() : current(nullptr) {}
+
+    void setCurrent(CSlider* const s) const;
+    CSlider* getCurrent() const { return current; }
+    CSlider* findNear(const qreal& position) const;
+private:
+    mutable CSlider* current;
 };
 
 #endif // CSLIDER_H

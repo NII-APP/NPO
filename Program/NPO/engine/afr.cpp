@@ -1,6 +1,8 @@
 #include "afr.h"
-#include <cchartdatalist.h>
-#include <cdimensionarray.h>
+//#include <cchartdatalist.h>
+//#include <cdimensionarray.h>
+#include "../../CGL/cchartdatalist.h"
+#include "../../CGL/cdimensionarray.h"
 
 AFR::AFR(const size_t size)
     : std::vector<FrequencyMagnitude>(size)

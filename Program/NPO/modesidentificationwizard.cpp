@@ -127,14 +127,14 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
     connect(changeOrientation, SIGNAL(clicked()), SLOT(changeSplitterOrientation()));
     top->addWidget(changeOrientation);
 
+    __splitter->setOrientation(Qt::Vertical);
     __splitter->addWidget(__viewer);
     __viewer->setModel(model);
     __chart->setGridStep(70);
     __splitter->addWidget(__chart);
-    __splitter->setStretchFactor(__splitter->indexOf(__viewer), 300);
-    __splitter->setStretchFactor(__splitter->indexOf(__chart), 200);
     __splitter->setHandleWidth(3);
     __splitter->handle(0)->setAutoFillBackground(false);
+    __splitter->setSizes(QList<int>() << 350 << 650);
 
 
     this->setLayout(new QVBoxLayout);

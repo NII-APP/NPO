@@ -6,10 +6,12 @@
 #include <QByteArray>
 #include <QDebug>
 
-#include <cparse.h>
-//#include "../../CGL/cparse.h"
-#include <cchartdatalist.h>
-#include <cchartdata.h>
+//#include <cparse.h>
+//#include <cchartdatalist.h>
+//#include <cchartdata.h>
+#include "../../CGL/cparse.h"
+#include "../../CGL/cchartdata.h"
+#include "../../CGL/cchartdatalist.h"
 
 #include "afr.h"
 

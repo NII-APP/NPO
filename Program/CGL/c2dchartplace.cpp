@@ -1,16 +1,28 @@
 #include "c2dchartplace.h"
-#include "cvertexes.h"
+
 #include <QVector3D>
+#include <QWheelEvent>
+#include <limits>
+
+#include "cvertexes.h"
 #include "cinterval.h"
 #include "cchartdatalist.h"
 
-C2dChartPlace::C2dChartPlace(QWidget* parent)
+const qreal C2dChartPlace::WHEELL_ZOOM_DEFAULT_COEFFICIENT = .8;
+
+C2dChartPlace::C2dChartPlace(const CSliders& sliders, CSlider*& haulage, QWidget* parent)
     : QGLWidget(parent)
     , viewPort(0.0, 0.0, 0.0, 0.0)
     , vertex(QOpenGLBuffer::VertexBuffer)
     , vShader(nullptr)
     , vArray(nullptr)
+    , gridStep(1.0)
+    , mousePrev(0.0,0.0)
+    , whellCoefficient(WHEELL_ZOOM_DEFAULT_COEFFICIENT)
+    , sliders(sliders)
+    , haulage(haulage)
 {
+    this->setMouseTracking(true);
 }
 
 C2dChartPlace::~C2dChartPlace()
@@ -93,6 +105,20 @@ void C2dChartPlace::paintGL()
         }
     }
     vArray->release();
+
+    if (!sliders.empty()) {
+        glEnable(GL_LINE_STIPPLE);
+        for (const CSlider* s: sliders) {
+            glLineStipple(1, s->isDragable() ? 0xFAFA : 0x3F07);
+            glBegin(GL_LINES);
+            qglColor(s->getColor());
+            const double p(s->getPosition());
+            glVertex2d(p, viewPort.bottom());
+            glVertex2d(p, viewPort.top());
+            glEnd();
+        }
+        glDisable(GL_LINE_STIPPLE);
+    }
 }
 
 void C2dChartPlace::setData(const CChartData& val) {
@@ -201,7 +227,7 @@ qreal C2dChartPlace::viewStep(qreal range, int limOfSteps)
     return 0.0;
 }
 
-CGL::CInterval C2dChartPlace::gridInterval(int h, qreal l, qreal r) const
+CInterval C2dChartPlace::gridInterval(int h, qreal l, qreal r) const
 {
     const int steps(static_cast<int>(h / gridStep));
     if (steps <= 0) {
@@ -219,23 +245,78 @@ CGL::CInterval C2dChartPlace::gridInterval(int h, qreal l, qreal r) const
     return CInterval(min, max, static_cast<int>((max - min) / step + 1.5));
 }
 
-CGL::CInterval C2dChartPlace::xGridInterval() const
+CInterval C2dChartPlace::xGridInterval() const
 {
     return gridInterval(this->width(), viewPort.left(), viewPort.right());
 }
 
-CGL::CInterval C2dChartPlace::yGridInterval() const
+CInterval C2dChartPlace::yGridInterval() const
 {
     return gridInterval(this->height(), viewPort.bottom(), viewPort.top());
 }
 
-CGL::CInterval C2dChartPlace::xGridInterval(qreal w) const
+CInterval C2dChartPlace::xGridInterval(qreal w) const
 {
     return gridInterval(w, viewPort.left(), viewPort.right());
 }
 
-CGL::CInterval C2dChartPlace::yGridInterval(qreal h) const
+CInterval C2dChartPlace::yGridInterval(qreal h) const
 {
     return gridInterval(h, viewPort.bottom(), viewPort.top());
+}
+
+CRealRange C2dChartPlace::xRange() const {
+    return CRealRange(viewPort.left(), viewPort.right());
+}
+
+CRealRange C2dChartPlace::yRange() const {
+    return CRealRange(viewPort.top(), viewPort.bottom());
+}
+
+QPointF C2dChartPlace::toSpace(const QPointF& p) const {
+    return QPointF(xRange()(p.x() / this->width()), yRange()(p.y() / this->height()));
+}
+
+void C2dChartPlace::mouseMoveEvent(QMouseEvent* e) {
+    if (e->buttons() & Qt::MidButton) {
+        viewPort.moveTopLeft(viewPort.topLeft() - toSpace(e->pos()) + toSpace(mousePrev));
+        update();
+        emit viewPortChanged(viewPort);
+    }
+    if (haulage) {
+        const int delta(e->x() - mousePrev.x());
+        haulage->setPixelPosition(haulage->getPixelPosition() + delta);
+        haulage->update();
+        this->update();
+    } else {
+        this->setCursor(sliders.findNear(e->x() + this->x()) ? Qt::SizeHorCursor : Qt::ArrowCursor);
+    }
+    mousePrev = e->pos();
+}
+
+void C2dChartPlace::mousePressEvent(QMouseEvent* e) {
+    mousePrev = e->pos();
+    CSlider* const s(sliders.findNear(e->x() + this->x()));
+    if (s) {
+        haulage = s;
+        sliders.setCurrent(haulage);
+    }
+}
+
+void C2dChartPlace::mouseReleaseEvent(QMouseEvent*) {
+    haulage = nullptr;
+}
+
+void C2dChartPlace::wheelEvent(QWheelEvent* w) {
+    const qreal k(w->angleDelta().y() > 0 ? whellCoefficient : 1.0 / whellCoefficient);
+    /*what is a new view port? width an height just an ould wiewPort size big scaled by k. Now about the position:
+     * newPosition = initialPosition + (1 - p) * positionOfMouseInSpace
+     * I guarantied it! It's allow to make unchanged position for point under pointer.
+     * */
+    viewPort = QRectF(viewPort.topLeft() + QPointF(toSpace(w->posF()) - viewPort.topLeft()) * (1.0 - k),
+                      QSizeF(viewPort.size()) *= k);
+    emit viewPortChanged(viewPort);
+    this->update();
+
 }
 

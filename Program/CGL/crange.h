@@ -99,6 +99,7 @@ public:
         return *this;
     }
 };
+typedef RealRange CRealRange;
 typedef CRange<int> IndexRange;
 
 
