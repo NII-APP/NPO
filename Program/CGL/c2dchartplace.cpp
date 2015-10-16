@@ -75,6 +75,9 @@ void C2dChartPlace::paintGL()
 
     glColor3ub(0x20,0x20,0x20);
     CInterval xInterval(xGridInterval());
+    glEnable(GL_LINE_STIPPLE);
+    glLineStipple(1, 0xAAAA);
+    qglColor(QColor(0x80,0x80,0x80));
     if (xInterval.size() > 0) {
         glBegin(GL_LINES);
         for (int i(0); i != xInterval.size(); ++i) {
@@ -92,6 +95,7 @@ void C2dChartPlace::paintGL()
         }
         glEnd();
     }
+    glDisable(GL_LINE_STIPPLE);
 
     static const QRgb defoultColorsCludge[] = { 0xFF880000, 0xFF008800, 0xFF000088,
                                                 0xFF888800, 0xFF880088, 0xFF008888,
