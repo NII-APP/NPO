@@ -12,6 +12,7 @@
 #include "../../CGL/cparse.h"
 #include "../../CGL/cchartdata.h"
 #include "../../CGL/cchartdatalist.h"
+#include "../../Mesh/eigenmode.h"
 
 #include "afr.h"
 
@@ -25,6 +26,44 @@ AFRArray::AFRArray()
 AFRArray::~AFRArray()
 {
 
+}
+
+EigenMode AFRArray::getMode(const double freq) const {
+    int i(0);
+    EigenMode result;
+    result.setFrequency(freq);
+    result.resize(this->size());
+    int j(0);
+    for (const AFR& it : *this) {
+        qDebug() << j;
+        while (i < it.size() && freq < it.at(i).frequency) {
+            ++i;
+        }
+        while (i > 0 && freq > it.at(i).frequency) {
+            --i;
+        }
+
+        if (it.empty()) {
+            result.form()(j) = QVector3D(0.0, 0.0, 0.0);
+        } else if (i == 0) {
+            result.form()(j) = QVector3D(0.0, 0.0, toScalar(it.front().amplitude));
+        } else if (i == it.size()) {
+            result.form()(j) = QVector3D(0.0, 0.0, toScalar(it.front().amplitude));
+        } else {
+            const double k((freq - it.at(i - 1).frequency) / (it.at(i).frequency - it.at(i - 1).frequency));
+            Q_ASSERT(k >= 0.0 && k <= 1.0);
+            const FrequencyMagnitude::Amplitude& left(it.at(i - 1).amplitude);
+            result.form()[j] = toScalar(left + (it.at(i).amplitude - left) * k);
+        }
+        ++j;
+    }
+    result.updateExtremums();
+    result.updatePreMac();
+    return result;
+}
+
+double AFRArray::toScalar(const FrequencyMagnitude::Amplitude& val) {
+    return val.imag() > 0 ? abs(val) : -abs(val);
 }
 
 void AFRArray::read(const QString& filename, int nodesCount) {

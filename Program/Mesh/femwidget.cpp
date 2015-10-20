@@ -169,6 +169,15 @@ void FEMWidget::MeshBuffer::setCurrentMode(int form) {
         array->release();
     }
 }
+
+void FEMWidget::MeshBuffer::setProxyMode(const EigenMode& imposter) {
+    self->colorize(imposter.form());
+    array->bind();
+    vertex.bind();
+    vertex.write(colorsSize + vertexSize, imposter.form().data(), vertexSize);
+    array->release();
+}
+
 void FEMWidget::reloadColors(const FEM* w) {
     MeshBuffers::iterator b(meshes.begin());
     while (b != meshes.end() && (*b)->fem() != w) {
@@ -212,6 +221,13 @@ QList<const FEM *> FEMWidget::getData() const
     return result;
 }
 
+void FEMWidget::setProxyMode(EigenMode& imposter) {
+    for (MeshBuffer* b : meshes) {
+        if (imposter.size() == b->fem()->getNodes().size()) {
+            b->setProxyMode(imposter);
+        }
+    }
+}
 
 void FEMWidget::wheelEvent(QWheelEvent * e) {
     if (e->modifiers() & Qt::CTRL) {

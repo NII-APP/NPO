@@ -41,6 +41,7 @@ public:
     void setData(const FEM& model) { setData(&model); }
     void setData(const QList<const FEM*>& model);
     QList<const FEM*> getData() const;
+    void setProxyMode(EigenMode &);
 
     void reloadColors(const FEM* forWho);
 signals:
@@ -75,6 +76,7 @@ public:
     float getCurrentDefoultMagnitude() const { try { return self->getModes().at(mode).defoultMagnitude(); } catch(...) { return 0.0f; } }
     double getDefaultMagnitude() const;
     void colorize(int);
+    void setProxyMode(const EigenMode& imposter);
 
     void uploadMode();
     void uploadColors();
