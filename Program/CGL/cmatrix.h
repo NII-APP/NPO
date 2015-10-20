@@ -40,6 +40,8 @@ public:
     T minInColumn(size_t c) const;
     T minInRowExclude(size_t r, size_t exclude) const;
     T minInColumnExclude(size_t c, size_t exclude) const;
+    T max() const;
+    T maxElement() const;
     RealRange estimateRange() const;
     void plusInRow(size_t r, const T& val);
     void plusInColumn(size_t c, const T& val);
