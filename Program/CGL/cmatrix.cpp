@@ -66,6 +66,20 @@ CMatrix::T CMatrix::minInColumnExclude(size_t c, size_t exclude) const {
 CMatrix::T CMatrix::max() const {
     return *std::max_element(data.begin(),data.end());
 }
+CMatrix::T CMatrix::maxElement() const {
+    return 0;
+}
+int CMatrix::maxIndex() const {
+   T max = -100.;
+   int maxN = 0;
+   for( int i(0); i < height(); i++){
+       if( m[i][1] > max ){
+                max = m[i][1];
+                maxN = i;
+        }
+    }
+    return maxN;
+}
 RealRange CMatrix::estimateRange() const {
     if (data.empty()) {
         return RealRange();
