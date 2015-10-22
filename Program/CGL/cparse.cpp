@@ -10,13 +10,6 @@ CParse::CParse(char *string)
 {
 }
 
-CParse::CParse(const char *string)
-{
-    int len = static_cast<int>(strlen(string)) + 1;
-    d = new char[len];
-    memcpy(d, string, len);
-}
-
 void CParse::UNIXRowSymbol() {
     char* v(d);
     char* k(d);
@@ -75,7 +68,7 @@ int CParse::integer()
 }
 double CParse::real()
 {
-    while (*d == ' ' || *d == '\t' || *d == '\n')
+    while (*d == ' ' || *d == '\t' || *d == '\n' || *d == '\r')
     {
         ++d;
     }
@@ -211,7 +204,7 @@ void CParse::skipRow() {
     while (*d && *d != '\n') {
         ++d;
     }
-    if (*d == '\n') {
+    while (*d == '\n' || *d == '\r') {
         ++d;
     }
 }

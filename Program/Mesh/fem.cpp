@@ -66,6 +66,7 @@ bool FEM::read(const QString &fileName) {
         return true;
     } else if (!format.compare("txt", Qt::CaseInsensitive)) {
         modes.readTXT(fileName);
+        modes.estimateDefoultMagnitudes();
         return true;
     } else if (!format.compare("f06", Qt::CaseInsensitive)) {
         modes.readF06(fileName);

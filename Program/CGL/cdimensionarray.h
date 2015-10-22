@@ -14,6 +14,7 @@ class CDimensionArray : public CDimension
 public:
     CDimensionArray();
     CDimensionArray(const CArray&, const QString& name = QString());
+    CDimensionArray(int size, const QString& name = QString());
     ~CDimensionArray();
 
     double operator[](int i) const { return nodes[i]; }
@@ -26,6 +27,7 @@ public:
     const double* data() const { return nodes.data(); }
 
     RealRange getRange() const { return range; }
+    void updateRange();
 
     void push_back(const double& v) { range.include(v); nodes.push_back(v); }
 };

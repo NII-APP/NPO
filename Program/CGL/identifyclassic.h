@@ -14,6 +14,7 @@ public:
     T getFreq( T freq1, T freq2);
     T getDissipation( T freq1, T freq2);
 private:
+    int maxIndex();
 
 }
 #endif // IDENTIFYCLASSIC_H

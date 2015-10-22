@@ -13,4 +13,9 @@ obsolete/
 Program/cglDebug/**
 Program/cgldebug.pro
 **/Thumbs.db
+<<<<<<< HEAD
 Program/debug**
+=======
+**.autosave
+Program/MeshDebug/**
+>>>>>>> 41ec126e4af1a184e6b489de47e3b338b952e7cf

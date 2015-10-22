@@ -1,15 +1,19 @@
 #ifndef C2DCHART_H
 #define C2DCHART_H
 
-#include <QGLWidget>
-#include "cchartdata.h"
 #include <QLabel>
 #include <QFrame>
-#include "c2dchartplace.h"
+#include <QList>
 #include <QGraphicsView>
+
+#include "cchartdata.h"
+#include "c2dchartplace.h"
 #include "c2dchartaxis.h"
+#include "cchartdatalist.h"
 
 class CArray;
+class CSlider;
+class CSliders;
 
 class C2dChart : public QGraphicsView
 {
@@ -18,8 +22,9 @@ private:
     static const QFont TITLE_FONT;
     static const QFont LABELS_FONT;
     static const QFont TICKETS_FONT;
+    static const int SLIDER_DRAG_RADIUS;
 
-    CChartData::ChartDataList data;
+    CChartDataList data;
     QGraphicsSimpleTextItem* title;
     QGraphicsSimpleTextItem* xLabel;
     QGraphicsSimpleTextItem* yLabel;
@@ -28,16 +33,22 @@ private:
 
     C2dChartPlace* chart;
 
+    CSliders sliders;
+    CSlider* haulage;
+    QPoint prevPos;
+
     void resizeEvent(QResizeEvent*);
     void closeEvent(QCloseEvent *);
+    void mouseMoveEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent* event);
 
 public:
     C2dChart(QWidget* parent = 0);
 
     void setData(const CChartData& newData);
-    void setData(const CChartData::ChartDataList& newData);
+    void setData(const CChartDataList& newData);
     void addData(const CChartData& newData);
-    void addData(const CChartData::ChartDataList& newData);
+    void addData(const CChartDataList& newData);
 
     void setTitle(const QString& val);
     void setXLabel(const QString& val);
@@ -46,9 +57,16 @@ public:
     QString getXLabel() const;
     QString getYLabel() const;
 
+    void addSlider(CSlider*);
+
+    void setGridStep(qreal val) { chart->setGridStep(val); }
+
     ~C2dChart();
 
     static void showArray(const CArray&);
+
+public slots:
+    void update();
 
 signals:
     void closed();

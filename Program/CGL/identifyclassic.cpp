@@ -2,11 +2,13 @@
 #include "cmatrix.h"
 #include "cgl.h"
 
-IdentifyClassic::IdentifyClassic( CGL::CMatrix const & matrix ){
+IdentifyClassic::IdentifyClassic( const CGL::CMatrix & matrix ){
 
 }
+IdentifyClassic::~IdentifyClassic( const CGL::CMatrix & matrix ){
 
-int CGL::maxIndex() const {
+}
+int IdentifyClassic::maxIndex(){
    T max = -100.;
    int maxN = 0;
    for( int i(0); i < height(); i++){

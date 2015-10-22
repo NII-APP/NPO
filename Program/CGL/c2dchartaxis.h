@@ -29,9 +29,10 @@ public:
 
     void setLength(const qreal val) { domain = edge & (Qt::LeftEdge | Qt::RightEdge) ? RealRange(val - 2, -1) : RealRange(-1, val - 1); }
     void setDomain(const RealRange& val) { domain = val; }
+    const RealRange& getDomain() const { return domain; }
     void setRange(const RealRange& val) { range = val; }
-    void setFont(const QFont& val);
     const RealRange& getRange() const { return range; }
+    void setFont(const QFont& val);
     const QFont& getFont() const { return font; }
 
     qreal implementation(const QPointF& topleft, const CInterval& tickValues, QPaintDevice* forMetric = 0);

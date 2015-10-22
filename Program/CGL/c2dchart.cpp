@@ -8,6 +8,8 @@
 #include <QEventLoop>
 #include "cdimensioninterval.h"
 #include "cdimensionarray.h"
+#include "cchartdatalist.h"
+#include "cslider.h"
 
 const QFont C2dChart::TITLE_FONT = QFont("Tahoma", 20);
 const QFont C2dChart::LABELS_FONT = QFont("Tahoma", 14);
@@ -15,14 +17,16 @@ const QFont C2dChart::TICKETS_FONT = QFont("Tahoma", 11);
 
 C2dChart::C2dChart(QWidget* parent)
     : QGraphicsView(parent)
+    , haulage(nullptr)
 {
     this->setScene(new QGraphicsScene(this));
     title = scene()->addSimpleText(QString(), TITLE_FONT);
     xLabel = scene()->addSimpleText(QString(), LABELS_FONT);
     yLabel = scene()->addSimpleText(QString(), LABELS_FONT);
     yLabel->setRotation(-90);
-    chart = new C2dChartPlace(this);
+    chart = new C2dChartPlace(sliders, haulage, this);
     chart->setGridStep(C2dChartAxis::commendableTicketSize(TICKETS_FONT, this).width() * 2.0);
+    this->connect(chart, SIGNAL(viewPortChanged(QRectF)), SLOT(update()));
     this->scene()->addItem(yAxis = new C2dChartAxis(Qt::LeftEdge, 0));
     this->scene()->addItem(xAxis = new C2dChartAxis(Qt::BottomEdge, 0));
 
@@ -33,7 +37,7 @@ C2dChart::C2dChart(QWidget* parent)
 
 C2dChart::~C2dChart()
 {
-
+    qDeleteAll(sliders);
 }
 
 void C2dChart::setData(const CChartData& newData) {
@@ -41,7 +45,7 @@ void C2dChart::setData(const CChartData& newData) {
     addData(newData);
 }
 
-void C2dChart::setData(const CChartData::ChartDataList& newData) {
+void C2dChart::setData(const CChartDataList& newData) {
     data.clear();
     addData(newData);
 }
@@ -62,7 +66,16 @@ void C2dChart::addData(const CChartData& newData) {
     chart->setData(data);
 }
 
-void C2dChart::addData(const CChartData::ChartDataList &d) {
+void C2dChart::addData(const CChartDataList &d) {
+    if (!d.getChartTitle().isNull()) {
+        title->setText(d.getChartTitle());
+    }
+    if (!d.getDimensionTitle(0).isNull()) {
+        xLabel->setText(d.getDimensionTitle(0));
+    }
+    if (!d.getDimensionTitle(1).isNull()) {
+        yLabel->setText(d.getDimensionTitle(1));
+    }
     for (const CChartData& newData: d) {
         Q_ASSERT(newData.size() == 2);
         Q_ASSERT(newData[0]->size() == newData[1]->size());
@@ -104,6 +117,10 @@ QString C2dChart::getYLabel() const {
 }
 
 void C2dChart::resizeEvent(QResizeEvent*) {
+    update();
+}
+
+void C2dChart::update() {
     QMarginsF margins(0.0, 0.0, 2.0, 0.0);
     scene()->setSceneRect(QRectF(QPointF(0.0, 0.0), QSizeF(this->size())));
 
@@ -113,6 +130,13 @@ void C2dChart::resizeEvent(QResizeEvent*) {
         margins += QMarginsF(0.0, title->boundingRect().height(), 0.0, 0.0);
     } else {
         title->hide();
+    }
+
+    if (!sliders.empty()) {
+        margins += QMarginsF(0.0,
+                             (**std::max_element(sliders.begin(), sliders.end(),[](const CSlider* s1, const CSlider* s2)->bool{ return s1->topLabelHeight() > s2->topLabelHeight(); } )).topLabelHeight(),
+                             0.0,
+                             0.0);
     }
 
     if (!xLabel->text().isEmpty()) {
@@ -150,6 +174,12 @@ void C2dChart::resizeEvent(QResizeEvent*) {
                    scene()->height() - xLabel->boundingRect().height());
 
     yLabel->setPos(0, scene()->height() - margins.bottom() - chart->height() / 2.0 + yLabel->boundingRect().width() / 2.0);
+
+    for (CSlider* s : sliders) {
+        s->setRange(xAxis->getRange());
+        s->setGeometry(chart->geometry());
+        s->update();
+    }
 }
 
 
@@ -157,11 +187,33 @@ void C2dChart::closeEvent(QCloseEvent *) {
     emit closed();
 }
 
+void C2dChart::mouseMoveEvent(QMouseEvent* event) {
+    const auto x(event->x());
+    if (event->buttons() && haulage) {
+        const int delta(event->x() - prevPos.x());
+        prevPos = event->pos();
+        haulage->setPixelPosition(haulage->getPixelPosition() + delta);
+        haulage->update();
+        chart->update();
+        return;
+    }
+
+    this->setCursor(sliders.findNear(x) ? Qt::SizeHorCursor : Qt::ArrowCursor);
+}
+
+void C2dChart::mousePressEvent(QMouseEvent* event) {
+    prevPos = event->pos();
+    CSlider* const s(sliders.findNear(event->x()));
+    if (s) {
+        haulage = s;
+        sliders.setCurrent(haulage);
+    }
+}
 
 void C2dChart::showArray(const CArray& m) {
     C2dChart chart;
     CChartData data;
-    data.push_back(new CDimensionInterval(CGL::CInterval(0.0, 1.0 * m.size() - 1.0, m.size())));
+    data.push_back(new CDimensionInterval(CGL::CInterval(0.0, static_cast<int>(1.0 * m.size() - 1.0, m.size()))));
     data.push_back(new CDimensionArray(m));
     chart.setData(data);
 
@@ -171,4 +223,14 @@ void C2dChart::showArray(const CArray& m) {
     chart.show();
 
     loop->exec();
+}
+
+void C2dChart::addSlider(CSlider* s) {
+    s->setGeometry(chart->geometry());
+    s->setRange(xAxis->getRange());
+    this->scene()->addItem(s);
+    sliders << s;
+    if (sliders.getCurrent() == nullptr) {
+        sliders.setCurrent(s);
+    }
 }

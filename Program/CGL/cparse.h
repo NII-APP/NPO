@@ -13,7 +13,6 @@ protected:
     char* d;
 public:
     CParse(char *string = 0);
-    CParse(const char *string);
     static CParse parseFile(const std::string& filename);
     inline char *data() { return d; }
 

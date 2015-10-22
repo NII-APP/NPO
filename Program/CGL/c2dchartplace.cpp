@@ -1,15 +1,28 @@
 #include "c2dchartplace.h"
-#include "cvertexes.h"
-#include <QVector3D>
-#include "cinterval.h"
 
-C2dChartPlace::C2dChartPlace(QWidget* parent)
+#include <QVector3D>
+#include <QWheelEvent>
+#include <limits>
+
+#include "cvertexes.h"
+#include "cinterval.h"
+#include "cchartdatalist.h"
+
+const qreal C2dChartPlace::WHEELL_ZOOM_DEFAULT_COEFFICIENT = .8;
+
+C2dChartPlace::C2dChartPlace(const CSliders& sliders, CSlider*& haulage, QWidget* parent)
     : QGLWidget(parent)
     , viewPort(0.0, 0.0, 0.0, 0.0)
     , vertex(QOpenGLBuffer::VertexBuffer)
     , vShader(nullptr)
     , vArray(nullptr)
+    , gridStep(1.0)
+    , mousePrev(0.0,0.0)
+    , whellCoefficient(WHEELL_ZOOM_DEFAULT_COEFFICIENT)
+    , sliders(sliders)
+    , haulage(haulage)
 {
+    this->setMouseTracking(true);
 }
 
 C2dChartPlace::~C2dChartPlace()
@@ -62,6 +75,9 @@ void C2dChartPlace::paintGL()
 
     glColor3ub(0x20,0x20,0x20);
     CInterval xInterval(xGridInterval());
+    glEnable(GL_LINE_STIPPLE);
+    glLineStipple(1, 0xAAAA);
+    qglColor(QColor(0x80,0x80,0x80));
     if (xInterval.size() > 0) {
         glBegin(GL_LINES);
         for (int i(0); i != xInterval.size(); ++i) {
@@ -79,17 +95,34 @@ void C2dChartPlace::paintGL()
         }
         glEnd();
     }
+    glDisable(GL_LINE_STIPPLE);
 
-    static const QRgb defoultColorsCludge[] = { 0x880000FF, 0x008800FF, 0x000088FF,
-                                                0x888800FF, 0x880088FF, 0x008888FF,
-                                                0x88FFFFFF, 0xFF88FFFF, 0xFFFF88FF,
-                                                0x8888FFFF, 0x88FF88FF, 0xFF8888FF };
+    static const QRgb defoultColorsCludge[] = { 0xFF880000, 0xFF008800, 0xFF000088,
+                                                0xFF888800, 0xFF880088, 0xFF008888,
+                                                0xFF88FFFF, 0xFFFF88FF, 0xFFFFFF88,
+                                                0xFF8888FF, 0xFF88FF88, 0xFFFF8888 };
     vArray->bind();
-    for (int i(1); i != bariers.size(); ++i) {
-        glColor3ubv(static_cast<const GLubyte*>(static_cast<const void*>(defoultColorsCludge + i)));
-        glDrawArrays(GL_LINE_STRIP, bariers.at(i - 1), bariers.at(i) - bariers.at(i - 1));
+    if (!bariers.empty()) {
+        for (int i(1); i != bariers.size(); ++i) {
+            glColor3ubv(static_cast<const GLubyte*>(static_cast<const void*>(defoultColorsCludge + i)));
+            glDrawArrays(GL_LINE_STRIP, bariers.at(i - 1), bariers.at(i) - bariers.at(i - 1));
+        }
     }
     vArray->release();
+
+    if (!sliders.empty()) {
+        glEnable(GL_LINE_STIPPLE);
+        for (const CSlider* s: sliders) {
+            glLineStipple(1, s->isDragable() ? 0xFAFA : 0x3F07);
+            glBegin(GL_LINES);
+            qglColor(s->getColor());
+            const double p(s->getPosition());
+            glVertex2d(p, viewPort.bottom());
+            glVertex2d(p, viewPort.top());
+            glEnd();
+        }
+        glDisable(GL_LINE_STIPPLE);
+    }
 }
 
 void C2dChartPlace::setData(const CChartData& val) {
@@ -125,14 +158,14 @@ void C2dChartPlace::setData(const CChartData& val) {
     bariers.push_back(d1.size());
 }
 
-void C2dChartPlace::setData(const CChartData::ChartDataList& val)
+void C2dChartPlace::setData(const CChartDataList &val)
 {
     this->makeCurrent();
     if (!vShader) {
         this->initializeGL();
     }
     int wholeSize(0);
-    for (CChartData item : val) {
+    for (const CChartData& item : val) {
         Q_ASSERT(item.size() >= 2);
         Q_ASSERT(item[0]->size() == item[0]->size());
         wholeSize += item[0]->size();
@@ -142,7 +175,7 @@ void C2dChartPlace::setData(const CChartData::ChartDataList& val)
     bariers.clear();
     bariers.push_back(0);
     viewPort = QRectF(QPointF(val[0][0]->operator[](0), val[0][1]->operator[](0)), QSizeF(0.0, 0.0));
-    for (CChartData item : val) {
+    for (const CChartData& item : val) {
         const CDimension& d1(*item[0]);
         const CDimension& d2(*item[1]);
 
@@ -198,7 +231,7 @@ qreal C2dChartPlace::viewStep(qreal range, int limOfSteps)
     return 0.0;
 }
 
-CGL::CInterval C2dChartPlace::gridInterval(int h, qreal l, qreal r) const
+CInterval C2dChartPlace::gridInterval(int h, qreal l, qreal r) const
 {
     const int steps(static_cast<int>(h / gridStep));
     if (steps <= 0) {
@@ -216,23 +249,78 @@ CGL::CInterval C2dChartPlace::gridInterval(int h, qreal l, qreal r) const
     return CInterval(min, max, static_cast<int>((max - min) / step + 1.5));
 }
 
-CGL::CInterval C2dChartPlace::xGridInterval() const
+CInterval C2dChartPlace::xGridInterval() const
 {
     return gridInterval(this->width(), viewPort.left(), viewPort.right());
 }
 
-CGL::CInterval C2dChartPlace::yGridInterval() const
+CInterval C2dChartPlace::yGridInterval() const
 {
     return gridInterval(this->height(), viewPort.bottom(), viewPort.top());
 }
 
-CGL::CInterval C2dChartPlace::xGridInterval(qreal w) const
+CInterval C2dChartPlace::xGridInterval(qreal w) const
 {
     return gridInterval(w, viewPort.left(), viewPort.right());
 }
 
-CGL::CInterval C2dChartPlace::yGridInterval(qreal h) const
+CInterval C2dChartPlace::yGridInterval(qreal h) const
 {
     return gridInterval(h, viewPort.bottom(), viewPort.top());
+}
+
+CRealRange C2dChartPlace::xRange() const {
+    return CRealRange(viewPort.left(), viewPort.right());
+}
+
+CRealRange C2dChartPlace::yRange() const {
+    return CRealRange(viewPort.top(), viewPort.bottom());
+}
+
+QPointF C2dChartPlace::toSpace(const QPointF& p) const {
+    return QPointF(xRange()(p.x() / this->width()), yRange()(p.y() / this->height()));
+}
+
+void C2dChartPlace::mouseMoveEvent(QMouseEvent* e) {
+    if (e->buttons() & Qt::MidButton) {
+        viewPort.moveTopLeft(viewPort.topLeft() - toSpace(e->pos()) + toSpace(mousePrev));
+        update();
+        emit viewPortChanged(viewPort);
+    }
+    if (haulage) {
+        const int delta(e->x() - mousePrev.x());
+        haulage->setPixelPosition(haulage->getPixelPosition() + delta);
+        haulage->update();
+        this->update();
+    } else {
+        this->setCursor(sliders.findNear(e->x() + this->x()) ? Qt::SizeHorCursor : Qt::ArrowCursor);
+    }
+    mousePrev = e->pos();
+}
+
+void C2dChartPlace::mousePressEvent(QMouseEvent* e) {
+    mousePrev = e->pos();
+    CSlider* const s(sliders.findNear(e->x() + this->x()));
+    if (s) {
+        haulage = s;
+        sliders.setCurrent(haulage);
+    }
+}
+
+void C2dChartPlace::mouseReleaseEvent(QMouseEvent*) {
+    haulage = nullptr;
+}
+
+void C2dChartPlace::wheelEvent(QWheelEvent* w) {
+    const qreal k(w->angleDelta().y() > 0 ? whellCoefficient : 1.0 / whellCoefficient);
+    /*what is a new view port? width an height just an ould wiewPort size big scaled by k. Now about the position:
+     * newPosition = initialPosition + (1 - p) * positionOfMouseInSpace
+     * I guarantied it! It's allow to make unchanged position for point under pointer.
+     * */
+    viewPort = QRectF(viewPort.topLeft() + QPointF(toSpace(w->posF()) - viewPort.topLeft()) * (1.0 - k),
+                      QSizeF(viewPort.size()) *= k);
+    emit viewPortChanged(viewPort);
+    this->update();
+
 }
 
