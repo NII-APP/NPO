@@ -26,8 +26,7 @@ MOC_DIR = $$PWD/../build/app/moc
 
 SOURCES += [a-z]*.cpp
 
-HEADERS += [a-z]*.h \
-    identifyclassic.h
+HEADERS += [a-z]*.h
 
 unix {
     target.path = /usr/lib

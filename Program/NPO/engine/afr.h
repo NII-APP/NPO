@@ -3,6 +3,7 @@
 
 #include <complex>
 #include <vector>
+#include <crange.h>
 
 class QString;
 class RealRange;
@@ -21,6 +22,9 @@ public:
     AFR();
     AFR(const size_t size);
     ~AFR();
+    //int maxNode(const AFR::const_iterator start = begin(), const AFR::const_iterator finish = end());
+    int maxNode(const AFR::const_iterator start, const AFR::const_iterator finish);
+    double damping(const CRealRange& range);
 
     enum IntegralParts {
         Real = 0x1,
