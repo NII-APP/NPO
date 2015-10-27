@@ -1,9 +1,11 @@
 #include "afr.h"
+#include "afrarray.h"
 //#include <cchartdatalist.h>
 //#include <cdimensionarray.h>
 #include "../../CGL/cchartdatalist.h"
 #include "../../CGL/cdimensionarray.h"
 #include <crange.h>
+#include <QDebug>
 
 AFR::AFR(const size_t size)
     : std::vector<FrequencyMagnitude>(size)
@@ -19,7 +21,7 @@ AFR::~AFR()
 }
 
 double AFR::damping(const CRealRange& range) {
-    AFR::const_iterator startIterator(begin());
+    AFR::const_iterator startIterator(begin()) ;
     while (startIterator->frequency < range.getMin() && startIterator < end()) {
         startIterator++;
     }
@@ -34,27 +36,38 @@ double AFR::damping(const CRealRange& range) {
     double maxAmplitude = abs(maxValue.amplitude);
     double freq_1 = 0,freq_2 = 0, freq_max = maxValue.frequency;
     double min = maxAmplitude;
+     qDebug() << "maxAmplitude/SQRT2=" << maxAmplitude/SQRT2;
     for ( int i(maxIndex); i > 0; i--){
-        if ( abs(at(i).amplitude - maxAmplitude/SQRT2)  < min ){
-            min = abs(at(i).amplitude - maxAmplitude/SQRT2);
+        if ( abs(abs(at(i).amplitude) - maxAmplitude/SQRT2)  < min ){
+            //check for decay
+            if( abs(at(i).amplitude) - abs(at(i-1).amplitude) < 0){
+                break;
+            }
+            min = abs(abs(at(i).amplitude) - maxAmplitude/SQRT2) ;
             freq_1 = at(i).frequency;
         }
     }
     min = maxAmplitude;
     for ( int i(maxIndex); i < (end() - begin()); i++){
-        if( abs(at(i).amplitude - maxAmplitude/SQRT2) < min ){
-            min = abs(at(i).amplitude - maxAmplitude/SQRT2);
+        if( abs(abs(at(i).amplitude) - maxAmplitude/SQRT2)  < min){
+            //checking for an increase
+            if( abs(at(i+1).amplitude) - abs(at(i).amplitude) > 0){
+                break;
+            }
+            min = abs(abs(at(i).amplitude) - maxAmplitude/SQRT2) ;
             freq_2 = at(i).frequency;
         }
     }
+    Q_ASSERT( freq_2 - freq_1 > 0 );
+
     return (freq_2 - freq_1)/freq_max;
 }
 
 int AFR::maxNode(const AFR::const_iterator start, const AFR::const_iterator finish) {
-    //Q_ASSERT(strat >= begin() && start < finish && finish <= end());
-    return std::max_element(begin(),end(),
+    Q_ASSERT(start >= begin() && start < finish && finish <= end());
+    return std::max_element(start,finish,
                             [](const FrequencyMagnitude& a, const FrequencyMagnitude& b)->bool
-                                                          { return abs(a.amplitude) > abs(b.amplitude); })
+                                                          { return abs(a.amplitude) < abs(b.amplitude); })
             - begin();
 }
 
@@ -92,7 +105,7 @@ CChartDataList AFR::toChartData(unsigned interalParts) const {
         im.push_back(yIm);
         result << im;
     }
-    if (interalParts & Magnitude) {
+    if (interalParts & Magnitude) {        
         CDimensionArray* xAbs(new CDimensionArray(static_cast<int>(this->size())));
         CDimensionArray* yAbs(new CDimensionArray(static_cast<int>(this->size())));
         double* xAbsIt(xAbs->data());

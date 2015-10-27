@@ -158,7 +158,7 @@ AFR AFRArray::average() const {
 CChartDataList AFRArray::toChartData(unsigned interalParts) const {
     CChartDataList result;
     for (const AFR& single : *this) {
-        if (!single.empty() && &single != &at(52)) {
+        if (!single.empty()) {
             result.append(single.toChartData(interalParts));
         }
     }
