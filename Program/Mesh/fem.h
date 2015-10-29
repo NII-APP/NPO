@@ -55,8 +55,6 @@ private:
     CParallelepiped sqre;
     //is [i] point included in some trace
     QBitArray isTraced;
-    //nodes may be marked to some reason
-    QBitArray markedNodes;
     //name of file which was parsed to this object
     QString file;
     //name
@@ -69,6 +67,7 @@ private:
     //UNV can store the transformation matrices for forms coordinate systems.
     std::vector<QMatrix3x3> UNVTransformations;
     //colorize... may be equal to size of vertexes or trace...
+    /// @todo remove this shit
     mutable CGL::Colors colors;
     //measurment of colorzed value
     mutable QString measurment;
