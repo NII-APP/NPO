@@ -5,7 +5,7 @@
 #
 #-------------------------------------------------
 
-QT       += core opengl gui svg
+QT       += core opengl gui svg winextras
 
 RC_ICONS += "images/Bez_imeni-1.ico"
 
@@ -53,7 +53,10 @@ SOURCES += main.cpp \
     pairsmodel.cpp \
     pairviewer.cpp \
     engine/fempair.cpp \
-    pairsview.cpp
+    pairsview.cpp \
+    modesidentificationwizard.cpp \
+    engine/afr.cpp \
+    engine/afrarray.cpp
 
 HEADERS += \
     relationdialog.h \
@@ -77,7 +80,10 @@ HEADERS += \
     pairsmodel.h \
     pairviewer.h \
     engine/fempair.h \
-    pairsview.h
+    pairsview.h \
+    modesidentificationwizard.h \
+    engine/afr.h \
+    engine/afrarray.h
 
 exists( engine/pyParse/BDFEntity.cpp ) {
     message( "Configuring with new parser" )

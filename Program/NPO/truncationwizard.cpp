@@ -19,8 +19,8 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     QSplitter* selectors(new QSplitter(Qt::Vertical, main));
     selectors->addWidget(first);
     selectors->addWidget(second);
-    connect(first, SIGNAL(meshSelected()), SLOT(previewPatrol()));
-    connect(second, SIGNAL(meshSelected()), SLOT(previewPatrol()));
+    connect(first, SIGNAL(meshSelected(int)), SLOT(previewPatrol()));
+    connect(second, SIGNAL(meshSelected(int)), SLOT(previewPatrol()));
     main->addWidget(selectors);
     relation = new RelationDialog(0, main);
     main->addWidget(relation);
@@ -32,7 +32,7 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     connect(relation, SIGNAL(updateMac(const FEMPair::Relation&)),
             this, SLOT(newMac(const FEMPair::Relation&)));
 
-    current = 0;
+    current = nullptr;
     previewPatrol();
 
     main->setStretchFactor(0, 1);
@@ -59,13 +59,14 @@ FEMPair* TruncationWizard::exec(QWidget* parent)
 
 void TruncationWizard::previewPatrol()
 {
+    relation->setPair(nullptr);
     delete current;
     if (first->current() && second->current()) {
         current = new FEMPair(first->current(), second->current());
         relation->setPair(current);
         chart->setData(current->getMac());
     } else {
-        current = 0;
+        current = nullptr;
     }
 }
 

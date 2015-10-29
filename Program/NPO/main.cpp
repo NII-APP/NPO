@@ -2,22 +2,26 @@
 #include "mainwindow.h"
 #include <QDebug>
 
-#include "pairviewer.h"
-#include "engine/fempair.h"
-#include "project.h"
-#include <QSettings>
+#include <c2dchart.h>
+#include <cchartdata.h>
+#include <cdimensioninterval.h>
+
+#include "modesidentificationwizard.h"
+#include <fem.h>
+#include "femviewer.h"
 
 int main(int argc, char *argv[])
 {
     Application a(argc, argv);
     setlocale(LC_ALL,"RUS");
 
-    Application::nonConstProject()->load(QSettings().value("project/location").value<QString>());
+    MainWindow w;
 
-    qDebug() << "V";
-    PairViewer vMeansVendetta;
-    vMeansVendetta.setData(new FEMPair(Application::project()->modelsList().front(), Application::project()->modelsList().at(1)));
-    vMeansVendetta.show();
+#ifndef QT_NO_DEBUG
+    w.show();
+#else
+    w.showMaximized();
+#endif
 
     return a.exec();
 }

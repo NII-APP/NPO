@@ -14,7 +14,7 @@ EigenMode::EigenMode(const EigenMode& v)
     , extremums(v.extremums)
     , pMac(v.pMac) { }
 
-EigenMode::EigenMode(float f, const CGL::CVertexes& v)
+EigenMode::EigenMode(float f, const CVertexes& v)
     : freq(f)
     , formVal(v) {
     updateExtremums();
@@ -50,10 +50,10 @@ QDataStream& operator>>(QDataStream& in, EigenMode& f) {
 
 void EigenMode::updateExtremums() {
     if (formVal.empty()) {
-        extremums = CGL::CDiapason(-1, -1);
+        extremums = CDiapason(-1, -1);
         return;
     }
-    extremums = CGL::CDiapason(0,0);
+    extremums = CDiapason(0,0);
     float currentMin;
     float currentMax;
     currentMin = currentMax = formVal(0).lengthSquared();
@@ -70,7 +70,7 @@ void EigenMode::updateExtremums() {
     }
 }
 
-void EigenMode::resize(CGL::CVertexes::size_type s) {
+void EigenMode::resize(CArray::size_type s) {
     formVal.resize(s + s + s);
     strainVal.resize(s);
     bandVal.resize(s + s + s);
@@ -78,7 +78,7 @@ void EigenMode::resize(CGL::CVertexes::size_type s) {
 
 void EigenMode::updatePreMac() {
     pMac = 0.0f;
-    for (CGL::CVertexes::const_iterator i(formVal.begin()), end(formVal.end()); i != end; ++i) {
+    for (CVertexes::const_iterator i(formVal.begin()), end(formVal.end()); i != end; ++i) {
         pMac += *i * *i;
     }
 }

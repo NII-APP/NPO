@@ -1,16 +1,12 @@
 #include "fempair.h"
 
-#include <eigenmodes.h>
-#include <fem.h>
-
-FEMPair::FEMPair(const FEM *a, const FEM *b)
-    : std::pair<const FEM* const, const FEM* const>(a->getNodes().size() > b->getNodes().size() ? b : a
-                                                  , a->getNodes().size() > b->getNodes().size() ? a : b)
+FEMPair::FEMPair(const FEM *theory, const FEM *practic)
+    : std::pair<FEM* const, FEM* const>(new FEM(*theory), new FEM(*practic))
 {
-    //theory->alignZero();
-    //practic->alignZero();
-    //practic->scaleTo(first->box().size());
-    /*trunc = FEM::truncation(*first, *second);
+    first->alignZero();
+    second->alignZero();
+    second->scaleTo(first->box().size());
+    trunc = FEM::truncation(*first, *second);
 
     //estimate mac
     makeMac(first->getModes(), trunc->getModes());
@@ -43,7 +39,12 @@ FEMPair::FEMPair(const FEM *a, const FEM *b)
         taked2.setBit(max2);
         taked.setBit(max);
         max = -1; max2 = -1;
-    }*/
+    }
+}
+FEMPair::~FEMPair() {
+    delete first;
+    delete second;
+    delete trunc;
 }
 
 void FEMPair::makeMac(const EigenModes &practic, const EigenModes &trunc)

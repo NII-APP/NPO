@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <QDebug>
 #include "cgl.h"
+#include <algorithm>
 
 namespace CGL {
 
@@ -61,6 +62,9 @@ CMatrix::T CMatrix::minInColumnExclude(size_t c, size_t exclude) const {
         }
     }
     return min;
+}
+CMatrix::T CMatrix::max() const {
+    return *std::max_element(data.begin(),data.end());
 }
 RealRange CMatrix::estimateRange() const {
     if (data.empty()) {

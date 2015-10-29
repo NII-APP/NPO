@@ -5,7 +5,7 @@
 #include "FEM.h"
 
 
-class FEMPair: std::pair<const FEM* const, const FEM* const>
+class FEMPair: std::pair<FEM* const, FEM* const>
 {
 public:
     typedef std::vector<int> Relation;
@@ -23,7 +23,8 @@ public:
     const CGL::CMatrix& getMac() const { return mac; }
 
     void createTuncationForm();
-    FEMPair(const FEM *a, const FEM *b);
+    FEMPair(const FEM *theory, const FEM *practic);
+    ~FEMPair();
 
     void makeMac(const Relation& r);
     void makeMac(const EigenModes&, const EigenModes&);

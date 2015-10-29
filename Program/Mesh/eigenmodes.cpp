@@ -176,6 +176,7 @@ void EigenModes::readF06(const QString& fileName)
         }
     }
 
+    /*
     f.skipTo("                                           E L E M E N T   S T R A I N   E N E R G I E ");
     while (f.testPrew("                                           E L E M E N T   S T R A I N   E N E R G I E ")) {
         qDebug() << "S T R A I N ececution" << (int) *f;
@@ -202,12 +203,13 @@ void EigenModes::readF06(const QString& fileName)
         f.skipRow();
         f.skipRow();
         f.skipRow();
-    }
+    }*/
 
 #ifndef QT_NO_DEBUG
     qDebug() << "\tFile correctly parse " << size() << " forms in "
              << (empty() ? std::numeric_limits<double>::quiet_NaN() : front().form().length()) << " nodes with each ("
-             << loop.msecsTo(QTime::currentTime()) / 1000. << "ms)\n";
+             << loop.msecsTo(QTime::currentTime()) / 1000. << "ms)\n"
+             << "it was hepen without strain reader. . . Cut it as soon as it possible.";
 #endif
 }
 

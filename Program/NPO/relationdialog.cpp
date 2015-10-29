@@ -21,15 +21,21 @@ RelationDialog::RelationDialog(FEMPair *forEdit, QWidget *parent)
   , title1(new QLabel(this))
   , title2(new QLabel(this))
 {
+    this->setContentsMargins(10, 0, 10, 0);
 }
 
 void RelationDialog::setPair(FEMPair *p) {
     pair = p;
 
-    this->setContentsMargins(10, 0, 10, 0);
+    qDebug() << "set pair" << p;
 
-    buildLabels(leftL, *pair->base());
-    buildLabels(rightL, *pair->truncated());
+    if (pair == nullptr) {
+        qDeleteAll(leftL);
+        qDeleteAll(rightL);
+        return;
+    }
+    popupConfig(leftP, leftF, *pair->base());
+    popupConfig(rightP, rightF, *pair->truncated());
 
     foreach (QLabel* l, leftL)
         l->resize(maxW, l->height());
@@ -43,7 +49,6 @@ void RelationDialog::setPair(FEMPair *p) {
     palette.setColor(QPalette::Background, QColor(0x00,0x00,0xFF));
     this->setPalette(palette);
     this->setMouseTracking(true);
-
 
     popupConfig(leftP, leftF, *pair->base());
     popupConfig(rightP, rightF, *pair->truncated());
@@ -59,19 +64,14 @@ void RelationDialog::setPair(FEMPair *p) {
 
 void RelationDialog::bgUpdate()
 {
-    for (int i(0); i != rightL.size(); ++i)
-    {
+    for (int i(0); i != rightL.size(); ++i) {
         rightL[i]->setBackgroundRole(QPalette::Dark);
     }
-    for (int i(0); i != leftL.size(); ++i)
-    {
-        if (relation()[i] >= 0)
-        {
+    for (int i(0); i != leftL.size(); ++i) {
+        if (relation()[i] >= 0) {
             rightL[relation()[i]]->setBackgroundRole(QPalette::Light);
             leftL[i]->setBackgroundRole(QPalette::Light);
-        }
-        else
-        {
+        } else {
             leftL[i]->setBackgroundRole(QPalette::Dark);
         }
     }
@@ -93,17 +93,17 @@ void RelationDialog::popupConfig(QFrame*& p, ViewerTab *&f, const FEM &v)
 
 void RelationDialog::buildLabels(Labels &lbls, const FEM& g)
 {
-    for (auto& i: lbls) {
-        delete i;
-    }
+    qDebug() << "built labels";
+    qDeleteAll(lbls);
     lbls.resize(static_cast<int>(g.getModes().size()));
+    qDebug() << "\t " << lbls.size();
 
     QPalette p(this->palette());
     p.setBrush(QPalette::Light, QColor(0xFF,0xFF,0xFF));
     p.setBrush(QPalette::Dark, QColor(0x88,0x88,0x88));
 
-    for (int i = 0; i != lbls.size(); ++i)
-    {
+    for (int i = 0; i != lbls.size(); ++i) {
+        qDebug() << "label it" << i;
         QLabel* l(new QLabel(Application::identity()->tr("form selector label").arg(QString::number(i + 1), QString::number(g.getModes().at(i).frequency())),this));
         l->resize(l->sizeHint());
         l->setFrameStyle(QFrame::Plain | QFrame::StyledPanel);

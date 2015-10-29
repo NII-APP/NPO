@@ -54,6 +54,11 @@ QString Identity::tr(QString key, const QString& context) const {
     return resolveKey((context.isEmpty() ? "" : context + '/') + key + ' ' + language()).toString();
 }
 
+QString Identity::openFileDialog(const QString& from) const {
+    return execOpenFileNameDialog(resolveKey(from).toObject());
+}
+
+
 QJsonValue Identity::at(const QString & name) const {
     QStringList keys(name.split('/'));
     QJsonValue node(configuration[keys.first()].toObject());
@@ -281,7 +286,7 @@ QString Identity::execSaveFileNameDialog(const QJsonObject& config) const {
     return QFileDialog::getSaveFileName(QApplication::topLevelWidgets().first(), caption, QString(), filter);
 }
 
-QVariant Identity::resolveKey(const QString& from) const {
+QJsonValue Identity::resolveKey(const QString& from) const {
     QStringList context(from.split('/'));
     const QString key(context.last());
     context.pop_back();
@@ -290,7 +295,7 @@ QVariant Identity::resolveKey(const QString& from) const {
             return configuration[key];
         } else {
             qFatal(QString("configuration doesn't contain field \"" + key + '\"').toUtf8());
-            return QVariant();
+            return QJsonValue();
         }
     } else {
         const QStringList& route(context);
@@ -302,7 +307,7 @@ QVariant Identity::resolveKey(const QString& from) const {
                         node = node[*i].toObject();
                     } else {
                         qFatal(QString("configuration doesn't contain field \"" + from + "\' (the object \"" + *i + "\" doesn't exist)").toUtf8());
-                        return QVariant();
+                        return QJsonValue();
                     }
                 }
             }
@@ -310,11 +315,11 @@ QVariant Identity::resolveKey(const QString& from) const {
                 return node[key];
             } else {
                 qFatal(QString("configuration doesn't contain field \"" + from + "\' (the key \"" + key + "\" doesn't exist)").toUtf8());
-                return QVariant();
+                return QJsonValue();
             }
         } else {
             qFatal(QString("configuration doesn't contain field \"" + from + "\' (the object \"" + route.first() + "\" doesn't exist)").toUtf8());
-            return QVariant();
+            return QJsonValue();
         }
     }
 }

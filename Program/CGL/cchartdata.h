@@ -6,15 +6,14 @@
 #include "cdimension.h"
 #include "crange.h"
 
-
 class CMatrix;
+
 typedef std::vector<std::shared_ptr<const CDimension> > SharedDimension;
 
 class CChartData : public SharedDimension
 {
     QString title;
 public:
-    typedef QList<CChartData> ChartDataList;
     CChartData(const QString& name = QString());
     ~CChartData();
 

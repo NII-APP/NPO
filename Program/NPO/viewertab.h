@@ -43,6 +43,7 @@ signals:
 public slots:
     void addModel();
     void addModes(int meshId);
+    void identificateModes(int meshId);
     void acceptNewProject();
     void setMode(int);
     void setModel(const FEM *);
