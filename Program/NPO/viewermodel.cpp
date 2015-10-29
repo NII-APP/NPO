@@ -189,6 +189,9 @@ QVariant ViewerModel::data(const QModelIndex & index, int role) const {
         }
         return QVariant();
     }
+    if (isRootIndex(index)) {
+        return QVariant();
+    }
 #ifdef VIEWERMODEL_DEBUG
     qDebug() << "data" << index;
 #endif

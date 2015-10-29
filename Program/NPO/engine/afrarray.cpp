@@ -35,25 +35,29 @@ EigenMode AFRArray::getMode(const double freq) const {
     result.resize(this->size());
     int j(0);
     for (const AFR& it : *this) {
-        qDebug() << j;
-        while (i < it.size() && freq < it.at(i).frequency) {
-            ++i;
-        }
-        while (i > 0 && freq > it.at(i).frequency) {
-            --i;
-        }
-
         if (it.empty()) {
+            //it must be the first item (it was stored to make from 1 indexes...)
+            Q_ASSERT(&it == &this->at(0));
             result.form()(j) = QVector3D(0.0, 0.0, 0.0);
-        } else if (i == 0) {
-            result.form()(j) = QVector3D(0.0, 0.0, toScalar(it.front().amplitude));
-        } else if (i == it.size()) {
-            result.form()(j) = QVector3D(0.0, 0.0, toScalar(it.front().amplitude));
+            --j;
+            result.resize(result.length() - 1);
         } else {
-            const double k((freq - it.at(i - 1).frequency) / (it.at(i).frequency - it.at(i - 1).frequency));
-            Q_ASSERT(k >= 0.0 && k <= 1.0);
-            const FrequencyMagnitude::Amplitude& left(it.at(i - 1).amplitude);
-            result.form()[j] = toScalar(left + (it.at(i).amplitude - left) * k);
+            while (i < it.size() && freq >= it.at(i).frequency) {
+                ++i;
+            }
+            while (i > 0 && freq < it.at(i - 1).frequency) {
+                --i;
+            }
+            if (i == 0) {
+                result.form()(j) = QVector3D(0.0, toScalar(it.front().amplitude), 0.0);
+            } else if (i == it.size()) {
+                result.form()(j) = QVector3D(0.0, toScalar(it.front().amplitude), 0.0);
+            } else {
+                const double k((freq - it.at(i - 1).frequency) / (it.at(i).frequency - it.at(i - 1).frequency));
+                Q_ASSERT(k >= 0.0 && k <= 1.0);
+                const FrequencyMagnitude::Amplitude& left(it.at(i - 1).amplitude);
+                result.form()(j) = QVector3D(0.0, toScalar(left + (it.at(i).amplitude - left) * k), 0.0);
+            }
         }
         ++j;
     }
@@ -158,7 +162,7 @@ AFR AFRArray::average() const {
 CChartDataList AFRArray::toChartData(unsigned interalParts) const {
     CChartDataList result;
     for (const AFR& single : *this) {
-        if (!single.empty() && &single != &at(52)) {
+        if (!single.empty()) {
             result.append(single.toChartData(interalParts));
         }
     }

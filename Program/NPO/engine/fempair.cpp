@@ -2,11 +2,11 @@
 #include "eigenmodes.h"
 
 FEMPair::FEMPair(const FEM *theory, const FEM *practic)
-    : std::pair<const FEM* const, const FEM* const>(theory, practic)
+    : std::pair<FEM* const, FEM* const>(new FEM(*theory), new FEM(*practic))
 {
-    //theory->alignZero();
-    //practic->alignZero();
-    //practic->scaleTo(first->box().size());
+    first->alignZero();
+    second->alignZero();
+    second->scaleTo(first->box().size());
     truncated = FEM::truncation(*first, *second);
 
     //estimate mac
@@ -41,6 +41,11 @@ FEMPair::FEMPair(const FEM *theory, const FEM *practic)
         taked.setBit(max);
         max = -1; max2 = -1;
     }
+}
+FEMPair::~FEMPair() {
+    delete first;
+    delete second;
+    delete truncated;
 }
 
 void FEMPair::makeMac(const EigenModes &practic, const EigenModes &truncated)

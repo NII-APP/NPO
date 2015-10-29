@@ -61,9 +61,7 @@ void ViewerTab::showMAC(int id) {
 
 void ViewerTab::identificateModes(int meshId) {
     qDebug() << "ident";
-    FEM* fem(Application::nonConstProject()->modelsList().at(meshId));
-    fem->read("C:\\Users\\username\\Downloads\\METEORIT.txt");
-    ModesIdentificationWizard::identifyModes(fem);
+    ModesIdentificationWizard::identifyModes(Application::project()->modelsList().at(meshId));
 }
 
 void ViewerTab::updateMACWidget() {

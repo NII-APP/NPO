@@ -16,12 +16,15 @@
 #include <cchartdata.h>
 #include <cdimensioninterval.h>
 #include <cdimensionarray.h>
+#include <cslider.h>
+#include <eigenmode.h>
 
 #include "application.h"
 #include "identity.h"
 #include "femviewer.h"
 #include "engine/afrarray.h"
 #include "engine/afr.h"
+
 
 ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* parent)
     : QDialog(parent)
@@ -76,9 +79,9 @@ ModesIdentificationWizard::MethodSelector::MethodSelector(QWidget* parent)
     second->setTitle("Метод полиномиальной аппроксимации");
     QWidget* const w(second->getBoard());
     QFormLayout* l(new QFormLayout);
-    l->addRow(tr("Порядок модели:"), new QSpinBox(w));
+    /*l->addRow(tr("Порядок модели:"), new QSpinBox(w));
     l->addRow(tr("Допуск на частоту:"), new QSpinBox(w));
-    l->addRow(tr("Допуск на демпфирование:"), new QSpinBox(w));
+    l->addRow(tr("Допуск на демпфирование:"), new QSpinBox(w));*/
     w->setLayout(l);
     Signboard* const third(new Signboard(this));
     third->setTitle("Метод сингулярного разложения");
@@ -104,6 +107,7 @@ ModesIdentificationWizard::MethodSelector::MethodSelector(QWidget* parent)
     __resultsTable->setItem(3,1, new QTableWidgetItem("220"));
     __resultsTable->setItem(3,2, new QTableWidgetItem("0.4"));
     __resultsTable->setFixedHeight(160);
+    __resultsTable->hide();
 
     this->layout()->addWidget(new QPushButton("Экспорт форм", this));
 
@@ -116,6 +120,7 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
     , __viewer(new FEMViewer(this))
     , __chart(new C2dChart(this))
     , __afr(nullptr)
+    , __slider(new CSlider)
 {
     QLayout* top(new QHBoxLayout);
     FileInput* const input(new FileInput(this));
@@ -136,10 +141,21 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
     __splitter->handle(0)->setAutoFillBackground(false);
     __splitter->setSizes(QList<int>() << 350 << 650);
 
+    __chart->addSlider(__slider);
+    connect(__chart, SIGNAL(sliderMoves(CSlider*)), SLOT(setModeFrequency(CSlider*)));
+    __slider->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
+
 
     this->setLayout(new QVBoxLayout);
     this->layout()->addItem(top);
     this->layout()->addWidget(__splitter);
+}
+
+void ModesIdentificationWizard::ManualController::setModeFrequency(CSlider* s) {
+    if (s == __slider) {
+        const EigenMode& mode(__afr->getMode(s->getPosition()));
+        __viewer->setProxyMode(mode);
+    }
 }
 
 void ModesIdentificationWizard::ManualController::setAFR(QString filename) {
@@ -147,6 +163,11 @@ void ModesIdentificationWizard::ManualController::setAFR(QString filename) {
     __afr = new AFRArray;
     __afr->read(filename);
     CChartDataList data(__afr->toChartData());
+
+    if (__afr->size() > 1 && !__afr->at(1).empty()) {
+        const AFR& afr(__afr->at(1));
+        __slider->setPurview(CRealRange(afr.front().frequency, afr.back().frequency));
+    }
 
     data.setChartTitle(Application::identity()->tr("title", "modes identification wizard/chart"));
     data.setDimensionTitle(Application::identity()->tr("xLabel", "modes identification wizard/chart"), 0);
@@ -177,7 +198,7 @@ void ModesIdentificationWizard::identifyModes(const FEM* who, QWidget* parent) {
 
     loop->exec();
 
-    delete w;
+    w->deleteLater();
 }
 
 ModesIdentificationWizard::MethodSelector::Signboard::Signboard(QWidget* parent)
@@ -188,6 +209,7 @@ ModesIdentificationWizard::MethodSelector::Signboard::Signboard(QWidget* parent)
     this->setLayout(new QVBoxLayout);
     this->layout()->addWidget(__title);
     this->layout()->addWidget(__board);
+    __title->setDisabled(true);
 }
 
 void ModesIdentificationWizard::MethodSelector::Signboard::setTitle(const QString& t) {

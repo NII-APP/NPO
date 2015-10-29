@@ -33,6 +33,8 @@ C2dChart::C2dChart(QWidget* parent)
     this->setScene(scene());
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    this->connect(chart, SIGNAL(sliderMoved(CSlider*)), SLOT(emitSliderMoves(CSlider*)));
 }
 
 C2dChart::~C2dChart()
@@ -195,6 +197,7 @@ void C2dChart::mouseMoveEvent(QMouseEvent* event) {
         haulage->setPixelPosition(haulage->getPixelPosition() + delta);
         haulage->update();
         chart->update();
+        emitSliderMoves(haulage);
         return;
     }
 
@@ -204,7 +207,7 @@ void C2dChart::mouseMoveEvent(QMouseEvent* event) {
 void C2dChart::mousePressEvent(QMouseEvent* event) {
     prevPos = event->pos();
     CSlider* const s(sliders.findNear(event->x()));
-    if (s) {
+    if (s && event->button() != Qt::MidButton) {
         haulage = s;
         sliders.setCurrent(haulage);
     }
@@ -223,6 +226,10 @@ void C2dChart::showArray(const CArray& m) {
     chart.show();
 
     loop->exec();
+}
+
+void C2dChart::emitSliderMoves(CSlider* s) {
+    emit sliderMoves(s);
 }
 
 void C2dChart::addSlider(CSlider* s) {

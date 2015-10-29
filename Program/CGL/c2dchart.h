@@ -70,6 +70,9 @@ public slots:
 
 signals:
     void closed();
+    void sliderMoves(CSlider*);
+private slots:
+    void emitSliderMoves(CSlider*);
 };
 
 

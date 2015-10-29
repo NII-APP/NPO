@@ -51,6 +51,7 @@ public:
 
 signals:
     void viewPortChanged(QRectF);
+    void sliderMoved(CSlider*);
 
 private:
     QRectF viewPort;

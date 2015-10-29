@@ -291,6 +291,7 @@ void C2dChartPlace::mouseMoveEvent(QMouseEvent* e) {
         const int delta(e->x() - mousePrev.x());
         haulage->setPixelPosition(haulage->getPixelPosition() + delta);
         haulage->update();
+        emit sliderMoved(haulage);
         this->update();
     } else {
         this->setCursor(sliders.findNear(e->x() + this->x()) ? Qt::SizeHorCursor : Qt::ArrowCursor);
@@ -301,7 +302,7 @@ void C2dChartPlace::mouseMoveEvent(QMouseEvent* e) {
 void C2dChartPlace::mousePressEvent(QMouseEvent* e) {
     mousePrev = e->pos();
     CSlider* const s(sliders.findNear(e->x() + this->x()));
-    if (s) {
+    if (s && e->button() != Qt::MidButton) {
         haulage = s;
         sliders.setCurrent(haulage);
     }

@@ -23,6 +23,7 @@ public:
     EigenMode(float f, int size = 0);
 
     CVertexes::size_type size() const { return formVal.size(); }
+    CArray::size_type length() const { return strainVal.size(); }
     void resize(CArray::size_type s);
 
     float& frequency() { return freq; }

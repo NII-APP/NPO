@@ -33,12 +33,14 @@ FEM::FEM(const FEM& g)
     , sqre(g.sqre)
     , isTraced(g.isTraced)
     , markedNodes(g.markedNodes)
-    , colors(g.colors)
     , file(g.file)
     , name(g.name)
     , shells(g.shells)
     , materials(g.materials)
     , UNVTransformations(g.UNVTransformations)
+    , colors(g.colors)
+    , measurment(g.measurment)
+    , modes(g.modes)
 {
     Trace::const_iterator s(g.trace.begin());
     Trace::iterator d(trace.begin());

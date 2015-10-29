@@ -87,6 +87,8 @@ void CSlider::setPosition(const double& p) {
 
 void CSlider::setPurview(const RealRange& p) {
     __purview = p;
+    //to retest the position
+    setPosition(__position);
 }
 
 qreal CSlider::getPosition() const {
@@ -98,7 +100,7 @@ qreal CSlider::getPixelPosition() const {
 }
 
 void CSlider::setPixelPosition(const qreal& v) {
-    setPosition(__range((v - __geometry.x()) / __geometry.width()));
+    setPosition(std::min(std::max(__range((v - __geometry.x()) / __geometry.width()), __purview.getMin()), __purview.getMax()));
 }
 
 const RealRange& CSlider::getPurview() const {

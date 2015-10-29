@@ -12,6 +12,7 @@ class C2dChart;
 class QSplitter;
 class AFRArray;
 class QTableWidget;
+class CSlider;
 
 class ModesIdentificationWizard : public QDialog
 {
@@ -64,6 +65,7 @@ public:
     explicit ModesIdentificationWizard::ManualController(const FEM * const model, QWidget* parent);
 public slots:
     void setAFR(QString);
+    void setModeFrequency(CSlider*);
 private slots:
     void changeSplitterOrientation();
 private:
@@ -71,6 +73,7 @@ private:
     FEMViewer* const __viewer;
     C2dChart* const __chart;
     AFRArray* __afr;
+    CSlider* const __slider;
 };
 
 class ModesIdentificationWizard::ManualController::FileInput : public QLineEdit {

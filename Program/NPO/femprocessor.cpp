@@ -48,7 +48,7 @@ void FEMProcessor::read(const QString& filename) {
     connect(w, SIGNAL(MACUpdated()), this, SLOT(MACUpdatedSlot()));
     connect(w, SIGNAL(MACEstimated()), this, SLOT(MACEstimatedSlot()));
 
-    __progressWidget->setText("f05 parsing");
+    __progressWidget->setText("f06 parsing");
     Application::mainWindow()->statusPush(__progressWidget);
     w->start();
 }

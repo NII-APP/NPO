@@ -8,6 +8,7 @@ class QToolBar;
 class FEMWidget;
 class FEM;
 class QAction;
+class EigenMode;
 
 class FEMViewer : public QWidget
 {
@@ -45,6 +46,7 @@ public:
     void setModel(const FEM*) const;
     const FEM* getModel() const;
     void setMode(const int m);
+    void setProxyMode(const EigenMode&);
 
 signals:
 

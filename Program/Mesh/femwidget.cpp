@@ -109,6 +109,7 @@ FEMWidget::MeshBuffer::MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader,
     , array(new QOpenGLVertexArrayObject(this))
     , vertexSize(static_cast<int>(data->getNodes().size()) * sizeof(CGL::CVertexes::value_type))
     , colorsSize(static_cast<int>(data->getNodes().size()) * sizeof(CGL::Colors::value_type))
+    , proxyDefoultMagnitude(0.0f)
 {
     array->create();
     array->bind();
@@ -161,6 +162,7 @@ void FEMWidget::play() {
 
 void FEMWidget::MeshBuffer::setCurrentMode(int form) {
     if (modes().size() > form && form >= 0) {
+        proxyDefoultMagnitude = 0.0f;
         colorize(form);
         mode = form;
         array->bind();
@@ -171,10 +173,12 @@ void FEMWidget::MeshBuffer::setCurrentMode(int form) {
 }
 
 void FEMWidget::MeshBuffer::setProxyMode(const EigenMode& imposter) {
+    proxyDefoultMagnitude = imposter.defoultMagnitude();
     self->colorize(imposter.form());
     array->bind();
     vertex.bind();
     vertex.write(colorsSize + vertexSize, imposter.form().data(), vertexSize);
+    uploadColors();
     array->release();
 }
 
@@ -221,9 +225,10 @@ QList<const FEM *> FEMWidget::getData() const
     return result;
 }
 
-void FEMWidget::setProxyMode(EigenMode& imposter) {
+void FEMWidget::setProxyMode(const EigenMode& imposter) {
     for (MeshBuffer* b : meshes) {
-        if (imposter.size() == b->fem()->getNodes().size()) {
+        if (imposter.size() <= b->fem()->getNodes().size()) {
+            this->makeCurrent();
             b->setProxyMode(imposter);
         }
     }

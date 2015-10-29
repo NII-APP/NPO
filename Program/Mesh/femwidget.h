@@ -41,7 +41,7 @@ public:
     void setData(const FEM& model) { setData(&model); }
     void setData(const QList<const FEM*>& model);
     QList<const FEM*> getData() const;
-    void setProxyMode(EigenMode &);
+    void setProxyMode(const EigenMode &);
 
     void reloadColors(const FEM* forWho);
 signals:
@@ -65,6 +65,7 @@ class FEMWidget::MeshBuffer : public QObject
     const int colorsSize;
     int mode;
     const EigenModes& modes() const { return self->getModes(); }
+    float proxyDefoultMagnitude;
 public:
     MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader, QObject* parent);
 
@@ -73,7 +74,7 @@ public:
     const FEM* fem() const { return self; }
     void setCurrentMode(int form);
     int getCurrentMode() const { return mode; }
-    float getCurrentDefoultMagnitude() const { try { return self->getModes().at(mode).defoultMagnitude(); } catch(...) { return 0.0f; } }
+    float getCurrentDefoultMagnitude() const { try { return self->getModes().at(mode).defoultMagnitude(); } catch(...) { return proxyDefoultMagnitude; } }
     double getDefaultMagnitude() const;
     void colorize(int);
     void setProxyMode(const EigenMode& imposter);

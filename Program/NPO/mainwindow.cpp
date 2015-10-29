@@ -125,7 +125,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setWindowTitle(Application::identity()->mainWindowTitle().arg(""));
 
-    load(QSettings().value("project/location").value<QString>());
+    const QString projectName(QSettings().value("project/location").value<QString>());
+    if (Project::isOwnProject(projectName)) {
+        load(projectName);
+    }
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closePorject()));
 }

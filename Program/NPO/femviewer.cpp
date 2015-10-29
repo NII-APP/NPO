@@ -157,3 +157,12 @@ const FEM* FEMViewer::getModel() const {
         return nullptr;
     }
 }
+
+void FEMViewer::setProxyMode(const EigenMode& m) {
+    mode->hide();
+    femWidget->setProxyMode(m);
+    frequency->setEnabled(true);
+    magnitude->setEnabled(true);
+    run->setEnabled(true);
+    stop->setEnabled(true);
+}
