@@ -1,7 +1,7 @@
 #ifndef FEMPAIR_H
 #define FEMPAIR_H
 #include <map>
-#include "FEM.h"
+#include "../../Mesh/FEM.h"
 
 
 class FEMPair: std::pair<FEM* const, FEM* const>
