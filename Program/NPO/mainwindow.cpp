@@ -125,10 +125,22 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setWindowTitle(Application::identity()->mainWindowTitle().arg(""));
 
+<<<<<<< HEAD
     const QString projectName(QSettings().value("project/location").value<QString>());
     if (Project::isOwnProject(projectName)) {
         load(projectName);
     }
+=======
+<<<<<<< Updated upstream
+    load(QSettings().value("project/location").value<QString>());
+=======
+    const QString projectName(QSettings().value("project/location").value<QString>());
+    if (Project::isOwnProject(projectName)) {
+        qDebug() << projectName;
+  //      load(projectName);
+    }
+>>>>>>> Stashed changes
+>>>>>>> engineer
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closePorject()));
 }
