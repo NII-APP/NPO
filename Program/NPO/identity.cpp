@@ -17,7 +17,7 @@
 #endif
 #include "viewermodel.h"
 
-const unsigned Identity::PROGRAM_VERSION = 2;
+const unsigned Identity::PROGRAM_VERSION = 3;
 
 Identity::Identity()
     : configuration(readConfig())

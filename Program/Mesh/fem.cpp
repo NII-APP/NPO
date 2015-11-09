@@ -32,7 +32,6 @@ FEM::FEM(const FEM& g)
     , trace(g.trace.size())
     , sqre(g.sqre)
     , isTraced(g.isTraced)
-    , markedNodes(g.markedNodes)
     , file(g.file)
     , name(g.name)
     , shells(g.shells)
@@ -41,6 +40,10 @@ FEM::FEM(const FEM& g)
     , colors(g.colors)
     , measurment(g.measurment)
     , modes(g.modes)
+    , linksPoint(g.linksPoint)
+    , linksSolution(g.linksSolution)
+    , constraints(g.constraints)
+    , superElementsId(g.superElementsId)
 {
     Trace::const_iterator s(g.trace.begin());
     Trace::iterator d(trace.begin());
@@ -358,19 +361,6 @@ void FEM::UNVTransformation(EigenModes &f) const {
     }
 }
 
-void FEM::renderSelect() const
-{
-    glBegin(GL_POINTS);
-    bool allMarked(markedNodes.size() != vertexes.length());
-    for (int i = 0, size(static_cast<int>(vertexes.length())); i != size; ++i) {
-        if (allMarked || markedNodes.testBit(i)) {
-            glColor3ub( i % 0x100, (i / 0x100) % 0x100, i / 0x10000);
-            glVertex3fv(vertexes.data() + 3 * i);
-        }
-    }
-    glEnd();
-}
-
 bool FEM::colorized() const {
     return !colors.empty();
 }
@@ -662,7 +652,7 @@ bool operator==(const FEM &l, const FEM &r)
             return false;
         }
     }
-    if ((l.sqre == r.sqre) && (l.isTraced == r.isTraced) && (l.markedNodes == r.markedNodes) &&
+    if ((l.sqre == r.sqre) && (l.isTraced == r.isTraced) &&
             (l.measurment == r.measurment) && (l.file == r.file) && (l.modelType == r.modelType) &&
             (l.vertexes == r.vertexes) && (l.colors == r.colors)) {
 #ifndef QT_NO_DEBUG
@@ -680,7 +670,7 @@ QDataStream& operator << (QDataStream& out, const FEM& g) {
 #ifndef QT_NO_DEBUG
     QTime loop(QTime::currentTime());
 #endif
-    out << g.sqre << g.isTraced << g.markedNodes << g.measurment << g.file << static_cast<int>(g.modelType);
+    out << g.sqre << g.isTraced << g.measurment << g.file << static_cast<int>(g.modelType);
     out << g.name;
     out << g.vertexes << g.colors;
 
@@ -741,7 +731,7 @@ QDataStream& operator >> (QDataStream& in, FEM& g)
     QTime loop(QTime::currentTime());
 #endif
     int modelType;
-    in >> g.sqre >> g.isTraced >> g.markedNodes >> g.measurment >> g.file >> modelType;
+    in >> g.sqre >> g.isTraced >> g.measurment >> g.file >> modelType;
     in >> g.name;
     g.modelType = static_cast<FEM::ModelType>(modelType);
     in >> g.vertexes >> g.colors;
@@ -825,31 +815,6 @@ void FEM::scaleTo(double v) {
     box().multX(k);
     box().multY(k);
     box().multZ(k);
-}
-
-std::vector<int> FEM::truncationIndexVector(const FEM& a, const FEM& b)
-{
-    const CGL::Vertexes& am(a.vertexes);
-    const CGL::Vertexes& bm(b.vertexes);
-    int aDimension(static_cast<int>(am.length()));
-    int bDimension(static_cast<int>(bm.length()));
-    CGL::Matrix dest(aDimension, bDimension);
-
-    for (int i(0); i != bDimension; ++i) {
-        for (int j = 0; j != aDimension; ++j) {
-            dest[i][j] = (am(j) - bm(i)).lengthSquared();
-        }
-    }
-
-    std::vector<int> numbers(bDimension, 0);
-    for (int i(0); i != bDimension; ++i) {
-        for (int j(0); j != aDimension; ++j) {
-            if (dest[i][j] < dest[i][numbers.at(i)] && a.isTraced.testBit(j)) {
-                numbers[i] = j;
-            }
-        }
-    }
-    return numbers;
 }
 
 
@@ -988,21 +953,48 @@ void FEM::layToBDF(const QString& source, const QString& dest, const CArray& dE,
     result.write(begin);
 }
 
+std::vector<int> FEM::truncationIndexVector(const FEM& a, const FEM& b)
+{
+    const CGL::Vertexes& am(a.vertexes);
+    const CGL::Vertexes& bm(b.vertexes);
+    int aDimension(static_cast<int>(am.length()));
+    int bDimension(static_cast<int>(bm.length()));
+    CGL::Matrix dest(aDimension, bDimension);
+
+    for (int i(0); i != bDimension; ++i) {
+        for (int j = 0; j != aDimension; ++j) {
+            dest[i][j] = (am(j) - bm(i)).lengthSquared();
+        }
+    }
+
+    std::vector<int> numbers(bDimension, 0);
+    for (int i(0); i != bDimension; ++i) {
+        for (int j(0); j != aDimension; ++j) {
+            if (dest[i][j] < dest[i][numbers.at(i)] && a.isTraced.testBit(j)) {
+                numbers[i] = j;
+            }
+        }
+    }
+    return numbers;
+}
+
 FEM* FEM::truncation(const FEM& a, const FEM& b) {
-    //make copy from the second mech form geometry
-    FEM* result = new FEM;
-
-    result->trace = b.trace;
-    result->sqre = b.sqre;
-    result->isTraced = b.isTraced;
-    result->markedNodes = b.markedNodes;
+    //first step consist of solution of one question. We must to deside whitch of models must be truncated.
+    //Hi-vertexes model must be truncated to low-vertexes model obvuisly.
+    const FEM& forTruncation(a.vertexes.size() > b.vertexes.size() ? b : a);
+    const FEM& base         (a.vertexes.size() > b.vertexes.size() ? a : b);
+    //Afer thet we may be shure in one statement: forTruncation.vertexes.size() < base.vertexes.size()
+    //make copy from the base geometry.
+    FEM* result = new FEM(base);
+    //then set up the name and filename no signe the model as a result of truncation
     result->name = "truncated(" + a.name + " x " + b.name + ")";
-    result->shells = b.shells;
-    result->materials = b.materials;
-    result->UNVTransformations = b.UNVTransformations;
-
     result->file = "truncated";
     result->modes.setFileName(result->file);
+
+    if (result->modes.empty()) {
+        //if it's haven't modes no reason to do any thing.
+        return result;
+    }
     //select vertexes in  the first mech form which will be associate with the second mech form
     std::vector<int> interrelations(FEM::truncationIndexVector(a, b));
     //and now just copy the form values from theory

@@ -1,5 +1,6 @@
 #ifndef FEMPAIR_H
 #define FEMPAIR_H
+
 #include <map>
 #include "../../Mesh/FEM.h"
 
@@ -10,14 +11,14 @@ public:
     typedef std::vector<int> Relation;
 private:
     Relation relation;
-    FEM* truncated;
+    FEM* trunc;
     CGL::CMatrix mac;
 public:
     Relation& relations() { return relation; }
 
-    const FEM* theory() { return first; }
-    const FEM* practic() { return second; }
-    FEM* truncation() { return truncated; }
+    const FEM* base() const { return first; }
+    const FEM* truncated() const { return second; }
+    FEM* trunced() { return trunc; }
 
     const CGL::CMatrix& getMac() const { return mac; }
 

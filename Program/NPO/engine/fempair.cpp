@@ -1,5 +1,8 @@
 #include "fempair.h"
+<<<<<<< HEAD
 #include "../../Mesh/eigenmodes.h"
+=======
+>>>>>>> 2aa0478b5836ded479b23445dc30d522d18c2a00
 
 FEMPair::FEMPair(const FEM *theory, const FEM *practic)
     : std::pair<FEM* const, FEM* const>(new FEM(*theory), new FEM(*practic))
@@ -7,10 +10,10 @@ FEMPair::FEMPair(const FEM *theory, const FEM *practic)
     first->alignZero();
     second->alignZero();
     second->scaleTo(first->box().size());
-    truncated = FEM::truncation(*first, *second);
+    trunc = FEM::truncation(*first, *second);
 
     //estimate mac
-    makeMac(practic->getModes(), truncated->getModes());
+    makeMac(first->getModes(), trunc->getModes());
 
     //estimate relations
     relation.clear();
@@ -45,15 +48,15 @@ FEMPair::FEMPair(const FEM *theory, const FEM *practic)
 FEMPair::~FEMPair() {
     delete first;
     delete second;
-    delete truncated;
+    delete trunc;
 }
 
-void FEMPair::makeMac(const EigenModes &practic, const EigenModes &truncated)
+void FEMPair::makeMac(const EigenModes &practic, const EigenModes &trunc)
 {
-    mac.resize(practic.size(), truncated.size());
+    mac.resize(practic.size(), trunc.size());
     for (int i = 0; i != mac.height(); ++i) {
         for (int j = 0; j != mac.width(); ++j) {
-            mac[i][j] = EigenModes::MAC(practic.at(j), truncated.at(i));
+            mac[i][j] = EigenModes::MAC(practic.at(j), trunc.at(i));
         }
     }
 }
@@ -67,14 +70,14 @@ void FEMPair::makeMac(const FEMPair::Relation& r)
         }
     }
 
-    size_t minSize = std::min(truncated->getModes().size(), second->getModes().size());
+    size_t minSize = std::min(trunc->getModes().size(), second->getModes().size());
     minSize = std::min(relationLength, minSize);
 
     mac.resize(minSize, minSize);
     for (int i = 0; i != mac.height(); ++i) {
         for (int j = 0; j != r.size(); ++j) {
             if (r[j] != -1) {
-                mac[i][j] = EigenModes::MAC(second->getModes().at(relation.at(j)), truncated->getModes().at(i));
+                mac[i][j] = EigenModes::MAC(second->getModes().at(relation.at(j)), trunc->getModes().at(i));
             }
         }
     }

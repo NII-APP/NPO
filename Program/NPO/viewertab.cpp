@@ -98,7 +98,7 @@ void ViewerTab::addModel() {
     fem->read(bdf);
     Application::nonConstProject()->pushModel(fem);
     femView->update();
-    femView->setCurrentIndex(femView->model()->index(Application::project()->modelsList().size() - 1, 0));
+    femView->setCurrentIndex(femView->model()->index(static_cast<int>(Application::project()->modelsList().size()) - 1, 0));
 }
 
 void ViewerTab::setModel(const FEM* model) {

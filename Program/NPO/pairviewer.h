@@ -1,18 +1,20 @@
 #ifndef PAIRVIEWER_H
 #define PAIRVIEWER_H
 
-#include <QWidget>
+#include <femwidget.h>
 
 class FEMPair;
 
-class PairViewer : public QWidget
+class PairViewer : public FEMWidget
 {
     Q_OBJECT
 public:
     explicit PairViewer(QWidget *parent = 0);
 
+    void setData(const FEMPair* const);
+
 private:
-    FEMPair* __data;
+    const FEMPair* __data;
 };
 
 #endif // PAIRVIEWER_H

@@ -12,14 +12,16 @@
 
 int main(int argc, char *argv[])
 {
-    qDebug() << "a3dedss";
     Application a(argc, argv);
     setlocale(LC_ALL,"RUS");
 
-    MainWindow window;
-    a.setMainWindow(&window);
+    MainWindow w;
 
-    window.showMaximized();
+#ifndef QT_NO_DEBUG
+    w.show();
+#else
+    w.showMaximized();
+#endif
 
     return a.exec();
 }

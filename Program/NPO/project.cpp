@@ -90,18 +90,21 @@ void Project::load(const QString &filename)
     unsigned programVersion;
     QDataStream in(&file);
     in >> insuranceRow;
+    qDebug() << insuranceRow;
     if (insuranceRow != Project::INSURANCE_ROW) {
         throw QFileDevice::ReadError;
         return;
     }
     in >> programVersion;
+    qDebug() << programVersion;
     if (programVersion < Identity::PROGRAM_VERSION) {
         /// @todo when you start to use versin control system call the load&update functions from here insted the throw
         throw QFileDevice::ResourceError;
-    } else
+    } else {
         if (programVersion > Identity::PROGRAM_VERSION) {
             throw QFileDevice::ResourceError;
         }
+    }
 
     size_t size;
     in >> size;
