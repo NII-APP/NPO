@@ -36,7 +36,7 @@ double AFR::damping(const CRealRange& range) {
     double maxAmplitude = abs(maxValue.amplitude);
     double freq_1 = 0,freq_2 = 0, freq_max = maxValue.frequency;
     double min = maxAmplitude;
-     qDebug() << "maxAmplitude/SQRT2=" << maxAmplitude/SQRT2;
+    qDebug() << "maxAmplitude/SQRT2=" << maxAmplitude/SQRT2;
     for ( int i(maxIndex); i > 0; i--){
         if ( abs(abs(at(i).amplitude) - maxAmplitude/SQRT2)  < min ){
             //check for decay
