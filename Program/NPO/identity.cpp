@@ -44,7 +44,7 @@ const QJsonObject Identity::readConfig() {
     QJsonDocument doc(QJsonDocument::fromJson(f.readAll(), errors));
     if (errors->errorString() != QString("no error occurred")) {
 #ifndef QT_NO_DEBUG
-        qFatal(QString("JSON error occured: " + errors->errorString()).toUtf8());
+        qFatal(("JSON error occured: " + errors->errorString() + QString(" (offset: %1)").arg(QString::number(errors->offset))).toUtf8());
 #endif
     }
     return doc.object();
@@ -54,8 +54,8 @@ QString Identity::tr(QString key, const QString& context) const {
     return resolveKey((context.isEmpty() ? "" : context + '/') + key + ' ' + language()).toString();
 }
 
-QString Identity::openFileDialog(const QString& from) const {
-    return execOpenFileNameDialog(resolveKey(from).toObject());
+QString Identity::openFileDialog(const QString& from, QWidget *parent) const {
+    return execOpenFileNameDialog(resolveKey(from).toObject(), parent);
 }
 
 
@@ -262,7 +262,7 @@ void Identity::messageObsoleteProgram(const QString& fName) const {
             q["text " + language()].toString().arg(fName));
 }
 
-QString Identity::execOpenFileNameDialog(const QJsonObject& config) const {
+QString Identity::execOpenFileNameDialog(const QJsonObject& config, QWidget* parent) const {
     QString caption;
     QString filter;
     if (config.contains("filter")) {
@@ -271,7 +271,7 @@ QString Identity::execOpenFileNameDialog(const QJsonObject& config) const {
     if (config.contains("caption " + language())) {
         caption = config["caption " + language()].toString();
     }
-    return QFileDialog::getOpenFileName(QApplication::topLevelWidgets().first(), caption, QString(), filter);
+    return QFileDialog::getOpenFileName(parent ? parent : QApplication::topLevelWidgets().first(), caption, QString(), filter);
 }
 
 QString Identity::execSaveFileNameDialog(const QJsonObject& config) const {

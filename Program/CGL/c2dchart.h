@@ -41,6 +41,7 @@ private:
     void closeEvent(QCloseEvent *);
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
+    void wheelEvent(QWheelEvent*);
 
 public:
     C2dChart(QWidget* parent = 0);

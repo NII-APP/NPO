@@ -1,8 +1,6 @@
 #include "fempair.h"
-<<<<<<< HEAD
-#include "../../Mesh/eigenmodes.h"
-=======
->>>>>>> 2aa0478b5836ded479b23445dc30d522d18c2a00
+
+#include <eigenmodes.h>
 
 FEMPair::FEMPair(const FEM *theory, const FEM *practic)
     : std::pair<FEM* const, FEM* const>(new FEM(*theory), new FEM(*practic))

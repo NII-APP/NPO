@@ -60,7 +60,6 @@ void ViewerTab::showMAC(int id) {
 }
 
 void ViewerTab::identificateModes(int meshId) {
-    qDebug() << "ident";
     ModesIdentificationWizard::identifyModes(Application::project()->modelsList().at(meshId));
 }
 

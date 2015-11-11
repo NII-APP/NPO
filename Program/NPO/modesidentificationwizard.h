@@ -59,10 +59,9 @@ private:
 
 class ModesIdentificationWizard::ManualController : public QWidget {
     Q_OBJECT
-private:
-    class FileInput;
 public:
     explicit ModesIdentificationWizard::ManualController(const FEM * const model, QWidget* parent);
+    ModesIdentificationWizard::ManualController::~ManualController();
 public slots:
     void setAFR(QString);
     void setModeFrequency(CSlider*);
@@ -74,22 +73,6 @@ private:
     C2dChart* const __chart;
     AFRArray* __afr;
     CSlider* const __slider;
-};
-
-class ModesIdentificationWizard::ManualController::FileInput : public QLineEdit {
-    Q_OBJECT
-private:
-    void keyPressEvent(QKeyEvent *);
-    void resizeEvent(QResizeEvent *);
-public:
-    ModesIdentificationWizard::ManualController::FileInput(QWidget* parent = 0);
-signals:
-    void fileNameChanged(QString);
-private slots:
-    void callDialod();
-
-private:
-    QPushButton* const __pb;
 };
 
 #endif // MODESIDENTIFICATIONWIZARD_H

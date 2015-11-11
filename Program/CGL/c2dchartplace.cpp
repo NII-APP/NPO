@@ -115,7 +115,7 @@ void C2dChartPlace::paintGL()
         for (const CSlider* s: sliders) {
             glLineStipple(1, s->isDragable() ? 0xFAFA : 0x3F07);
             glBegin(GL_LINES);
-            qglColor(s->getColor());
+            qglColor(qRgb(0,0,0));
             const double p(s->getPosition());
             glVertex2d(p, viewPort.bottom());
             glVertex2d(p, viewPort.top());
@@ -242,7 +242,7 @@ CInterval C2dChartPlace::gridInterval(int h, qreal l, qreal r) const
         return CInterval(l, r, 0);
     }
     const qreal max(static_cast<int>(r / step - +(r < 0)) * step);
-    const qreal min(static_cast<int>(l / step - +(l > 0)) * step);
+    const qreal min(static_cast<int>(l / step + +(l > 0)) * step);
     if (min > max) {
         return CInterval(l, r, 0);
     }
@@ -314,7 +314,7 @@ void C2dChartPlace::mouseReleaseEvent(QMouseEvent*) {
 
 void C2dChartPlace::wheelEvent(QWheelEvent* w) {
     const qreal k(w->angleDelta().y() > 0 ? whellCoefficient : 1.0 / whellCoefficient);
-    /*what is a new view port? width an height just an ould wiewPort size big scaled by k. Now about the position:
+    /*what is a new view port? width an height just ould wiewPort size scaled by k. Now about the position:
      * newPosition = initialPosition + (1 - p) * positionOfMouseInSpace
      * I guarantied it! It's allow to make unchanged position for point under pointer.
      * */
@@ -322,6 +322,21 @@ void C2dChartPlace::wheelEvent(QWheelEvent* w) {
                       QSizeF(viewPort.size()) *= k);
     emit viewPortChanged(viewPort);
     this->update();
+}
 
+void C2dChartPlace::acceptWheelX(const int pos, const float delta) {
+    const qreal k(delta > 0 ? whellCoefficient : 1.0 / whellCoefficient);
+    viewPort = QRectF(viewPort.topLeft() + QPointF((QPointF(toSpace(QPointF(pos, 0.0f)) - viewPort.topLeft()) * (1.0 - k)).x(), 0.0f),
+                      QSizeF(viewPort.width() * k, viewPort.height()));
+    emit viewPortChanged(viewPort);
+    this->update();
+}
+
+void C2dChartPlace::acceptWheelY(const int pos, const float delta) {
+    const qreal k(delta > 0 ? whellCoefficient : 1.0 / whellCoefficient);
+    viewPort = QRectF(viewPort.topLeft() + QPointF(0.0f, (QPointF(toSpace(QPointF(0.0f, pos)) - viewPort.topLeft()) * (1.0 - k)).y()),
+                      QSizeF(viewPort.width(), viewPort.height() * k));
+    emit viewPortChanged(viewPort);
+    this->update();
 }
 

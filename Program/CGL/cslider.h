@@ -9,11 +9,12 @@ class QString;
 class QGraphicsPolygonItem;
 class QGraphicsLineItem;
 class QGraphicsTextItem;
+class QGraphicsProxyWidget;
 
 class CSlider : public QGraphicsItemGroup
 {
 public:
-    CSlider(QGraphicsItem *parent = 0);
+    explicit CSlider(QGraphicsItem *parent = 0);
     ~CSlider();
 
     void setPurview(const RealRange&);
@@ -31,11 +32,8 @@ public:
     void setLabelTemplate(const QString&);
     const QString& getLabelTemplate() const;
 
-    QGraphicsPolygonItem* getLabelBar();
-    QGraphicsTextItem* getLabelText();
+    QGraphicsProxyWidget* getLabelBar();
     QGraphicsLineItem* getLine();
-    void setColor(const QColor&);
-    const QColor &getColor() const;
 
     qreal getPosition() const;
     void setPosition(const qreal&);
@@ -58,12 +56,8 @@ private:
     double __position;
     bool __dragable;
     QString __labelTemplate;
-    QColor __color;
 
-    QGraphicsPolygonItem* const __labelBar;
-    QGraphicsPolygonItem* const __bottomArrow;
-    QGraphicsPolygonItem* const __topArrow;
-    QGraphicsTextItem* const __labelText;
+    QGraphicsProxyWidget* const __labelBar;
     QGraphicsLineItem* const __line;
 };
 

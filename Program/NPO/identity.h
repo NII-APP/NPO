@@ -26,9 +26,8 @@ private:
     static const QJsonObject readConfig();
     QJsonValue at(const QString&) const;
     static QList<QAction*> toActions(const QJsonArray &menu, QObject* parent, const Relations & relations = Relations());
-    QString execOpenFileNameDialog(const QJsonObject& config) const;
+    QString execOpenFileNameDialog(const QJsonObject& config, QWidget *parent = 0) const;
     QString execSaveFileNameDialog(const QJsonObject& config) const;
-    QJsonValue resolveKey(const QString& from) const;
 public:
     Identity();
     ~Identity();
@@ -54,7 +53,8 @@ public:
     QIcon tabPairIcon() const;
 
     QString tr(QString key, const QString& context = QString()) const;
-    QString openFileDialog(const QString& from) const;
+    QJsonValue resolveKey(const QString& from) const;
+    QString openFileDialog(const QString& from, QWidget *parent = 0) const;
 
     QString choseModelFile() const;
     QString choseModesFile() const;

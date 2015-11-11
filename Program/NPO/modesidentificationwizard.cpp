@@ -24,6 +24,7 @@
 #include "femviewer.h"
 #include "engine/afrarray.h"
 #include "engine/afr.h"
+#include "filenameedit.h"
 
 
 ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* parent)
@@ -64,7 +65,6 @@ void ModesIdentificationWizard::reject() {
 }
 ModesIdentificationWizard::~ModesIdentificationWizard()
 {
-
 }
 
 ModesIdentificationWizard::MethodSelector::MethodSelector(QWidget* parent)
@@ -79,9 +79,6 @@ ModesIdentificationWizard::MethodSelector::MethodSelector(QWidget* parent)
     second->setTitle("Метод полиномиальной аппроксимации");
     QWidget* const w(second->getBoard());
     QFormLayout* l(new QFormLayout);
-    /*l->addRow(tr("Порядок модели:"), new QSpinBox(w));
-    l->addRow(tr("Допуск на частоту:"), new QSpinBox(w));
-    l->addRow(tr("Допуск на демпфирование:"), new QSpinBox(w));*/
     w->setLayout(l);
     Signboard* const third(new Signboard(this));
     third->setTitle("Метод сингулярного разложения");
@@ -123,7 +120,10 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
     , __slider(new CSlider)
 {
     QLayout* top(new QHBoxLayout);
-    FileInput* const input(new FileInput(this));
+    FileNameEdit* const input(new FileNameEdit(this));
+    input->setOpenFileFunction([](QWidget* parent)->QString{
+        return Application::identity()->openFileDialog("modes identification wizard/file dialog", parent);
+    });
     top->addWidget(input);
     connect(input, SIGNAL(fileNameChanged(QString)), SLOT(setAFR(QString)));
     QPushButton* changeOrientation(new QPushButton(this));
@@ -145,20 +145,27 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
     connect(__chart, SIGNAL(sliderMoves(CSlider*)), SLOT(setModeFrequency(CSlider*)));
     __slider->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
 
-
     this->setLayout(new QVBoxLayout);
     this->layout()->addItem(top);
     this->layout()->addWidget(__splitter);
 }
 
+ModesIdentificationWizard::ManualController::~ManualController() {
+    delete __slider;
+}
+
 void ModesIdentificationWizard::ManualController::setModeFrequency(CSlider* s) {
     if (s == __slider) {
+        qDebug() << "s" << s << s->getPosition();
         const EigenMode& mode(__afr->getMode(s->getPosition()));
         __viewer->setProxyMode(mode);
     }
 }
 
 void ModesIdentificationWizard::ManualController::setAFR(QString filename) {
+    if (filename.split('.').last().toLower() != "unv") {
+        return;
+    }
     delete __afr;
     __afr = new AFRArray;
     __afr->read(filename);
@@ -173,6 +180,9 @@ void ModesIdentificationWizard::ManualController::setAFR(QString filename) {
     data.setDimensionTitle(Application::identity()->tr("xLabel", "modes identification wizard/chart"), 0);
     data.setDimensionTitle(Application::identity()->tr("yLabel", "modes identification wizard/chart"), 1);
     __chart->setData(data);
+    __chart->update();
+    setModeFrequency(__slider);
+
 }
 
 void ModesIdentificationWizard::ManualController::changeSplitterOrientation() {
@@ -217,38 +227,4 @@ void ModesIdentificationWizard::MethodSelector::Signboard::setTitle(const QStrin
 }
 QWidget* ModesIdentificationWizard::MethodSelector::Signboard::getBoard() {
     return __board;
-}
-
-void ModesIdentificationWizard::ManualController::FileInput::keyPressEvent(QKeyEvent * e) {
-    QLineEdit::keyPressEvent(e);
-    if (this->text().split('.').last().toLower() == "unv" && QFile::exists(this->text())) {
-        emit fileNameChanged(this->text());
-    }
-}
-void ModesIdentificationWizard::ManualController::FileInput::resizeEvent(QResizeEvent * e) {
-    if (e) {
-        QLineEdit::resizeEvent(e);
-    }
-    this->__pb->move(QPoint(this->width() - 25, -5));
-}
-
-ModesIdentificationWizard::ManualController::FileInput::FileInput(QWidget* parent)
-    : QLineEdit(parent)
-    , __pb(new QPushButton(this))
-{
-    __pb->setIcon(Application::identity()->icon("modes identification wizard/open file icon"));
-    __pb->setToolTip(Application::identity()->tr("open file tooltip", "modes identification wizard"));
-    __pb->setFlat(true);
-    __pb->setFixedHeight(this->height());
-    connect(__pb, SIGNAL(clicked()), SLOT(callDialod()));
-    resizeEvent(0);
-}
-
-void ModesIdentificationWizard::ManualController::FileInput::callDialod() {
-    const QString s(Application::identity()->openFileDialog("modes identification wizard/file dialog"));
-    if (s.split('.').last().toLower() != "unv" || !QFile::exists(s)) {
-        return;
-    }
-    this->setText(s);
-    emit fileNameChanged(this->text());
 }

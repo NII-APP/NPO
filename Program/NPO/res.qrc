@@ -17,6 +17,7 @@
         <file>images/plane_model.svg</file>
         <file>images/open.png</file>
         <file>images/orientation.png</file>
+        <file>images/warning.svg</file>
     </qresource>
     <qresource prefix="/css" lang="css">
         <file>css.css</file>

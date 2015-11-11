@@ -6,6 +6,7 @@
 #include <QOpenGLContext>
 #include <QSizeF>
 #include <QEventLoop>
+#include <QCoreApplication>
 #include "cdimensioninterval.h"
 #include "cdimensionarray.h"
 #include "cchartdatalist.h"
@@ -39,7 +40,6 @@ C2dChart::C2dChart(QWidget* parent)
 
 C2dChart::~C2dChart()
 {
-    qDeleteAll(sliders);
 }
 
 void C2dChart::setData(const CChartData& newData) {
@@ -118,11 +118,14 @@ QString C2dChart::getYLabel() const {
     return yLabel->text();
 }
 
-void C2dChart::resizeEvent(QResizeEvent*) {
+void C2dChart::resizeEvent(QResizeEvent* event) {
+    QGraphicsView::resizeEvent(event);
     update();
 }
 
 void C2dChart::update() {
+    this->setBackgroundBrush(this->backgroundBrush());
+    invalidateScene(QRect(QPoint(0,0), this->size()));
     QMarginsF margins(0.0, 0.0, 2.0, 0.0);
     scene()->setSceneRect(QRectF(QPointF(0.0, 0.0), QSizeF(this->size())));
 
@@ -136,7 +139,8 @@ void C2dChart::update() {
 
     if (!sliders.empty()) {
         margins += QMarginsF(0.0,
-                             (**std::max_element(sliders.begin(), sliders.end(),[](const CSlider* s1, const CSlider* s2)->bool{ return s1->topLabelHeight() > s2->topLabelHeight(); } )).topLabelHeight(),
+                             (**std::max_element(sliders.begin(), sliders.end(),[](const CSlider* s1, const CSlider* s2)->bool
+        { return s1->topLabelHeight() > s2->topLabelHeight(); } )).topLabelHeight(),
                              0.0,
                              0.0);
     }
@@ -159,8 +163,12 @@ void C2dChart::update() {
     qreal centerH(scene()->height() - margins.bottom() - margins.top());
     yAxis->setLength(centerH);
     yAxis->setRange(RealRange(chart->getViewPort().bottom(), chart->getViewPort().top()));
-    margins += QMarginsF(yAxis->implementation(QPointF(margins.left(), margins.top()),
-                                               chart->yGridInterval(centerH)),
+    static const qreal LEFT_SIDE_LABELS_CAPACITY(50);
+    const qreal yAxysWidth(yAxis->implementation(QPointF(margins.left(), margins.top()),
+                                                    chart->yGridInterval(centerH)));
+    const qreal yAxisMargin(std::max(yAxysWidth, LEFT_SIDE_LABELS_CAPACITY));
+    yAxis->setX(yAxisMargin - yAxysWidth);
+    margins += QMarginsF(yAxisMargin,
                          0.0, 0.0, 0.0);
     qreal centerW(scene()->width() - margins.left() - margins.right());
     xAxis->setLength(centerW);
@@ -197,6 +205,7 @@ void C2dChart::mouseMoveEvent(QMouseEvent* event) {
         haulage->setPixelPosition(haulage->getPixelPosition() + delta);
         haulage->update();
         chart->update();
+        qDebug() << haulage << haulage->getPosition();
         emitSliderMoves(haulage);
         return;
     }
@@ -204,7 +213,8 @@ void C2dChart::mouseMoveEvent(QMouseEvent* event) {
     this->setCursor(sliders.findNear(x) ? Qt::SizeHorCursor : Qt::ArrowCursor);
 }
 
-void C2dChart::mousePressEvent(QMouseEvent* event) {
+void C2dChart::mousePressEvent(QMouseEvent* event)
+{
     prevPos = event->pos();
     CSlider* const s(sliders.findNear(event->x()));
     if (s && event->button() != Qt::MidButton) {
@@ -213,7 +223,18 @@ void C2dChart::mousePressEvent(QMouseEvent* event) {
     }
 }
 
-void C2dChart::showArray(const CArray& m) {
+void C2dChart::wheelEvent(QWheelEvent *e)
+{
+    if (e->x() > chart->geometry().left() && e->x() < chart->geometry().right()) {
+        chart->acceptWheelX((e->pos() - chart->pos()).x(), e->angleDelta().y());
+    }
+    if (e->y() > chart->geometry().top() && e->y() < chart->geometry().bottom()) {
+        chart->acceptWheelY((e->pos() - chart->pos()).y(), e->angleDelta().y());
+    }
+}
+
+void C2dChart::showArray(const CArray& m)
+{
     C2dChart chart;
     CChartData data;
     data.push_back(new CDimensionInterval(CGL::CInterval(0.0, static_cast<int>(1.0 * m.size() - 1.0, m.size()))));

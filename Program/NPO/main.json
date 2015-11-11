@@ -45,6 +45,12 @@
             }
         ]
     },
+    "FileNameEdit" : {
+        "tooltip eng" : "Chose file",
+        "tooltip rus" : "Указать файл",
+        "open file icon" : ":/media/images/open.png",
+        "warning icon" : ":/media/images/warning.svg"
+    },
     "tab view eng" : "View",
     "tab view rus" : "Просмотр",
     "tab view icon" : ":/media/images/plane_model.svg",
@@ -178,10 +184,7 @@
             "caption rus" : "Укажите файл результатов испытаний",
             "filter" : "Universal File Format(*.unv)"
         },
-        "open file icon" : ":/media/images/open.png",
         "orientation icon" : ":/media/images/orientation.png",
-        "open file tooltip eng" : "Chose file",
-        "open file tooltip rus" : "Указать файл",
         "orientation tooltip eng" : "Change splitter orientation",
         "orientation tooltip rus" : "Изменить направление разделителя",
         "chart" : {
@@ -191,6 +194,20 @@
             "yLabel eng" : "Amplitude",
             "title eng" : "Amplitude-frequency response",
             "title rus" : "Амплитудно-частотная характеристика"
-        }
+        },
+        "methods" : [
+            {
+                "title rus" : "Метод выделения тона",
+                "params" : []
+            },
+            {
+                "title rus" : "Метод полиномиальной аппроксимации",
+                "params" : []
+            },
+            {
+                "title rus" : "Метод сингулярного разложения",
+                "params" : []
+            }
+        ]
     }
 }
