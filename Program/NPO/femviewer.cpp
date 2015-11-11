@@ -70,7 +70,12 @@ FEMViewer::FEMViewer(QWidget* parent)
     toolbox->adjustSize();
 }
 
-void FEMViewer::runTrigger() {
+FEMViewer::~FEMViewer()
+{
+}
+
+void FEMViewer::runTrigger()
+{
     if (femWidget->getAnimationOptions()->isPaused()) {
         femWidget->getAnimationOptions()->play();
         run->setText(Application::identity()->tr("play", "FEMViewer"));
@@ -81,39 +86,46 @@ void FEMViewer::runTrigger() {
         run->setIcon(play);
     }
 }
-void FEMViewer::runEnable() {
+void FEMViewer::runEnable()
+{
     if (femWidget->getAnimationOptions()->isPaused()) {
         femWidget->getAnimationOptions()->play();
         run->setIcon(pause);
     }
 }
 
-void FEMViewer::stopTrigger(bool v) {
+void FEMViewer::stopTrigger(bool v)
+{
     run->setDisabled(v);
     femWidget->getAnimationOptions()->setMagnitude(magnitude->getValue() * !v);
 }
 
-QSize FEMViewer::sizeHint() const {
+QSize FEMViewer::sizeHint() const
+{
     return QSize(200,200);
 }
 
-bool FEMViewer::eventFilter(QObject * o, QEvent * e) {
+bool FEMViewer::eventFilter(QObject * o, QEvent * e)
+{
     if (o == femWidget && e->type() == QEvent::MouseMove) {
         toolbox->setVisible(toolbox->geometry().contains(static_cast<QMouseEvent*>(e)->pos()));
     }
     return !true && !false;
 }
 
-void FEMViewer::leaveEvent(QEvent *) {
+void FEMViewer::leaveEvent(QEvent *)
+{
     toolbox->setVisible(false);
 }
 
-void FEMViewer::resizeEvent(QResizeEvent *) {
+void FEMViewer::resizeEvent(QResizeEvent *)
+{
     toolbox->resize(this->size().width(), toolbox->height());
     femWidget->resize(this->size());
 }
 
-void FEMViewer::paintEvent(QPaintEvent *) {
+void FEMViewer::paintEvent(QPaintEvent *)
+{
     if (femWidget->isVisible()) {
         return;
     }
@@ -122,7 +134,8 @@ void FEMViewer::paintEvent(QPaintEvent *) {
     painter.drawPixmap(QRect(QPoint(this->width() / 2.0 - bg.width() / 2.0, this->height() / 2.0 - bg.height() / 2.0), bg.size()), bg);
 }
 
-void FEMViewer::setModel(const FEM* m) const {
+void FEMViewer::setModel(const FEM* m) const
+{
     femWidget->setVisible(m);
     femWidget->setData(m);
     updateToolBar();
@@ -130,11 +143,13 @@ void FEMViewer::setModel(const FEM* m) const {
     femWidget->resize(this->size());
 }
 
-void FEMViewer::setMode(const int m) {
+void FEMViewer::setMode(const int m)
+{
     femWidget->setMode(m);
 }
 
-void FEMViewer::updateToolBar() const {
+void FEMViewer::updateToolBar() const
+{
     mode->updateValueBounds();
     bool isHaveModes(false);
     for (const FEM* i : femWidget->getData()) {
@@ -146,11 +161,13 @@ void FEMViewer::updateToolBar() const {
     stop->setEnabled(isHaveModes);
 }
 
-void FEMViewer::colorize(int m) {
+void FEMViewer::colorize(int m)
+{
     femWidget->colorize(m);
 }
 
-const FEM* FEMViewer::getModel() const {
+const FEM* FEMViewer::getModel() const
+{
     if (!femWidget->getData().isEmpty()) {
         return femWidget->getData().first();
     } else {
@@ -158,7 +175,8 @@ const FEM* FEMViewer::getModel() const {
     }
 }
 
-void FEMViewer::setProxyMode(const EigenMode& m) {
+void FEMViewer::setProxyMode(const EigenMode& m)
+{
     mode->hide();
     femWidget->setProxyMode(m);
     frequency->setEnabled(true);

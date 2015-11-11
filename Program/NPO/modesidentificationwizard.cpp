@@ -56,11 +56,13 @@ ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* pa
     this->resize(1300,800);
 }
 
-void ModesIdentificationWizard::accept() {
+void ModesIdentificationWizard::accept()
+{
     QDialog::accept();
 }
 
-void ModesIdentificationWizard::reject() {
+void ModesIdentificationWizard::reject()
+{
     QDialog::reject();
 }
 ModesIdentificationWizard::~ModesIdentificationWizard()
@@ -69,53 +71,27 @@ ModesIdentificationWizard::~ModesIdentificationWizard()
 
 ModesIdentificationWizard::MethodSelector::MethodSelector(QWidget* parent)
     : QWidget(parent)
-    , __resultsTable(new QTableWidget(this))
 {
     this->setLayout(new QVBoxLayout);
-    this->layout()->addWidget(new QLabel("<h2>Идентификация параметров</h2>", this));
-    Signboard* const first(new Signboard(this));
-    first->setTitle("Метод выделения тона");
-    Signboard* const second(new Signboard(this));
-    second->setTitle("Метод полиномиальной аппроксимации");
-    QWidget* const w(second->getBoard());
-    QFormLayout* l(new QFormLayout);
-    w->setLayout(l);
-    Signboard* const third(new Signboard(this));
-    third->setTitle("Метод сингулярного разложения");
-    __methods << first << second << third;
-    for (Signboard* i : __methods) {
-        this->layout()->addWidget(i);
-    }
+    this->layout()->addWidget(new QLabel(Application::identity()->tr("modes identification wizard/nethods selector/title"), this));
     static_cast<QVBoxLayout*>(this->layout())->addStretch(200);
-    this->layout()->addWidget(__resultsTable);
 
-    __resultsTable->setColumnCount(3);
-    __resultsTable->setRowCount(4);
-    __resultsTable->setItem(0,0, new QTableWidgetItem("Номер формы"));
-    __resultsTable->setItem(0,1, new QTableWidgetItem("Частота [Гц]"));
-    __resultsTable->setItem(0,2, new QTableWidgetItem("Демпифрование [%]"));
-    __resultsTable->setItem(1,0, new QTableWidgetItem("1"));
-    __resultsTable->setItem(1,1, new QTableWidgetItem("24"));
-    __resultsTable->setItem(1,2, new QTableWidgetItem("0.3"));
-    __resultsTable->setItem(2,0, new QTableWidgetItem("2"));
-    __resultsTable->setItem(2,1, new QTableWidgetItem("45"));
-    __resultsTable->setItem(2,2, new QTableWidgetItem("0.5"));
-    __resultsTable->setItem(3,0, new QTableWidgetItem("3"));
-    __resultsTable->setItem(3,1, new QTableWidgetItem("220"));
-    __resultsTable->setItem(3,2, new QTableWidgetItem("0.4"));
-    __resultsTable->setFixedHeight(160);
-    __resultsTable->hide();
-
-    this->layout()->addWidget(new QPushButton("Экспорт форм", this));
+    QPushButton* const exportButton(new QPushButton(Application::identity()->tr("modes identification wizard/nethods selector/export button"), this));
+    exportButton->setDisabled(true);
+    this->layout()->addWidget(exportButton);
 
     this->setFixedWidth(335);
+}
+
+ModesIdentificationWizard::MethodSelector::~MethodSelector()
+{
 }
 
 ModesIdentificationWizard::ManualController::ManualController(const FEM* const model, QWidget* parent)
     : QWidget(parent)
     , __splitter(new QSplitter(this))
-    , __viewer(new FEMViewer(this))
-    , __chart(new C2dChart(this))
+    , __viewer(new FEMViewer(__splitter))
+    , __chart(new C2dChart(__splitter))
     , __afr(nullptr)
     , __slider(new CSlider)
 {
@@ -150,19 +126,23 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
     this->layout()->addWidget(__splitter);
 }
 
-ModesIdentificationWizard::ManualController::~ManualController() {
+ModesIdentificationWizard::ManualController::~ManualController()
+{
     delete __slider;
+    ///@todo fix this tarible kluge... destructor crash the program. but it's called when i complidely close the app anyway. Only for one instance of ManualController
+    __viewer->setParent(0);
 }
 
-void ModesIdentificationWizard::ManualController::setModeFrequency(CSlider* s) {
+void ModesIdentificationWizard::ManualController::setModeFrequency(CSlider* s)
+{
     if (s == __slider) {
-        qDebug() << "s" << s << s->getPosition();
         const EigenMode& mode(__afr->getMode(s->getPosition()));
         __viewer->setProxyMode(mode);
     }
 }
 
-void ModesIdentificationWizard::ManualController::setAFR(QString filename) {
+void ModesIdentificationWizard::ManualController::setAFR(QString filename)
+{
     if (filename.split('.').last().toLower() != "unv") {
         return;
     }
@@ -185,11 +165,13 @@ void ModesIdentificationWizard::ManualController::setAFR(QString filename) {
 
 }
 
-void ModesIdentificationWizard::ManualController::changeSplitterOrientation() {
+void ModesIdentificationWizard::ManualController::changeSplitterOrientation()
+{
     __splitter->setOrientation(__splitter->orientation() == Qt::Vertical ? Qt::Horizontal : Qt::Vertical);
 }
 
-void ModesIdentificationWizard::stylize() {
+void ModesIdentificationWizard::stylize()
+{
     if (QtWin::isCompositionEnabled()) {
         QtWin::extendFrameIntoClientArea(this, -1, -1, -1, -1);
         setAttribute(Qt::WA_TranslucentBackground, true);
@@ -198,7 +180,8 @@ void ModesIdentificationWizard::stylize() {
     }
 }
 
-void ModesIdentificationWizard::identifyModes(const FEM* who, QWidget* parent) {
+void ModesIdentificationWizard::identifyModes(const FEM* who, QWidget* parent)
+{
     ModesIdentificationWizard* w(new ModesIdentificationWizard(who, parent));
 
     QEventLoop* loop(new QEventLoop(w));
@@ -209,22 +192,4 @@ void ModesIdentificationWizard::identifyModes(const FEM* who, QWidget* parent) {
     loop->exec();
 
     w->deleteLater();
-}
-
-ModesIdentificationWizard::MethodSelector::Signboard::Signboard(QWidget* parent)
-    : QWidget(parent)
-    , __board(new QWidget(this))
-    , __title(new QPushButton(this))
-{
-    this->setLayout(new QVBoxLayout);
-    this->layout()->addWidget(__title);
-    this->layout()->addWidget(__board);
-    __title->setDisabled(true);
-}
-
-void ModesIdentificationWizard::MethodSelector::Signboard::setTitle(const QString& t) {
-    __title->setText(t);
-}
-QWidget* ModesIdentificationWizard::MethodSelector::Signboard::getBoard() {
-    return __board;
 }

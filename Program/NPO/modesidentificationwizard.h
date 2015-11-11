@@ -38,30 +38,17 @@ private:
 };
 
 class ModesIdentificationWizard::MethodSelector : public QWidget {
-    class Signboard;
 public:
     explicit ModesIdentificationWizard::MethodSelector(QWidget* parent);
+    ~MethodSelector();
 private:
-    QTableWidget* const __resultsTable;
-    QList<Signboard*> __methods;
-};
-
-class ModesIdentificationWizard::MethodSelector::Signboard : public QWidget {
-public:
-    explicit ModesIdentificationWizard::MethodSelector::Signboard(QWidget* parent);
-
-    void setTitle(const QString&);
-    QWidget* getBoard();
-private:
-    QWidget* __board;
-    QPushButton* __title;
 };
 
 class ModesIdentificationWizard::ManualController : public QWidget {
     Q_OBJECT
 public:
     explicit ModesIdentificationWizard::ManualController(const FEM * const model, QWidget* parent);
-    ModesIdentificationWizard::ManualController::~ManualController();
+    ~ManualController();
 public slots:
     void setAFR(QString);
     void setModeFrequency(CSlider*);

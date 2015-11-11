@@ -32,6 +32,10 @@ FEMViewer::FEMViewerFrequencyInput::FEMViewerFrequencyInput(QWidget* parent)
     this->setEnabled(false);
 }
 
+FEMViewer::FEMViewerFrequencyInput::~FEMViewerFrequencyInput()
+{
+}
+
 void FEMViewer::FEMViewerFrequencyInput::setValue(double v) {
     numeric->setValue(v);
 }

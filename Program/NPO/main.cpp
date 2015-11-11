@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
     setlocale(LC_ALL,"RUS");
 
     MainWindow w;
-    qDebug() << "fdcomfedse";
 
 #ifndef QT_NO_DEBUG
     w.show();

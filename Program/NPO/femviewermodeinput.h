@@ -17,6 +17,7 @@ class FEMViewer::FEMViewerModeInput : public QFrame
     void changeEvent(QEvent *);
 public:
     FEMViewerModeInput(FEMViewer *viewer, QWidget *parent = 0);
+    ~FEMViewerModeInput();
 
     int getValue() const;
     void setValue(int value);

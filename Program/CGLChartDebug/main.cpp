@@ -6,6 +6,7 @@
 #include "../CGL/cdimensionarray.h"
 #include "../CGL/cchartdatalist.h"
 #include "../CGL/cslider.h"
+#include <QFile>
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
@@ -13,7 +14,9 @@ int main(int argc, char** argv) {
     C2dChart chart;
 
     AFRArray afr;
-    afr.read("C:\\Users\\BOPOHOB\\Downloads\\FRF_10.unv");
+    afr.read(QFile::exists("C:\\Users\\username\\Downloads\\FRF_10.unv") ?
+                 "C:\\Users\\username\\Downloads\\FRF_10.unv" :
+                 "C:\\Users\\BOPOHOB\\Downloads\\FRF_10.unv");
 
     CSlider* const slider(new CSlider);
     slider->setLabelTemplate("%1 hz");
