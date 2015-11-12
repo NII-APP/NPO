@@ -56,7 +56,7 @@ double AFR::damping(const CRealRange& range) {
             break;
         }
     }
-     qDebug() << "freq_2=" << freq_2;
+    qDebug() << "freq_2=" << freq_2;
     DELTA_FREQ = at(iteratotFreq_2).frequency - at(iteratotFreq_2 - 1).frequency;
     DELTA_AMPLITUDE_SMALL = maxAmplitude/SQRT2 - abs(at(iteratotFreq_2).amplitude);
     DELTA_AMPLITUDE = abs(at(iteratotFreq_2 - 1).amplitude) - abs(at(iteratotFreq_2).amplitude);
