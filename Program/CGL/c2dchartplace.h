@@ -32,6 +32,7 @@ public:
     ~C2dChartPlace();
 
     const QRectF& getViewPort() const { return viewPort; }
+    void setViewPort(const QRectF& v) { viewPort = v; }
 
     void setData(const CChartData&);
     void setData(const CChartDataList&);
@@ -48,6 +49,9 @@ public:
     CRealRange yRange() const;
     QPointF toSpace(const QPointF&) const;
     void setGridStep(qreal val) { gridStep = val; }
+
+    void acceptWheelX(const int, const float);
+    void acceptWheelY(const int, const float);
 
 signals:
     void viewPortChanged(QRectF);

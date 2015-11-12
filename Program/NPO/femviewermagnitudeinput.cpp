@@ -29,6 +29,10 @@ FEMViewer::FEMViewerMagnitudeInput::FEMViewerMagnitudeInput(QWidget *parent)
     this->setDisabled(true);
 }
 
+FEMViewer::FEMViewerMagnitudeInput::~FEMViewerMagnitudeInput()
+{
+}
+
 void FEMViewer::FEMViewerMagnitudeInput::changeEvent(QEvent * e) {
     if (e->type() == QEvent::EnabledChange) {
         for (auto& i : this->children()) {

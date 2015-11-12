@@ -56,7 +56,9 @@ SOURCES += main.cpp \
     pairsview.cpp \
     modesidentificationwizard.cpp \
     engine/afr.cpp \
-    engine/afrarray.cpp
+    engine/afrarray.cpp \
+    filenameedit.cpp \
+    pixmapwidget.cpp
 
 HEADERS += \
     relationdialog.h \
@@ -83,7 +85,9 @@ HEADERS += \
     pairsview.h \
     modesidentificationwizard.h \
     engine/afr.h \
-    engine/afrarray.h
+    engine/afrarray.h \
+    filenameedit.h \
+    pixmapwidget.h
 
 exists( engine/pyParse/BDFEntity.cpp ) {
     message( "Configuring with new parser" )

@@ -7,6 +7,9 @@
 #include <QDebug>
 #include <QBrush>
 #include <QPen>
+#include <QGraphicsProxyWidget>
+#include <QLabel>
+#include <QPalette>
 
 #include "crange.h"
 
@@ -15,24 +18,13 @@ CSlider::CSlider(QGraphicsItem *parent)
     , __position(0.0)
     , __dragable(true)
     , __labelTemplate("%1")
-    , __labelBar(new QGraphicsPolygonItem(this))
-    , __bottomArrow(new QGraphicsPolygonItem(this))
-    , __topArrow(new QGraphicsPolygonItem(this))
-    , __labelText(new QGraphicsTextItem(this))
+    , __labelBar(new QGraphicsProxyWidget(this))
     , __line(new QGraphicsLineItem(this))
-    , __color(Qt::black)
 {
-    __bottomArrow->setPolygon(QPolygonF()
-                              << QPointF(0.0,0.0)
-                              << QPointF(-5.0,10.0)
-                              << QPointF(0.0, 7.0)
-                              << QPointF(5.0, 10.0));
-    __topArrow->setPolygon(QPolygonF()
-                           << QPointF(0.0,0.0)
-                           << QPointF(-5.0,-10.0)
-                           << QPointF(0.0, -7.0)
-                           << QPointF(5.0, -10.0));
-    __labelText->setPlainText(__labelTemplate.arg(__position));
+    __labelBar->setWidget(new QLabel(0));
+    QPalette p(__labelBar->widget()->palette());
+    p.setBrush(QPalette::Background, Qt::white);
+    __labelBar->widget()->setPalette(p);
 }
 
 CSlider::~CSlider() {
@@ -44,32 +36,19 @@ void CSlider::update() {
         return;
     }
     const double pPos(getPixelPosition());
-    __bottomArrow->setPos(pPos, __geometry.bottom());
-    __topArrow->setPos(pPos, __geometry.top());
+    if (pPos != pPos) {
+        return;
+    }
     __line->setLine(pPos, __geometry.top(), pPos, __geometry.bottom());
-    __labelText->setPos(pPos - __labelText->boundingRect().width() / 2.0, __geometry.top() - topLabelHeight());
+    __labelBar->setPos(pPos - (__labelBar->widget()->width() >> 1), __geometry.top() - __labelBar->widget()->height());
 }
 
 int CSlider::topLabelHeight() const {
-    return 15 + __labelText->boundingRect().height();
+    return __labelBar->widget()->height();
 }
 
 int CSlider::bottomLabelheight() const {
     return 0;
-}
-
-void CSlider::setColor(const QColor& c) {
-    __color = c;
-    auto l(QList<QAbstractGraphicsShapeItem*>() << __labelBar << __bottomArrow << __topArrow);
-    for (QAbstractGraphicsShapeItem* i : l) {
-        QPen p(i->pen());
-        p.setColor(c);
-        i->setPen(c);
-    }
-}
-
-const QColor& CSlider::getColor() const {
-    return __color;
 }
 
 void CSlider::setGeometry(const QRectF& r) {
@@ -81,8 +60,16 @@ const QRectF& CSlider::getGeometry() const {
 }
 
 void CSlider::setPosition(const double& p) {
-    __position = p;
-    __labelText->setPlainText(__labelTemplate.arg(__position));
+    if (__purview.getMin() < __purview.getMax()) {
+        __position = std::min(std::max(p, __purview.getMin()), __purview.getMax());
+    } else {
+        __position = p;
+    }
+    if (dynamic_cast<QLabel*>(__labelBar->widget())) {
+        static_cast<QLabel*>(__labelBar->widget())->setText(__labelTemplate.arg(__position));
+        __labelBar->resize(__labelBar->widget()->sizeHint());
+        __labelBar->resize(__labelBar->widget()->size());
+    }
 }
 
 void CSlider::setPurview(const RealRange& p) {
@@ -100,7 +87,7 @@ qreal CSlider::getPixelPosition() const {
 }
 
 void CSlider::setPixelPosition(const qreal& v) {
-    setPosition(std::min(std::max(__range((v - __geometry.x()) / __geometry.width()), __purview.getMin()), __purview.getMax()));
+    setPosition(__range((v - __geometry.x()) / __geometry.width()));
 }
 
 const RealRange& CSlider::getPurview() const {
@@ -126,11 +113,12 @@ bool CSlider::isDragable() const {
 
 void CSlider::setLabelTemplate(const QString& s) {
     __labelTemplate = s;
-    __labelText->setPlainText(__labelTemplate.arg(__position));
+    if (dynamic_cast<QLabel*>(__labelBar->widget())) {
+        static_cast<QLabel*>(__labelBar->widget())->setText(__labelTemplate.arg(__position));
+    }
 }
 const QString& CSlider::getLabelTemplate() const { return __labelTemplate; }
-QGraphicsPolygonItem* CSlider::getLabelBar() { return __labelBar; }
-QGraphicsTextItem* CSlider::getLabelText() { return __labelText; }
+QGraphicsProxyWidget* CSlider::getLabelBar() { return __labelBar; }
 QGraphicsLineItem* CSlider::getLine() { return __line; }
 
 const int CSliders::SLIDER_DRAG_RADIUS = 3;

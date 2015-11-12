@@ -27,6 +27,10 @@ FEMViewer::FEMViewerModeInput::FEMViewerModeInput(FEMViewer *viewer, QWidget* pa
     updateValueBounds(0);
 }
 
+FEMViewer::FEMViewerModeInput::~FEMViewerModeInput()
+{
+}
+
 
 void FEMViewer::FEMViewerModeInput::holdValue(int v) {
     try {

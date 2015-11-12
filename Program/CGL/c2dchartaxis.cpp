@@ -47,7 +47,7 @@ qreal C2dChartAxis::implementation(const QPointF& topleft, const CGL::CInterval&
 
     qreal maxWidth(0.0);
     for (int i(0); i != tickValues.size(); ++i) {
-        tickets[i]->setText(QString::number(tickValues[i], 'g', 3));
+        tickets[i]->setText(QString::number(qFuzzyIsNull(tickValues[i]) ? 0.0 : tickValues[i], 'g', 3));
         maxWidth = std::max(tickets[i]->boundingRect().width(), maxWidth);
     }
     for (int i(0); i != tickValues.size(); ++i) {

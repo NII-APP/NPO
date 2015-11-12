@@ -42,6 +42,7 @@ public:
     struct FEMViewerState;
 
     FEMViewer(QWidget* parent = 0);
+    ~FEMViewer();
 
     void setModel(const FEM*) const;
     const FEM* getModel() const;

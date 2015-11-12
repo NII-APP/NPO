@@ -15,6 +15,7 @@ class FEMViewer::FEMViewerMagnitudeInput : public QFrame
     void changeEvent(QEvent *);
 public:
     explicit FEMViewer::FEMViewerMagnitudeInput(QWidget *parent = 0);
+    ~FEMViewerMagnitudeInput();
 
     double getValue() const;
 signals:

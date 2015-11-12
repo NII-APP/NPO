@@ -37,7 +37,7 @@ EigenMode AFRArray::getMode(const double freq) const {
     for (const AFR& it : *this) {
         if (it.empty()) {
             //it must be the first item (it was stored to make from 1 indexes...)
-            Q_ASSERT(&it == &this->at(0));
+            //but actualy it's skiped dataset or some enother shit... Don't worry. just set zero...
             result.form()(j) = QVector3D(0.0, 0.0, 0.0);
             --j;
             result.resize(result.length() - 1);
@@ -104,7 +104,7 @@ void AFRArray::read(const QString& filename, int nodesCount) {
             p.integer();
             const int nodeId(p.integer());
 #ifdef AFR_ARRAY_READER_DEBUG
-            qDebug() << "find dataset for node" << nodeId;
+            qDebug() << "find dataset 58 for node" << nodeId;
 #endif
             if (this->size() <= nodeId) {
                 this->resize(nodeId + 1);

@@ -38,31 +38,17 @@ private:
 };
 
 class ModesIdentificationWizard::MethodSelector : public QWidget {
-    class Signboard;
 public:
     explicit ModesIdentificationWizard::MethodSelector(QWidget* parent);
+    ~MethodSelector();
 private:
-    QTableWidget* const __resultsTable;
-    QList<Signboard*> __methods;
-};
-
-class ModesIdentificationWizard::MethodSelector::Signboard : public QWidget {
-public:
-    explicit ModesIdentificationWizard::MethodSelector::Signboard(QWidget* parent);
-
-    void setTitle(const QString&);
-    QWidget* getBoard();
-private:
-    QWidget* __board;
-    QPushButton* __title;
 };
 
 class ModesIdentificationWizard::ManualController : public QWidget {
     Q_OBJECT
-private:
-    class FileInput;
 public:
     explicit ModesIdentificationWizard::ManualController(const FEM * const model, QWidget* parent);
+    ~ManualController();
 public slots:
     void setAFR(QString);
     void setModeFrequency(CSlider*);
@@ -74,22 +60,6 @@ private:
     C2dChart* const __chart;
     AFRArray* __afr;
     CSlider* const __slider;
-};
-
-class ModesIdentificationWizard::ManualController::FileInput : public QLineEdit {
-    Q_OBJECT
-private:
-    void keyPressEvent(QKeyEvent *);
-    void resizeEvent(QResizeEvent *);
-public:
-    ModesIdentificationWizard::ManualController::FileInput(QWidget* parent = 0);
-signals:
-    void fileNameChanged(QString);
-private slots:
-    void callDialod();
-
-private:
-    QPushButton* const __pb;
 };
 
 #endif // MODESIDENTIFICATIONWIZARD_H
