@@ -35,29 +35,32 @@ double AFR::damping(const CRealRange& range) {
     const FrequencyMagnitude& maxValue = at(maxIndex);
     double maxAmplitude = abs(maxValue.amplitude);
     double freq_1 = 0,freq_2 = 0, freq_max = maxValue.frequency;
-    double min = maxAmplitude;
+    int iteratotFreq_1 = 0, iteratotFreq_2 = 0;
     qDebug() << "maxAmplitude/SQRT2=" << maxAmplitude/SQRT2;
     for ( int i(maxIndex); i > 0; i--){
-        if ( abs(abs(at(i).amplitude) - maxAmplitude/SQRT2)  < min ){
-            //check for decay
-            if( abs(at(i).amplitude) - abs(at(i-1).amplitude) < 0){
-                break;
-            }
-            min = abs(abs(at(i).amplitude) - maxAmplitude/SQRT2) ;
-            freq_1 = at(i).frequency;
+        if ( abs(at(i).amplitude) < maxAmplitude/SQRT2 ){
+           freq_1 = at(i).frequency;
+           iteratotFreq_1 = i;
+           break;
         }
     }
-    min = maxAmplitude;
+    //Линейное уточнение частоты. Формула получина из подобия треугольникв
+    double DELTA_FREQ = at(iteratotFreq_1 + 1).frequency - at(iteratotFreq_1).frequency;
+    double DELTA_AMPLITUDE_SMALL = maxAmplitude/SQRT2 - abs(at(iteratotFreq_1).amplitude);
+    double DELTA_AMPLITUDE = abs(at(iteratotFreq_1 + 1).amplitude) - abs(at(iteratotFreq_1).amplitude);
+    freq_1 += DELTA_AMPLITUDE_SMALL / DELTA_AMPLITUDE * DELTA_FREQ;
     for ( int i(maxIndex); i < (end() - begin()); i++){
-        if( abs(abs(at(i).amplitude) - maxAmplitude/SQRT2)  < min){
-            //checking for an increase
-            if( abs(at(i+1).amplitude) - abs(at(i).amplitude) > 0){
-                break;
-            }
-            min = abs(abs(at(i).amplitude) - maxAmplitude/SQRT2) ;
+        if( abs(at(i).amplitude) < maxAmplitude/SQRT2 ){
             freq_2 = at(i).frequency;
+            iteratotFreq_2 = i;
+            break;
         }
     }
+    qDebug() << "freq_2=" << freq_2;
+    DELTA_FREQ = at(iteratotFreq_2).frequency - at(iteratotFreq_2 - 1).frequency;
+    DELTA_AMPLITUDE_SMALL = maxAmplitude/SQRT2 - abs(at(iteratotFreq_2).amplitude);
+    DELTA_AMPLITUDE = abs(at(iteratotFreq_2 - 1).amplitude) - abs(at(iteratotFreq_2).amplitude);
+    freq_2 -= DELTA_AMPLITUDE_SMALL / DELTA_AMPLITUDE * DELTA_FREQ;
     Q_ASSERT( freq_2 - freq_1 > 0 );
 
     return (freq_2 - freq_1)/freq_max;
