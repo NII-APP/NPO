@@ -36,7 +36,6 @@ double AFR::damping(const CRealRange& range) {
     double maxAmplitude = abs(maxValue.amplitude);
     double freq_1 = 0,freq_2 = 0, freq_max = maxValue.frequency;
     int iteratotFreq_1 = 0, iteratotFreq_2 = 0;
-    qDebug() << "maxAmplitude/SQRT2=" << maxAmplitude/SQRT2;
     for ( int i(maxIndex); i > 0; i--){
         if ( abs(at(i).amplitude) < maxAmplitude/SQRT2 ){
            freq_1 = at(i).frequency;
@@ -44,7 +43,7 @@ double AFR::damping(const CRealRange& range) {
            break;
         }
     }
-    //Линейное уточнение частоты. Формула получина из подобия треугольникв
+    //The frequency is interpolated between the two points. The expression is derived from the similarity of triangles
     double DELTA_FREQ = at(iteratotFreq_1 + 1).frequency - at(iteratotFreq_1).frequency;
     double DELTA_AMPLITUDE_SMALL = maxAmplitude/SQRT2 - abs(at(iteratotFreq_1).amplitude);
     double DELTA_AMPLITUDE = abs(at(iteratotFreq_1 + 1).amplitude) - abs(at(iteratotFreq_1).amplitude);
@@ -56,7 +55,6 @@ double AFR::damping(const CRealRange& range) {
             break;
         }
     }
-    qDebug() << "freq_2=" << freq_2;
     DELTA_FREQ = at(iteratotFreq_2).frequency - at(iteratotFreq_2 - 1).frequency;
     DELTA_AMPLITUDE_SMALL = maxAmplitude/SQRT2 - abs(at(iteratotFreq_2).amplitude);
     DELTA_AMPLITUDE = abs(at(iteratotFreq_2 - 1).amplitude) - abs(at(iteratotFreq_2).amplitude);
