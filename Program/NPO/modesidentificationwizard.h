@@ -2,7 +2,7 @@
 #define MODESIDENTIFICATIONWIZARD_H
 
 #include <QDialog>
-#include <QLineEdit>
+#include "tablistwidget.h"
 
 class FEM;
 class QString;
@@ -13,6 +13,7 @@ class QSplitter;
 class AFRArray;
 class QTableWidget;
 class CSlider;
+class QTextEdit;
 
 class ModesIdentificationWizard : public QDialog
 {
@@ -37,11 +38,13 @@ private:
     const FEM* const __model;
 };
 
-class ModesIdentificationWizard::MethodSelector : public QWidget {
+class ModesIdentificationWizard::MethodSelector : public TabListWidget {
 public:
     explicit ModesIdentificationWizard::MethodSelector(QWidget* parent);
     ~MethodSelector();
 private:
+    QVector<QTextEdit*> currentResults;
+
 };
 
 class ModesIdentificationWizard::ManualController : public QWidget {

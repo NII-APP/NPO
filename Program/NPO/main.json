@@ -204,16 +204,33 @@
 
         "methods" : [
             {
+                "name" : "viewing",
+                "title rus" : "Режим просмотра",
+                "title eng" : "Viewing mode",
+                "disabled" : false,
+                "discription file eng" : "filename",
+                "discription file rus" : ":/docs/identificationMethodsDiscription/view rus.htm"
+            },
+            {
+                "name" : "picking",
                 "title rus" : "Метод выделения тона",
-                "params" : []
+                "title eng" : "Peak picking",
+                "params" : [],
+                "disabled" : false,
+                "discription file eng" : "filename",
+                "discription file rus" : ":/docs/identificationMethodsDiscription/manual rus.htm"
             },
             {
                 "title rus" : "Метод полиномиальной аппроксимации",
-                "params" : []
+                "title eng" : "Least square curve fitting",
+                "params" : [],
+                "disabled" : true
             },
             {
                 "title rus" : "Метод сингулярного разложения",
-                "params" : []
+                "title eng" : "Frequency domain decomposition",
+                "params" : [],
+                "disabled" : true
             }
         ]
     }

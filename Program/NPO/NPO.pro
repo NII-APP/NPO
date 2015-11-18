@@ -59,7 +59,8 @@ SOURCES += main.cpp \
     engine/afrarray.cpp \
     filenameedit.cpp \
     pixmapwidget.cpp \
-    tablistwidget.cpp
+    tablistwidget.cpp \
+    modesidentpickingchart.cpp
 
 HEADERS += \
     relationdialog.h \
@@ -89,7 +90,8 @@ HEADERS += \
     engine/afrarray.h \
     filenameedit.h \
     pixmapwidget.h \
-    tablistwidget.h
+    tablistwidget.h \
+    modesidentpickingchart.h
 
 exists( engine/pyParse/BDFEntity.cpp ) {
     message( "Configuring with new parser" )

@@ -25,6 +25,7 @@ public:
 
     int	addTab(QWidget* page, const QString& label);
     int	addTab(QWidget* page, const QIcon& icon, const QString& label);
+    void disable(int id, bool disabled = true);
 
 private slots:
     void togleTab();

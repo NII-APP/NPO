@@ -25,4 +25,9 @@
     <qresource prefix="/json">
         <file>main.json</file>
     </qresource>
+    <qresource prefix="/docs">
+        <file>identificationMethodsDiscription/manual rus.htm</file>
+        <file>identificationMethodsDiscription/img/ok.png</file>
+        <file>identificationMethodsDiscription/view rus.htm</file>
+    </qresource>
 </RCC>

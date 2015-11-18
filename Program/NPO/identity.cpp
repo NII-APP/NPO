@@ -54,6 +54,10 @@ QString Identity::tr(QString key, const QString& context) const {
     return resolveKey((context.isEmpty() ? "" : context + '/') + key + ' ' + language()).toString();
 }
 
+QString Identity::tr(QJsonObject node, QString key, const QString& context) const {
+    return node[key + ' ' + language()].toString();
+}
+
 QString Identity::openFileDialog(const QString& from, QWidget *parent) const {
     return execOpenFileNameDialog(resolveKey(from).toObject(), parent);
 }

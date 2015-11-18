@@ -167,7 +167,7 @@ void C2dChart::update() {
     const qreal yAxysWidth(yAxis->implementation(QPointF(margins.left(), margins.top()),
                                                     chart->yGridInterval(centerH)));
     const qreal yAxisMargin(std::max(yAxysWidth, LEFT_SIDE_LABELS_CAPACITY));
-    yAxis->setX(yAxisMargin - yAxysWidth);
+    yAxis->setX(yAxisMargin - yAxysWidth + margins.left());
     margins += QMarginsF(yAxisMargin,
                          0.0, 0.0, 0.0);
     qreal centerW(scene()->width() - margins.left() - margins.right());

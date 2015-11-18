@@ -31,7 +31,7 @@ TabListWidget::~TabListWidget()
 
 int TabListWidget::addTab(Items::iterator item)
 {
-    if (current() == items.end()) {
+    if (current() == item) {
         layout()->removeItem(stretch);
     }
 
@@ -39,13 +39,13 @@ int TabListWidget::addTab(Items::iterator item)
     layout()->addWidget(item.key());
     layout()->addWidget(item.value());
 
-    if (current() == items.end()) {
+    if (current() == item) {
         layout()->addItem(stretch);
     }
 
     item.value()->hide();
     connect(item.key(), &QPushButton::clicked, this, &TabListWidget::togleTab);
-    return layout()->count() >> 1 - 1;
+    return (layout()->count() >> 1) - 1;
 }
 
 void TabListWidget::togleTab()
@@ -66,8 +66,12 @@ void TabListWidget::togleTab()
             layout()->removeItem(stretch);
         }
         items[static_cast<QPushButton*>(QObject::sender())]->show();
-
     }
+}
+
+void TabListWidget::disable(int id, bool disabled) {
+    Q_ASSERT(dynamic_cast<QPushButton*>(layout()->itemAt(id * 2)->widget()));
+    static_cast<QPushButton*>(layout()->itemAt(id * 2)->widget())->setDisabled(disabled);
 }
 
 TabListWidget::Items::iterator TabListWidget::current()

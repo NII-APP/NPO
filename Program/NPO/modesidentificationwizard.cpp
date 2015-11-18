@@ -10,6 +10,8 @@
 #include <QTableWidget>
 #include <QFormLayout>
 #include <QSpinBox>
+#include <QTextBrowser>
+#include <QScrollArea>
 
 #include <fem.h>
 #include <c2dchart.h>
@@ -25,6 +27,7 @@
 #include "engine/afrarray.h"
 #include "engine/afr.h"
 #include "filenameedit.h"
+#include "tablistwidget.h"
 
 
 ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* parent)
@@ -39,6 +42,10 @@ ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* pa
 
     QHBoxLayout* const buttons(new QHBoxLayout);
     buttons->addStretch(200);
+    QPushButton* const exportButton(new QPushButton(Application::identity()->tr("modes identification wizard/nethods selector/export button"), this));
+    exportButton->setDisabled(true);
+    buttons->addWidget(exportButton);
+    buttons->addSpacing(30);
     QPushButton* const acceptB(new QPushButton(Application::identity()->tr("accept", "modes identification wizard"), this));
     buttons->addWidget(acceptB);
     buttons->addSpacing(30);
@@ -65,20 +72,44 @@ void ModesIdentificationWizard::reject()
 {
     QDialog::reject();
 }
+
 ModesIdentificationWizard::~ModesIdentificationWizard()
 {
 }
 
 ModesIdentificationWizard::MethodSelector::MethodSelector(QWidget* parent)
-    : QWidget(parent)
+    : TabListWidget(parent)
 {
-    this->setLayout(new QVBoxLayout);
-    this->layout()->addWidget(new QLabel(Application::identity()->tr("modes identification wizard/nethods selector/title"), this));
-    static_cast<QVBoxLayout*>(this->layout())->addStretch(200);
-
-    QPushButton* const exportButton(new QPushButton(Application::identity()->tr("modes identification wizard/nethods selector/export button"), this));
-    exportButton->setDisabled(true);
-    this->layout()->addWidget(exportButton);
+    Q_ASSERT(Application::identity()->resolveKey("modes identification wizard/methods").isArray());
+    QJsonArray config(Application::identity()->resolveKey("modes identification wizard/methods").toArray());
+    for (QJsonValueRef i : config) {
+        QJsonObject itm(i.toObject());
+        QWidget* tab(new QWidget(this));
+        Q_ASSERT(itm.contains("disabled") && itm["disabled"].isBool());
+        if (itm["disabled"].toBool()) {
+            this->disable(this->addTab(tab, Application::identity()->tr(itm, "title")));
+        } else {
+            QVBoxLayout* l(new QVBoxLayout);
+            tab->setLayout(l);
+            l->setMargin(0);
+            if (itm.contains("params") && itm["params"].isArray()) {
+                ///@todo add params import
+            }
+            currentResults.push_back(new QTextEdit(tab));
+            currentResults.last()->setReadOnly(false);
+            l->addWidget(currentResults.last());
+            if (QFile::exists(Application::identity()->tr(itm, "discription file"))) {
+                QFile f(Application::identity()->tr(itm, "discription file"));
+                if (!f.open(QFile::ReadOnly)) {
+                    qFatal(QString(f.fileName() + " man file can't be open").toLocal8Bit());
+                }
+                QTextBrowser* doc(new QTextBrowser(tab));
+                doc->setHtml(QString(f.readAll()));
+                l->addWidget(doc);
+            }
+            this->addTab(tab, Application::identity()->tr(itm, "title"));
+        }
+    }
 
     this->setFixedWidth(335);
 }
