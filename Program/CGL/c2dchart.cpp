@@ -190,6 +190,7 @@ void C2dChart::update() {
         s->setGeometry(chart->geometry());
         s->update();
     }
+    chart->repaint();
 }
 
 
@@ -205,7 +206,6 @@ void C2dChart::mouseMoveEvent(QMouseEvent* event) {
         haulage->setPixelPosition(haulage->getPixelPosition() + delta);
         haulage->update();
         chart->update();
-        qDebug() << haulage << haulage->getPosition();
         emitSliderMoves(haulage);
         return;
     }

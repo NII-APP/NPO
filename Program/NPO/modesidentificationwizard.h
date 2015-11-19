@@ -2,7 +2,9 @@
 #define MODESIDENTIFICATIONWIZARD_H
 
 #include <QDialog>
+#include <QMap>
 #include "tablistwidget.h"
+#include "modesidentresult.h"
 
 class FEM;
 class QString;
@@ -13,7 +15,8 @@ class QSplitter;
 class AFRArray;
 class QTableWidget;
 class CSlider;
-class QTextEdit;
+class QTextBrowser;
+class ModesIdentChart;
 
 class ModesIdentificationWizard : public QDialog
 {
@@ -39,12 +42,14 @@ private:
 };
 
 class ModesIdentificationWizard::MethodSelector : public TabListWidget {
+    Q_OBJECT
 public:
     explicit ModesIdentificationWizard::MethodSelector(QWidget* parent);
     ~MethodSelector();
+public slots:
+    void updateResultsCurrent(ModesIdentResult);
 private:
-    QVector<QTextEdit*> currentResults;
-
+    QMap<int, QTextBrowser*> __resultDisplays;
 };
 
 class ModesIdentificationWizard::ManualController : public QWidget {
@@ -54,15 +59,14 @@ public:
     ~ManualController();
 public slots:
     void setAFR(QString);
-    void setModeFrequency(CSlider*);
+    void setModeFrequency(double);
 private slots:
     void changeSplitterOrientation();
 private:
     QSplitter* const __splitter;
     FEMViewer* const __viewer;
-    C2dChart* const __chart;
+    ModesIdentChart* const __chart;
     AFRArray* __afr;
-    CSlider* const __slider;
 };
 
 #endif // MODESIDENTIFICATIONWIZARD_H

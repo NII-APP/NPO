@@ -102,7 +102,7 @@ void FEMViewer::stopTrigger(bool v)
 
 QSize FEMViewer::sizeHint() const
 {
-    return QSize(200,200);
+    return QSize(500,500);
 }
 
 bool FEMViewer::eventFilter(QObject * o, QEvent * e)

@@ -18,6 +18,10 @@
         <file>images/open.png</file>
         <file>images/orientation.png</file>
         <file>images/warning.svg</file>
+        <file>images/amp.png</file>
+        <file>images/average.png</file>
+        <file>images/re.png</file>
+        <file>images/im.png</file>
     </qresource>
     <qresource prefix="/css" lang="css">
         <file>css.css</file>

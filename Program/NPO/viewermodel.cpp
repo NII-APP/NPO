@@ -174,7 +174,7 @@ int	ViewerModel::rowCount(const QModelIndex & i) const {
     }
 }
 
-QVariant ViewerModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant ViewerModel::headerData(int, Qt::Orientation, int role) const {
     if (role == Qt::DisplayRole) {
         return Application::identity()->tr("models list", "viewer model");
     }

@@ -193,7 +193,15 @@
             "yLabel rus" : "Амплитуда",
             "yLabel eng" : "Amplitude",
             "title eng" : "Amplitude-frequency response",
-            "title rus" : "Амплитудно-частотная характеристика"
+            "title rus" : "Амплитудно-частотная характеристика",
+            "average rus" : "Среднее значение",
+            "average eng" : "Average",
+            "re rus" : "Действительная часть",
+            "re eng" : "Real part",
+            "im rus" : "Мнимая часть",
+            "im eng" : "Imaginary part",
+            "amplitude rus" : "Модуль",
+            "amplitude eng" : "Amplitude"
         },
         "nethods selector" : {
             "title eng" : "<h2>Eigen modes identification methods</h2>",

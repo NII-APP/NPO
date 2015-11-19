@@ -53,7 +53,7 @@ public:
     QIcon tabPairIcon() const;
 
     QString tr(QString key, const QString& context = QString()) const;
-    QString tr(QJsonObject node, QString key, const QString& context = QString()) const;
+    QString tr(QJsonObject node, QString key) const;
     QJsonValue resolveKey(const QString& from) const;
     QString openFileDialog(const QString& from, QWidget *parent = 0) const;
 

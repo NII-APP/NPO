@@ -106,7 +106,7 @@ CChartDataList AFR::toChartData(unsigned interalParts) const {
         im.push_back(yIm);
         result << im;
     }
-    if (interalParts & Magnitude) {        
+    if (interalParts & Amplitude) {
         CDimensionArray* xAbs(new CDimensionArray(static_cast<int>(this->size())));
         CDimensionArray* yAbs(new CDimensionArray(static_cast<int>(this->size())));
         double* xAbsIt(xAbs->data());

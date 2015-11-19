@@ -54,7 +54,7 @@ QString Identity::tr(QString key, const QString& context) const {
     return resolveKey((context.isEmpty() ? "" : context + '/') + key + ' ' + language()).toString();
 }
 
-QString Identity::tr(QJsonObject node, QString key, const QString& context) const {
+QString Identity::tr(QJsonObject node, QString key) const {
     return node[key + ' ' + language()].toString();
 }
 
@@ -328,8 +328,9 @@ QJsonValue Identity::resolveKey(const QString& from) const {
     }
 }
 
-QIcon Identity::icon(const QString &from) const {
-    const QString ico(resolveKey(from).toString());
+QIcon Identity::icon(const QString &from) const
+{
+    const QString ico(QFile::exists(from) ? from : resolveKey(from).toString());
     if (ico.split('.').last() != "svg") {
         return QIcon(ico);
     } else {
@@ -337,7 +338,8 @@ QIcon Identity::icon(const QString &from) const {
     }
 }
 
-QIcon Identity::fromSvg(const QString& fname) {
+QIcon Identity::fromSvg(const QString& fname)
+{
     QSvgRenderer svgRenderer(fname);
     QPixmap pix(svgRenderer.defaultSize());
     pix.fill(Qt::transparent);

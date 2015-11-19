@@ -58,6 +58,8 @@ public:
     QString getXLabel() const;
     QString getYLabel() const;
 
+    C2dChartPlace* place() { return chart; }
+
     void addSlider(CSlider*);
 
     void setGridStep(qreal val) { chart->setGridStep(val); }

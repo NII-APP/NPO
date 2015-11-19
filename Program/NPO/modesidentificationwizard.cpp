@@ -28,6 +28,7 @@
 #include "engine/afr.h"
 #include "filenameedit.h"
 #include "tablistwidget.h"
+#include "modesidentchart.h"
 
 
 ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* parent)
@@ -90,14 +91,15 @@ ModesIdentificationWizard::MethodSelector::MethodSelector(QWidget* parent)
             this->disable(this->addTab(tab, Application::identity()->tr(itm, "title")));
         } else {
             QVBoxLayout* l(new QVBoxLayout);
+            QTextBrowser* resultDisplay(nullptr);
             tab->setLayout(l);
             l->setMargin(0);
             if (itm.contains("params") && itm["params"].isArray()) {
                 ///@todo add params import
+                resultDisplay = new QTextBrowser(tab);
+                resultDisplay->setReadOnly(false);
+                l->addWidget(resultDisplay);
             }
-            currentResults.push_back(new QTextEdit(tab));
-            currentResults.last()->setReadOnly(false);
-            l->addWidget(currentResults.last());
             if (QFile::exists(Application::identity()->tr(itm, "discription file"))) {
                 QFile f(Application::identity()->tr(itm, "discription file"));
                 if (!f.open(QFile::ReadOnly)) {
@@ -107,7 +109,7 @@ ModesIdentificationWizard::MethodSelector::MethodSelector(QWidget* parent)
                 doc->setHtml(QString(f.readAll()));
                 l->addWidget(doc);
             }
-            this->addTab(tab, Application::identity()->tr(itm, "title"));
+            __resultDisplays.insert(this->addTab(tab, Application::identity()->tr(itm, "title")), resultDisplay);
         }
     }
 
@@ -118,13 +120,17 @@ ModesIdentificationWizard::MethodSelector::~MethodSelector()
 {
 }
 
+void ModesIdentificationWizard::MethodSelector::updateResultsCurrent(ModesIdentResult r)
+{
+    __resultDisplays[this->currentId()]->setHtml(r.toHtml());
+}
+
 ModesIdentificationWizard::ManualController::ManualController(const FEM* const model, QWidget* parent)
     : QWidget(parent)
     , __splitter(new QSplitter(this))
     , __viewer(new FEMViewer(__splitter))
-    , __chart(new C2dChart(__splitter))
+    , __chart(new ModesIdentChart(__splitter))
     , __afr(nullptr)
-    , __slider(new CSlider)
 {
     QLayout* top(new QHBoxLayout);
     FileNameEdit* const input(new FileNameEdit(this));
@@ -142,15 +148,12 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
     __splitter->setOrientation(Qt::Vertical);
     __splitter->addWidget(__viewer);
     __viewer->setModel(model);
-    __chart->setGridStep(70);
     __splitter->addWidget(__chart);
     __splitter->setHandleWidth(3);
     __splitter->handle(0)->setAutoFillBackground(false);
     __splitter->setSizes(QList<int>() << 350 << 650);
 
-    __chart->addSlider(__slider);
-    connect(__chart, SIGNAL(sliderMoves(CSlider*)), SLOT(setModeFrequency(CSlider*)));
-    __slider->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
+    connect(__chart, SIGNAL(newCurrentFrequency(double)), this, SLOT(setModeFrequency(double)));
 
     this->setLayout(new QVBoxLayout);
     this->layout()->addItem(top);
@@ -159,17 +162,13 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
 
 ModesIdentificationWizard::ManualController::~ManualController()
 {
-    delete __slider;
     ///@todo fix this tarible kluge... destructor crash the program. but it's called when i complidely close the app anyway. Only for one instance of ManualController
     __viewer->setParent(0);
 }
 
-void ModesIdentificationWizard::ManualController::setModeFrequency(CSlider* s)
+void ModesIdentificationWizard::ManualController::setModeFrequency(double v)
 {
-    if (s == __slider) {
-        const EigenMode& mode(__afr->getMode(s->getPosition()));
-        __viewer->setProxyMode(mode);
-    }
+    __viewer->setProxyMode(__afr->getMode(v));
 }
 
 void ModesIdentificationWizard::ManualController::setAFR(QString filename)
@@ -180,19 +179,8 @@ void ModesIdentificationWizard::ManualController::setAFR(QString filename)
     delete __afr;
     __afr = new AFRArray;
     __afr->read(filename);
-    CChartDataList data(__afr->toChartData());
 
-    if (__afr->size() > 1 && !__afr->at(1).empty()) {
-        const AFR& afr(__afr->at(1));
-        __slider->setPurview(CRealRange(afr.front().frequency, afr.back().frequency));
-    }
-
-    data.setChartTitle(Application::identity()->tr("title", "modes identification wizard/chart"));
-    data.setDimensionTitle(Application::identity()->tr("xLabel", "modes identification wizard/chart"), 0);
-    data.setDimensionTitle(Application::identity()->tr("yLabel", "modes identification wizard/chart"), 1);
-    __chart->setData(data);
-    __chart->update();
-    setModeFrequency(__slider);
+    __chart->setData(*__afr);
 
 }
 

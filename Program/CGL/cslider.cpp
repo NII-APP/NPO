@@ -124,7 +124,8 @@ QGraphicsLineItem* CSlider::getLine() { return __line; }
 const int CSliders::SLIDER_DRAG_RADIUS = 3;
 
 void CSliders::setCurrent(CSlider* const s) const {
-    Q_ASSERT(this->contains(s) || s == nullptr); current - s;
+    Q_ASSERT(this->contains(s) || s == nullptr);
+    current = s;
 }
 
 CSlider* CSliders::findNear(const qreal& x) const {

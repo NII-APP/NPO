@@ -83,6 +83,24 @@ TabListWidget::Items::iterator TabListWidget::current()
     return it;
 }
 
+int TabListWidget::toId(Items::iterator it)
+{
+    if (items.end() == it) {
+        return -1;
+    }
+    for (int i(0); i < layout()->count(); ++i) {
+        if (layout()->itemAt(i)->widget() == it.key()) {
+            return i >> 1;
+        }
+    }
+    return -1;
+}
+
+int TabListWidget::currentId()
+{
+    return toId(current());
+}
+
 int	TabListWidget::addTab(QWidget* page, const QString& label)
 {
     return addTab(items.insert(new QPushButton(label, this), page));

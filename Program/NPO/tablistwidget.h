@@ -18,6 +18,7 @@ class TabListWidget : public QWidget
     QVBoxLayout* layout();
     int addTab(Items::iterator item);
     Items::iterator current();
+    int toId(Items::iterator);
 
 public:
     TabListWidget(QWidget *parent = 0);
@@ -26,6 +27,7 @@ public:
     int	addTab(QWidget* page, const QString& label);
     int	addTab(QWidget* page, const QIcon& icon, const QString& label);
     void disable(int id, bool disabled = true);
+    int currentId();
 
 private slots:
     void togleTab();

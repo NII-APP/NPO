@@ -40,17 +40,15 @@ void main(void) { gl_Position = gl_ModelViewProjectionMatrix * vec4(in_Position,
 ");
 
     vShader = new QOpenGLShaderProgram(this);
+#ifndef QT_NO_DEBUG
     if (!vShader->addShaderFromSourceCode(QOpenGLShader::Vertex, shaider))
     {
-#ifndef QT_NO_DEBUG
         qDebug() << vShader->log();
-#endif
     }
     if (!vShader->bind()) {
-#ifndef QT_NO_DEBUG
         qDebug() << vShader->log();
-#endif
     }
+#endif
     Q_ASSERT(vShader->isLinked());
     vArray = new QOpenGLVertexArrayObject(this);
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -174,23 +172,29 @@ void C2dChartPlace::setData(const CChartDataList &val)
     int v(0);
     bariers.clear();
     bariers.push_back(0);
-    viewPort = QRectF(QPointF(val[0][0]->operator[](0), val[0][1]->operator[](0)), QSizeF(0.0, 0.0));
-    for (const CChartData& item : val) {
-        const CDimension& d1(*item[0]);
-        const CDimension& d2(*item[1]);
+    if (val.empty()) {
+        viewPort = QRectF(QPointF(-1.0f, -1.0f), QSizeF(2.0f,2.0f));
+    } else {
+        viewPort = QRectF(QPointF(val[0][0]->operator[](0), val[0][1]->operator[](0)), QSizeF(0.0f, 0.0f));
+        for (const CChartData& item : val) {
+            const CDimension& d1(*item[0]);
+            const CDimension& d2(*item[1]);
 
-        for (int i(0); i != d1.size(); ++i, ++v) {
-            vertexes(v) = QVector3D(d1[i], d2[i], 0.0);
+            for (int i(0); i != d1.size(); ++i, ++v) {
+                vertexes(v) = QVector3D(d1[i], d2[i], 0.0);
+            }
+            bariers.push_back(v);
+            const RealRange r1(d1.getRange());
+            const RealRange r2(d2.getRange());
+            viewPort |= QRectF(r1.getMin() - r1.range() * 0.1, r2.getMin() - r2.range() * 0.1, r1.range() * 1.2, r2.range() * 1.2);
         }
-        bariers.push_back(v);
-        const RealRange r1(d1.getRange());
-        const RealRange r2(d2.getRange());
-        viewPort |= QRectF(r1.getMin() - r1.range() * 0.1, r2.getMin() - r2.range() * 0.1, r1.range() * 1.2, r2.range() * 1.2);
     }
     qreal cnt(viewPort.bottom());
     viewPort.setBottom(viewPort.top());
     viewPort.setTop(cnt);
-    vArray->create();
+    if (!vArray->isCreated()) {
+        vArray->create();
+    }
     vArray->bind();
     if (!vertex.isCreated()) {
         vertex.create();

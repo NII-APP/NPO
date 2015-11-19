@@ -29,7 +29,7 @@ public:
     enum IntegralParts {
         Real = 0x1,
         Imaginary = 0x2,
-        Magnitude = 0x4
+        Amplitude = 0x4
     };
 
     CChartDataList toChartData(unsigned interalParts = 0x7) const;
