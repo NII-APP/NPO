@@ -29,6 +29,30 @@ TabListWidget::~TabListWidget()
 {
 }
 
+void TabListWidget::setCurrentIndex(int i)
+{
+    QPushButton* imposter(dynamic_cast<QPushButton*>(layout()->itemAt(i << 1)->widget()));
+    if (current().key() == imposter) {
+        layout()->addItem(stretch);
+        current().value()->setVisible(false);
+    } else {
+        if (current() != items.end()) {
+            current().value()->hide();
+        } else {
+            layout()->removeItem(stretch);
+        }
+        items[imposter]->show();
+
+        emit currentChanged(i);
+    }
+}
+
+void TabListWidget::togleTab()
+{
+    Q_ASSERT(dynamic_cast<QPushButton*>(QObject::sender()));
+    setCurrentIndex(toId(dynamic_cast<QWidget*>(QObject::sender())));
+}
+
 int TabListWidget::addTab(Items::iterator item)
 {
     if (current() == item) {
@@ -48,27 +72,6 @@ int TabListWidget::addTab(Items::iterator item)
     return (layout()->count() >> 1) - 1;
 }
 
-void TabListWidget::togleTab()
-{
-    Q_ASSERT(dynamic_cast<QPushButton*>(QObject::sender()));
-    if (current().key() == QObject::sender()) {
-        if (current().value()->isHidden()) {
-            layout()->removeItem(stretch);
-            current().value()->setVisible(true);
-        } else {
-            layout()->addItem(stretch);
-            current().value()->setVisible(false);
-        }
-    } else {
-        if (current() != items.end()) {
-            current().value()->hide();
-        } else {
-            layout()->removeItem(stretch);
-        }
-        items[static_cast<QPushButton*>(QObject::sender())]->show();
-    }
-}
-
 void TabListWidget::disable(int id, bool disabled) {
     Q_ASSERT(dynamic_cast<QPushButton*>(layout()->itemAt(id * 2)->widget()));
     static_cast<QPushButton*>(layout()->itemAt(id * 2)->widget())->setDisabled(disabled);
@@ -83,20 +86,29 @@ TabListWidget::Items::iterator TabListWidget::current()
     return it;
 }
 
-int TabListWidget::toId(Items::iterator it)
+int TabListWidget::toId(const Items::iterator it)
 {
     if (items.end() == it) {
         return -1;
     }
+    int id(toId(it.key()));
+    if (id < 0) {
+        id = toId(it.value());
+    }
+    return id;
+}
+
+int TabListWidget::toId(const QWidget* const w)
+{
     for (int i(0); i < layout()->count(); ++i) {
-        if (layout()->itemAt(i)->widget() == it.key()) {
+        if (layout()->itemAt(i)->widget() == w) {
             return i >> 1;
         }
     }
     return -1;
 }
 
-int TabListWidget::currentId()
+int TabListWidget::currentIndex()
 {
     return toId(current());
 }

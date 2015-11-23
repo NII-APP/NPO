@@ -31,7 +31,8 @@ CSlider::~CSlider() {
 
 }
 
-void CSlider::update() {
+void CSlider::update()
+{
     if (__geometry.height() <= 0) {
         return;
     }
@@ -43,23 +44,28 @@ void CSlider::update() {
     __labelBar->setPos(pPos - (__labelBar->widget()->width() >> 1), __geometry.top() - __labelBar->widget()->height());
 }
 
-int CSlider::topLabelHeight() const {
+int CSlider::topLabelHeight() const
+{
     return __labelBar->widget()->height();
 }
 
-int CSlider::bottomLabelheight() const {
+int CSlider::bottomLabelheight() const
+{
     return 0;
 }
 
-void CSlider::setGeometry(const QRectF& r) {
+void CSlider::setGeometry(const QRectF& r)
+{
     __geometry = r;
 }
 
-const QRectF& CSlider::getGeometry() const {
+const QRectF& CSlider::getGeometry() const
+{
     return __geometry;
 }
 
-void CSlider::setPosition(const double& p) {
+void CSlider::setPosition(const double& p)
+{
     if (__purview.getMin() < __purview.getMax()) {
         __position = std::min(std::max(p, __purview.getMin()), __purview.getMax());
     } else {
@@ -70,48 +76,64 @@ void CSlider::setPosition(const double& p) {
         __labelBar->resize(__labelBar->widget()->sizeHint());
         __labelBar->resize(__labelBar->widget()->size());
     }
+    update();
 }
 
-void CSlider::setPurview(const RealRange& p) {
+void CSlider::setProxyLabel(QWidget* w)
+{
+    __labelBar->setWidget(w);
+}
+
+void CSlider::setPurview(const RealRange& p)
+{
     __purview = p;
     //to retest the position
     setPosition(__position);
 }
 
-qreal CSlider::getPosition() const {
+qreal CSlider::getPosition() const
+{
     return __position;
 }
 
-qreal CSlider::getPixelPosition() const {
+qreal CSlider::getPixelPosition() const
+{
     return __range[__position] * __geometry.width() + __geometry.x();
 }
 
-void CSlider::setPixelPosition(const qreal& v) {
+void CSlider::setPixelPosition(const qreal& v)
+{
     setPosition(__range((v - __geometry.x()) / __geometry.width()));
 }
 
-const RealRange& CSlider::getPurview() const {
+const RealRange& CSlider::getPurview() const
+{
     return __purview;
 }
 
-void CSlider::setRange(const RealRange& d) {
+void CSlider::setRange(const RealRange& d)
+{
     __range = d;
 }
 
-const RealRange& CSlider::getRange() const {
+const RealRange& CSlider::getRange() const
+{
     return __range;
 }
 
-void CSlider::setDragable(bool v) {
+void CSlider::setDragable(bool v)
+{
     __dragable = v;
 }
 
-bool CSlider::isDragable() const {
+bool CSlider::isDragable() const
+{
     return __dragable;
 }
 
 
-void CSlider::setLabelTemplate(const QString& s) {
+void CSlider::setLabelTemplate(const QString& s)
+{
     __labelTemplate = s;
     if (dynamic_cast<QLabel*>(__labelBar->widget())) {
         static_cast<QLabel*>(__labelBar->widget())->setText(__labelTemplate.arg(__position));
@@ -123,12 +145,14 @@ QGraphicsLineItem* CSlider::getLine() { return __line; }
 
 const int CSliders::SLIDER_DRAG_RADIUS = 3;
 
-void CSliders::setCurrent(CSlider* const s) const {
+void CSliders::setCurrent(CSlider* const s) const
+{
     Q_ASSERT(this->contains(s) || s == nullptr);
     current = s;
 }
 
-CSlider* CSliders::findNear(const qreal& x) const {
+CSlider* CSliders::findNear(const qreal& x) const
+{
     for (CSlider* s : *this) {
         if (s->isDragable() && abs(s->getPixelPosition() - x) < SLIDER_DRAG_RADIUS) {
             return s;

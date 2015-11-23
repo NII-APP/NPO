@@ -60,7 +60,6 @@ SOURCES += main.cpp \
     filenameedit.cpp \
     pixmapwidget.cpp \
     tablistwidget.cpp \
-    modesidentresult.cpp \
     modesidentchart.cpp
 
 HEADERS += \
@@ -92,7 +91,6 @@ HEADERS += \
     filenameedit.h \
     pixmapwidget.h \
     tablistwidget.h \
-    modesidentresult.h \
     modesidentchart.h
 
 exists( engine/pyParse/BDFEntity.cpp ) {

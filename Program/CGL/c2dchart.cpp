@@ -35,7 +35,7 @@ C2dChart::C2dChart(QWidget* parent)
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    this->connect(chart, SIGNAL(sliderMoved(CSlider*)), SLOT(emitSliderMoves(CSlider*)));
+    this->connect(chart, SIGNAL(sliderMoved(CSlider*)), SLOT(emitSliderMoved(CSlider*)));
 }
 
 C2dChart::~C2dChart()
@@ -206,7 +206,7 @@ void C2dChart::mouseMoveEvent(QMouseEvent* event) {
         haulage->setPixelPosition(haulage->getPixelPosition() + delta);
         haulage->update();
         chart->update();
-        emitSliderMoves(haulage);
+        emitSliderMoved(haulage);
         return;
     }
 
@@ -249,11 +249,14 @@ void C2dChart::showArray(const CArray& m)
     loop->exec();
 }
 
-void C2dChart::emitSliderMoves(CSlider* s) {
-    emit sliderMoves(s);
+void C2dChart::emitSliderMoved(CSlider* s) {
+    emit sliderMoved(s);
 }
 
 void C2dChart::addSlider(CSlider* s) {
+    if (sliders.contains(s)) {
+        return;
+    }
     s->setGeometry(chart->geometry());
     s->setRange(xAxis->getRange());
     this->scene()->addItem(s);
@@ -261,4 +264,13 @@ void C2dChart::addSlider(CSlider* s) {
     if (sliders.getCurrent() == nullptr) {
         sliders.setCurrent(s);
     }
+}
+
+void C2dChart::removeSlider(CSlider* s) {
+    if (!sliders.contains(s)) {
+        return;
+    }
+    this->scene()->removeItem(s);
+    sliders.removeOne(s);
+    chart->repaint();
 }

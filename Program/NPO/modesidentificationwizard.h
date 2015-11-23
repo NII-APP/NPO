@@ -4,7 +4,6 @@
 #include <QDialog>
 #include <QMap>
 #include "tablistwidget.h"
-#include "modesidentresult.h"
 
 class FEM;
 class QString;
@@ -17,6 +16,7 @@ class QTableWidget;
 class CSlider;
 class QTextBrowser;
 class ModesIdentChart;
+class EigenModes;
 
 class ModesIdentificationWizard : public QDialog
 {
@@ -35,6 +35,13 @@ public:
 
     static void identifyModes(const FEM* who, QWidget* parent = 0);
 
+    enum IdentificationMode {
+        View,
+        Pick,
+
+        WrongMode
+    };
+
 private:
     MethodSelector* const __method;
     ManualController* const __controller;
@@ -46,8 +53,12 @@ class ModesIdentificationWizard::MethodSelector : public TabListWidget {
 public:
     explicit ModesIdentificationWizard::MethodSelector(QWidget* parent);
     ~MethodSelector();
+signals:
+    void identificationModeChanged(ModesIdentificationWizard::IdentificationMode);
 public slots:
-    void updateResultsCurrent(ModesIdentResult);
+    void updateCurrentResults(EigenModes*);
+    void setCurrentMode(ModesIdentificationWizard::IdentificationMode);
+    void changeCurrentIdentMode(int);
 private:
     QMap<int, QTextBrowser*> __resultDisplays;
 };
@@ -57,11 +68,16 @@ class ModesIdentificationWizard::ManualController : public QWidget {
 public:
     explicit ModesIdentificationWizard::ManualController(const FEM * const model, QWidget* parent);
     ~ManualController();
+    EigenModes* currentResult();
 public slots:
     void setAFR(QString);
     void setModeFrequency(double);
+    void setIdentificationMode(ModesIdentificationWizard::IdentificationMode);
+signals:
+    void currentResultChanged(EigenModes*);
 private slots:
     void changeSplitterOrientation();
+    void postResultChanges(EigenModes*);
 private:
     QSplitter* const __splitter;
     FEMViewer* const __viewer;

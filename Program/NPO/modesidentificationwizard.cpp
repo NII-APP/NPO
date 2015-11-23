@@ -29,6 +29,7 @@
 #include "filenameedit.h"
 #include "tablistwidget.h"
 #include "modesidentchart.h"
+#include "project.h"
 
 
 ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* parent)
@@ -40,10 +41,15 @@ ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* pa
     QHBoxLayout* const center(new QHBoxLayout);
     center->addWidget(__method);
     center->addWidget(__controller);
+    connect(__method, SIGNAL(identificationModeChanged(ModesIdentificationWizard::IdentificationMode)),
+            __controller, SLOT(setIdentificationMode(ModesIdentificationWizard::IdentificationMode)));
+    connect(__controller, SIGNAL(currentResultChanged(EigenModes*)),
+            __method, SLOT(updateCurrentResults(EigenModes*)));
+    __method->setCurrentMode(View);
 
     QHBoxLayout* const buttons(new QHBoxLayout);
     buttons->addStretch(200);
-    QPushButton* const exportButton(new QPushButton(Application::identity()->tr("modes identification wizard/nethods selector/export button"), this));
+    QPushButton* const exportButton(new QPushButton(Application::identity()->tr("modes identification wizard/methods selector/export button"), this));
     exportButton->setDisabled(true);
     buttons->addWidget(exportButton);
     buttons->addSpacing(30);
@@ -112,6 +118,7 @@ ModesIdentificationWizard::MethodSelector::MethodSelector(QWidget* parent)
             __resultDisplays.insert(this->addTab(tab, Application::identity()->tr(itm, "title")), resultDisplay);
         }
     }
+    connect(this, SIGNAL(currentChanged(int)), this, SLOT(changeCurrentIdentMode(int)));
 
     this->setFixedWidth(335);
 }
@@ -120,9 +127,41 @@ ModesIdentificationWizard::MethodSelector::~MethodSelector()
 {
 }
 
-void ModesIdentificationWizard::MethodSelector::updateResultsCurrent(ModesIdentResult r)
+void ModesIdentificationWizard::MethodSelector::setCurrentMode(ModesIdentificationWizard::IdentificationMode t)
 {
-    __resultDisplays[this->currentId()]->setHtml(r.toHtml());
+    switch (t) {
+    case View:
+        this->setCurrentIndex(0);
+        return;
+    case Pick:
+        this->setCurrentIndex(1);
+        return;
+    }
+}
+
+
+void ModesIdentificationWizard::MethodSelector::changeCurrentIdentMode(int i)
+{
+    switch (i) {
+    case 0:
+        emit identificationModeChanged(View);
+        return;
+    case 1:
+        emit identificationModeChanged(Pick);
+        return;
+    }
+}
+
+void ModesIdentificationWizard::MethodSelector::updateCurrentResults(EigenModes* r)
+{
+    QString result;
+    static const QString stencil(Application::identity()->tr("modes identification wizard/methods selector/result template"));
+    for (int i(0); i != r->size(); ++i) {
+        result += stencil.arg(QString::number(i + 1),
+                              QString::number(r->at(i).frequency()),
+                              QString::number(r->at(i).averageDamping())) + "<br/>";
+    }
+    __resultDisplays[this->currentIndex()]->setHtml(result);
 }
 
 ModesIdentificationWizard::ManualController::ManualController(const FEM* const model, QWidget* parent)
@@ -154,10 +193,16 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
     __splitter->setSizes(QList<int>() << 350 << 650);
 
     connect(__chart, SIGNAL(newCurrentFrequency(double)), this, SLOT(setModeFrequency(double)));
+    connect(__chart, SIGNAL(currentResultChanged(EigenModes*)), this, SLOT(postResultChanges(EigenModes*)));
 
     this->setLayout(new QVBoxLayout);
     this->layout()->addItem(top);
     this->layout()->addWidget(__splitter);
+}
+
+void ModesIdentificationWizard::ManualController::postResultChanges(EigenModes* m)
+{
+    emit currentResultChanged(m);
 }
 
 ModesIdentificationWizard::ManualController::~ManualController()
@@ -189,6 +234,11 @@ void ModesIdentificationWizard::ManualController::changeSplitterOrientation()
     __splitter->setOrientation(__splitter->orientation() == Qt::Vertical ? Qt::Horizontal : Qt::Vertical);
 }
 
+void ModesIdentificationWizard::ManualController::setIdentificationMode(ModesIdentificationWizard::IdentificationMode mode)
+{
+    __chart->setIdentMode(mode);
+}
+
 void ModesIdentificationWizard::stylize()
 {
     if (QtWin::isCompositionEnabled()) {
@@ -210,5 +260,14 @@ void ModesIdentificationWizard::identifyModes(const FEM* who, QWidget* parent)
 
     loop->exec();
 
-    w->deleteLater();
+    if ((w->result() & Accepted) && w->__controller->currentResult()) {
+        Application::nonConstProject()->constCast(who)->getModes() = *w->__controller->currentResult();
+    }
+
+    ///@todo finish this crutch alliance...
+    //w->deleteLater();
+}
+
+EigenModes* ModesIdentificationWizard::ManualController::currentResult() {
+    return __chart->currentResult();
 }

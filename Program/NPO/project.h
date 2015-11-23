@@ -35,6 +35,7 @@ public:
     void pushModel(FEM* const);
 
     int toId(const FEM* const val) const { return std::find(geometries.begin(), geometries.end(), val) - geometries.begin(); }
+    FEM* constCast(const FEM* v) { Q_ASSERT(geometries[toId(v)] == v); return geometries[toId(v)]; }
 
     static bool isOwnProject(const QString& filename);
     void save(const QString& filename);

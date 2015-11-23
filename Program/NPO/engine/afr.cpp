@@ -20,56 +20,77 @@ AFR::~AFR()
 
 }
 
-double AFR::damping(const CRealRange& range) {
+FrequencyMagnitude AFR::findEigenFreq(const CRealRange& range) const
+{
     AFR::const_iterator startIterator(begin()) ;
-    while (startIterator->frequency < range.getMin() && startIterator < end()) {
+    while (startIterator < end() && startIterator->frequency < range.getMin()) {
         startIterator++;
     }
     AFR::const_iterator finishIterator(startIterator);
-    while (finishIterator->frequency < range.getMax() && finishIterator < end()) {
+    while (finishIterator < end() && finishIterator->frequency < range.getMax()) {
         finishIterator++;
     }
-    --finishIterator;
-    static const double SQRT2 = sqrt(2.0);
-    const int maxIndex(maxNode(startIterator,finishIterator));
-    const FrequencyMagnitude& maxValue = at(maxIndex);
-    double maxAmplitude = abs(maxValue.amplitude);
-    double freq_1 = 0,freq_2 = 0, freq_max = maxValue.frequency;
-    int iteratotFreq_1 = 0, iteratotFreq_2 = 0;
-    for ( int i(maxIndex); i > 0; i--){
-        if ( abs(at(i).amplitude) < maxAmplitude/SQRT2 ){
-           freq_1 = at(i).frequency;
-           iteratotFreq_1 = i;
-           break;
-        }
+    if (startIterator > finishIterator) {
+        --finishIterator;
     }
-    //The frequency is interpolated between the two points. The expression is derived from the similarity of triangles
-    double DELTA_FREQ = at(iteratotFreq_1 + 1).frequency - at(iteratotFreq_1).frequency;
-    double DELTA_AMPLITUDE_SMALL = maxAmplitude/SQRT2 - abs(at(iteratotFreq_1).amplitude);
-    double DELTA_AMPLITUDE = abs(at(iteratotFreq_1 + 1).amplitude) - abs(at(iteratotFreq_1).amplitude);
-    freq_1 += DELTA_AMPLITUDE_SMALL / DELTA_AMPLITUDE * DELTA_FREQ;
-    for ( int i(maxIndex); i < (end() - begin()); i++){
-        if( abs(at(i).amplitude) < maxAmplitude/SQRT2 ){
-            freq_2 = at(i).frequency;
-            iteratotFreq_2 = i;
-            break;
-        }
-    }
-    DELTA_FREQ = at(iteratotFreq_2).frequency - at(iteratotFreq_2 - 1).frequency;
-    DELTA_AMPLITUDE_SMALL = maxAmplitude/SQRT2 - abs(at(iteratotFreq_2).amplitude);
-    DELTA_AMPLITUDE = abs(at(iteratotFreq_2 - 1).amplitude) - abs(at(iteratotFreq_2).amplitude);
-    freq_2 -= DELTA_AMPLITUDE_SMALL / DELTA_AMPLITUDE * DELTA_FREQ;
-    Q_ASSERT( freq_2 - freq_1 > 0 );
-
-    return (freq_2 - freq_1)/freq_max;
+    return maxItem(startIterator,finishIterator);
 }
 
-int AFR::maxNode(const AFR::const_iterator start, const AFR::const_iterator finish) {
-    Q_ASSERT(start >= begin() && start < finish && finish <= end());
-    return std::max_element(start,finish,
+double AFR::damping(const FrequencyMagnitude& maxValue) const
+{
+#ifndef SQRT2
+    const double rimAmplitude(abs(maxValue.amplitude) / sqrt(2.0));
+#else
+    const double rimAmplitude(abs(maxValue.amplitude) / SQRT2);
+#endif
+    if (this->empty()) {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+    const double& maxFreq = maxValue.frequency;
+    RealRange freq;
+    typedef CRange<const_iterator> DampingRange;
+    const_iterator maxNode(begin());
+    while (maxNode->frequency < maxValue.frequency && maxNode < end()) {
+        ++maxNode;
+    }
+    DampingRange range(maxNode);
+    while (range.getMin() > begin() && abs(range.getMin()->amplitude) >= rimAmplitude) {
+        --range.first;
+    }
+    while (range.getMax() < end() && abs(range.getMax()->amplitude) >= rimAmplitude) {
+        ++range.second;
+    }
+    if (range.getMax() == end()) {
+        --range.second;
+    }
+    if (range.getMin() >= range.getMax() ||
+            range.getMax() <= begin() || range.getMax() >= end() ||
+            range.getMin() < begin() || (range.getMin() + 1) >= end()) {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+    //The frequency is interpolated between the two points. The expression is derived from the similarity of triangles
+    //nahu'ya?
+    double deltaFreq = (range.getMin() + 1)->frequency - range.getMin()->frequency;
+    double deltaAmplitudeSmall = rimAmplitude - abs(range.getMin()->amplitude);
+    double deltaAmplitude = abs((range.getMin() + 1)->amplitude) - abs(range.getMin()->amplitude);
+    freq.setMin(range.getMin()->frequency + deltaAmplitudeSmall / deltaAmplitude * deltaFreq);
+    deltaFreq = range.getMax()->frequency - (range.getMax() - 1)->frequency;
+    deltaAmplitudeSmall = rimAmplitude - abs(range.getMax()->amplitude);
+    deltaAmplitude = abs((range.getMax() - 1)->amplitude) - abs(range.getMax()->amplitude);
+    freq.setMax(range.getMax()->frequency - deltaAmplitudeSmall / deltaAmplitude * deltaFreq);
+    Q_ASSERT(freq.range() > 0);
+
+    return freq.range() / maxFreq;
+}
+
+FrequencyMagnitude AFR::maxItem(const AFR::const_iterator start, const AFR::const_iterator finish) const {
+    Q_ASSERT(start >= begin() && start <= finish && finish <= end());
+    if (start == finish) {
+        return *start;
+    }
+    return *std::max_element(start, finish,
                             [](const FrequencyMagnitude& a, const FrequencyMagnitude& b)->bool
-                                                          { return abs(a.amplitude) < abs(b.amplitude); })
-            - begin();
+                                                          { return abs(a.amplitude) < abs(b.amplitude); });
 }
 
 CChartDataList AFR::toChartData(unsigned interalParts) const {

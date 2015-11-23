@@ -12,6 +12,8 @@ EigenMode::EigenMode(const EigenMode& v)
     , strainVal(v.strainVal)
     , bandVal(v.bandVal)
     , extremums(v.extremums)
+    , __damping(v.__damping)
+    , __averageDamping(v.__averageDamping)
     , pMac(v.pMac) { }
 
 EigenMode::EigenMode(float f, const CVertexes& v)
@@ -34,6 +36,8 @@ QDataStream& operator<<(QDataStream& out, const EigenMode& f) {
     out << f.formVal;
     out << f.strainVal;
     out << f.bandVal;
+    out << f.__damping;
+    out << f.__averageDamping;
     out << f.extremums;
     out << f.pMac;
     return out;
@@ -43,6 +47,8 @@ QDataStream& operator>>(QDataStream& in, EigenMode& f) {
     in >> f.formVal;
     in >> f.strainVal;
     in >> f.bandVal;
+    in >> f.__damping;
+    in >> f.__averageDamping;
     in >> f.extremums;
     in >> f.pMac;
     return in;
@@ -74,6 +80,7 @@ void EigenMode::resize(CArray::size_type s) {
     formVal.resize(s + s + s);
     strainVal.resize(s);
     bandVal.resize(s + s + s);
+    __damping.resize(s);
 }
 
 void EigenMode::updatePreMac() {

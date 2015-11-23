@@ -160,7 +160,7 @@
     "FEMViewer" : {
         "frequency rus" : "Частота анимации",
         "frequency eng" : "Animation frequency",
-        "magnitude rus" : "Амплитула анимации",
+        "magnitude rus" : "Амплитуда анимации",
         "magnitude eng" : "Animation magnitude",
         "stop rus" : "Выключить анимацию",
         "stop eng" : "Disable animation",
@@ -203,11 +203,13 @@
             "amplitude rus" : "Модуль",
             "amplitude eng" : "Amplitude"
         },
-        "nethods selector" : {
+        "methods selector" : {
             "title eng" : "<h2>Eigen modes identification methods</h2>",
             "title rus" : "<h2>Методы идентификации собственных форм</h2>",
             "export button eng" : "Modes export",
-            "export button rus" : "Экспорт форм"
+            "export button rus" : "Экспорт форм",
+            "result template rus" : "Частота №%1: %2 Гц (ζ=%3)",
+            "result template eng" : "Mode #%1: %2 Hz (ζ=%3)"
         },
 
         "methods" : [

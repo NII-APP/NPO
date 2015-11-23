@@ -18,13 +18,13 @@ struct FrequencyMagnitude {
 //amplitude-frequency response
 class AFR : public std::vector<FrequencyMagnitude>
 {
+    FrequencyMagnitude maxItem(const AFR::const_iterator start, const AFR::const_iterator finish) const;
 public:
     AFR();
     AFR(const size_t size);
     ~AFR();
-    //int maxNode(const AFR::const_iterator start = begin(), const AFR::const_iterator finish = end());
-    int maxNode(const AFR::const_iterator start, const AFR::const_iterator finish);
-    double damping(const CRealRange& range);
+    FrequencyMagnitude findEigenFreq(const CRealRange& range) const;
+    double damping(const FrequencyMagnitude&) const;
 
     enum IntegralParts {
         Real = 0x1,

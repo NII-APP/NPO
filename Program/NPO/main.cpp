@@ -9,6 +9,7 @@
 #include "modesidentificationwizard.h"
 #include <fem.h>
 #include "femviewer.h"
+#include "project.h"
 
 int main(int argc, char *argv[])
 {

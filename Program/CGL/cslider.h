@@ -40,6 +40,7 @@ public:
     qreal getPixelPosition() const;
     void setPixelPosition(const qreal&);
 
+    void setProxyLabel(QWidget*);
 
     int topLabelHeight() const;
     int bottomLabelheight() const;

@@ -13,6 +13,8 @@ class EigenMode
     CVertexes formVal;
     CArray strainVal;//strain energy.
     CVertexes bandVal;//some rocket science by finit elements
+    CArray __damping;
+    float __averageDamping;
     float pMac;
 
     CDiapason extremums;
@@ -29,6 +31,12 @@ public:
     float& frequency() { return freq; }
     const float& frequency() const { return freq; }
     void  setFrequency(float v) { freq = v; }
+
+    float averageDamping() const { return __averageDamping; }
+    void setAverageDamping(const float v) { __averageDamping = v; }
+
+    const CArray& damping() const { return __damping; }
+    void setDamping(const double value, const int id) { __damping[id] = value; }
 
     CVertexes& form() { return formVal; }
     const CVertexes& form() const { return formVal; }

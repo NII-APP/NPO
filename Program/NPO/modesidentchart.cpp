@@ -2,9 +2,13 @@
 
 #include <QToolBar>
 #include <QMouseEvent>
+#include <QLabel>
+#include <QPushButton>
+#include <QLayout>
 
 #include <c2dchart.h>
 #include <cslider.h>
+#include <eigenmodes.h>
 
 #include "application.h"
 #include "identity.h"
@@ -19,6 +23,8 @@ ModesIdentChart::ModesIdentChart(QWidget *parent)
     , __im(new QAction(Application::identity()->icon(":/media/images/im.png"), Application::identity()->tr("modes identification wizard/chart/im"), __toolbar))
     , __am(new QAction(Application::identity()->icon(":/media/images/amp.png"), Application::identity()->tr("modes identification wizard/chart/amplitude"), __toolbar))
     , __average(new QAction(Application::identity()->icon(":/media/images/average.png"), Application::identity()->tr("modes identification wizard/chart/average"), __toolbar))
+    , __pickFreq(new QAction(QIcon(":/docs/identificationMethodsDiscription/img/ok.png"), "", __toolbar))
+    , __data(nullptr)
 {
     qApp->installEventFilter(this);
     __toolbar->setAutoFillBackground(true);
@@ -29,7 +35,7 @@ ModesIdentChart::ModesIdentChart(QWidget *parent)
 
     __chart->setGridStep(70);
     __chart->move(0,0);
-    //__slider->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
+    connect(__chart, SIGNAL(sliderMoved(CSlider*)), SLOT(slidersPotrol(CSlider*)));
     __average->setCheckable(true);
     __average->setChecked(true);
     __toolbar->addAction(__average);
@@ -45,11 +51,22 @@ ModesIdentChart::ModesIdentChart(QWidget *parent)
     __am->setCheckable(true);
     __am->setChecked(true);
     __toolbar->addAction(__am);
+    connect(__pickFreq, SIGNAL(triggered()), this, SLOT(pickMode()));
+    __toolbar->addAction(__pickFreq);
 
     connect(__re, SIGNAL(triggered()), this, SLOT(update()));
     connect(__im, SIGNAL(triggered()), this, SLOT(update()));
     connect(__am, SIGNAL(triggered()), this, SLOT(update()));
     connect(__average, SIGNAL(triggered()), this, SLOT(update()));
+}
+
+ModesIdentChart::~ModesIdentChart()
+{
+    qDeleteAll(__sliders.keys());
+    qDeleteAll(__currentResults);
+    for (QList<CSlider*>& i : __resultSliders) {
+        qDeleteAll(i);
+    }
 }
 
 void ModesIdentChart::leaveEvent(QEvent *)
@@ -90,12 +107,46 @@ void ModesIdentChart::setData(const AFRArray &afrArray)
         Q_ASSERT(i != afrArray.size());
         if (i != afrArray.size()) {
             const AFR& afr(afrArray.at(i));
-            for (auto s : __sliders) {
-                s->setPurview(CRealRange(afr.front().frequency, afr.back().frequency));
+            __purview = CRealRange(afr.front().frequency, afr.back().frequency);
+            for (auto s : __sliders.keys()) {
+                s->setPurview(__purview);
             }
         }
     }
     update();
+    __data = &afrArray;
+}
+
+ModesIdentChart::SliderRole ModesIdentChart::valueSliderRole(ModesIdentificationWizard::IdentificationMode m)
+{
+    switch (m) {
+    case ModesIdentificationWizard::Pick:
+        return Pick;
+    default:
+        return WrongRole;
+    }
+}
+
+void ModesIdentChart::pickMode()
+{
+    CSlider* const s(new CSlider);
+    if (!__resultSliders.contains(__currentMode)) {
+        __resultSliders.insert(__currentMode, QList<CSlider*>());
+    }
+    if (!__currentResults.contains(__currentMode)) {
+        __currentResults.insert(__currentMode, new EigenModes);
+    }
+    s->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
+    s->setDragable(false);
+    __resultSliders[__currentMode].append(s);
+    __chart->addSlider(s);
+    s->setPosition(__sliders.key(valueSliderRole(__currentMode))->getPosition());
+    if (__currentMode == ModesIdentificationWizard::Pick) {
+        __currentResults[__currentMode]->push_back(__data->getMode(s->getPosition(), pickRange()));
+        std::sort(__currentResults[__currentMode]->begin(), __currentResults[__currentMode]->end(),
+                  [](const EigenMode& a, const EigenMode& b)->bool{ return a.frequency() < b.frequency(); });
+    }
+    currentResultChanged(__currentResults[__currentMode]);
 }
 
 void ModesIdentChart::update()
@@ -117,4 +168,117 @@ void ModesIdentChart::update()
 
     __chart->setData(data);
     __chart->update();
+}
+
+void ModesIdentChart::slidersPotrol(CSlider* s) {
+    switch (__sliders[s]) {
+    case View: case Pick:
+        if (__data != nullptr) {
+            emit newCurrentFrequency(s->getPosition());
+        }
+        return;
+    case PickBound:
+        __sliders.key(Pick)->setPurview(pickRange());
+        __sliders.key(Pick)->setPosition(__data->average().findEigenFreq(pickRange()).frequency);
+        if (__data != nullptr) {
+            emit newCurrentFrequency(__sliders.key(Pick)->getPosition());
+        }
+        return;
+    case WrongRole:
+        qFatal("wrong slider role");
+        return;
+    }
+}
+
+RealRange ModesIdentChart::pickRange() {
+    CSlider* b1(nullptr);
+    CSlider* b2(nullptr);
+    for (CSlider* s: __sliders.keys()) {
+        if (__sliders[s] == PickBound) {
+            Q_ASSERT(b2 == nullptr);
+            (b1 == nullptr ? b1 : b2) = s;
+        }
+    }
+    Q_ASSERT(b2 != nullptr && b1 != nullptr);
+    return RealRange(std::min(b1->getPosition(), b2->getPosition()),
+                     std::max(b1->getPosition(), b2->getPosition()));
+}
+
+void ModesIdentChart::enableSliders(int v)
+{
+    typedef QMap<CSlider*, SliderRole> Sliders;
+    for (Sliders::iterator i(__sliders.begin()); i != __sliders.end(); ++i) {
+        if (i.value() & v) {
+            i.key()->show();
+            __chart->addSlider(i.key());
+        } else {
+            i.key()->hide();
+            __chart->removeSlider(i.key());
+        }
+    }
+}
+
+void ModesIdentChart::setIdentMode(ModesIdentificationWizard::IdentificationMode t)
+{
+    switch (__currentMode = t) {
+    case ModesIdentificationWizard::View:
+        __pickFreq->setEnabled(false);
+        if (!__sliders.values().contains(View)) {
+            __sliders.insert(new CSlider, View);
+            __chart->addSlider(__sliders.key(View));
+            __sliders.key(View)->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
+            __sliders.key(View)->setPurview(__purview);
+            slidersPotrol(__sliders.key(View));
+        }
+        enableSliders(View);
+        return;
+    case ModesIdentificationWizard::Pick:
+        __pickFreq->setEnabled(true);
+        if (!__sliders.values().contains(PickBound)) {
+            CSlider* b1;
+            CSlider* b2;
+            __sliders.insert(b1 = new CSlider, PickBound);
+            __sliders.insert(b2 = new CSlider, PickBound);
+            b1->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
+            b1->setPurview(__purview);
+            b2->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
+            b2->setPurview(__purview);
+        }
+        if (!__sliders.values().contains(Pick)) {
+            CSlider* s;
+            __sliders.insert(s = new CSlider, Pick);
+            s->setPurview(pickRange());
+            s->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
+            slidersPotrol(s);
+        }
+        enableSliders(Pick | PickBound);
+        return;
+    }
+    updateResultsSliders();
+}
+
+void ModesIdentChart::updateResultsSliders()
+{
+    typedef QMap<ModesIdentificationWizard::IdentificationMode, QList<CSlider*>> ResultsMap;
+
+    for (ResultsMap::iterator i(__resultSliders.begin()); i != __resultSliders.end(); ++i) {
+        if (i.key() == __currentMode) {
+            for (CSlider* s : i.value()) {
+                __chart->removeSlider(s);
+            }
+        } else {
+            for (CSlider* s : i.value()) {
+                __chart->addSlider(s);
+            }
+        }
+    }
+}
+
+EigenModes* ModesIdentChart::currentResult()
+{
+    if (__currentResults.contains(__currentMode)) {
+        return __currentResults[__currentMode];
+    } else {
+        return nullptr;
+    }
 }

@@ -61,6 +61,7 @@ public:
     C2dChartPlace* place() { return chart; }
 
     void addSlider(CSlider*);
+    void removeSlider(CSlider*);
 
     void setGridStep(qreal val) { chart->setGridStep(val); }
 
@@ -73,9 +74,9 @@ public slots:
 
 signals:
     void closed();
-    void sliderMoves(CSlider*);
+    void sliderMoved(CSlider*);
 private slots:
-    void emitSliderMoves(CSlider*);
+    void emitSliderMoved(CSlider*);
 };
 
 

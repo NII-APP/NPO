@@ -66,6 +66,16 @@ EigenMode AFRArray::getMode(const double freq) const {
     return result;
 }
 
+EigenMode AFRArray::getMode(const double freq, const RealRange& range) const {
+    EigenMode mode(getMode(freq));
+    const FrequencyMagnitude f(average().findEigenFreq(range));
+    mode.setAverageDamping(average().damping(f));
+    for (int i(0); i != mode.length(); ++i) {
+        mode.setDamping(this->at(i).damping(f), i);
+    }
+    return mode;
+}
+
 double AFRArray::toScalar(const FrequencyMagnitude::Amplitude& val) {
     return val.imag() > 0 ? abs(val) : -abs(val);
 }
@@ -147,8 +157,8 @@ AFR AFRArray::average() const {
         const AFR& one(this->at(i));
         AFR::iterator acceptor(result.begin());
         for (AFR::const_iterator it(one.begin()); it != one.end(); ++it, ++acceptor) {
-            acceptor->amplitude += std::complex<double>(fabs(it->amplitude.real()), fabs(it->amplitude.imag()));
-            //acceptor->amplitude += it->amplitude;
+            //acceptor->amplitude += std::complex<double>(fabs(it->amplitude.real()), fabs(it->amplitude.imag()));
+            acceptor->amplitude += it->amplitude;
         }
     }
     const double k(i - 1);
