@@ -7,6 +7,14 @@
 #include <crange.h>
 #include <QDebug>
 
+namespace {
+
+QDebug operator<< (QDebug out, const FrequencyMagnitude::Amplitude& a) {
+    return out << '{' << a.real() << ',' << a.imag() << '}';
+}
+
+}
+
 AFR::AFR(const size_t size)
     : std::vector<FrequencyMagnitude>(size)
 {
@@ -36,23 +44,35 @@ FrequencyMagnitude AFR::findEigenFreq(const CRealRange& range) const
     return maxItem(startIterator,finishIterator);
 }
 
-double AFR::damping(const FrequencyMagnitude& maxValue) const
+double AFR::damping(const double& maxFreq) const
 {
+    if (this->empty()) {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+    auto deltafreq([](const_iterator i)->double{ return i->frequency - (i - 1)->frequency; });
+    auto deltamag([](const_iterator i)->double{ return abs(i->amplitude) - abs((i - 1)->amplitude); });
+    const_iterator maxNode(begin());
+    while (maxNode->frequency < maxFreq && maxNode < end()) {
+        ++maxNode;
+    }
+    //if maxFreq is too small or too big (i.e. lower or grater then all frequency values)...
+    if (maxNode == begin() || maxNode == end()) {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+    typedef CRange<FrequencyMagnitude::Amplitude> ComplexRange;
+    const ComplexRange amplitudeInterpolation((maxNode - 1)->amplitude, maxNode->amplitude);
+    FrequencyMagnitude::Amplitude maxAmplitude(amplitudeInterpolation(deltafreq(maxNode) / (maxFreq - (maxNode - 1)->frequency)));
+
 #ifndef SQRT2
-    const double rimAmplitude(abs(maxValue.amplitude) / sqrt(2.0));
+    const double rimAmplitude(abs(maxAmplitude) / sqrt(2.0));
 #else
-    const double rimAmplitude(abs(maxValue.amplitude) / SQRT2);
+    const double rimAmplitude(abs(maxAmplitude) / SQRT2);
 #endif
     if (this->empty()) {
         return std::numeric_limits<double>::quiet_NaN();
     }
-    const double& maxFreq = maxValue.frequency;
     RealRange freq;
     typedef CRange<const_iterator> DampingRange;
-    const_iterator maxNode(begin());
-    while (maxNode->frequency < maxValue.frequency && maxNode < end()) {
-        ++maxNode;
-    }
     DampingRange range(maxNode);
     while (range.getMin() > begin() && abs(range.getMin()->amplitude) >= rimAmplitude) {
         --range.first;
@@ -68,17 +88,25 @@ double AFR::damping(const FrequencyMagnitude& maxValue) const
             range.getMin() < begin() || (range.getMin() + 1) >= end()) {
         return std::numeric_limits<double>::quiet_NaN();
     }
+
     //The frequency is interpolated between the two points. The expression is derived from the similarity of triangles
-    //nahu'ya?
-    double deltaFreq = (range.getMin() + 1)->frequency - range.getMin()->frequency;
-    double deltaAmplitudeSmall = rimAmplitude - abs(range.getMin()->amplitude);
-    double deltaAmplitude = abs((range.getMin() + 1)->amplitude) - abs(range.getMin()->amplitude);
-    freq.setMin(range.getMin()->frequency + deltaAmplitudeSmall / deltaAmplitude * deltaFreq);
-    deltaFreq = range.getMax()->frequency - (range.getMax() - 1)->frequency;
-    deltaAmplitudeSmall = rimAmplitude - abs(range.getMax()->amplitude);
-    deltaAmplitude = abs((range.getMax() - 1)->amplitude) - abs(range.getMax()->amplitude);
-    freq.setMax(range.getMax()->frequency - deltaAmplitudeSmall / deltaAmplitude * deltaFreq);
-    Q_ASSERT(freq.range() > 0);
+    const CRealRange minInterpolation(range.getMin()->frequency, (range.getMin() + 1)->frequency);
+    const double minK((abs((range.getMin() + 1)->amplitude) - rimAmplitude) / deltamag(range.getMin() + 1));
+    if (minK < 1.0) {
+        freq.setMin(minInterpolation(minK));
+    } else {
+        //i.e. finde the tail of data and it's not pass the rim condition. value is invalid.
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+    const CRealRange maxInterpolation((range.getMax() - 1)->frequency, range.getMax()->frequency);
+    const double maxK((abs((range.getMax())->amplitude) - rimAmplitude) / deltamag(range.getMax()));
+    freq.setMax(maxInterpolation(maxK));
+    if (maxK < 1.0) {
+        freq.setMax(maxInterpolation(maxK));
+    } else {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+    //Q_ASSERT(freq.range() > 0);
 
     return freq.range() / maxFreq;
 }

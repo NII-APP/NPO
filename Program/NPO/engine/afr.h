@@ -24,7 +24,7 @@ public:
     AFR(const size_t size);
     ~AFR();
     FrequencyMagnitude findEigenFreq(const CRealRange& range) const;
-    double damping(const FrequencyMagnitude&) const;
+    double damping(const double &maxFreq) const;
 
     enum IntegralParts {
         Real = 0x1,

@@ -56,24 +56,19 @@ EigenMode AFRArray::getMode(const double freq) const {
                 const double k((freq - it.at(i - 1).frequency) / (it.at(i).frequency - it.at(i - 1).frequency));
                 Q_ASSERT(k >= 0.0 && k <= 1.0);
                 const FrequencyMagnitude::Amplitude& left(it.at(i - 1).amplitude);
-                result.form()(j) = QVector3D(0.0, toScalar(left + (it.at(i).amplitude - left) * k), 0.0);
+                (result.form()(j) = QVector3D(0.0, toScalar(left + (it.at(i).amplitude - left) * k), 0.0));
             }
         }
         ++j;
     }
     result.updateExtremums();
     result.updatePreMac();
-    return result;
-}
 
-EigenMode AFRArray::getMode(const double freq, const RealRange& range) const {
-    EigenMode mode(getMode(freq));
-    const FrequencyMagnitude f(average().findEigenFreq(range));
-    mode.setAverageDamping(average().damping(f));
-    for (int i(0); i != mode.length(); ++i) {
-        mode.setDamping(this->at(i).damping(f), i);
+    result.setAverageDamping(average().damping(freq));
+    for (int i(0); i != result.length(); ++i) {
+        result.setDamping(this->at(i).damping(freq), i);
     }
-    return mode;
+    return result;
 }
 
 double AFRArray::toScalar(const FrequencyMagnitude::Amplitude& val) {

@@ -17,7 +17,6 @@ public:
     void read(const QString& filename, int nodesCount = 0);
     AFR average() const;
     EigenMode getMode(const double freq) const;
-    EigenMode getMode(const double freq, const RealRange& range) const;
 
     static double toScalar(const FrequencyMagnitude::Amplitude& val);
 

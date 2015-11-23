@@ -40,15 +40,17 @@ void main(void) { gl_Position = gl_ModelViewProjectionMatrix * vec4(in_Position,
 ");
 
     vShader = new QOpenGLShaderProgram(this);
-#ifndef QT_NO_DEBUG
     if (!vShader->addShaderFromSourceCode(QOpenGLShader::Vertex, shaider))
     {
+#ifndef QT_NO_DEBUG
         qDebug() << vShader->log();
+#endif
     }
     if (!vShader->bind()) {
+#ifndef QT_NO_DEBUG
         qDebug() << vShader->log();
-    }
 #endif
+    }
     Q_ASSERT(vShader->isLinked());
     vArray = new QOpenGLVertexArrayObject(this);
     glEnableClientState(GL_VERTEX_ARRAY);

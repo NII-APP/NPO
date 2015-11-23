@@ -261,6 +261,8 @@ void ModesIdentificationWizard::identifyModes(const FEM* who, QWidget* parent)
     loop->exec();
 
     if ((w->result() & Accepted) && w->__controller->currentResult()) {
+        EigenModes* solution(w->__controller->currentResult());
+        solution->estimateAutoMAC();
         Application::nonConstProject()->constCast(who)->getModes() = *w->__controller->currentResult();
     }
 

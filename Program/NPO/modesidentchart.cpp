@@ -142,7 +142,7 @@ void ModesIdentChart::pickMode()
     __chart->addSlider(s);
     s->setPosition(__sliders.key(valueSliderRole(__currentMode))->getPosition());
     if (__currentMode == ModesIdentificationWizard::Pick) {
-        __currentResults[__currentMode]->push_back(__data->getMode(s->getPosition(), pickRange()));
+        __currentResults[__currentMode]->push_back(__data->getMode(s->getPosition()));
         std::sort(__currentResults[__currentMode]->begin(), __currentResults[__currentMode]->end(),
                   [](const EigenMode& a, const EigenMode& b)->bool{ return a.frequency() < b.frequency(); });
     }
@@ -171,18 +171,20 @@ void ModesIdentChart::update()
 }
 
 void ModesIdentChart::slidersPotrol(CSlider* s) {
+    Q_ASSERT(__sliders.contains(s));
     switch (__sliders[s]) {
     case View: case Pick:
         if (__data != nullptr) {
             emit newCurrentFrequency(s->getPosition());
         }
         return;
-    case PickBound:
+    case PickBound: {
         __sliders.key(Pick)->setPurview(pickRange());
-        __sliders.key(Pick)->setPosition(__data->average().findEigenFreq(pickRange()).frequency);
+        double curFreq(__data->average().findEigenFreq(pickRange()).frequency);
+        __sliders.key(Pick)->setPosition(curFreq);
         if (__data != nullptr) {
             emit newCurrentFrequency(__sliders.key(Pick)->getPosition());
-        }
+        }}
         return;
     case WrongRole:
         qFatal("wrong slider role");
@@ -243,14 +245,16 @@ void ModesIdentChart::setIdentMode(ModesIdentificationWizard::IdentificationMode
             b1->setPurview(__purview);
             b2->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
             b2->setPurview(__purview);
+            b1->setPosition(__purview.getMin());
+            b2->setPosition(__purview.getMax());
         }
         if (!__sliders.values().contains(Pick)) {
             CSlider* s;
             __sliders.insert(s = new CSlider, Pick);
             s->setPurview(pickRange());
             s->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
-            slidersPotrol(s);
         }
+        slidersPotrol(__sliders.key(PickBound));
         enableSliders(Pick | PickBound);
         return;
     }
