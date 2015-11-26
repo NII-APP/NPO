@@ -19,6 +19,7 @@ ModesIdentChart::ModesIdentChart(QWidget *parent)
     : QWidget(parent)
     , __chart(new C2dChart(this))
     , __toolbar(new QToolBar(this))
+    , __currentMode(ModesIdentificationWizard::View)
     , __re(new QAction(Application::identity()->icon(":/media/images/re.png"), Application::identity()->tr("modes identification wizard/chart/re"), __toolbar))
     , __im(new QAction(Application::identity()->icon(":/media/images/im.png"), Application::identity()->tr("modes identification wizard/chart/im"), __toolbar))
     , __am(new QAction(Application::identity()->icon(":/media/images/amp.png"), Application::identity()->tr("modes identification wizard/chart/amplitude"), __toolbar))
@@ -115,6 +116,7 @@ void ModesIdentChart::setData(const AFRArray &afrArray)
     }
     update();
     __data = &afrArray;
+    setIdentMode(__currentMode);
 }
 
 ModesIdentChart::SliderRole ModesIdentChart::valueSliderRole(ModesIdentificationWizard::IdentificationMode m)
@@ -129,12 +131,13 @@ ModesIdentChart::SliderRole ModesIdentChart::valueSliderRole(ModesIdentification
 
 void ModesIdentChart::pickMode()
 {
+    Q_ASSERT(ModesIdentificationWizard::Pick == __currentMode);
     CSlider* const s(new CSlider);
     if (!__resultSliders.contains(__currentMode)) {
         __resultSliders.insert(__currentMode, QList<CSlider*>());
     }
-    if (!__currentResults.contains(__currentMode)) {
-        __currentResults.insert(__currentMode, new EigenModes);
+    if (!__currentResults.contains(__currentMode) || __currentResults[__currentMode] == nullptr) {
+        __currentResults[__currentMode] = new EigenModes;
     }
     s->setLabelTemplate("%1 " + Application::identity()->tr("hertz"));
     s->setDragable(false);
@@ -222,6 +225,9 @@ void ModesIdentChart::enableSliders(int v)
 
 void ModesIdentChart::setIdentMode(ModesIdentificationWizard::IdentificationMode t)
 {
+    if (__data == nullptr) {
+        return;
+    }
     switch (__currentMode = t) {
     case ModesIdentificationWizard::View:
         __pickFreq->setEnabled(false);
@@ -233,6 +239,7 @@ void ModesIdentChart::setIdentMode(ModesIdentificationWizard::IdentificationMode
             slidersPotrol(__sliders.key(View));
         }
         enableSliders(View);
+        emit currentResultChanged(nullptr);
         return;
     case ModesIdentificationWizard::Pick:
         __pickFreq->setEnabled(true);
@@ -256,6 +263,10 @@ void ModesIdentChart::setIdentMode(ModesIdentificationWizard::IdentificationMode
         }
         slidersPotrol(__sliders.key(PickBound));
         enableSliders(Pick | PickBound);
+        if (!__currentResults.contains(ModesIdentificationWizard::Pick)) {
+            __currentResults.insert(ModesIdentificationWizard::Pick, nullptr);
+        }
+        emit currentResultChanged(__currentResults[ModesIdentificationWizard::Pick]);
         return;
     }
     updateResultsSliders();

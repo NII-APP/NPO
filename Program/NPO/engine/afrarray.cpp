@@ -18,6 +18,17 @@
 
 using namespace CGL;
 
+namespace {
+
+//this avoidance of abs writed for avoid some VS2013 compiler bug: abs just fall the application.
+//With out any reason. Only in this context.
+double stableAbs(FrequencyMagnitude::Amplitude v)
+{
+    return sqrt(v.real() * v.real() + v.imag() * v.imag());
+}
+
+}
+
 AFRArray::AFRArray()
 {
 
@@ -29,6 +40,10 @@ AFRArray::~AFRArray()
 }
 
 EigenMode AFRArray::getMode(const double freq) const {
+
+
+    auto toScalar([](const FrequencyMagnitude::Amplitude& val)->double
+                { return val.imag() > 0 ? stableAbs(val) : -stableAbs(val); });
     int i(0);
     EigenMode result;
     result.setFrequency(freq);
@@ -51,13 +66,15 @@ EigenMode AFRArray::getMode(const double freq) const {
             if (i == 0) {
                 result.form()(j) = QVector3D(0.0, toScalar(it.front().amplitude), 0.0);
             } else if (i == it.size()) {
-                result.form()(j) = QVector3D(0.0, toScalar(it.front().amplitude), 0.0);
+                result.form()(j) = QVector3D(0.0, toScalar(it.back().amplitude), 0.0);
             } else {
                 const double k((freq - it.at(i - 1).frequency) / (it.at(i).frequency - it.at(i - 1).frequency));
                 Q_ASSERT(k >= 0.0 && k <= 1.0);
                 const FrequencyMagnitude::Amplitude& left(it.at(i - 1).amplitude);
-                (result.form()(j) = QVector3D(0.0, toScalar(left + (it.at(i).amplitude - left) * k), 0.0));
+                result.form()(j) = QVector3D(0.0, toScalar(left + (it.at(i).amplitude - left) * k), 0.0);
             }
+            ///@todo fix it for each node...
+            //result.setDamping(it.damping(freq), i);
         }
         ++j;
     }
@@ -65,14 +82,7 @@ EigenMode AFRArray::getMode(const double freq) const {
     result.updatePreMac();
 
     result.setAverageDamping(average().damping(freq));
-    for (int i(0); i != result.length(); ++i) {
-        result.setDamping(this->at(i).damping(freq), i);
-    }
     return result;
-}
-
-double AFRArray::toScalar(const FrequencyMagnitude::Amplitude& val) {
-    return val.imag() > 0 ? abs(val) : -abs(val);
 }
 
 void AFRArray::read(const QString& filename, int nodesCount) {

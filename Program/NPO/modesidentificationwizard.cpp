@@ -37,6 +37,7 @@ ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* pa
     , __method(new MethodSelector(this))
     , __controller(new ManualController(who, this))
     , __model(who)
+    , __acceptB(new QPushButton(Application::identity()->tr("accept", "modes identification wizard"), this))
 {
     QHBoxLayout* const center(new QHBoxLayout);
     center->addWidget(__method);
@@ -45,6 +46,8 @@ ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* pa
             __controller, SLOT(setIdentificationMode(ModesIdentificationWizard::IdentificationMode)));
     connect(__controller, SIGNAL(currentResultChanged(EigenModes*)),
             __method, SLOT(updateCurrentResults(EigenModes*)));
+    connect(__controller, SIGNAL(currentResultChanged(EigenModes*)),
+            this, SLOT(checkIsCurrentModesAcceptable()));
     __method->setCurrentMode(View);
 
     QHBoxLayout* const buttons(new QHBoxLayout);
@@ -53,10 +56,10 @@ ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* pa
     exportButton->setDisabled(true);
     buttons->addWidget(exportButton);
     buttons->addSpacing(30);
-    QPushButton* const acceptB(new QPushButton(Application::identity()->tr("accept", "modes identification wizard"), this));
-    buttons->addWidget(acceptB);
+    __acceptB->setDisabled(true);
+    buttons->addWidget(__acceptB);
     buttons->addSpacing(30);
-    connect(acceptB, SIGNAL(clicked()), SLOT(accept()));
+    connect(__acceptB, SIGNAL(clicked()), SLOT(accept()));
     QPushButton* const cancelB(new QPushButton(Application::identity()->tr("cancel", "modes identification wizard"), this));
     buttons->addWidget(cancelB);
     connect(cancelB, SIGNAL(clicked()), SLOT(reject()));
@@ -68,6 +71,11 @@ ModesIdentificationWizard::ModesIdentificationWizard(const FEM* who, QWidget* pa
     stylize();
 
     this->resize(1300,800);
+}
+
+void ModesIdentificationWizard::checkIsCurrentModesAcceptable()
+{
+    __acceptB->setEnabled(__controller->currentResult() == nullptr ? false : true);
 }
 
 void ModesIdentificationWizard::accept()
@@ -154,6 +162,10 @@ void ModesIdentificationWizard::MethodSelector::changeCurrentIdentMode(int i)
 
 void ModesIdentificationWizard::MethodSelector::updateCurrentResults(EigenModes* r)
 {
+    //r is null if signal emited just to disable acceptButton
+    if (r == nullptr) {
+        return;
+    }
     QString result;
     static const QString stencil(Application::identity()->tr("modes identification wizard/methods selector/result template"));
     for (int i(0); i != r->size(); ++i) {
@@ -209,6 +221,7 @@ ModesIdentificationWizard::ManualController::~ManualController()
 {
     ///@todo fix this tarible kluge... destructor crash the program. but it's called when i complidely close the app anyway. Only for one instance of ManualController
     __viewer->setParent(0);
+    __chart->setParent(0);
 }
 
 void ModesIdentificationWizard::ManualController::setModeFrequency(double v)
@@ -224,6 +237,21 @@ void ModesIdentificationWizard::ManualController::setAFR(QString filename)
     delete __afr;
     __afr = new AFRArray;
     __afr->read(filename);
+    if (__afr->size() == 0) {
+        QMessageBox::warning(static_cast<QWidget*>(this->parent()),
+                             Application::identity()->tr("modes identification wizard/file warning/title"),
+                             Application::identity()->tr("modes identification wizard/file warning/text")
+                                .arg(filename));
+        return;
+    }
+    if (__afr->size() - 1 != __viewer->getModel()->getNodes().length()) {
+        QMessageBox::warning(static_cast<QWidget*>(this->parent()),
+                             Application::identity()->tr("modes identification wizard/size warning/title"),
+                             Application::identity()->tr("modes identification wizard/size warning/text")
+                                .arg(QString::number(__viewer->getModel()->getNodes().length()),
+                                     QString::number(__afr->size() - 1),
+                                     filename));
+    }
 
     __chart->setData(*__afr);
 
@@ -266,8 +294,7 @@ void ModesIdentificationWizard::identifyModes(const FEM* who, QWidget* parent)
         Application::nonConstProject()->constCast(who)->getModes() = *w->__controller->currentResult();
     }
 
-    ///@todo finish this crutch alliance...
-    //w->deleteLater();
+    w->deleteLater();
 }
 
 EigenModes* ModesIdentificationWizard::ManualController::currentResult() {

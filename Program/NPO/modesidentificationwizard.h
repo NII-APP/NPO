@@ -42,10 +42,14 @@ public:
         WrongMode
     };
 
+private slots:
+    void checkIsCurrentModesAcceptable();
+
 private:
     MethodSelector* const __method;
     ManualController* const __controller;
     const FEM* const __model;
+    QPushButton* const __acceptB;
 };
 
 class ModesIdentificationWizard::MethodSelector : public TabListWidget {

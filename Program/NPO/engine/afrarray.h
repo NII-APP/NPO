@@ -18,8 +18,6 @@ public:
     AFR average() const;
     EigenMode getMode(const double freq) const;
 
-    static double toScalar(const FrequencyMagnitude::Amplitude& val);
-
     CChartDataList toChartData(unsigned interalParts = 0x7) const;
 };
 

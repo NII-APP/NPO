@@ -184,6 +184,18 @@
             "caption rus" : "Укажите файл результатов испытаний",
             "filter" : "Universal File Format(*.unv)"
         },
+        "size warning" : {
+            "title rus" : "Обнаружено несоответствие исходных данных",
+            "title eng" : "Wrong dataset",
+            "text rus" : "Количество узлов модели (%1) не совпадает с количеством амплитудно-частотных характеристик (%2) в файле \"%3\"",
+            "text eng" : "Number of vertexes of model (%1) must be equal to AFR sets count (%2) in file \"%3\""
+        },
+        "file warning" : {
+            "title rus" : "Файл не содержит необходимых данных",
+            "title eng" : "Wrong dataset",
+            "text rus" : "Не обнаружено результатов модальных испытаний в формате unv:58 в файле \"%1\"",
+            "text eng" : "Required dataset (unv:58) doesn't finded in file \"%1\""
+        },
         "orientation icon" : ":/media/images/orientation.png",
         "orientation tooltip eng" : "Change splitter orientation",
         "orientation tooltip rus" : "Изменить направление разделителя",
