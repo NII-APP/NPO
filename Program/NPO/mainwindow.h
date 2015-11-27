@@ -12,7 +12,6 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    QWidget* const __status;
     ViewerTab* const __modelsGUI;
     PairsTab* const __pairsGUI;
 
@@ -38,11 +37,6 @@ public slots:
     void saveAs();
     void open();
     void closePorject();
-    void statusPush(QWidget*);
-    void statusPush(const QString &);
-    void statusInsertBefore(QWidget* which, QWidget* before);
-    void statusClear();
-    void statusSizeUpdate();
 };
 
 #endif // MAINWINDOW_H

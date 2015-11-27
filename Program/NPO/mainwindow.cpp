@@ -19,90 +19,12 @@
 #include "maintabbar.h"
 #include "viewertab.h"
 
-
-namespace {
-class Status : public QFrame {
-    void selfPosition() {
-        this->move(QPoint(this->nativeParentWidget()->width() - this->width(),
-                          this->nativeParentWidget()->height() - this->height()));
-    }
-
-    void resizeEvent(QResizeEvent *) {
-        selfPosition();
-    }
-    bool eventFilter(QObject * o, QEvent * e) {
-        if (o == nativeParentWidget() && e->type() == QEvent::Resize) {
-            selfPosition();
-        }
-        return false;
-    }
-
-public:
-    Status(QWidget* parent) : QFrame(parent) {
-        this->hide();
-        this->setLayout(new QVBoxLayout(this));
-        this->setAutoFillBackground(true);
-        this->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-    }
-    void push(QWidget* w) {
-        w->setParent(this);
-        this->layout()->addWidget(w);
-        this->show();
-        sizeUpdate();
-    }
-    void push(const QString& s) {
-        push(new QLabel(s, this));
-    }
-    void clear() {
-        int i(this->layout()->count());
-        while (i) {
-            --i;
-            if (dynamic_cast<QWidgetItem*>(this->layout()->itemAt(i)))
-                delete static_cast<QWidgetItem*>(this->layout()->itemAt(i))->widget();
-        }
-        this->hide();
-    }
-    void insertBefore(QWidget* which, QWidget* before) {
-        int i(0);
-        while (i < this->layout()->count() && dynamic_cast<QWidgetItem*>(this->layout()->itemAt(i)) && static_cast<QWidgetItem*>(this->layout()->itemAt(i))->widget() != before) {
-            ++i;
-        }
-        static_cast<QBoxLayout*>(this->layout())->insertWidget(i, which);
-        this->show();
-    }
-    void sizeUpdate() {
-        this->resize(this->layout()->sizeHint() + QSize(this->layout()->margin(), this->layout()->margin()));
-    }
-};
-}
-
-void MainWindow::statusPush(QWidget* w) {
-    static_cast<Status*>(__status)->push(w);
-}
-
-void MainWindow::statusClear() {
-    static_cast<Status*>(__status)->clear();
-}
-void MainWindow::statusPush(const QString& s) {
-    static_cast<Status*>(__status)->push(s);
-}
-void MainWindow::statusSizeUpdate() {
-    static_cast<Status*>(__status)->sizeUpdate();
-}
-
-void MainWindow::statusInsertBefore(QWidget* which, QWidget* before) {
-    static_cast<Status*>(__status)->insertBefore(which, before);
-}
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , __status(new Status(0))
     , __modelsGUI(new ViewerTab(centralWidget()))
     , __pairsGUI(new PairsTab(centralWidget()))
 {
-    this->installEventFilter(__status);
     this->setCentralWidget(new TabWidget(this));
-    __status->setParent(this->centralWidget());
     static_cast<TabWidget*>(centralWidget())->setTabBar(new MainTabBar(this->centralWidget()));
     static_cast<QTabWidget*>(centralWidget())->setTabPosition(QTabWidget::West);
     static_cast<QTabWidget*>(centralWidget())->addTab(__modelsGUI, Application::identity()->tabViewIcon(), Application::identity()->tabView());
@@ -127,6 +49,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     const QString projectName(QSettings().value("project/location").value<QString>());
     if (Project::isOwnProject(projectName)) {
+#ifndef QT_NO_DEBUG
+        qDebug() << "occure prev project" << projectName;
+#endif
         load(projectName);
     }
 

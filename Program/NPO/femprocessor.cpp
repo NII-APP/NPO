@@ -9,7 +9,6 @@ FEMProcessor::FEMProcessor(FEM *model, QObject *parent)
     : QObject(parent)
     , __model(model)
     , __t(new QThread(this))
-    , __progressWidget(new QLabel)
 {
 
 }
@@ -18,24 +17,14 @@ FEMProcessor::~FEMProcessor() {
 }
 
 void FEMProcessor::modelReadedSlot() {
-    const size_t size(__model->getModes().size());
-    __progressWidget->setText("estiamting MAC ( 0 / " + QString::number(size * size) + " )");
-    __progressWidget->setProperty("formindex", 0);
-    Application::mainWindow()->statusSizeUpdate();
     emit modelReaded();
 }
 
 void FEMProcessor::MACUpdatedSlot() {
-    const size_t size(__model->getModes().size());
-    __progressWidget->setProperty("formindex", __progressWidget->property("formindex").toInt() + 1);
-    __progressWidget->setText("estiamting MAC ( " + QString::number(__progressWidget->property("formindex").toInt())
-                              + " / " + QString::number(size * size) + " )");
-    Application::mainWindow()->statusSizeUpdate();
     emit MACUpdated();
 }
 
 void FEMProcessor::MACEstimatedSlot() {
-    Application::mainWindow()->statusClear();
     emit MACEstimated();
     emit finished();
 }
@@ -48,8 +37,6 @@ void FEMProcessor::read(const QString& filename) {
     connect(w, SIGNAL(MACUpdated()), this, SLOT(MACUpdatedSlot()));
     connect(w, SIGNAL(MACEstimated()), this, SLOT(MACEstimatedSlot()));
 
-    __progressWidget->setText("f06 parsing");
-    Application::mainWindow()->statusPush(__progressWidget);
     w->start();
 }
 
@@ -63,13 +50,24 @@ void FEMProcessor::FEMWorker::setFileName(const QString& f) { fName = f; }
 void FEMProcessor::FEMWorker::run() {
     __model->read(fName);
     emit modelReaded();
+#ifndef QT_NO_DEBUG
+    qDebug() << "Estimate auto MAC";
+    QTime start(QTime::currentTime());
+#endif
     EigenModes& modes(__model->getModes());
     modes.MACEstimationPrepare();
+#ifndef QT_NO_DEBUG
+    qDebug() << "\tUpdare preMAC delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec";
+    start = QTime::currentTime();
+#endif
     for (int i(0); i != modes.size(); ++i) {
         for (int j(0); j != modes.size(); ++j) {
             modes.estimateAutoMAC(i, j);
             emit MACUpdated();
         }
     }
+#ifndef QT_NO_DEBUG
+    qDebug() << "\tautoMac delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec";
+#endif
     emit MACEstimated();
 }
