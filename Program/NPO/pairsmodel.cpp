@@ -17,9 +17,9 @@ int PairModel::rowCount(const QModelIndex &parent) const {
 #ifdef PAIRS_MODEL_DEBUG
     qDebug() << "rowCount" << parent;
 #endif
-    return QModelIndex() != parent ? 0 : (__project ? __project->pairsList().size() + 1 : 1);
+    return QModelIndex() != parent ? 0 : (__project ? static_cast<int>(__project->pairsList().size() + 1) : 1);
 }
-int PairModel::columnCount(const QModelIndex &parent) const { return 1; }
+int PairModel::columnCount(const QModelIndex &) const { return 1; }
 
 QVariant PairModel::data(const QModelIndex &index, int role) const {
 #ifdef PAIRS_MODEL_DEBUG
@@ -38,14 +38,14 @@ QVariant PairModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-QModelIndex PairModel::parent(const QModelIndex &child) const {
+QModelIndex PairModel::parent(const QModelIndex &) const {
 #ifdef PAIRS_MODEL_DEBUG
     qDebug() << "parent" << child;
 #endif
     return QModelIndex();
 }
 
-QModelIndex PairModel::index(int row, int column, const QModelIndex &parent) const {
+QModelIndex PairModel::index(int row, int column, const QModelIndex &) const {
 #ifdef PAIRS_MODEL_DEBUG
     qDebug() << "index" << row << column << parent;
 #endif

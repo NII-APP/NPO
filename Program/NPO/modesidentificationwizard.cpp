@@ -185,8 +185,8 @@ ModesIdentificationWizard::ManualController::ManualController(const FEM* const m
 {
     QLayout* top(new QHBoxLayout);
     FileNameEdit* const input(new FileNameEdit(this));
-    input->setOpenFileFunction([](QWidget* parent)->QString{
-        return Application::identity()->openFileDialog("modes identification wizard/file dialog", parent);
+    input->setOpenFileFunction([](FileNameEdit* w)->QString{
+        return Application::identity()->openFileDialog("modes identification wizard/file dialog", w);
     });
     top->addWidget(input);
     connect(input, SIGNAL(fileNameChanged(QString)), SLOT(setAFR(QString)));

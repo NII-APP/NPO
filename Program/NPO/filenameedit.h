@@ -18,7 +18,7 @@ private:
 
 public:
     FileNameEdit(QWidget* parent = 0);
-    void setOpenFileFunction(std::function<QString(QWidget*)> f) {
+    void setOpenFileFunction(std::function<QString(FileNameEdit*)> f) {
         __onClick = f;
     }
 
@@ -30,7 +30,7 @@ private slots:
 private:
     QPushButton* const __pb;
     QWidget* const __warning;
-    std::function<QString(QWidget*)> __onClick;
+    std::function<QString(FileNameEdit*)> __onClick;
 };
 
 

@@ -6,10 +6,7 @@
 #include <cchartdata.h>
 #include <cdimensioninterval.h>
 
-#include "modesidentificationwizard.h"
-#include <fem.h>
-#include "femviewer.h"
-#include "project.h"
+#include "filenameedit.h"
 
 int main(int argc, char *argv[])
 {

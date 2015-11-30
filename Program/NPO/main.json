@@ -48,6 +48,8 @@
     "FileNameEdit" : {
         "tooltip eng" : "Chose file",
         "tooltip rus" : "Указать файл",
+        "warning tooltip rus" : "Файл не задан",
+        "warning tooltip eng" : "Current file doesn't exist",
         "open file icon" : ":/media/images/open.png",
         "warning icon" : ":/media/images/warning.svg"
     },
