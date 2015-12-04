@@ -13,7 +13,7 @@ public:
     CVertexes(int size = 0, float val = 0.0f);
     const QVector3D& operator () (int p) const;
     QVector3D& operator () (int p);
-    size_t length() const { return size() / 3; }
+    int length() const { return size() / 3; }
 
     ~CVertexes() {}
 

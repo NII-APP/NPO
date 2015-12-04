@@ -1,7 +1,9 @@
 #include "modesidentificationwizard.h"
 
 #include <QEventLoop>
+#ifdef Q_OS_WIN
 #include <QtWinExtras>
+#endif
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QKeyEvent>
@@ -12,6 +14,7 @@
 #include <QSpinBox>
 #include <QTextBrowser>
 #include <QScrollArea>
+#include <QJsonArray>
 
 #include <fem.h>
 #include <c2dchart.h>
@@ -269,12 +272,14 @@ void ModesIdentificationWizard::ManualController::setIdentificationMode(ModesIde
 
 void ModesIdentificationWizard::stylize()
 {
+#ifdef Q_OS_WIN
     if (QtWin::isCompositionEnabled()) {
         QtWin::extendFrameIntoClientArea(this, -1, -1, -1, -1);
         setAttribute(Qt::WA_TranslucentBackground, true);
         setAttribute(Qt::WA_NoSystemBackground, false);
         setStyleSheet("ModesIdentificationWizard { background: transparent; }");
     }
+#endif
 }
 
 void ModesIdentificationWizard::identifyModes(const FEM* who, QWidget* parent)

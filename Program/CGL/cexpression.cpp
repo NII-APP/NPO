@@ -1,4 +1,4 @@
-#include "CExpression.h"
+#include "cexpression.h"
 #include <iostream>
 #define qDebug() std::cout
 
@@ -172,9 +172,8 @@ CExpression& CExpression::rebild(const char* CExpression)
         fine = false;
         return *this;
     }
-    //ѕереписываем содежимое строки CExpression в sourseString
     int len = static_cast<int>(strlen(CExpression));
-    char* sourseString = new char[len * 3 + 1];//¬ыражение, как правило, не длинное а нам пригодитс€ пам€ть воврем€ разбора. к тому же она будет очищена сразу после создани€ объекта
+    char* sourseString = new char[len * 3 + 1];
     for (int i = 0, j = 0; i < len; ++i)
         sourseString[j++] = CExpression[i];
     sourseString[len] = 0;

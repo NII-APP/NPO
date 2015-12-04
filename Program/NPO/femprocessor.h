@@ -13,10 +13,7 @@
 class FEM;
 class QString;
 class QLabel;
-namespace CGL {
 class CMatrix;
-}
-using CGL::CMatrix;
 
 class FEMProcessor : public QObject
 {
@@ -52,7 +49,7 @@ class FEMProcessor::FEMWorker : public QThread   {
     QString fName;
 
 public:
-    FEMProcessor::FEMWorker(FEM* model, QObject* parent);
+    FEMWorker(FEM* model, QObject* parent);
     void setFileName(const QString&);
     void run() Q_DECL_OVERRIDE;
 signals:

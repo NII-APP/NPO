@@ -5,26 +5,24 @@
 #include <cgl.h>
 #include <QThread>
 
-namespace CGL {
-    class CParse;
-}
 class FEM;
 class QString;
+class CParse;
 
 class EigenModes : public std::vector<EigenMode>
 {
-    CGL::CMatrix mac;//auto-mac will be computed in enother process assyncronius...
+    CMatrix mac;//auto-mac will be computed in enother process assyncronius...
 
     QString file;
 
-    static int findNext(CGL::CParse &i);//Just for readCRD()
+    static int findNext(CParse &i);//Just for readCRD()
 
     class MacAsyncEngine;
 public:
     EigenModes();
     EigenModes(const EigenModes&);
 
-    const CGL::CMatrix& getMAC() const;
+    const CMatrix& getMAC() const;
 
     bool read(const QString &fileName);
     void readF06(const QString &fileName);

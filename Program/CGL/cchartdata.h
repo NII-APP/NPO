@@ -1,14 +1,15 @@
 #ifndef CCHARTDATA_H
 #define CCHARTDATA_H
 
-#include <memory>
+#include <tr1/memory>
+using std::tr1::shared_ptr;
 #include <vector>
 #include "cdimension.h"
 #include "crange.h"
 
 class CMatrix;
 
-typedef std::vector<std::shared_ptr<const CDimension> > SharedDimension;
+typedef std::vector<shared_ptr<const CDimension> > SharedDimension;
 
 class CChartData : public SharedDimension
 {
@@ -18,7 +19,7 @@ public:
     ~CChartData();
 
     void push_back(const CDimension* const val);
-    void push_back(const std::shared_ptr<const CDimension>& val);
+    void push_back(const shared_ptr<const CDimension>& val);
     const QString& getTitle() const { return title; }
     void setTitle(const QString& v) { title = v; }
     const CDimension& operator()(int i) const { return *at(i).get(); }

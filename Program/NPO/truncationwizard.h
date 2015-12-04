@@ -45,7 +45,7 @@ class TruncationWizard::Preview : public QWidget {
 
     QComboBox* const selector;
     FEMViewer* const screen;
-    std::vector<const FEM* const> meshes;
+    std::vector<const FEM*> meshes;
 public:
     Preview(Qt::ToolBarArea area, QWidget* parent = 0);
 

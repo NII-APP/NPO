@@ -2,7 +2,7 @@
 #define FILENAMEEDIT_H
 
 #include <QLineEdit>
-#include <functional>
+#include <tr1/functional>
 
 class QPushButton;
 class QFileDialog;
@@ -18,7 +18,7 @@ private:
 
 public:
     FileNameEdit(QWidget* parent = 0);
-    void setOpenFileFunction(std::function<QString(FileNameEdit*)> f) {
+    void setOpenFileFunction(std::tr1::function<QString(FileNameEdit*)> f) {
         __onClick = f;
     }
 
@@ -30,7 +30,7 @@ private slots:
 private:
     QPushButton* const __pb;
     QWidget* const __warning;
-    std::function<QString(FileNameEdit*)> __onClick;
+    std::tr1::function<QString(FileNameEdit*)> __onClick;
 };
 
 

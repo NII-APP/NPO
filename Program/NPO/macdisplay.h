@@ -17,7 +17,7 @@ signals:
     void closed();
 
 public slots:
-    void setData(const CGL::CMatrix& m);
+    void setData(const CMatrix& m);
 
 private:
     CGL::C3dColumnChart* __chart;

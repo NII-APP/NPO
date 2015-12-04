@@ -32,7 +32,7 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     connect(relation, SIGNAL(updateMac(const FEMPair::Relation&)),
             this, SLOT(newMac(const FEMPair::Relation&)));
 
-    current = nullptr;
+    current = 0;
     previewPatrol();
 
     main->setStretchFactor(0, 1);
@@ -59,14 +59,14 @@ FEMPair* TruncationWizard::exec(QWidget* parent)
 
 void TruncationWizard::previewPatrol()
 {
-    relation->setPair(nullptr);
+    relation->setPair(0);
     delete current;
     if (first->current() && second->current()) {
         current = new FEMPair(first->current(), second->current());
         relation->setPair(current);
         chart->setData(current->getMac());
     } else {
-        current = nullptr;
+        current = 0;
     }
 }
 

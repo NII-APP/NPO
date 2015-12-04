@@ -2,8 +2,7 @@
 #include <cstring>
 #include <ios>
 #include <iostream>
-#include <conio.h>
-namespace CGL {
+#include <cmath>
 
 CParse::CParse(char *string)
     : d(string)
@@ -35,9 +34,9 @@ CParse CParse::parseFile(const std::string& filename)
         return out;
     }
 
-    is.seekg (0, std::ios::end);
+    is.seekg(0, std::ios::end);
     length = is.tellg();
-    is.seekg (0, std::ios::beg);
+    is.seekg(0, std::ios::beg);
 
     out.d = new char [length + 10];
     out.d[length] = '\0';
@@ -66,6 +65,7 @@ int CParse::integer()
 
     return flag ? -num : num;
 }
+
 double CParse::real()
 {
     while (*d == ' ' || *d == '\t' || *d == '\n' || *d == '\r')
@@ -114,6 +114,7 @@ double CParse::real()
     num *= pow(k, integer());
     return flag ? -num : num;
 }
+
 float CParse::fixFloat(int fixLen)
 {
     int sign(1);
@@ -165,6 +166,7 @@ float CParse::fixFloat(int fixLen)
     num *= pow(expK, expV);
     return num * sign;
 }
+
 std::string CParse::string()
 {
     char* start(d);
@@ -180,6 +182,7 @@ std::string CParse::string()
 
     return ret;
 }
+
 std::string CParse::word()
 {
     while ((*d == ' ' || *d == '\t' || *d == '\n' || *d == '\r') && *d) {
@@ -250,9 +253,4 @@ bool CParse::testPrew(const char *dest)
     }
     while (ret && d[i] && dest[i]);
     return ret;
-}
-
-
-
-
 }

@@ -29,7 +29,7 @@ void RelationDialog::setPair(FEMPair *p) {
 
     qDebug() << "set pair" << p;
 
-    if (pair == nullptr) {
+    if (!pair) {
         qDeleteAll(leftL);
         qDeleteAll(rightL);
         return;

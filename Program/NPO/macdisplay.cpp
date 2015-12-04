@@ -12,7 +12,7 @@ MACDisplay::MACDisplay(QWidget *parent)
 }
 
 
-void MACDisplay::setData(const CGL::CMatrix& m) {
+void MACDisplay::setData(const CMatrix& m) {
     __chart->setData(m);
 }
 

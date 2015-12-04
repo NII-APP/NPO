@@ -8,8 +8,6 @@
 class QDebug;
 class QDataStream;
 
-namespace CGL {
-
 class CMatrix
 {
 public:
@@ -21,32 +19,32 @@ private:
 
     Data data;
     Pointers m;
-    size_t wid;
+    int wid;
     void repoint();
 
     CMatrix dotTranspose() const;
 public:
     CMatrix();
-    CMatrix(size_t w, size_t h);
+    CMatrix(int w, int h);
     CMatrix(const CMatrix&);
 
-    void resize(size_t w, size_t h);
+    void resize(int w, int h);
 
     CMatrix& operator =(const CMatrix &);
 
-    T* operator [](size_t r) { return m[r]; }
-    const T* operator [](size_t r) const { return m[r]; }
+    T* operator [](int r) { return m[r]; }
+    const T* operator [](int r) const { return m[r]; }
 
-    T minInRow(size_t r) const;
-    T minInColumn(size_t c) const;
-    T minInRowExclude(size_t r, size_t exclude) const;
-    T minInColumnExclude(size_t c, size_t exclude) const;
+    T minInRow(int r) const;
+    T minInColumn(int c) const;
+    T minInRowExclude(int r, int exclude) const;
+    T minInColumnExclude(int c, int exclude) const;
     T max() const;
     RealRange estimateRange() const;
-    void plusInRow(size_t r, const T& val);
-    void plusInColumn(size_t c, const T& val);
-    void excludeRow(size_t r);
-    void excludeColumn(size_t c);
+    void plusInRow(int r, const T& val);
+    void plusInColumn(int c, const T& val);
+    void excludeRow(int r);
+    void excludeColumn(int c);
 
 
     CMatrix pseudoInvers() const;
@@ -57,9 +55,9 @@ public:
     T det();
     void naNtoInf();
 
-    size_t width() const { return wid; }
-    size_t height() const { return m.size(); }
-    size_t size() const { return data.size(); }
+    int width() const { return wid; }
+    int height() const { return m.size(); }
+    int size() const { return data.size(); }
     bool empty() const { return data.empty(); }
 
     friend QDebug operator<< (QDebug out, const CMatrix &obj);
@@ -73,8 +71,6 @@ QDataStream& operator<< (QDataStream&, const CMatrix&);
 QDataStream& operator>> (QDataStream&, CMatrix&);
 
 QDebug operator<< (QDebug out, const CMatrix &obj);
-
-}
 
 #endif // CMatrix_H
 

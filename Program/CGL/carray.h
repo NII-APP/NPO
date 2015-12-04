@@ -14,6 +14,7 @@ public:
     CArray(int size = 0, double val = 0.0f, Orientation orienataion = Horizontal);
 
     CArray(double* data, int size, Orientation orienataion = Horizontal);
+    virtual ~CArray() {}
 
     RealRange estimateRange() const;
     IndexRange estimateRangeIndex() const;

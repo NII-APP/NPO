@@ -10,8 +10,10 @@
 
 int main(int argc, char *argv[])
 {
+    qDebug() << "app";
     Application a(argc, argv);
     setlocale(LC_ALL,"RUS");
+    qDebug() << "main wrddsxdindow";
 
     MainWindow w;
 

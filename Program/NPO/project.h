@@ -13,9 +13,9 @@ class Identity;
 class Project
 {
 public:
-    typedef std::vector<FEM* const> Models;
-    typedef std::vector<const FEM* const> ConstModels;
-    typedef std::vector<FEMPair* const> FEMPairs;
+    typedef std::vector<FEM*> Models;
+    typedef std::vector<const FEM*> ConstModels;
+    typedef std::vector<FEMPair*> FEMPairs;
 
     static const QString INSURANCE_ROW;
 private:

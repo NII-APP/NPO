@@ -55,7 +55,7 @@ private:
 class ModesIdentificationWizard::MethodSelector : public TabListWidget {
     Q_OBJECT
 public:
-    explicit ModesIdentificationWizard::MethodSelector(QWidget* parent);
+    explicit MethodSelector(QWidget* parent);
     ~MethodSelector();
 signals:
     void identificationModeChanged(ModesIdentificationWizard::IdentificationMode);
@@ -70,7 +70,7 @@ private:
 class ModesIdentificationWizard::ManualController : public QWidget {
     Q_OBJECT
 public:
-    explicit ModesIdentificationWizard::ManualController(const FEM * const model, QWidget* parent);
+    explicit ManualController(const FEM * const model, QWidget* parent);
     ~ManualController();
     EigenModes* currentResult();
 public slots:

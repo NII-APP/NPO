@@ -32,9 +32,6 @@ public:
         }
         const size_t edges(array.size() - 1);
         const size_t node((op - domain.getMin()) / domain.range() * edges);
-        if (node < 0) {
-            return array.front();
-        }
         if (node >= edges) {
             return array.back();
         }

@@ -4,9 +4,6 @@
 #include <fstream>
 #include <string>
 
-namespace CGL {
-
-
 class CParse
 {
 protected:
@@ -41,11 +38,6 @@ public:
     char operator *() const { return *d; }
     char operator [](int i) const { return d[i]; }
 };
-typedef CParse Parse;
 
-
-
-
-}
 
 #endif // CPARSE_H

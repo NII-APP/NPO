@@ -38,12 +38,15 @@ void FEMWidget::initializeCGL()
     shader = new QOpenGLShaderProgram(this);
     if (!shader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/codes/meshSummator.vert")) {
 #ifndef QT_NO_DEBUG
+        //0x1804a4e90
         qDebug() << "log:" << shader->log();
+        qDebug() << "come from GLSL version" << glGetString(GL_SHADING_LANGUAGE_VERSION_ARB);
+        qFatal("fatal shader eror");
 #endif
     }
     if (!shader->bind()) {
 #ifndef QT_NO_DEBUG
-        qDebug() << shader->log();
+        qFatal(shader->log().toLocal8Bit());
 #endif
     }
     Q_ASSERT(shader->isLinked());

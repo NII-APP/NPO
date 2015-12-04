@@ -65,7 +65,7 @@ private:
 class CSliders : public QList<CSlider*> {
     static const int SLIDER_DRAG_RADIUS;
 public:
-    CSliders() : current(nullptr) {}
+    CSliders() : current(0) {}
 
     void setCurrent(CSlider* const s) const;
     CSlider* getCurrent() const { return current; }

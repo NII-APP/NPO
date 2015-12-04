@@ -3,10 +3,7 @@
 #include <QVector3D>
 #include "cylindercoordinatesystem.h"
 #include <QDebug>
-
-namespace CGL {
-
-RectangularCoordinateSystem::RectangularCoordinateSystem(const QVector3D& d, const QVector3D& z, const QVector3D& p)
+CRectangularCoordinateSystem::CRectangularCoordinateSystem(const QVector3D& d, const QVector3D& z, const QVector3D& p)
     : a(d)
     , oz(z - d)
     , oy(QVector3D::crossProduct(oz,p - d))
@@ -17,9 +14,9 @@ RectangularCoordinateSystem::RectangularCoordinateSystem(const QVector3D& d, con
     ox.normalize();
 }
 
-RectangularCoordinateSystem::RectangularCoordinateSystem() {}
+CRectangularCoordinateSystem::CRectangularCoordinateSystem() {}
 
-void RectangularCoordinateSystem::toGlobal(QVector3D& v) const
+void CRectangularCoordinateSystem::toGlobal(QVector3D& v) const
 {
     QVector3D n(v);
     v.setX(ox.x() * n.x() + oy.x() * n.y() + oz.x() * n.z());
@@ -29,33 +26,31 @@ void RectangularCoordinateSystem::toGlobal(QVector3D& v) const
     v += a;
 }
 
-void RectangularCoordinateSystem::save(QDataStream& to) const
+void CRectangularCoordinateSystem::save(QDataStream& to) const
 {
     to << type() << a << ox << oy << oz;
 }
 
 
-RectangularCoordinateSystem* RectangularCoordinateSystem::load(QDataStream& in)
+CRectangularCoordinateSystem* CRectangularCoordinateSystem::load(QDataStream& in)
 {
     int type;
     in >> type;
-    RectangularCoordinateSystem* g;
+    CRectangularCoordinateSystem* g;
     switch (type) {
     case Rectangular:
-        g = new RectangularCoordinateSystem;
+        g = new CRectangularCoordinateSystem;
         break;
     case Cylinder:
-        g = new CylinderCoordinateSystem;
+        g = new CCylinderCoordinateSystem;
         break;
     }
     in >> g->a >> g->ox >> g->oy >> g->oz;
     return g;
 }
 
-bool RectangularCoordinateSystem::operator==(const RectangularCoordinateSystem &r) const
+bool CRectangularCoordinateSystem::operator==(const CRectangularCoordinateSystem &r) const
 {
     return (type() == r.type()) && (a == r.a) && (ox == r.ox) && (oy == r.oy) && (oz == r.oz);
-}
-
 }
 

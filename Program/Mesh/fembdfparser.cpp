@@ -10,7 +10,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
 #ifndef QT_NO_DEBUG
     qDebug() << "\tnative parser";
 #endif
-    CGL::CParse f(CGL::CParse::parseFile(fileName.toStdString()));
+    CParse f(CParse::parseFile(fileName.toStdString()));
     char* memory(f.data());
     if (memory == nullptr) {
         throw QFileDevice::OpenError;
@@ -131,9 +131,9 @@ void FEM::nativeBDFParser(const QString& fileName) {
             m[7] = f.fixFloat(wordSize);
             m[8] = f.fixFloat(wordSize);
             f.skipRow();
-            systems.insert(id, new CGL::RectangularCoordinateSystem(QVector3D(m[0], m[1], m[2]),
-                                                                    QVector3D(m[3], m[4], m[5]),
-                                                                    QVector3D(m[6], m[7], m[8])));
+            systems.insert(id, 0);/*new CRectangularCoordinateSystem(QVector3D(m[0], m[1], m[2]),
+                                                                QVector3D(m[3], m[4], m[5]),
+                                                                QVector3D(m[6], m[7], m[8])));*/
         } else if (type == "CORD2C") {
             f += BORDER_FIELD_SIZE - static_cast<int>(type.length()) - (highAccuracy ? 1 : 0);
             const int id(f.fixFloat(wordSize));
@@ -157,9 +157,9 @@ void FEM::nativeBDFParser(const QString& fileName) {
             m[7] = f.fixFloat(wordSize);
             m[8] = f.fixFloat(wordSize);
             f.skipRow();
-            systems.insert(id, new CGL::CylinderCoordinateSystem(QVector3D(m[0], m[1], m[2]),
-                                                                 QVector3D(m[3], m[4], m[5]),
-                                                                 QVector3D(m[6], m[7], m[8])));
+            systems.insert(id, 0);/*new CCylinderCoordinateSystem(QVector3D(m[0], m[1], m[2]),
+                                                             QVector3D(m[3], m[4], m[5]),
+                                                             QVector3D(m[6], m[7], m[8])));*/
         } else if (type == "RBE2") {
             f.skipRow();
             if (*f == ' ') {

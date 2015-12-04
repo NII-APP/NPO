@@ -58,7 +58,7 @@ void Project::save(const QString &filename)
     QTime loop(QTime::currentTime());
     out << Project::INSURANCE_ROW;
     out << Identity::PROGRAM_VERSION;
-    out << geometries.size();
+    out << static_cast<quint32>(geometries.size());
     for (size_t i = 0; i < geometries.size(); ++i ){
         out << *geometries.at(i);
     }
@@ -104,7 +104,7 @@ void Project::load(const QString &filename)
         }
     }
 
-    size_t size;
+    quint32 size;
     in >> size;
     geometries.clear();
     for (size_t i = 0; i < size; ++i) {

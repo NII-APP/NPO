@@ -13,9 +13,9 @@ CChartData::~CChartData()
 }
 void CChartData::push_back(const CDimension* const val)
 {
-    std::vector<std::shared_ptr<const CDimension>>::push_back(std::shared_ptr<const CDimension>(val));
+    std::vector<shared_ptr<const CDimension>>::push_back(shared_ptr<const CDimension>(val));
 }
-void CChartData::push_back(const std::shared_ptr<const CDimension>& val)
+void CChartData::push_back(const shared_ptr<const CDimension>& val)
 {
-    std::vector<std::shared_ptr<const CDimension>>::push_back(val);
+    std::vector<shared_ptr<const CDimension>>::push_back(val);
 }

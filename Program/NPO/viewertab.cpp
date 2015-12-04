@@ -65,7 +65,7 @@ void ViewerTab::identificateModes(int meshId) {
 
 void ViewerTab::updateMACWidget() {
     FEMProcessor* sender(dynamic_cast<FEMProcessor*>(QObject::sender()));
-    if (sender == nullptr) {
+    if (sender == 0) {
         return;
     }
     const FEM* const model(processors.key(sender));
@@ -76,13 +76,13 @@ void ViewerTab::updateMACWidget() {
 
 void ViewerTab::forgetMACWidget() {
     MACDisplay* sender(dynamic_cast<MACDisplay*>(QObject::sender()));
-    const FEM* const p(MACs.key(sender, nullptr));
+    const FEM* const p(MACs.key(sender, 0));
     if (p) {
         MACs.remove(p);
     }
 }
 void ViewerTab::forgetFEMProcessor() {
-    const FEM* const p(processors.key(dynamic_cast<FEMProcessor*>(QObject::sender()), nullptr));
+    const FEM* const p(processors.key(dynamic_cast<FEMProcessor*>(QObject::sender()), 0));
     if (p) {
         processors.remove(p);
     }
@@ -118,7 +118,7 @@ void ViewerTab::setMode(int v) {
 
 void ViewerTab::acceptNewProject() {
     femView->acceptNewProject();
-    setModel(Application::project()->modelsList().empty() ? nullptr : Application::project()->modelsList().front());
+    setModel(Application::project()->modelsList().empty() ? 0 : Application::project()->modelsList().front());
 }
 
 void ViewerTab::addModes(int meshId) {

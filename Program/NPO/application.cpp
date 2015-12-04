@@ -13,7 +13,7 @@ Application::Application(int argc, char** argv)
     : QApplication(argc, argv)
     , self(new Identity)
     , pro(new Project)
-    , window(nullptr)
+    , window(0)
 {
     QFile css(":/css/css.css");
     css.open(QFile::ReadOnly);
@@ -37,7 +37,7 @@ Application::~Application()
 const Identity* Application::identity() { return static_cast<Application*>(qApp)->self; }
 
 Project* Application::nonConstProject() {
-    if (static_cast<Application*>(qApp)->window != nullptr) {
+    if (static_cast<Application*>(qApp)->window) {
         static_cast<Application*>(qApp)->window->setWindowModified(true);
     }
     return static_cast<Application*>(qApp)->pro;

@@ -12,7 +12,7 @@ public:
 private:
     Relation relation;
     FEM* trunc;
-    CGL::CMatrix mac;
+    CMatrix mac;
 public:
     Relation& relations() { return relation; }
 
@@ -20,7 +20,7 @@ public:
     const FEM* truncated() const { return second; }
     FEM* trunced() { return trunc; }
 
-    const CGL::CMatrix& getMac() const { return mac; }
+    const CMatrix& getMac() const { return mac; }
 
     void createTuncationForm();
     FEMPair(const FEM *theory, const FEM *practic);

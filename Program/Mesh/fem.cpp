@@ -8,13 +8,13 @@
 #include "elements/lines.h"
 #include "elements/hexa.h"
 #include "cgl.h"
-#include "conio.h"
 #include <QFile>
 #include <QTextStream>
 #include <sstream>
 #include <cassert>
 #include "eigenmode.h"
 #include <QApplication>
+#include <rectangularcoordinatesystem.h>
 
 const int FEM::LOW_POLYGON = 300;
 const unsigned char FEM::CONST_BLACK[] = { 0x00, 0x00, 0x00 };
@@ -77,7 +77,7 @@ bool FEM::read(const QString &fileName) {
         modes.readF06(fileName);
         for (const CoordinateLink& l : linksSolution) {
             if (systems.contains(l.first)) {
-                CGL::RectangularCoordinateSystem* s(systems[l.first]);
+                CRectangularCoordinateSystem* s(systems[l.first]);
                 for (EigenMode& m : modes) {
                     try {
                         s->toGlobal(m.form()(l.second));
@@ -164,7 +164,7 @@ void FEM::scarfUp(PyParse::BDFEntity& entity) {
         entity.waitForReadyRead();
         Q_ASSERT(entity.read(static_cast<char*>(static_cast<void*>(&id)), sizeof(id)) == sizeof(id));\
         entity.waitForReadyRead();
-        trace[id] = FinitElement::load(entity);\
+        trace[id] = FinitElement::load(entity);
     }
     /// @todo add import of shell and matherials data
 }
@@ -186,7 +186,8 @@ bool FEM::readBDF(const QString &fileName)
     UNVTransformations.clear();
 
     if (usePyParser) {
-        scarfUp(PyParse::BDFEntity(fileName, QApplication::topLevelWidgets().first()));
+        PyParse::BDFEntity f(fileName);
+        this->scarfUp(f);
     } else {
         nativeBDFParser(fileName);
     }
@@ -201,7 +202,7 @@ bool FEM::readBDF(const QString &fileName)
     return true;
 }
 
-int FEM::arriveKnownUNVBlock(CGL::CParse& f) {
+int FEM::arriveKnownUNVBlock(CParse& f) {
     while (*f && !(f.testPrew("    -1\n    15\n") ||
                    f.testPrew("    -1\n    82\n") ||
                    f.testPrew("    -1\n  2420\n") ||
@@ -238,7 +239,7 @@ bool FEM::readUNV(const QString &fileName)
     if (name.isEmpty()) {
         name = fileName.split('/').last();
     }
-    CGL::CParse f(CGL::Parse::parseFile(fileName.toStdString()));
+    CParse f(CParse::parseFile(fileName.toStdString()));
     char* memory(f.data());
     f.UNIXRowSymbol();
 
@@ -252,7 +253,7 @@ bool FEM::readUNV(const QString &fileName)
     core::Lines* elem(new core::Lines);
     trace.push_back(elem);
     int blockId;
-    while (blockId = arriveKnownUNVBlock(f)) {
+    while (static_cast<bool>(blockId = arriveKnownUNVBlock(f))) {
         switch (blockId) {
         case 15:
         {
@@ -493,10 +494,10 @@ void FEM::colorizeElements(const CArray &v, const QString& mes) const
 CArray FEM::extractElasticityModulus() {
     CArray elasticyModulus(static_cast<int>(trace.size()));
 
-    for (int i = 0; i != elasticyModulus.size(); ++i) {
+    for (size_t i = 0; i != elasticyModulus.size(); ++i) {
         if (trace.at(i)) {
             if (trace[i]->getShell() >= shells.size()) {
-            } else if (materials.size() <= shells[trace[i]->getShell()].getMatId()) {
+            } else if (static_cast<int>(materials.size()) <= shells[trace[i]->getShell()].getMatId()) {
             } else {
                 elasticyModulus[i] = materials[shells[trace[i]->getShell()].getMatId()][Material::MAT1_E];
             }
@@ -597,12 +598,13 @@ bool operator==(const FEM &l, const FEM &r)
             return false;
         }
 
-        if (!(systemLeft.value()->operator==(*systemRight.value()))) {
+//        if (!(systemLeft.value()->operator==(*systemRight.value()))) {
 #ifndef QT_NO_DEBUG
+             qDebug() << "fix uncompared systems";
              qDebug() << "\tmaterials value " << i;
 #endif
-            return false;
-        }
+  //          return false;
+    //    }
 
         ++systemLeft;
         ++systemRight;
@@ -674,21 +676,21 @@ QDataStream& operator << (QDataStream& out, const FEM& g) {
     out << g.name;
     out << g.vertexes << g.colors;
 
-    size_t shellsSize;
+    quint32 shellsSize;
     shellsSize = g.shells.size();
     out << shellsSize;
     for (size_t i = 0; i < shellsSize; ++i) {
         out << g.shells[i];
     }
 
-    size_t materialsSize;
+    quint32 materialsSize;
     materialsSize = g.materials.size();
     out << materialsSize;
     for (size_t i = 0; i < materialsSize; ++i) {
         out << g.materials[i];
     }
 
-    size_t linksSize;
+    quint32 linksSize;
     linksSize = g.linksPoint.size();
     out << linksSize;
     for (size_t i = 0; i < linksSize; ++i) {
@@ -696,14 +698,14 @@ QDataStream& operator << (QDataStream& out, const FEM& g) {
         out << g.linksPoint[i].second;
     }
 
-    out << g.trace.size();
-    size_t realCount(0);
+    out << static_cast<quint32>(g.trace.size());
+    quint32 realCount(0);
     for (FEM::Trace::const_iterator it(g.trace.begin()), end(g.trace.end()); it != end; ++it) {
         realCount += *it != nullptr;
     }
     out << realCount;
 
-    for (size_t i(0); i != g.trace.size(); ++i) {
+    for (quint32 i(0); i != g.trace.size(); ++i) {
         if (g.trace[i] != nullptr) {
             out << i;
             out << *g.trace[i];
@@ -736,21 +738,21 @@ QDataStream& operator >> (QDataStream& in, FEM& g)
     g.modelType = static_cast<FEM::ModelType>(modelType);
     in >> g.vertexes >> g.colors;
 
-    size_t shellsSize;
+    quint32 shellsSize;
     in >> shellsSize;
     g.shells.resize(shellsSize);
     for (size_t i = 0; i < shellsSize; ++i) {
         in >> g.shells[i];
     }
 
-    size_t materialsSize;
+    quint32 materialsSize;
     in >> materialsSize;
     g.materials.resize(materialsSize);
     for (size_t i = 0; i < materialsSize; ++i) {
         in >> g.materials[i];
     }
 
-    size_t linksSize;
+    quint32 linksSize;
     in >> linksSize;
     g.linksPoint.resize(linksSize);
     for (size_t i = 0; i < linksSize; ++i) {
@@ -759,15 +761,15 @@ QDataStream& operator >> (QDataStream& in, FEM& g)
     }
 
 
-    size_t size;
+    quint32 size;
     in >> size;
 
-    size_t realCount;
+    quint32 realCount;
     in >> realCount;
 
     g.trace.resize(size, 0);
     for (size_t i(0); i != realCount; ++i) {
-        size_t id;
+        quint32 id;
         in >> id;
         g.trace[id] = FinitElement::load(in);
         Q_ASSERT(g.trace[id] && "type element fail");
@@ -776,10 +778,10 @@ QDataStream& operator >> (QDataStream& in, FEM& g)
     FEM::CoordinateSystems::size_type s;
     in >> s;
     int key;
-    CGL::RectangularCoordinateSystem* val;
+    CRectangularCoordinateSystem* val;
     while (s--) {
         in >> key;
-        val = CGL::RectangularCoordinateSystem::load(in);
+        //val = CRectangularCoordinateSystem::load(in);
         g.systems.insert(key, val);
     }
 
@@ -826,7 +828,7 @@ void FEM::layToBDF(const QString& source, const QString& dest, const CArray& dE,
     std::map<CArray::value_type, int> find;
 
     int k(0);
-    for (int i(0); i != dE.size(); ++i) {
+    for (size_t i(0); i != dE.size(); ++i) {
         if (find.find(dE.at(i)) == find.end()) {
             find[dE.at(i)] = k;
             newMat[k][Material::MAT1_E] += dE.at(i);
@@ -837,8 +839,8 @@ void FEM::layToBDF(const QString& source, const QString& dest, const CArray& dE,
     }
 
     Shells newShell(shells.size() * newMat.size());
-    for (int i(0); i != newMat.size(); ++i) {
-        for (int j(0); j != shells.size(); ++j) {
+    for (size_t i(0); i != newMat.size(); ++i) {
+        for (size_t j(0); j != shells.size(); ++j) {
             newShell[i * shells.size() + j] = shells[j];
             newShell[i * shells.size() + j].setMatId(i);
         }
@@ -851,7 +853,7 @@ void FEM::layToBDF(const QString& source, const QString& dest, const CArray& dE,
         return;
     }
     QByteArray data(base.readAll().append('\0'));
-    CGL::CParse f(data.data());
+    CParse f(data.data());
     char* begin(f.data());
 
 
@@ -880,7 +882,7 @@ void FEM::layToBDF(const QString& source, const QString& dest, const CArray& dE,
                 ++write;
             }
         } else if (type == "PSHELL") {
-            int id(CGL::Parse(f).integer());
+            int id(CParse(f).integer());
             shellStrings[id] = type + ' ' + f.string() + '\n';
         } else {
             ++f;
@@ -888,34 +890,34 @@ void FEM::layToBDF(const QString& source, const QString& dest, const CArray& dE,
         }
     }
     QString newString;
-    for (int i(0); i != newMat.size(); ++i) {
+    for (size_t i(0); i != newMat.size(); ++i) {
         std::stringstream buf;
         buf << newMat[i][Material::MAT1_E];
         std::string s1("MAT1*    1              2.+11           7.69231+10      .3\n");
         static const std::string s2("*       7800.\n");
         static const int where(24);
         std::string num(buf.str());
-        for (int j(0); j != num.size(); ++j) {
+        for (size_t j(0); j != num.size(); ++j) {
             s1[j + where] = num[j];
         }
         static const int whereG(40);
         std::stringstream bufG;
         bufG << newMat[i][Material::MAT1_G];
         std::string numG(bufG.str());
-        for (int j(0); j != numG.size(); ++j) {
+        for (size_t j(0); j != numG.size(); ++j) {
             s1[j + whereG] = numG[j];
         }
         static const int whereId(9);
         std::stringstream bufId;
         bufId << i + materials.size() + 1;
         std::string numId(bufId.str());
-        for (int j(0); j != numId.size(); ++j) {
+        for (size_t j(0); j != numId.size(); ++j) {
             s1[j + whereId] = numId[j];
         }
         newString += QString::fromStdString(s1);
         newString += QString::fromStdString(s2);
     }
-    for (int it(0); it != usedId.size(); ++it) {
+    for (size_t it(0); it != usedId.size(); ++it) {
         int matrixId(usedId[it]);
         int i(matrixId / static_cast<int>(shells.size()));
         int j(matrixId % shells.size());
@@ -927,14 +929,14 @@ void FEM::layToBDF(const QString& source, const QString& dest, const CArray& dE,
             bufId << id;
             std::string idNum(bufId.str());
             static const int whereId(9);
-            for (int k(0); k != idNum.size(); ++k) {
+            for (size_t k(0); k != idNum.size(); ++k) {
                 data[k + whereId] = idNum[k];
             }
             std::stringstream buf;
             buf << i + 1;
             std::string num(buf.str());
             static const int where(17);
-            for (int k(0); k != num.size(); ++k) {
+            for (size_t k(0); k != num.size(); ++k) {
                 data[k + where] = num[k];
             }
             newString = newString + QString::fromStdString(data);

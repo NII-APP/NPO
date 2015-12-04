@@ -12,7 +12,6 @@
 #include "elements/finitelement.h"
 #include "shell.h"
 #include <QStack>
-#include <conio.h>
 #include <QMatrix4x4>
 #include <cmath>
 #include "material.h"
@@ -21,11 +20,6 @@
 #include "bdfentity.h"
 
 using namespace core;
-
-namespace CGL {
-    class CParse;
-}
-
 class FEM
 {
 public:
@@ -83,7 +77,7 @@ private:
     //basicaly it's 0 for each node((
     IntegerArray superElementsId;
 
-    static int arriveKnownUNVBlock(CGL::CParse& f);
+    static int arriveKnownUNVBlock(CParse& f);
     
     void estimateTraced();
     void estimateBox();
@@ -95,7 +89,7 @@ private:
     void scarfUp(PyParse::BDFEntity &entity);
 protected:
     //coordinate systems. firest is the ordering number of coordinate system, second is correspond coordinate system
-    typedef QMap<int, CGL::RectangularCoordinateSystem*> CoordinateSystems;
+    typedef QMap<int, CRectangularCoordinateSystem*> CoordinateSystems;
     CoordinateSystems systems;
 
 
@@ -131,7 +125,7 @@ public:
     void colorize(const CGL::CVertexes& v, const QString& mes = "") const;
     void colorize(const CArray& v, const QString& mes = "") const;
     void colorize(int i) const {
-        try { colorize(modes.at(i).form()); } catch (const std::out_of_range&) { Q_ASSERT("colorize model mode id fail"); }
+        try { colorize(modes.at(i).form()); } catch (...) { Q_ASSERT("colorize model mode id fail"); }
     }
     void colorizeElements(const CArray &v, const QString& mes = "") const;
 

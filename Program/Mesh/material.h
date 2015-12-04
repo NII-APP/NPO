@@ -56,7 +56,7 @@ public:
 
     Material(Type t);
     Material(){}
-    double& operator[](int where) { if (values.size() <= where) { values.resize(where + 1, 0.0); } return values[where]; }
+    double& operator[](int where) { if (static_cast<int>(values.size()) <= where) { values.resize(where + 1, 0.0); } return values[where]; }
 
     friend QDataStream& operator >> (QDataStream&, Material&);
     friend QDataStream& operator << (QDataStream&, const Material&);

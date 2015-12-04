@@ -14,7 +14,7 @@ class FEMViewer::FEMViewerFrequencyInput : public QFrame {
     void changeEvent(QEvent * e);
 public:
     typedef CScale<int, double> ToRealScale;
-    explicit FEMViewer::FEMViewerFrequencyInput(QWidget* parent = 0);
+    explicit FEMViewerFrequencyInput(QWidget* parent = 0);
     ~FEMViewerFrequencyInput();
 signals:
     void valueChanged(double val);

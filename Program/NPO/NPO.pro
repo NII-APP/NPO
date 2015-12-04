@@ -5,7 +5,10 @@
 #
 #-------------------------------------------------
 
-QT       += core opengl gui svg winextras
+QT       += core opengl gui svg
+win32 {
+    QT += winextras
+}
 
 RC_ICONS += "images/Bez_imeni-1.ico"
 
@@ -14,6 +17,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = NPO
 
 TEMPLATE = app
+
+CONFIG += c++11
 
 include(../CGL/CGL.pri)
 include(../Mesh/Mesh.pri)

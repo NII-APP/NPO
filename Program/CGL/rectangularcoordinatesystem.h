@@ -3,9 +3,8 @@
 class QDataStream;
 class QVector3D;
 #include <QVector3D>
-namespace CGL {
 
-class RectangularCoordinateSystem {
+class CRectangularCoordinateSystem {
 protected:
     QVector3D a;
     QVector3D oz;
@@ -18,25 +17,23 @@ public:
         Cylinder
     };
 
-    RectangularCoordinateSystem(const QVector3D& d, const QVector3D& z, const QVector3D& p);
-    RectangularCoordinateSystem();
-    virtual ~RectangularCoordinateSystem() {}
+    CRectangularCoordinateSystem(const QVector3D& d, const QVector3D& z, const QVector3D& p);
+    CRectangularCoordinateSystem();
+    virtual ~CRectangularCoordinateSystem() {}
     virtual void toGlobal(QVector3D& v) const;
-    virtual RectangularCoordinateSystem* clone() const { return new RectangularCoordinateSystem(*this); }
+    virtual CRectangularCoordinateSystem* clone() const { return new CRectangularCoordinateSystem(*this); }
     virtual int type() const { return Rectangular; }
 
-    friend QDataStream& operator << (QDataStream& out, const RectangularCoordinateSystem& g);
-    bool operator==(const RectangularCoordinateSystem&) const;
+    friend QDataStream& operator << (QDataStream& out, const CRectangularCoordinateSystem& g);
+    bool operator==(const CRectangularCoordinateSystem&) const;
 
-    static RectangularCoordinateSystem* load(QDataStream& in);
+    static CRectangularCoordinateSystem* load(QDataStream& in);
 
     virtual void save(QDataStream& to) const;
 };
 
-}
 
-
-QDataStream& operator << (QDataStream& out, const CGL::RectangularCoordinateSystem& g);
+QDataStream& operator << (QDataStream& out, const CRectangularCoordinateSystem& g);
 
 
 #endif // RECTANGULARCOORDINATESYSTEM_H

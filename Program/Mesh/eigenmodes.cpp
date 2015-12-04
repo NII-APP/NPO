@@ -17,7 +17,7 @@ EigenModes::EigenModes(const EigenModes& op)
     , mac(op.mac)
     , file(op.file) { }
 
-int EigenModes::findNext(CGL::CParse& i)
+int EigenModes::findNext(CParse& i)
 {
     //if the pointer not in the start of string
     if (i[-1] != '\n') {
@@ -42,7 +42,7 @@ void EigenModes::readTXT(const QString &fileName)
     QByteArray fileArray(file.readAll());
     file.close();
     fileArray.append('\0');
-    CGL::CParse f(fileArray.data());
+    CParse f(fileArray.data());
     f.UNIXRowSymbol();
 
     QString head(QString::fromStdString(f.string()));
@@ -109,7 +109,7 @@ void EigenModes::readF06(const QString& fileName)
     QByteArray fileArray(file.readAll());
     file.close();
     fileArray.append('\0');
-    CGL::CParse f(fileArray.data());
+    CParse f(fileArray.data());
 
 
     f.skipTo("R E A L   E I G E N V A L U E S");
@@ -221,14 +221,14 @@ void EigenModes::estimateDefoultMagnitudes() {
     }
 }
 
-const CGL::CMatrix& EigenModes::getMAC() const {
+const CMatrix& EigenModes::getMAC() const {
     return mac;
 }
 
 
 void EigenModes::MACEstimationPrepare() {
-    mac = CGL::Matrix(size(), size());
-    for (EigenModes::iterator it(begin()), end(end()); it != end; ++it) {
+    mac = CMatrix(size(), size());
+    for (EigenModes::iterator it(begin()); it != end(); ++it) {
         it->updatePreMac();
     }
 }
@@ -286,20 +286,21 @@ float EigenModes::MAC(const EigenMode& a, const EigenMode& b)
 QDataStream& operator << (QDataStream& s, const EigenModes& g) {
     s << g.mac;
     s << g.file;
-    s << g.size();
+    s << static_cast<quint32>(g.size());
     qDebug() << "write size" << g.size();
     for (EigenModes::const_iterator i(g.begin()), end(g.end()); i != end; ++i) {
         s << *i;
     }
     return s;
 }
+
 QDataStream& operator >> (QDataStream& s, EigenModes& g) {
 #ifndef QT_NO_DEBUG
     QTime loop(QTime::currentTime());
 #endif
     s >> g.mac;
     s >> g.file;
-    EigenModes::size_type size;
+    quint32 size;
     s >> size;
     g.resize(size);
 #ifndef QT_NO_DEBUG

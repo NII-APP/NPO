@@ -3,7 +3,6 @@
 #include <QtOpenGL>
 #include <QDebug>
 #include <QDataStream>
-#include <gl/GLU.h>
 
 namespace core {
 

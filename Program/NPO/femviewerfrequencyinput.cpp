@@ -1,4 +1,4 @@
-#include "FEMViewerFrequencyInput.h"
+#include "femviewerfrequencyinput.h"
 #include <QDoubleSpinBox>
 #include <QSlider>
 #include <QHBoxLayout>
