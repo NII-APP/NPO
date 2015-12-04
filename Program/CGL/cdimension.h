@@ -2,7 +2,13 @@
 #define CDIMENSION_H
 #include <QString>
 #include "crange.h"
-#include <tr1/memory>
+#ifdef _WIN32
+# include <memory>
+using std::shared_ptr;
+#else
+# include <trl/memory>
+using std::tr1::shared_ptr;
+#endif
 /**
   it's abstract class to provide data handling for any chart.
   It must be a pure abstract class but it's impossible to add their to shared pointers vector((
@@ -22,7 +28,7 @@ public:
 
     virtual RealRange getRange() const { return RealRange(0,0); }
 
-    std::tr1::shared_ptr<CDimension> provideInterval(double begin, double end);
+    shared_ptr<CDimension> provideInterval(double begin, double end);
 
     typedef double ValueType;
 };

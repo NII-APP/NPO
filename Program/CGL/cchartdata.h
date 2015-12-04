@@ -1,8 +1,13 @@
 #ifndef CCHARTDATA_H
 #define CCHARTDATA_H
 
-#include <tr1/memory>
+#ifdef _WIN32
+# include <memory>
+using std::shared_ptr;
+#else
+# include <trl/memory>
 using std::tr1::shared_ptr;
+#endif
 #include <vector>
 #include "cdimension.h"
 #include "crange.h"

@@ -56,8 +56,8 @@ public:
     void naNtoInf();
 
     int width() const { return wid; }
-    int height() const { return m.size(); }
-    int size() const { return data.size(); }
+    int height() const { return static_cast<int>(m.size()); }
+    int size() const { return static_cast<int>(data.size()); }
     bool empty() const { return data.empty(); }
 
     friend QDebug operator<< (QDebug out, const CMatrix &obj);
