@@ -35,7 +35,7 @@ void C2dChartPlace::initializeGL()
         return;
     }
     static const QString shaider("\n\
-vec3 in_Position;\n\
+in  vec3 in_Position;\n\
 void main(void) { gl_Position = gl_ModelViewProjectionMatrix * vec4(in_Position, 1.0); gl_FrontColor = gl_Color; }\n\
 ");
 
