@@ -82,7 +82,7 @@ double CParse::real()
     double k(1.);
     double k2(10.);
     double k3(1.);
-    while ((*d >= '0' && *d <= '9') || *d == '.' || *d == ',') {
+    while ((*d >= '0' && *d <= '9') || *d == '.' || (*d == ',' && k == 1.)) {
         if (*d != '.' && *d != ',') {
             num *= k2;
             num += (*d - '0') * k;

@@ -21,7 +21,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
 
     //parce each datum
     static const int BORDER_FIELD_SIZE(8);
-    while (!f.testPrew("ENDDATA")) {
+    while (*f && !f.testPrew("ENDDATA")) {
         std::string type(f.word());
         bool highAccuracy(false);
         if (type[type.length() - 1] == '*') {
@@ -29,7 +29,62 @@ void FEM::nativeBDFParser(const QString& fileName) {
             type.resize(type.size() - 1);
         }
         const int wordSize(BORDER_FIELD_SIZE << (highAccuracy ? 1 : 0));
-        if (type == "CQUAD4") {
+        if (std::find(type.begin(), type.end(), ',') != type.end()) {
+            std::string::iterator tail(std::find(type.begin(), type.end(), ',') + 1);
+            std::string inRowType(type.begin(), tail - 1);
+            char* row = new char[type.end() - tail + 1];
+            CParse p(row);
+            while (tail != type.end()) {
+                *row = *tail;
+                ++row;
+                ++tail;
+            }
+            *row = '\0';
+            row -= (row - p.data());
+
+            if (inRowType == "GRID") {
+                const int id(static_cast<int>(p.integer()));
+                /*for example id have a value 5. it's mean values should
+                    be stored in positions {15, 16, 17}. as a result size of 'values' must be >18=id * 3 + 3*/
+                if (vertexes.size() < id * 3 + 3) {
+                    vertexes.resize(id * 3 + 3, 0.0f);
+                    constraints.resize(id + 1, 0.0f);
+                    superElementsId.resize(id + 1, 0.0f);
+                }
+                ++p;
+                const int cp(static_cast<int>(p.integer()));
+                if (cp) {
+                    linksPoint.push_back(CoordinateLink(cp, id));
+                }
+                ++p;
+                vertexes[id * 3    ] = p.real();
+                ++p;
+                vertexes[id * 3 + 1] = p.real();
+                ++p;
+                vertexes[id * 3 + 2] = p.real();
+                /*Identification number of coordinate system in which the displacements, degrees of
+                 * freedom, constraints, and solution vectors are defined at the grid point. ( or blank)*/
+                const int cd(static_cast<int>(p.real()));
+                if (cd) {
+                    linksSolution.push_back(CoordinateLink(cd, id));
+                }
+                /*Permanent single-point constraints associated with the grid point.
+                 * (Any of the Integers 1 through 6 with no embedded blanks, or blank) */
+                constraints[id] = static_cast<int>(p.integer());
+                //Superelement identification number. ( ; Default = 0)
+                superElementsId[id] = static_cast<int>(p.integer());
+            } else if (inRowType == "CHEXA") {
+                const int id(f.integer());
+                if (static_cast<int>(trace.size()) <= id) {
+                    trace.resize(id + 100, 0);
+                }
+                int m(f.integer());
+                trace[id] = new core::Hexa(f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer());
+                trace[id]->setShell(m);
+                f.skipRow();
+            }
+            delete row;
+        } else if (type == "CQUAD4") {
             int id(f.integer());
             if (trace.size() <= id) {
                 trace.resize(id + 100, 0);
@@ -188,6 +243,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
     }
     delete memory;
 
+    qDebug() << "parser";
     //*
     for (CoordinateLinks::const_iterator l(linksPoint.begin()), end(linksPoint.end()); l != end; ++l) {
         if (systems.contains(l->first)) {
