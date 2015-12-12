@@ -112,7 +112,8 @@ double AFR::damping(const double& maxFreq) const
         return std::numeric_limits<double>::quiet_NaN();
     }
     //Q_ASSERT(freq.range() > 0);
-    return freq.range() / maxFreq;
+
+    return freq.range() / maxFreq * 100;
 }
 
 FrequencyMagnitude AFR::maxItem(const AFR::const_iterator start, const AFR::const_iterator finish) const {

@@ -72,6 +72,7 @@ EigenMode AFRArray::getMode(const double freq) const {
                 Q_ASSERT(k >= 0.0 && k <= 1.0);
                 const FrequencyMagnitude::Amplitude& left(it.at(i - 1).amplitude);
                 result.form()(j) = QVector3D(0.0, toScalar(left + (it.at(i).amplitude - left) * k), 0.0);
+
             }
             ///@todo fix it for each node...
             //result.setDamping(it.damping(freq), i);
