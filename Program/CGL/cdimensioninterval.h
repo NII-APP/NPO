@@ -19,7 +19,7 @@ public:
     double operator[](int id) const { return value[id]; }
     int size() const { return value.size(); }
 
-    RealRange getRange() const { return RealRange(value.first(), value.last()); }
+    CRealRange getRange() const { return CRealRange(value.first(), value.last()); }
 };
 
 #endif // CDIMENSIONINTERVAL_H

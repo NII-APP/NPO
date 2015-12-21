@@ -28,7 +28,7 @@ class ModesIdentChart : public QWidget
     void resizeEvent(QResizeEvent*);
     void leaveEvent(QEvent *);
     void enterEvent(QEvent *);
-    RealRange pickRange();
+    CRealRange pickRange();
     void enableSliders(int);
     static SliderRole valueSliderRole(ModesIdentificationWizard::IdentificationMode);
     void updateResultsSliders();

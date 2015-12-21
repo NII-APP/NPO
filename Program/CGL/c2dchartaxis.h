@@ -14,8 +14,8 @@ class C2dChartAxis : public QGraphicsItemGroup
 {
     Qt::Edge edge;
     QFont font;
-    RealRange range;
-    RealRange domain;
+    CRealRange range;
+    CRealRange domain;
     QGraphicsLineItem* border;
 
     class Ticket;
@@ -27,11 +27,11 @@ public:
     C2dChartAxis(Qt::Edge side, QGraphicsItem* parent = 0);
     ~C2dChartAxis();
 
-    void setLength(const qreal val) { domain = edge & (Qt::LeftEdge | Qt::RightEdge) ? RealRange(val - 2, -1) : RealRange(-1, val - 1); }
-    void setDomain(const RealRange& val) { domain = val; }
-    const RealRange& getDomain() const { return domain; }
-    void setRange(const RealRange& val) { range = val; }
-    const RealRange& getRange() const { return range; }
+    void setLength(const qreal val) { domain = edge & (Qt::LeftEdge | Qt::RightEdge) ? CRealRange(val - 2, -1) : CRealRange(-1, val - 1); }
+    void setDomain(const CRealRange& val) { domain = val; }
+    const CRealRange& getDomain() const { return domain; }
+    void setRange(const CRealRange& val) { range = val; }
+    const CRealRange& getRange() const { return range; }
     void setFont(const QFont& val);
     const QFont& getFont() const { return font; }
 

@@ -5,6 +5,7 @@
 #include "elements/hexa.h"
 #include <cparse.h>
 #include <QDebug>
+#include <cylindercoordinatesystem.h>
 
 void FEM::nativeBDFParser(const QString& fileName) {
 #ifndef QT_NO_DEBUG
@@ -186,9 +187,9 @@ void FEM::nativeBDFParser(const QString& fileName) {
             m[7] = f.fixFloat(wordSize);
             m[8] = f.fixFloat(wordSize);
             f.skipRow();
-            systems.insert(id, 0);/*new CRectangularCoordinateSystem(QVector3D(m[0], m[1], m[2]),
+            systems.insert(id, new CRectangularCoordinateSystem(QVector3D(m[0], m[1], m[2]),
                                                                 QVector3D(m[3], m[4], m[5]),
-                                                                QVector3D(m[6], m[7], m[8])));*/
+                                                                QVector3D(m[6], m[7], m[8])));
         } else if (type == "CORD2C") {
             f += BORDER_FIELD_SIZE - static_cast<int>(type.length()) - (highAccuracy ? 1 : 0);
             const int id(f.fixFloat(wordSize));
@@ -212,9 +213,9 @@ void FEM::nativeBDFParser(const QString& fileName) {
             m[7] = f.fixFloat(wordSize);
             m[8] = f.fixFloat(wordSize);
             f.skipRow();
-            systems.insert(id, 0);/*new CCylinderCoordinateSystem(QVector3D(m[0], m[1], m[2]),
+            systems.insert(id, new CCylinderCoordinateSystem(QVector3D(m[0], m[1], m[2]),
                                                              QVector3D(m[3], m[4], m[5]),
-                                                             QVector3D(m[6], m[7], m[8])));*/
+                                                             QVector3D(m[6], m[7], m[8])));
         } else if (type == "RBE2") {
             f.skipRow();
             if (*f == ' ') {

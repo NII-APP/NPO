@@ -14,7 +14,6 @@
 #include <cassert>
 #include "eigenmode.h"
 #include <QApplication>
-#include <rectangularcoordinatesystem.h>
 
 const int FEM::LOW_POLYGON = 300;
 const unsigned char FEM::CONST_BLACK[] = { 0x00, 0x00, 0x00 };
@@ -444,7 +443,7 @@ void FEM::colorize(const CArray &v, const QString& mes) const
 void FEM::colorizeFromArray(const CArray& v) const
 {
 
-    RealRange range(v.estimateRange());
+    CRealRange range(v.estimateRange());
 
     range.flatProof();
 
@@ -510,7 +509,7 @@ void FEM::colorize(const CGL::CVertexes &v, const QString& mes) const
 {
     measurment = mes;
 
-    RealRange range(v.estimateRange().flatProof());
+    CRealRange range(v.estimateRange().flatProof());
 
     const float height(range.range());
     const float heightp2(height / 2.0f);

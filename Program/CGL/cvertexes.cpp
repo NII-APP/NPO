@@ -17,8 +17,8 @@ const QVector3D& CVertexes::operator ()(int p) const {
 }
 
 
-RealRange CVertexes::estimateRange() const {
-    RealRange domain((*this)(0).lengthSquared());
+CRealRange CVertexes::estimateRange() const {
+    CRealRange domain((*this)(0).lengthSquared());
     int i(static_cast<int>(this->length()));
     while(i) {
         domain.include((*this)(--i).lengthSquared());
@@ -27,9 +27,9 @@ RealRange CVertexes::estimateRange() const {
     domain.setMax(sqrt(domain.getMax()));
     return domain;
 }
-IndexRange CVertexes::estimateRangeIndex() const {
-    RealRange domain((*this)(0).lengthSquared());
-    IndexRange range(0);
+CIndexRange CVertexes::estimateRangeIndex() const {
+    CRealRange domain((*this)(0).lengthSquared());
+    CIndexRange range(0);
     int i(static_cast<int>(this->length()));
     while(i) {
         float v((*this)(--i).lengthSquared());

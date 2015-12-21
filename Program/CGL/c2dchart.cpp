@@ -162,7 +162,7 @@ void C2dChart::update() {
     margins += QMarginsF(0.0, 0.0, 0.0, C2dChartAxis::commendableAxisWeight(xAxis->getFont(), this));
     qreal centerH(scene()->height() - margins.bottom() - margins.top());
     yAxis->setLength(centerH);
-    yAxis->setRange(RealRange(chart->getViewPort().bottom(), chart->getViewPort().top()));
+    yAxis->setRange(CRealRange(chart->getViewPort().bottom(), chart->getViewPort().top()));
     static const qreal LEFT_SIDE_LABELS_CAPACITY(50);
     const qreal yAxysWidth(yAxis->implementation(QPointF(margins.left(), margins.top()),
                                                     chart->yGridInterval(centerH)));
@@ -172,7 +172,7 @@ void C2dChart::update() {
                          0.0, 0.0, 0.0);
     qreal centerW(scene()->width() - margins.left() - margins.right());
     xAxis->setLength(centerW);
-    xAxis->setRange(RealRange(chart->getViewPort().left(), chart->getViewPort().right()));
+    xAxis->setRange(CRealRange(chart->getViewPort().left(), chart->getViewPort().right()));
     xAxis->implementation(QPointF(margins.left(), margins.top() + centerH), chart->xGridInterval(centerW));
 
     chart->move(margins.left(), margins.top());

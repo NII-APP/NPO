@@ -10,7 +10,7 @@ class CDimensionArray : public CDimension
 {
     CArray nodes;
     QString label;
-    RealRange range;
+    CRealRange range;
 public:
     CDimensionArray();
     CDimensionArray(const CArray&, const QString& name = QString());
@@ -26,7 +26,7 @@ public:
     double* data() { return nodes.data(); }
     const double* data() const { return nodes.data(); }
 
-    RealRange getRange() const { return range; }
+    CRealRange getRange() const { return range; }
     void updateRange();
 
     void push_back(const double& v) { range.include(v); nodes.push_back(v); }

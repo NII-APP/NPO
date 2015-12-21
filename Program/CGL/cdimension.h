@@ -26,7 +26,7 @@ public:
     virtual double operator[](int) const { return 0; }
     virtual int size() const { return -1; }
 
-    virtual RealRange getRange() const { return RealRange(0,0); }
+    virtual CRealRange getRange() const { return CRealRange(0,0); }
 
     shared_ptr<CDimension> provideInterval(double begin, double end);
 

@@ -1,5 +1,5 @@
-#ifndef RECTANGULARCOORDINATESYSTEM_H
-#define RECTANGULARCOORDINATESYSTEM_H
+#ifndef CRectangularCoordinateSystem_H
+#define CRectangularCoordinateSystem_H
 class QDataStream;
 class QVector3D;
 #include <QVector3D>
@@ -36,4 +36,4 @@ public:
 QDataStream& operator << (QDataStream& out, const CRectangularCoordinateSystem& g);
 
 
-#endif // RECTANGULARCOORDINATESYSTEM_H
+#endif // CRectangularCoordinateSystem_H

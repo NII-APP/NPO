@@ -26,7 +26,7 @@ void CDimensionArray::updateRange() {
     if (nodes.empty()) {
         return;
     }
-    range = RealRange(nodes.front());
+    range = CRealRange(nodes.front());
     for (CArray::const_iterator i(nodes.begin()); i != nodes.end();  ++i) {
         range.include(*i);
     }

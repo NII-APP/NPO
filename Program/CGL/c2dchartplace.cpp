@@ -150,8 +150,8 @@ void C2dChartPlace::setData(const CChartData& val) {
     vShader->setAttributeBuffer("in_Position", GL_FLOAT, 0, 3);
     vShader->enableAttributeArray("in_Position");
     vArray->release();
-    const RealRange r1(d1.getRange());
-    const RealRange r2(d2.getRange());
+    const CRealRange r1(d1.getRange());
+    const CRealRange r2(d2.getRange());
     viewPort = QRectF(r1.getMin() - r1.range() * 0.1, r2.getMin() - r2.range() * 0.1, r1.range() * 1.2, r2.range() * 1.2);
     bariers.clear();
     bariers.push_back(0);
@@ -186,8 +186,8 @@ void C2dChartPlace::setData(const CChartDataList &val)
                 vertexes(v) = QVector3D(d1[i], d2[i], 0.0);
             }
             bariers.push_back(v);
-            const RealRange r1(d1.getRange());
-            const RealRange r2(d2.getRange());
+            const CRealRange r1(d1.getRange());
+            const CRealRange r2(d2.getRange());
             viewPort |= QRectF(r1.getMin() - r1.range() * 0.1, r2.getMin() - r2.range() * 0.1, r1.range() * 1.2, r2.range() * 1.2);
         }
     }

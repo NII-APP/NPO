@@ -28,7 +28,7 @@ public:
     const QString& getTitle() const { return title; }
     void setTitle(const QString& v) { title = v; }
     const CDimension& operator()(int i) const { return *at(i).get(); }
-    RealRange range(int i) const { return at(i).get()->getRange(); }
+    CRealRange range(int i) const { return at(i).get()->getRange(); }
 };
 
 

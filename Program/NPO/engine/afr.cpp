@@ -76,7 +76,7 @@ double AFR::damping(const double& maxFreq) const
     if (this->empty()) {
         return std::numeric_limits<double>::quiet_NaN();
     }
-    RealRange freq;
+    CRealRange freq;
     typedef CRange<const_iterator> DampingRange;
     DampingRange range(maxNode);
     while (range.getMin() > begin() && stableAbs(range.getMin()->amplitude) >= rimAmplitude) {

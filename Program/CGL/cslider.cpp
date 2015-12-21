@@ -84,7 +84,7 @@ void CSlider::setProxyLabel(QWidget* w)
     __labelBar->setWidget(w);
 }
 
-void CSlider::setPurview(const RealRange& p)
+void CSlider::setPurview(const CRealRange& p)
 {
     __purview = p;
     //to retest the position
@@ -106,17 +106,17 @@ void CSlider::setPixelPosition(const qreal& v)
     setPosition(__range((v - __geometry.x()) / __geometry.width()));
 }
 
-const RealRange& CSlider::getPurview() const
+const CRealRange& CSlider::getPurview() const
 {
     return __purview;
 }
 
-void CSlider::setRange(const RealRange& d)
+void CSlider::setRange(const CRealRange& d)
 {
     __range = d;
 }
 
-const RealRange& CSlider::getRange() const
+const CRealRange &CSlider::getRange() const
 {
     return __range;
 }

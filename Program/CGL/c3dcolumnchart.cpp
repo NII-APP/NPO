@@ -20,12 +20,12 @@ void C3dColumnChart::setData(const CMatrix& d) {
     if (data.empty()) {
         return;
     }
-    RealRange r(data.estimateRange());
+    CRealRange r(data.estimateRange());
     r.include(0.0);
     size = std::max(data.width(), data.height());
-    scale = RealScale(RealRange(r.getMin(),  r.getMax()), RealRange(0.0, size));
+    scale = RealScale(CRealRange(r.getMin(),  r.getMax()), CRealRange(0.0, size));
     this->scene() = CParallelepiped(0.0, size, 0.0, size, 0.0, size);
-    color.setDomain(RealRange(r.getMin(), r.getMax()));
+    color.setDomain(CRealRange(r.getMin(), r.getMax()));
     this->update();
 }
 

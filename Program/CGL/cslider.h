@@ -17,14 +17,14 @@ public:
     explicit CSlider(QGraphicsItem *parent = 0);
     ~CSlider();
 
-    void setPurview(const RealRange&);
-    const RealRange& getPurview() const;
+    void setPurview(const CRealRange&);
+    const CRealRange& getPurview() const;
 
     void setGeometry(const QRectF&);
     const QRectF& getGeometry() const;
 
-    const RealRange& getRange() const;
-    void setRange(const RealRange&);
+    const CRealRange& getRange() const;
+    void setRange(const CRealRange&);
 
     void setDragable(const bool);
     bool isDragable() const;
@@ -50,8 +50,8 @@ public:
 
 private:
     ///area in real coordinates where the slider may be dragable
-    RealRange __purview;
-    RealRange __range;
+    CRealRange __purview;
+    CRealRange __range;
     ///position on scene
     QRectF __geometry;
     double __position;

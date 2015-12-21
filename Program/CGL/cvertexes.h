@@ -18,8 +18,8 @@ public:
     ~CVertexes() {}
 
 
-    RealRange estimateRange() const;
-    IndexRange estimateRangeIndex() const;
+    CRealRange estimateRange() const;
+    CIndexRange estimateRangeIndex() const;
 
     void push_vector_back(const QVector3D&);
 };

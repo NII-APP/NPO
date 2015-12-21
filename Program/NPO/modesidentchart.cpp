@@ -195,7 +195,7 @@ void ModesIdentChart::slidersPotrol(CSlider* s) {
     }
 }
 
-RealRange ModesIdentChart::pickRange() {
+CRealRange ModesIdentChart::pickRange() {
     CSlider* b1(nullptr);
     CSlider* b2(nullptr);
     for (CSlider* s: __sliders.keys()) {
@@ -205,7 +205,7 @@ RealRange ModesIdentChart::pickRange() {
         }
     }
     Q_ASSERT(b2 != nullptr && b1 != nullptr);
-    return RealRange(std::min(b1->getPosition(), b2->getPosition()),
+    return CRealRange(std::min(b1->getPosition(), b2->getPosition()),
                      std::max(b1->getPosition(), b2->getPosition()));
 }
 

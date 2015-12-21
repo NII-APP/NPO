@@ -10,12 +10,12 @@
 
 namespace CGL {
 
-class CInterval : public RealRange
+class CInterval : public CRealRange
 {
     int s;
 public:
     CInterval();
-    CInterval(const RealRange& range, int size = 1000);
+    CInterval(const CRealRange& range, int size = 1000);
     CInterval(double begin, double end, int size = 1000);
     static CInterval interval(double begin, double step, int size);
     inline double first() const { return getMin(); }
@@ -26,8 +26,8 @@ public:
 
     inline double operator[] (int i) const {
         return getMin() + (i ? step() * i : 0.0); }
-    inline bool operator !=(const CInterval& v) const { return RealRange::operator !=(v) && s != v.s; }
-    inline bool operator ==(const CInterval& v) const { return RealRange::operator ==(v) && s == v.s; }
+    inline bool operator !=(const CInterval& v) const { return CRealRange::operator !=(v) && s != v.s; }
+    inline bool operator ==(const CInterval& v) const { return CRealRange::operator ==(v) && s == v.s; }
 
     friend std::ostream& operator << (std::ostream& out, const CInterval& i);
     friend std::istream& operator >> (std::istream& in, CInterval& i);
@@ -40,8 +40,6 @@ public:
 
 std::ostream& operator << (std::ostream& out, const CInterval& i);
 std::istream& operator >> (std::istream& in, CInterval& i);
-QTextStream& operator << (QTextStream& out, const CInterval& i);
-QTextStream& operator >> (QTextStream& in, CInterval& i);
 QDataStream& operator << (QDataStream& out, const CInterval& i);
 QDataStream& operator >> (QDataStream& out, CInterval& i);
 QDebug operator << (QDebug out, const CInterval& i);

@@ -2,11 +2,14 @@
 #define CMatrix_H
 #include <vector>
 #include <cstddef>
-#include "crange.h"
 #include "carray.h"
+#include "cvector.h"
 
+#ifdef QT_VERSION
 class QDebug;
 class QDataStream;
+#endif
+class CRealRange;
 
 class CMatrix
 {
@@ -17,12 +20,12 @@ private:
     typedef std::vector<T*> Pointers;
 
 
-    Data data;
+    Data memory;
     Pointers m;
     int wid;
     void repoint();
 
-    CMatrix dotTranspose() const;
+    CMatrix dotTransposed() const;
 public:
     CMatrix();
     CMatrix(int w, int h);
@@ -40,37 +43,46 @@ public:
     T minInRowExclude(int r, int exclude) const;
     T minInColumnExclude(int c, int exclude) const;
     T max() const;
-    RealRange estimateRange() const;
+    CRealRange estimateRange() const;
     void plusInRow(int r, const T& val);
     void plusInColumn(int c, const T& val);
     void excludeRow(int r);
     void excludeColumn(int c);
 
 
-    CMatrix pseudoInvers() const;
-    CMatrix invers() const;
-    CMatrix transpose() const;
+    CMatrix pseudoInversed() const;
+    CMatrix inversed() const;
+    CMatrix transposed() const;
     CMatrix operator* (const CMatrix&) const;
-    CMatrix operator* (const CArray& vector) const;
+    CVector operator* (const CVector&) const;
     T det();
-    void naNtoInf();
+    void nanToInf();
 
     int width() const { return wid; }
     int height() const { return static_cast<int>(m.size()); }
-    int size() const { return static_cast<int>(data.size()); }
-    bool empty() const { return data.empty(); }
+    int size() const { return static_cast<int>(memory.size()); }
+    bool empty() const { return memory.empty(); }
+    T* data() { return memory.data(); }
+    const T* data() const { return memory.data(); }
 
+
+    friend CVector operator*(const CVector&, const CMatrix&);
+
+#ifdef QT_VERSION
     friend QDebug operator<< (QDebug out, const CMatrix &obj);
 
     friend QDataStream& operator<< (QDataStream&, const CMatrix&);
     friend QDataStream& operator>> (QDataStream&, CMatrix&);
+#endif
 };
 
-CMatrix operator* (const CArray&, const CMatrix&);
+CVector operator* (const CVector&, const CMatrix&);
+#ifdef QT_VERSION
 QDataStream& operator<< (QDataStream&, const CMatrix&);
 QDataStream& operator>> (QDataStream&, CMatrix&);
 
 QDebug operator<< (QDebug out, const CMatrix &obj);
+#endif
 
 #endif // CMatrix_H
 
