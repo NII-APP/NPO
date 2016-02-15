@@ -9,6 +9,7 @@
 //#include <cparse.h>
 //#include <cchartdatalist.h>
 //#include <cchartdata.h>
+//#include <eigenmode.h>
 #include "../../CGL/cparse.h"
 #include "../../CGL/cchartdata.h"
 #include "../../CGL/cchartdatalist.h"
@@ -39,9 +40,8 @@ AFRArray::~AFRArray()
 
 }
 
-EigenMode AFRArray::getMode(const double freq) const {
-
-
+EigenMode AFRArray::getMode(const double freq) const
+{
     auto toScalar([](const FrequencyMagnitude::Amplitude& val)->double
                 { return val.imag() > 0 ? stableAbs(val) : -stableAbs(val); });
     int i(0);
@@ -74,7 +74,7 @@ EigenMode AFRArray::getMode(const double freq) const {
                 result.form()(j) = QVector3D(0.0, toScalar(left + (it.at(i).amplitude - left) * k), 0.0);
             }
             ///@todo fix it for each node...
-            //result.setDamping(it.damping(freq), i);
+            result.setDamping(it.damping(freq), i);
         }
         ++j;
     }

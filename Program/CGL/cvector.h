@@ -20,6 +20,10 @@ public:
     CVector transposed() const;
 
     CVector& operator+=(const value_type& v);
+    CVector& operator+=(const CVector& v);
+
+    CVector operator+(const value_type& v) const;
+    CVector operator+(const CVector& v) const;
 
 private:
     Orientation orientation;

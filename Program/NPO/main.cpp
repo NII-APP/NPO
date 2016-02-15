@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 {
     Application a(argc, argv);
 
-    qDebug() << "xyz";
+    qDebug() << " ";
     MainWindow w;
 
 #ifndef QT_NO_DEBUG

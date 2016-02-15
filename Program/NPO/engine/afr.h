@@ -4,6 +4,7 @@
 #include <complex>
 #include <vector>
 #include <crange.h>
+#include "../CGL/cslider.h"
 
 class QString;
 class RealRange;
@@ -24,7 +25,7 @@ public:
     AFR(const size_t size);
     ~AFR();
     FrequencyMagnitude findEigenFreq(const CRealRange& range) const;
-    double damping(const double &maxFreq) const;
+    double damping(const double &freq, QString& debug = QString(), CSlider* const pos = 0, CSlider* const left = 0, CSlider* const right = 0) const;
 
     enum IntegralParts {
         Real = 0x1,

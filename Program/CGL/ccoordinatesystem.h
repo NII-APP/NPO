@@ -31,6 +31,11 @@ public:
 
 };
 
-QDataStream& operator << (QDataStream& out, const CCoordinateSystem& g);
+inline QDataStream& operator << (QDataStream& out, const CCoordinateSystem& g)
+{
+    out << (quint8)g.type();
+    out.writeRawData(static_cast<const char*>(static_cast<const void*>(g.data)), sizeof(g.data));
+    return out;
+}
 
 #endif // CCOORDINATESYSTEM_H

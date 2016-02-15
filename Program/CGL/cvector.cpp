@@ -29,10 +29,46 @@ void CVector::transpose()
 
 CVector& CVector::operator+=(const value_type& v)
 {
-    for (iterator i(begin()), tail(end()); i != tail; ++i) {
+    iterator i(begin());
+    const iterator tail(end());
+    for (; i != tail; ++i) {
         *i += v;
     }
     return *this;
+}
+
+CVector& CVector::operator+=(const CVector& v)
+{
+    const iterator tail(end());
+    const_iterator j(v.begin());
+    iterator i(begin());
+    for (; i != tail; ++i, ++j) {
+        *i += *j;
+    }
+    return *this;
+}
+
+CVector CVector::operator+(const value_type& v) const
+{
+    CVector result(*this);
+    iterator i(result.begin());
+    const iterator tail(result.end());
+    for (; i != tail; ++i) {
+        *i += v;
+    }
+    return result;
+}
+
+CVector CVector::operator+(const CVector& v) const
+{
+    CVector result(*this);
+    const iterator tail(result.end());
+    const_iterator j(v.begin());
+    iterator i(result.begin());
+    for (; i != tail; ++i, ++j) {
+        *i += *j;
+    }
+    return result;
 }
 
 CVector CVector::transposed() const

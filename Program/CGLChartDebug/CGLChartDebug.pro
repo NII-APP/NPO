@@ -8,12 +8,14 @@ TEMPLATE = app
 
 SUBDIRS += \
     ../CGL/CGL.pro \
-    ../Mesh/Mesh.pro
+    ../Mesh/Mesh.pro \
+    ../CGL/CGL.pro
 
 INCLUDEPATH += ../CGL
 
 DISTFILES += \
-    ../Mesh/Mesh.pri
+    ../Mesh/Mesh.pri \
+    ../CGL/CGL.pri
 
 HEADERS += \
     ../CGL/c2dchart.h \
@@ -57,7 +59,9 @@ HEADERS += \
     ../Mesh/elements/lines.h \
     ../Mesh/elements/quad.h \
     ../Mesh/elements/tetra.h \
-    ../Mesh/elements/tria.h
+    ../Mesh/elements/tria.h \
+    ../CGL/cvector.h \
+    ../CGL/csize.h
 
 SOURCES += \
     ../CGL/c2dchart.cpp \
@@ -103,4 +107,6 @@ SOURCES += \
     ../Mesh/elements/lines.cpp \
     ../Mesh/elements/quad.cpp \
     ../Mesh/elements/tetra.cpp \
-    ../Mesh/elements/tria.cpp
+    ../Mesh/elements/tria.cpp \
+    ../CGL/cvector.cpp \
+    ../CGL/csize.cpp

@@ -30,13 +30,13 @@ public:
     bool testPrew(const char* dest);
     inline bool testPrew(const std::string& dest) { return testPrew(dest.c_str()); }
 
-    CParse& operator +=(int v) { d += v; return *this; }
-    CParse& operator -=(int v) { d -= v; return *this; }
-    CParse& operator ++() { ++d; return *this; }
-    CParse& operator ++(int) { ++d; return *this; }
+    CParse& operator+= (int v) { d += v; return *this; }
+    CParse& operator-= (int v) { d -= v; return *this; }
+    CParse& operator++ () { ++d; return *this; }
+    CParse& operator++ (int) { ++d; return *this; }
     int operator- (const CParse& p) const { return static_cast<int>(d - p.d); }
-    char operator *() const { return *d; }
-    char operator [](int i) const { return d[i]; }
+    char operator* () const { return *d; }
+    char operator[] (int i) const { return d[i]; }
 };
 
 

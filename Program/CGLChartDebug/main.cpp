@@ -7,29 +7,77 @@
 #include "../CGL/cchartdatalist.h"
 #include "../CGL/cslider.h"
 #include <QFile>
+#include <QEventLoop>
+#include <QTimer>
+#include <QVBoxLayout>
+#include <QDebug>
+#include <QTime>
+
+void w8(int ms) {
+    QEventLoop loop;
+    QTimer t;
+    t.singleShot(ms, &loop, SLOT(quit()));
+    loop.exec();
+}
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
 
-    C2dChart chart;
-
     AFRArray afr;
-    afr.read(QFile::exists("C:\\Users\\username\\Downloads\\FRF_10.unv") ?
-                 "C:\\Users\\username\\Downloads\\FRF_10.unv" :
-                 "C:\\Users\\BOPOHOB\\Downloads\\FRF_10.unv");
+    afr.read(QFile::exists("C:\\Users\\BOPOHOB\\Downloads\\FRF_METEORIT.unv") ?
+                 "C:\\Users\\BOPOHOB\\Downloads\\FRF_METEORIT.unv" :
+                 "/user/BOPOHOB/Download/FRF_METEORIT.unv");
+
+    QWidget gui;
+    gui.setLayout(new QVBoxLayout);
+    C2dChart* chart(new C2dChart(&gui));
+    gui.layout()->addWidget(chart);
+    QLabel* label(new QLabel(&gui));
+    gui.layout()->addWidget(label);
 
     CSlider* const slider(new CSlider);
-    slider->setLabelTemplate("%1 hz");
-    chart.addSlider(slider);
-    /*CSlider* const slider2(new CSlider);
-    slider2->setDragable(0);
-    slider2->setPosition(42.8);
-    slider2->setColor(Qt::gray);
-    chart.addSlider(slider2);*/
+    slider->setLabelTemplate("%1 hz source");
+    chart->addSlider(slider);
 
-    chart.showMaximized();
+    CSlider* const pos(new CSlider);
+    pos->setLabelTemplate("%1 hz pos");
+    chart->addSlider(pos);
 
-    chart.setData(afr.average().toChartData(AFR::Magnitude));
+    CSlider* const left(new CSlider);
+    left->setLabelTemplate("%1 hz left");
+    chart->addSlider(left);
 
-    return app.exec();
+    CSlider* const right(new CSlider);
+    right->setLabelTemplate("%1 hz right");
+    chart->addSlider(right);
+
+    chart->showMaximized();
+
+    const AFR average(afr.average());
+
+    chart->setData(average.toChartData(AFR::Amplitude));
+
+    gui.show();
+
+    int i(average.size());
+    while (i && chart->isVisible()) {
+        --i;
+        QTime now(QTime::currentTime());
+        slider->setPosition(average.at(i).frequency);
+
+        const int delay(now.msecsTo(QTime::currentTime()));
+        QString debug;
+        const float damping(average.damping(average.at(i).frequency, debug, pos, left, right));
+        label->setText("damping: " + QString::number(damping) + "\ndelay: " + QString::number(delay) + "\n" + debug);
+        chart->update();
+
+        w8(1000);
+    }
+
+    if (chart->isVisible()) {
+        return app.exec();
+    } else {
+        app.quit();
+        return 0;
+    }
 }

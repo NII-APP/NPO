@@ -25,14 +25,8 @@ CCoordinateSystem* CCoordinateSystem::load(QDataStream& in)
     return r;
 }
 
-QDataStream& operator << (QDataStream& out, const CCoordinateSystem& g)
+bool CCoordinateSystem::operator==(const CCoordinateSystem& o) const
 {
-    out << (quint8)g.type();
-    out.writeRawData(static_cast<const char*>(static_cast<const void*>(g.data)), sizeof(g.data));
-    return out;
-}
-
-bool CCoordinateSystem::operator==(const CCoordinateSystem& o) const {
     const float* p1(data);
     const float* p2(o.data);
     const float* const end(p1 + sizeof(data) / sizeof(data[0]));
