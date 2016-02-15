@@ -5,7 +5,7 @@
 #include "elements/hexa.h"
 #include <cparse.h>
 #include <QDebug>
-#include <cylindercoordinatesystem.h>
+#include <ccylindercoordinatesystem.h>
 
 void FEM::nativeBDFParser(const QString& fileName) {
 #ifndef QT_NO_DEBUG

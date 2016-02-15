@@ -1,19 +1,24 @@
 #include "fem.h"
+
 #include <iostream>
-#include "cparse.h"
 #include <algorithm>
+#include <sstream>
+#include <cassert>
+
+#include <QFile>
+#include <QTextStream>
+#include <QApplication>
+
+#include <cgl.h>
+#include <cparse.h>
+#include <ccylindercoordinatesystem.h>
+
+#include "eigenmode.h"
 #include "elements/quad.h"
 #include "elements/tetra.h"
 #include "elements/tria.h"
 #include "elements/lines.h"
 #include "elements/hexa.h"
-#include "cgl.h"
-#include <QFile>
-#include <QTextStream>
-#include <sstream>
-#include <cassert>
-#include "eigenmode.h"
-#include <QApplication>
 
 const int FEM::LOW_POLYGON = 300;
 const unsigned char FEM::CONST_BLACK[] = { 0x00, 0x00, 0x00 };
@@ -76,7 +81,7 @@ bool FEM::read(const QString &fileName) {
         modes.readF06(fileName);
         for (const CoordinateLink& l : linksSolution) {
             if (systems.contains(l.first)) {
-                CRectangularCoordinateSystem* s(systems[l.first]);
+                CCoordinateSystem* s(systems[l.first]);
                 for (EigenMode& m : modes) {
                     try {
                         s->toGlobal(m.form()(l.second));
@@ -714,7 +719,7 @@ QDataStream& operator << (QDataStream& out, const FEM& g) {
     out << g.systems.size();
     for (FEM::CoordinateSystems::const_iterator i(g.systems.begin()); i != g.systems.end(); ++i) {
         out << i.key();
-        i.value()->save(out);
+        out << *i.value();
     }
 
     out << g.modes;

@@ -1,14 +1,13 @@
-#include "cylindercoordinatesystem.h"
-#include <QVector3D>
-#include <QDataStream>
-#define _USE_MATH_DEFINES
+#include "ccylindercoordinatesystem.h"
 #include <cmath>
-#include <math.h>
 
 CCylinderCoordinateSystem::CCylinderCoordinateSystem(const QVector3D& d, const QVector3D& z, const QVector3D& p)
     : CRectangularCoordinateSystem(d, z, p) { }
 
 void CCylinderCoordinateSystem::toGlobal(QVector3D& v) const {
+#ifndef M_PI
+    static const float M_PI(acos(-1.0));
+#endif
     static const float k(static_cast<float>(1. / 180. * M_PI));
     const float phi(v.y() * k);
     //Optimization)) be careful

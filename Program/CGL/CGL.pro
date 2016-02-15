@@ -25,9 +25,11 @@ UI_DIR = $$PWD/../build/app/ui
 MOC_DIR = $$PWD/../build/app/moc
 
 
-SOURCES += [a-z]*.cpp
+SOURCES += [a-z]*.cpp \
+    ccoordinatesystem.cpp
 
-HEADERS += [a-z]*.h
+HEADERS += [a-z]*.h \
+    ccoordinatesystem.h
 
 unix {
     target.path = /usr/lib

@@ -7,8 +7,6 @@
 #include "cmatrix.h"
 #include "crange.h"
 #include "carray.h"
-#include "rectangularcoordinatesystem.h"
-#include "cylindercoordinatesystem.h"
 
 namespace CGL
 {

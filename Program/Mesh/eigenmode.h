@@ -2,6 +2,7 @@
 #define EIGENMODE_H
 #include "cgl.h"
 #include "cvertexes.h"
+#include <QVector3D>
 
 class QDataStream;
 

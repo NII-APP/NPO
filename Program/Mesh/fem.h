@@ -18,6 +18,7 @@
 #include <QMatrix3x3>
 #include "eigenmodes.h"
 #include "bdfentity.h"
+#include <ccoordinatesystem.h>
 
 using namespace core;
 class FEM
@@ -89,7 +90,7 @@ private:
     void scarfUp(PyParse::BDFEntity &entity);
 protected:
     //coordinate systems. firest is the ordering number of coordinate system, second is correspond coordinate system
-    typedef QMap<int, CRectangularCoordinateSystem*> CoordinateSystems;
+    typedef QMap<int, CCoordinateSystem*> CoordinateSystems;
     CoordinateSystems systems;
 
 
