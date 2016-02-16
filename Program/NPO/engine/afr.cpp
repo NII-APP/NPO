@@ -49,7 +49,7 @@ FrequencyMagnitude AFR::findEigenFreq(const CRealRange& range) const
     return maxItem(startIterator,finishIterator);
 }
 
-double AFR::damping(const double& maxFreq, QString& debug, CSlider * const pos, CSlider * const left, CSlider * const right) const
+double AFR::damping(const double& maxFreq) const
 {
     if (this->empty()) {
         return std::numeric_limits<double>::quiet_NaN();
@@ -64,13 +64,9 @@ double AFR::damping(const double& maxFreq, QString& debug, CSlider * const pos, 
     if (maxNode == begin() || maxNode == end() || maxNode == end() - 1) {
         return std::numeric_limits<double>::quiet_NaN();
     }
-    if (pos) {
-        pos->setPosition(maxNode->frequency);
-    }
     //I try to use CRange for this interpolation. but it's couse application fall... just like abs(std::complex)
     const double k(deltafreq(maxNode) / (maxFreq - (maxNode - 1)->frequency));
     FrequencyMagnitude::Amplitude maxAmplitude((maxNode - 1)->amplitude + (maxNode->amplitude - (maxNode - 1)->amplitude) * k);
-    debug += "value k: " + QString::number(k) + " (it must be pure 1.0)\n";
 
 #ifndef SQRT2
     const double rimAmplitude(stableAbs(maxAmplitude) / sqrt(2.0));
@@ -104,7 +100,6 @@ double AFR::damping(const double& maxFreq, QString& debug, CSlider * const pos, 
         //i.e. finde the tail of data and it's not pass the rim condition. value is invalid.
         return std::numeric_limits<double>::quiet_NaN();
     }
-    debug += "min k: " + QString::number(minK) + "\n";
 
 
     const CRealRange maxInterpolation((range.getMax() - 1)->frequency, range.getMax()->frequency);
@@ -115,11 +110,6 @@ double AFR::damping(const double& maxFreq, QString& debug, CSlider * const pos, 
     } else {
         return std::numeric_limits<double>::quiet_NaN();
     }
-    if (left && right) {
-        left->setPosition(freq.min());
-        right->setPosition(freq.max());
-    }
-    debug += "max k: " + QString::number(maxK) + "\n";
     Q_ASSERT(freq.range() > 0);
     return freq.range() / maxFreq;
 }

@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+
 #include <QVBoxLayout>
 #include <QTimer>
 #include <QFrame>
@@ -11,6 +12,9 @@
 #include <QDir>
 #include <QFileDevice>
 #include <QSettings>
+#include <QShortcut>
+#include <QFileDialog>
+
 #include "application.h"
 #include "identity.h"
 #include "project.h"
@@ -56,6 +60,21 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closePorject()));
+
+    connect(new QShortcut(QKeySequence("ctrl+shift+alt+p"),this, 0,0, Qt::ApplicationShortcut),
+            &QShortcut::activated, this, [this](){
+        this->setFixedSize(1000,600);
+    });
+    connect(new QShortcut(QKeySequence("ctrl+shift+alt+o"),this, 0,0, Qt::ApplicationShortcut),
+            &QShortcut::activated, this, [this](){
+        QPixmap pix(this->size());
+        this->render(&pix);
+        QString s(QFileDialog::getSaveFileName(this, "Save img", QString(), QString("*.png")));
+        if (s.split('.').last().toLower() != "png") {
+            s += ".png";
+        }
+        pix.save(s);
+    });
 }
 
 MainWindow::~MainWindow()
