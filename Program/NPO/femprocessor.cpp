@@ -17,7 +17,7 @@ FEMProcessor::~FEMProcessor() {
 }
 
 void FEMProcessor::modelReadedSlot() {
-    emit modelReaded();
+    emit modelReaded(__model);
 }
 
 void FEMProcessor::MACUpdatedSlot() {

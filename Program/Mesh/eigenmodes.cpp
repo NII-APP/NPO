@@ -287,7 +287,9 @@ QDataStream& operator << (QDataStream& s, const EigenModes& g) {
     s << g.mac;
     s << g.file;
     s << static_cast<quint32>(g.size());
-    qDebug() << "write size" << g.size();
+#ifndef QT_NO_DEBUG
+    qDebug() << "writed modes count" << g.size();
+#endif
     for (EigenModes::const_iterator i(g.begin()), end(g.end()); i != end; ++i) {
         s << *i;
     }

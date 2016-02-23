@@ -23,6 +23,7 @@ public:
 
     void push_vector_back(const QVector3D&);
 };
+
 }
 
 using CGL::CVertexes;

@@ -55,7 +55,9 @@ void Project::save(const QString &filename)
     }
 
     QDataStream out(&file);
+#ifndef QT_NO_DEBUG
     QTime loop(QTime::currentTime());
+#endif
     out << Project::INSURANCE_ROW;
     out << Identity::PROGRAM_VERSION;
     out << static_cast<quint32>(geometries.size());

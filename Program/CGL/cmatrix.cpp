@@ -151,7 +151,7 @@ QDataStream& operator<< (QDataStream& out, const std::vector<CMatrix::T>& m) {
     out << static_cast<const quint32>(m.size());
     const int writed(out.writeRawData(static_cast<const char*>(static_cast<const void*>(m.data())),
                                       static_cast<int>(m.size() * sizeof(CMatrix::T))));
-    if (writed == static_cast<int>(m.size() * sizeof(CMatrix::T))) {
+    if (writed != static_cast<int>(m.size() * sizeof(CMatrix::T))) {
         out.setStatus(QDataStream::WriteFailed);
     }
     return out;

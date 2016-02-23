@@ -55,3 +55,8 @@ void ViewerView::acceptNewProject() {
 void ViewerView::update() {
     QTreeView::reset();
 }
+
+void ViewerView::updateModel(int id) {
+    QTreeView::dataChanged(myModel()->index(id, 0, QModelIndex()),
+                           myModel()->index(id, 0, QModelIndex()));
+}

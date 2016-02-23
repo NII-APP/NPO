@@ -128,6 +128,7 @@ QDataStream& operator<< (QDataStream& out, const CArray& m)
 {
     out << static_cast<const quint32>(m.size());
     const int writed(out.writeRawData(static_cast<const char*>(static_cast<const void*>(m.data())), static_cast<int>(m.size() * sizeof(CArray::value_type))));
+
     if (writed != static_cast<int>(m.size() * sizeof(CArray::value_type))) {
         out.setStatus(QDataStream::WriteFailed);
     }

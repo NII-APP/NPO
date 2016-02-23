@@ -28,7 +28,7 @@ public:
     ~FEMProcessor();
 
 signals:
-    void modelReaded();
+    void modelReaded(FEM*);
     void MACUpdated();
     void MACEstimated();
     void finished();

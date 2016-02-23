@@ -675,27 +675,41 @@ bool operator==(const FEM &l, const FEM &r)
 QDataStream& operator << (QDataStream& out, const FEM& g) {
 #ifndef QT_NO_DEBUG
     QTime loop(QTime::currentTime());
+    qint64 preWrited(out.device()->pos());
+    qDebug() << "attempting to write fem with" << g.vertexes.size() <<
+                "vertexes and" << g.modes.size() << "modes";
+    if (out.status() != QDataStream::Ok) {
+        qDebug() << ">>> FARAL OUT STATE" << out.status() << "<<<";
+    }
 #endif
+
     out << g.sqre << g.isTraced << g.measurment << g.file << static_cast<int>(g.modelType);
+
     out << g.name;
+
     out << g.vertexes << g.colors;
 
+
     quint32 shellsSize;
-    shellsSize = g.shells.size();
+    shellsSize = static_cast<quint32>(g.shells.size());
     out << shellsSize;
+
     for (size_t i = 0; i < shellsSize; ++i) {
         out << g.shells[i];
+
     }
 
     quint32 materialsSize;
-    materialsSize = g.materials.size();
+    materialsSize = static_cast<quint32>(g.materials.size());
     out << materialsSize;
+
     for (size_t i = 0; i < materialsSize; ++i) {
         out << g.materials[i];
+
     }
 
     quint32 linksSize;
-    linksSize = g.linksPoint.size();
+    linksSize = static_cast<quint32>(g.linksPoint.size());
     out << linksSize;
     for (size_t i = 0; i < linksSize; ++i) {
         out << g.linksPoint[i].first;
@@ -717,16 +731,24 @@ QDataStream& operator << (QDataStream& out, const FEM& g) {
     }
 
     out << g.systems.size();
+
     for (FEM::CoordinateSystems::const_iterator i(g.systems.begin()); i != g.systems.end(); ++i) {
         out << i.key();
         out << *i.value();
+
     }
+
 
     out << g.modes;
 
+
 #ifndef QT_NO_DEBUG
+    if (out.status()) {
+        qDebug() << ">>> FATAL OUT STATE" << out.status() << "<<<";
+    }
     qDebug() << "\tmesh with name" << g.name <<
-             "was finaly saved (" << loop.msecsTo(QTime::currentTime()) << "ms)";
+             "was finaly saved (" << loop.msecsTo(QTime::currentTime()) << "ms, " <<
+               out.device()->pos() - preWrited << "b))";
 #endif
 
     return out;
@@ -735,10 +757,17 @@ QDataStream& operator >> (QDataStream& in, FEM& g)
 {
 #ifndef QT_NO_DEBUG
     QTime loop(QTime::currentTime());
+    const quint64 preWrited(in.device()->bytesAvailable());
+    if (in.status() != QDataStream::Ok) {
+        qDebug() << ">>> FARAL IN STATE" << in.status() << "<<<";
+    }
 #endif
     int modelType;
     in >> g.sqre >> g.isTraced >> g.measurment >> g.file >> modelType;
     in >> g.name;
+#ifndef QT_NO_DEBUG
+    qDebug() << "    read model " << g.name;
+#endif
     g.modelType = static_cast<FEM::ModelType>(modelType);
     in >> g.vertexes >> g.colors;
 
@@ -792,7 +821,8 @@ QDataStream& operator >> (QDataStream& in, FEM& g)
     in >> g.modes;
 #ifndef QT_NO_DEBUG
     qDebug() << "\tmesh with name" << g.name <<
-             "was finaly uploaded (" << loop.msecsTo(QTime::currentTime()) << "ms)";
+             "was finaly uploaded (" << loop.msecsTo(QTime::currentTime()) << "ms, " <<
+                         preWrited - in.device()->bytesAvailable() << "b)";
 #endif
     return in;
 }
