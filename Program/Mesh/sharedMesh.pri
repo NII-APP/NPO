@@ -1,7 +1,10 @@
 INCLUDEPATH += $$PWD
 
+    $$PWD/**.cpp
 SOURCES += \
-    $$PWD/*.cpp
+    $$PWD/elements/**.cpp
 
 HEADERS += \
-    $$PWD/*.h
+    $$PWD/**.h
+HEADERS += \
+    $$PWD/elements/**.h

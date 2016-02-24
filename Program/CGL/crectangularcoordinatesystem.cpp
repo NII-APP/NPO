@@ -1,6 +1,7 @@
 #include "crectangularcoordinatesystem.h"
 
 CRectangularCoordinateSystem::CRectangularCoordinateSystem(const QVector3D& d, const QVector3D& z, const QVector3D& p)
+    : CRectangularCoordinateSystem()
 {
     this->d(0) = d;
     this->d(3) = z - d;
