@@ -20,8 +20,8 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-include(../CGL/CGL.pri)
-include(../Mesh/Mesh.pri)
+include(../CGL/sharedCGL.pri)
+include(../Mesh/sharedMesh.pri)
 
 CONFIG(debug, debug|release): {
 OBJECTS_DIR = $$PWD/../build/debug/main/obj

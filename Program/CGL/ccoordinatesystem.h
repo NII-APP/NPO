@@ -19,6 +19,7 @@ public:
         Spherical
     };
 
+    CCoordinateSystem() {}
     virtual ~CCoordinateSystem() {}
     virtual void toGlobal(QVector3D& v) const = 0;
     virtual CCoordinateSystem* clone() const = 0;
