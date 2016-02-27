@@ -200,6 +200,7 @@ std::string CParse::word()
 
     return ret;
 }
+
 void CParse::skipRow() {
     if (!d) {
         return;
@@ -209,6 +210,13 @@ void CParse::skipRow() {
     }
     while (*d == '\n' || *d == '\r') {
         ++d;
+    }
+}
+
+void CParse::skipRows(int c) {
+    while (c) {
+        skipRow();
+        --c;
     }
 }
 

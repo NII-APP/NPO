@@ -14,6 +14,7 @@ public:
     const QVector3D& operator () (int p) const;
     QVector3D& operator () (int p);
     int length() const { return static_cast<int>(size() / 3); }
+    void reachOut(int);
 
     ~CVertexes() {}
 
@@ -27,5 +28,7 @@ public:
 }
 
 using CGL::CVertexes;
+
+QDebug operator<<(QDebug out, const CVertexes& m);
 
 #endif // VERTEXES_H

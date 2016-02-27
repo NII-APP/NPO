@@ -25,6 +25,7 @@ public:
     float fixFloat(const int fixLen);
 
     void skipRow();
+    void skipRows(int);
     void skipTo(const char* dest);
     inline void skipTo(const std::string& dest) { skipTo(dest.c_str()); }
     bool testPrew(const char* dest);

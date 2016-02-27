@@ -44,10 +44,49 @@ CIndexRange CVertexes::estimateRangeIndex() const {
     return range;
 }
 
+void CVertexes::reachOut(int s)
+{
+    if (length() <= s) {
+        ++s;
+        this->resize(s * 3, 0.0f);
+    }
+}
+
 void CVertexes::push_vector_back(const QVector3D& v) {
     push_back(v.x());
     push_back(v.y());
     push_back(v.z());
 }
 
+}
+
+QDebug operator<<(QDebug out, const CVertexes& m)
+{
+    switch (m.size()) {
+    case 0:
+        out << "CVertexes( 0 ) { }";
+        return out;
+    case 1:
+        out << "CVertexes( 1 ) {" << m(0) << "}";
+        return out;
+    case 2:
+        out << "CVertexes( 2 ) {" << m(0) << ',' << m(1) << "}";
+        return out;
+    case 3:
+        out << "CVertexes( 3 ) {" << m(0) << ',' << m(1) << ',' << m(2) << "}";
+        return out;
+    case 4:
+        out << "CVertexes( 4 ) {" << m(0) << ',' << m(1) << ',' << m(2) << ',' << m(3) << "}";
+        return out;
+    case 5:
+        out << "CVertexes( 5 ) {" << m(0) << ',' << m(1) << ',' << m(2) << ',' << m(3) << ',' << m(4) << "}";
+        return out;
+    case 6:
+        out << "CVertexes( 6 ) {" << m(0) << ',' << m(1) << ',' << m(2) << ',' << m(3) << ',' << m(4) << ',' << m(5) << "}";
+        return out;
+    default:
+        out << "CVertexes(" << m.length() << "* 3 ) {" << m(0) << ',' << m(1)
+            << "..." << m(m.size() - 2) << ',' << m(m.size() - 1) << "}";
+        return out;
+    }
 }

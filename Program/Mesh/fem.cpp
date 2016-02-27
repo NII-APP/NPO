@@ -210,7 +210,8 @@ int FEM::arriveKnownUNVBlock(CParse& f) {
     while (*f && !(f.testPrew("    -1\n    15\n") ||
                    f.testPrew("    -1\n    82\n") ||
                    f.testPrew("    -1\n  2420\n") ||
-                   f.testPrew("    -1\n  2411\n")))
+                   f.testPrew("    -1\n  2411\n") ||
+                   f.testPrew("    -1\n    55\n")))
         ++f;
     f.skipRow();
     if        (f.testPrew("    15\n")) {
@@ -225,6 +226,9 @@ int FEM::arriveKnownUNVBlock(CParse& f) {
     } else if (f.testPrew("  2411\n")) {
         f.skipRow();
         return 2411;
+    } else if (f.testPrew("    55\n")) {
+        f.skipRow();
+        return 55;
     }
     return *f ? -1 : 0;
 }
@@ -254,8 +258,6 @@ bool FEM::readUNV(const QString &fileName)
     }
     UNVTransformations.clear();
 
-    core::Lines* elem(new core::Lines);
-    trace.push_back(elem);
     int blockId;
     while (static_cast<bool>(blockId = arriveKnownUNVBlock(f))) {
         switch (blockId) {
@@ -264,24 +266,22 @@ bool FEM::readUNV(const QString &fileName)
             //it's set of vertexes
             while (!f.testPrew("    -1")) {
                 int vId(f.integer());
-                while (vertexes.length() < vId) {
-                    vertexes.push_back(0.0);
-                    vertexes.push_back(0.0);
-                    vertexes.push_back(0.0);
-                }
+                vertexes.reachOut(vId);
                 f.integer();
                 f.integer();
                 f.integer();
-                vertexes.push_back(f.real());
-                vertexes.push_back(f.real());
-                vertexes.push_back(f.real());
+                const float x(f.real());
+                const float y(f.real());
+                const float z(f.real());
+                vertexes(vId) = QVector3D(x, y, z);
                 ++f;
             }
 #ifndef QT_NO_DEBUG
-            qDebug() << '\t' << vertexes.length() << " vertexes in geometryr";
+            qDebug() << '\t' << vertexes.length() << " vertexes in geometry";
 #endif
         } break;
         case 82: {
+            core::Lines* elem;
             //it's the trace of experemental nodes
             if (*f != ' ' || f[1] != '\n') {
                 f.skipRow();
@@ -291,6 +291,7 @@ bool FEM::readUNV(const QString &fileName)
                 unsigned n(f.integer());
                 if (n < unsigned(-1) && n) {
                     elem->addNode(n);
+                    qDebug() << n;
                 } else {
                     trace.push_back(elem = new core::Lines);
                 }
@@ -335,11 +336,27 @@ bool FEM::readUNV(const QString &fileName)
                 f.skipRow();
             }
         } break;
+        case 55: {
+            f.skipRows(7);
+            modes.push_back(EigenMode(f.real()));
+            EigenMode& mode(modes.back());
+            qDebug() << mode.frequency();
+            f.skipRow();
+            while (!f.testPrew("    -1")) {
+                const int v(f.integer());
+                mode.form().reachOut(v);
+                const float x(f.real());
+                const float y(f.real());
+                const float z(f.real());
+                mode.form()(v) = QVector3D(x, y, z);
+                ++f;
+            }
+        } break;
         case -1:
         default:
             f -= 6;
 #ifndef QT_NO_DEBUG
-            qDebug() << "\tinknown UNV block (" << f.integer() << "). try to skip. . .";
+            qDebug() << "\tunknown UNV block (" << f.integer() << "). try to skip. . .";
 #endif
             while (!f.testPrew("    -1\n")) {
                 f.skipRow();
@@ -349,6 +366,9 @@ bool FEM::readUNV(const QString &fileName)
     delete memory;
     estimateTraced();
     estimateBox();
+    if (!modes.empty()) {
+        modes.estimateDefoultMagnitudes();
+    }
     modelType = Practic;
 #ifndef QT_NO_DEBUG
     qDebug() << '\t' << loop.msecsTo(QTime::currentTime()) / 1e3 << "s parsing pelay";

@@ -27,7 +27,10 @@ public:
 
 private:
     Orientation orientation;
-
 };
+
+#ifndef NOT_QT_AVAILABLE
+QDebug operator<<(QDebug out, const CVector& m);
+#endif
 
 #endif // CVECTOR_H

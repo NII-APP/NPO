@@ -77,3 +77,36 @@ CVector CVector::transposed() const
     r.orientation = orientation == Horizontal ? Vertical : Horizontal;
     return r;
 }
+
+#ifndef NOT_QT_AVAILABLE
+QDebug operator<<(QDebug out, const CVector& m)
+{
+    switch (m.size()) {
+    case 0:
+        out << "CArray[ 0 ] { }";
+        return out;
+    case 1:
+        out << "CArray[ 1 ] {" << m[0] << "}";
+        return out;
+    case 2:
+        out << "CArray[ 2 ] {" << m[0] << ',' << m[1] << "}";
+        return out;
+    case 3:
+        out << "CArray[ 3 ] {" << m[0] << ',' << m[1] << ',' << m[2] << "}";
+        return out;
+    case 4:
+        out << "CArray[ 4 ] {" << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << "}";
+        return out;
+    case 5:
+        out << "CArray[ 5 ] {" << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << ',' << m[4] << "}";
+        return out;
+    case 6:
+        out << "CArray[ 6 ] {" << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << ',' << m[4] << ',' << m[5] << "}";
+        return out;
+    default:
+        out << "CArray(" << m.size() << ") {" << m[0] << ',' << m[1] << ',' << m[2]
+            << "..." << m[m.size() - 3] << ',' << m[m.size() - 2] << ',' << m[m.size() - 1] << "}";
+        return out;
+    }
+}
+#endif
