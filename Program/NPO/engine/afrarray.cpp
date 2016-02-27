@@ -87,7 +87,7 @@ EigenMode AFRArray::getMode(const double freq) const
 
 void AFRArray::read(const QString& filename, int nodesCount) {
     this->resize(nodesCount);
-
+#define AFR_ARRAY_READER_DEBUG
     QFile file(filename);
     if (!file.open(QFile::ReadOnly)) {
         throw QFile::OpenError;
@@ -138,14 +138,19 @@ void AFRArray::read(const QString& filename, int nodesCount) {
                 it->amplitude.real(p.real());
                 it->amplitude.imag(p.real());
             }
-            while (!p.testPrew("    -1")) {
+            int lim(10);
+            while (!p.testPrew("    -1") && --lim) {
                 p.skipRow();
             }
+            Q_ASSERT(lim);
             std::sort(array.begin(), array.end(), [](const FrequencyMagnitude& a, const FrequencyMagnitude& b)->bool{ return a.frequency < b.frequency; });
         }
         Q_ASSERT(p.testPrew("    -1"));
         p.skipRow();
     }
+#ifdef AFR_ARRAY_READER_DEBUG
+    qDebug() << "UFF 58 readed";
+#endif
 }
 
 AFR AFRArray::average() const {

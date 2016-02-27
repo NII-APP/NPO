@@ -263,7 +263,12 @@ bool FEM::readUNV(const QString &fileName)
         {
             //it's set of vertexes
             while (!f.testPrew("    -1")) {
-                f.integer();
+                int vId(f.integer());
+                while (vertexes.length() < vId) {
+                    vertexes.push_back(0.0);
+                    vertexes.push_back(0.0);
+                    vertexes.push_back(0.0);
+                }
                 f.integer();
                 f.integer();
                 f.integer();
@@ -283,8 +288,8 @@ bool FEM::readUNV(const QString &fileName)
                 f.skipRow();
             }
             while (!f.testPrew("\n    -1")) {
-                unsigned n(f.integer() - 1);
-                if (n < unsigned(-1)) {
+                unsigned n(f.integer());
+                if (n < unsigned(-1) && n) {
                     elem->addNode(n);
                 } else {
                     trace.push_back(elem = new core::Lines);
