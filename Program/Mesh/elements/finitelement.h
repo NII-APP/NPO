@@ -23,9 +23,9 @@ public:
         TetraType = 2,
         HexaType = 3,
         TriaType = 4,
+        BarType = 6,
         //follow types still haven't realisation
-        BushType = 5,
-        BarType = 6
+        BushType = 5
     };
     FinitElement();
     virtual ~FinitElement() {}

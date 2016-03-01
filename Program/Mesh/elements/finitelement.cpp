@@ -10,6 +10,7 @@
 #include <vector>
 #include <QBitArray>
 #include <QIODevice>
+#include "bar.h"
 
 namespace core {
 
@@ -61,7 +62,9 @@ FinitElement* FinitElement::resolveType(int type) {
         return new Hexa;
     case TriaType:
         return new Tria;
-    case BushType: case BarType:
+    case BarType:
+        return new Bar;
+    case BushType:
         return nullptr;
     default:
         return nullptr;

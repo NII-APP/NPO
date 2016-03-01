@@ -19,6 +19,7 @@
 #include "elements/tria.h"
 #include "elements/lines.h"
 #include "elements/hexa.h"
+#include "elements/bar.h"
 
 const int FEM::LOW_POLYGON = 300;
 const unsigned char FEM::CONST_BLACK[] = { 0x00, 0x00, 0x00 };
@@ -281,19 +282,17 @@ bool FEM::readUNV(const QString &fileName)
 #endif
         } break;
         case 82: {
-            core::Lines* elem;
             //it's the trace of experemental nodes
             if (*f != ' ' || f[1] != '\n') {
                 f.skipRow();
                 f.skipRow();
             }
+            quint32 n1(0), n2(0);
             while (!f.testPrew("\n    -1")) {
-                unsigned n(f.integer());
-                if (n < unsigned(-1) && n) {
-                    elem->addNode(n);
-                    qDebug() << n;
-                } else {
-                    trace.push_back(elem = new core::Lines);
+                n1 = n2;
+                n2 = f.integer();
+                if (n1 && n2) {
+                    trace.push_back(new core::Bar(n1, n2));
                 }
             }
             ++f;
