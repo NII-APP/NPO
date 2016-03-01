@@ -1,13 +1,11 @@
 INCLUDEPATH += $$PWD
 
 SOURCES += \
-    $$PWD/**.cpp \
-    $$PWD/elements/bar.cpp
+    $$PWD/**.cpp
 SOURCES += \
     $$PWD/elements/**.cpp
 
 HEADERS += \
-    $$PWD/**.h \
-    $$PWD/elements/bar.h
+    $$PWD/**.h
 HEADERS += \
     $$PWD/elements/**.h

@@ -1,15 +1,18 @@
 #include "finitelement.h"
+
+#include <cassert>
+#include <vector>
+
 #include <QDataStream>
+#include <QDebug>
+#include <QBitArray>
+#include <QIODevice>
+
 #include "lines.h"
 #include "hexa.h"
 #include "quad.h"
 #include "tetra.h"
 #include "tria.h"
-#include <QDebug>
-#include <cassert>
-#include <vector>
-#include <QBitArray>
-#include <QIODevice>
 #include "bar.h"
 
 namespace core {
@@ -49,8 +52,8 @@ void FinitElement::fillTraced(QBitArray & a) const {
     }
 }
 
-FinitElement* FinitElement::resolveType(int type) {
-
+FinitElement* FinitElement::resolveType(int type)
+{
     switch (type) {
     case LinesType:
         return new Lines;
