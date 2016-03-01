@@ -43,6 +43,15 @@ ViewerModel::ModelRow ViewerModel::modelRole(const int row, const int model) con
 #endif
             return WrongId;
         }
+    case 3:
+        try {
+            return __project->modelsList().at(model)->getModes().empty() ? ModesCompute : WrongId;
+        } catch (...) {
+#ifdef VIEWERMODEL_DEBUG
+            qDebug() << model << "value fail";
+#endif
+            return WrongId;
+        }
     }
     return WrongId;
 }
@@ -210,6 +219,7 @@ QVariant ViewerModel::data(const QModelIndex & index, int role) const {
             static const QString modesStr(Application::identity()->tr("modes", "viewer model"));
             static const QString importStr(Application::identity()->tr("import", "viewer model"));
             static const QString identificationStr(Application::identity()->tr("identification", "viewer model"));
+            static const QString compute(Application::identity()->tr("compute", "viewer model"));
             static const QString macStr(Application::identity()->tr("mac", "viewer model"));
             switch (r) {
             case ViewerModel::Vertexes:
@@ -220,6 +230,8 @@ QVariant ViewerModel::data(const QModelIndex & index, int role) const {
                 return importStr;
             case ViewerModel::ModesIdentification:
                 return identificationStr;
+            case ViewerModel::ModesCompute:
+                return compute;
             case ViewerModel::MAC:
                 return macStr;
             }

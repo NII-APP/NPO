@@ -23,6 +23,7 @@ class FEMProcessor : public QObject
     QThread* const __t;
 
     class FEMWorker;
+    class FEMCalculateModes;
 public:
     FEMProcessor(FEM* model, QObject* parent);
     ~FEMProcessor();
@@ -35,10 +36,7 @@ signals:
 
 public slots:
     void read(const QString& filename);
-private slots:
-    void modelReadedSlot();
-    void MACUpdatedSlot();
-    void MACEstimatedSlot();
+    void calculateModes();
 };
 
 class FEMProcessor::FEMWorker : public QThread   {
@@ -56,6 +54,18 @@ signals:
     void modelReaded();
     void MACUpdated();
     void MACEstimated();
+};
+
+class FEMProcessor::FEMCalculateModes : public QThread   {
+    Q_OBJECT
+
+    FEM* const __model;
+
+public:
+    FEMCalculateModes(FEM* model, QObject* parent);
+    void run() Q_DECL_OVERRIDE;
+signals:
+    void calculated();
 };
 
 #endif // FEMPROCESSOR_H

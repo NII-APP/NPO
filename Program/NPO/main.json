@@ -141,7 +141,9 @@
     	"identification rus" : "Идентифицировать собственные формы...",
         "identification eng" : "Eigen modes import...",
         "models list eng" : "Avalible models",
-        "models list rus" : "Модели"
+        "models list rus" : "Модели",
+        "compute rus" : "Расчитать собственные формы...",
+        "compute eng" : "Compute eigen modes..."
     },
 
     "pair tab" : {

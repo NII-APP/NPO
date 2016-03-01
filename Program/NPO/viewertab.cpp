@@ -3,6 +3,10 @@
 #include <QModelIndex>
 #include <QTreeView>
 #include <QFile>
+#include <QMessageBox>
+#include <QProgressBar>
+#include <QHBoxLayout>
+#include <QLabel>
 
 #include <fem.h>
 
@@ -29,6 +33,22 @@ ViewerTab::ViewerTab(QWidget *parent)
     this->connect(femView, SIGNAL(currentModeChanged(int, int)), SLOT(setMode(int)));
     this->connect(femView, SIGNAL(MACPressed(int)), SLOT(showMAC(int)));
     this->connect(femView, SIGNAL(modesIdentificationPressed(int)), SLOT(identificateModes(int)));
+    this->connect(femView,&ViewerView::calcModes, [this](int v) {
+        QMessageBox* const hold(new QMessageBox(this));
+        hold->setModal(true);
+        hold->setStandardButtons(QMessageBox::NoButton);
+        hold->setText("Ща посчитаю");
+        QEventLoop* const loop(new QEventLoop(hold));
+        FEMProcessor p(Application::nonConstProject()->modelsList()[v], hold);
+        connect(&p, &FEMProcessor::finished, [loop](){
+            loop->exit();
+        });
+        connect(hold, &QMessageBox::finished, [loop]() { loop->exit(); });
+        hold->show();
+        p.calculateModes();
+        loop->exec();
+        hold->deleteLater();
+    });
     this->addWidget(femView);
     this->addWidget(cascadeNode);
     this->setSizes(QList<int>() << 300 << 1000);

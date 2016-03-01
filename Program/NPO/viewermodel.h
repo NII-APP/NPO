@@ -13,7 +13,8 @@ public:
         Modes = 2,
         ImportModes = 3,
         ModesIdentification = 4,
-        MAC = 5,
+        ModesCompute = 5,
+        MAC = 6,
 
         WrongId = 0xFFFF
     };
@@ -21,7 +22,7 @@ public:
 private:
     enum ModelRowsCount {
         WithModes = 3,
-        WithoutModes = 3
+        WithoutModes = 4
     };
 public:
     static bool isRootIndex(const QModelIndex&);

@@ -22,6 +22,7 @@ signals:
     void importModesPressed(int);
     void modesIdentificationPressed(int);
     void MACPressed(int);
+    void calcModes(int);
 
 public slots:
     void update();

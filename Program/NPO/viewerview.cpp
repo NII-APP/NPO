@@ -39,6 +39,8 @@ void ViewerView::mousePressEvent(QMouseEvent* e) {
         emit modesIdentificationPressed(modelId);
     } else if (r == ViewerModel::MAC) {
         emit MACPressed(modelId);
+    } else if (r == ViewerModel::ModesCompute) {
+        emit calcModes(modelId);
     }
 }
 
