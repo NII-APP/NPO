@@ -145,9 +145,13 @@ void ModesIdentChart::pickMode()
     __chart->addSlider(s);
     s->setPosition(__sliders.key(valueSliderRole(__currentMode))->getPosition());
     if (__currentMode == ModesIdentificationWizard::Pick) {
-        __currentResults[__currentMode]->push_back(__data->getMode(s->getPosition()));
+        const EigenMode mod(__data->getMode(s->getPosition()));
+        qDebug() << "alpha";
+        __currentResults[__currentMode]->push_back(mod);
+        qDebug() << "sort";
         std::sort(__currentResults[__currentMode]->begin(), __currentResults[__currentMode]->end(),
                   [](const EigenMode& a, const EigenMode& b)->bool{ return a.frequency() < b.frequency(); });
+        qDebug() << "end";
     }
     currentResultChanged(__currentResults[__currentMode]);
 }

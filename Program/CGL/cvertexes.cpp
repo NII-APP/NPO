@@ -86,7 +86,7 @@ QDebug operator<<(QDebug out, const CVertexes& m)
         return out;
     default:
         out << "CVertexes(" << m.length() << "* 3 ) {" << m(0) << ',' << m(1)
-            << "..." << m(m.size() - 2) << ',' << m(m.size() - 1) << "}";
+            << "..." << m(static_cast<int>(m.size()) - 2) << ',' << m(static_cast<int>(m.size()) - 1) << "}";
         return out;
     }
 }

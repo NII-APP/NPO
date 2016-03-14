@@ -3,6 +3,9 @@
 #include "elements/tetra.h"
 #include "elements/tria.h"
 #include "elements/hexa.h"
+
+#include <cassert>
+
 #include <cparse.h>
 #include <QDebug>
 #include <ccylindercoordinatesystem.h>
@@ -118,7 +121,24 @@ void FEM::nativeBDFParser(const QString& fileName) {
                 trace.resize(id + 100, 0);
             }
             int m(f.integer());
-            trace[id] = new core::Hexa(f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer());
+            int indexex[8];
+            int i(0);
+            while (*f != '+' && i < 8) {
+                indexex[i] = f.fixFloat8();
+                ++i;
+            }
+            if (*f == '+') {
+                ++f;
+                const int fId(f.integer());
+                const int fId2(f.integer());
+                assert(fId2 == fId);
+            }
+            while (i < 8) {
+                indexex[i] = f.fixFloat8();
+                ++i;
+            }
+            trace[id] = new core::Hexa(indexex[0],indexex[1],indexex[2],indexex[3],
+                    indexex[4],indexex[5],indexex[6],indexex[7]);
             trace[id]->setShell(m);
             f.skipRow();
         } else if (type == "GRID") {

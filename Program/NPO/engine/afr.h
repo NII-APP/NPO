@@ -14,6 +14,10 @@ struct FrequencyMagnitude {
     typedef std::complex<double> Amplitude;
     Amplitude amplitude;
     double frequency;
+
+    bool operator==(const FrequencyMagnitude& o) const {
+        return amplitude == o.amplitude && o.frequency == frequency;
+    }
 };
 
 //amplitude-frequency response

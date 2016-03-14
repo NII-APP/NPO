@@ -227,7 +227,7 @@ const CMatrix& EigenModes::getMAC() const {
 
 
 void EigenModes::MACEstimationPrepare() {
-    mac = CMatrix(size(), size());
+    mac = CMatrix(static_cast<int>(size()), static_cast<int>(size()));
     for (EigenModes::iterator it(begin()); it != end(); ++it) {
         it->updatePreMac();
     }

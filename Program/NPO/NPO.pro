@@ -8,7 +8,32 @@
 QT       += core opengl gui svg
 win32 {
     QT += winextras
+
+    LIBS += -L$$PWD\..\igolib
+    INCLUDEPATH += $$PWD\..\igolib
+    DEPENDPATH += $$PWD\..\igolib
+
+    !contains(QMAKE_TARGET.arch, x86_64) {
+        message("x86 build")
+
+        !win32-g++ {
+            LIBS += -lExtSolInterface
+            PRE_TARGETDEPS += $$PWD/../igolib/ExtSolInterface.lib
+        } else {
+            message("Kiselev lib doesn't compiled as *.a (gcc) lib")
+            DEFINES += "DISABLE_KISELEV_SOLVER"
+        }
+    } else {
+        message("x86_64 build")
+
+        LIBS += -lExtSolInterface64
+        PRE_TARGETDEPS += $$PWD/../igolib/ExtSolInterface64.lib
+    }
+} else {
+    message("nix build doesn't allow winextras and Kiselev solver")
+    DEFINES += "DISABLE_KISELEV_SOLVER"
 }
+
 
 RC_ICONS += "images/Bez_imeni-1.ico"
 
@@ -22,19 +47,6 @@ CONFIG += c++11
 
 include(../CGL/sharedCGL.pri)
 include(../Mesh/sharedMesh.pri)
-
-CONFIG(debug, debug|release): {
-OBJECTS_DIR = $$PWD/../build/debug/main/obj
-TARGET = main_d
-}
-else: {
-OBJECTS_DIR = $$PWD/../build/release/main/obj
-TARGET = main
-}
-DESTDIR = $$PWD/../build/binaries
-RCC_DIR = $$PWD/../build/main/rcc
-UI_DIR = $$PWD/../build/main/ui
-MOC_DIR = $$PWD/../build/main/moc
 
 SOURCES += main.cpp \
     relationdialog.cpp \
@@ -105,7 +117,6 @@ exists( engine/pyParse/BDFEntity.cpp ) {
     DEFINES += "PyBDF"
 }
 
-OTHER_FILES +=
 
 RESOURCES += \
     res.qrc

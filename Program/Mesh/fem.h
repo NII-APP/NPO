@@ -30,8 +30,10 @@ public:
         Practic,
         Truncated
     };
+
+    typedef std::vector<core::FinitElement*> FinitElements;
 private:
-    typedef std::vector<core::FinitElement*> Trace;
+    typedef FinitElements Trace;
     typedef std::vector<Shell> Shells;
     typedef std::vector<int> TraceBufer;
     typedef std::vector<int> IntegerArray;
@@ -148,17 +150,24 @@ public:
     CGL::CVertexes& getNodes() { return vertexes; }
     void setNodes(const CGL::CVertexes& v) { vertexes = v; }
 
+    //shells
+    const Shells& getShells() const { return shells; }
+    Shells& getShells() { return shells; }
+    void setShells(const Shells& v) { shells = v; }
+    const Shell& getShell(const int p) const { return shells.at(p); }
+    Shell& getShell(const int p) { return shells.at(p); }
+
     //colorss
     const CGL::Colors& getColors() const { return colors; }
     CGL::Colors& getColors() { return colors; }
     void setColors(const CGL::Colors& v) { colors = v; }
 
     //elements
-    std::vector<core::FinitElement*>& elements() { return trace; }
-    const std::vector<core::FinitElement*>& elements() const { return trace; }
+    FinitElements& elements() { return trace; }
+    const FinitElements& elements() const { return trace; }
     //synonyms for elements assess functions
-    std::vector<core::FinitElement*>& getElements() { return trace; }
-    const std::vector<core::FinitElement*>& getElements() const { return trace; }
+    FinitElements& getElements() { return trace; }
+    const FinitElements& getElements() const { return trace; }
 
     inline const QString& getMeasurment() { return measurment; }
     inline void setMeasurment(const QString& m) { measurment = m; }

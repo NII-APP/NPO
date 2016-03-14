@@ -22,7 +22,7 @@ public:
 private:
     enum ModelRowsCount {
         WithModes = 3,
-        WithoutModes = 4
+        WithoutModes = 3
     };
 public:
     static bool isRootIndex(const QModelIndex&);

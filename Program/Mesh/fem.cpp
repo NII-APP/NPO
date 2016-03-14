@@ -301,10 +301,14 @@ bool FEM::readUNV(const QString &fileName)
         case 2411: {
             //it's enother way to declare a vertexes
             while (!f.testPrew("    -1\n")) {
+                const int id(f.integer());
+                vertexes.reachOut(id);
                 f.skipRow();
-                vertexes.push_back(f.real());
-                vertexes.push_back(f.real());
-                vertexes.push_back(f.real());
+                QVector3D v;
+                v.setX(f.real());
+                v.setY(f.real());
+                v.setZ(f.real());
+                vertexes(id) = v;
                 f.skipRow();
             }
         } break;
@@ -339,7 +343,6 @@ bool FEM::readUNV(const QString &fileName)
             f.skipRows(7);
             modes.push_back(EigenMode(f.real()));
             EigenMode& mode(modes.back());
-            qDebug() << mode.frequency();
             f.skipRow();
             while (!f.testPrew("    -1")) {
                 const int v(f.integer());
@@ -835,10 +838,10 @@ QDataStream& operator >> (QDataStream& in, FEM& g)
     FEM::CoordinateSystems::size_type s;
     in >> s;
     int key;
-    CRectangularCoordinateSystem* val;
+    CCoordinateSystem* val;
     while (s--) {
         in >> key;
-        //val = CRectangularCoordinateSystem::load(in);
+        val = CCoordinateSystem::load(in);
         g.systems.insert(key, val);
     }
 
@@ -900,7 +903,7 @@ void FEM::layToBDF(const QString& source, const QString& dest, const CArray& dE,
     for (size_t i(0); i != newMat.size(); ++i) {
         for (size_t j(0); j != shells.size(); ++j) {
             newShell[i * shells.size() + j] = shells[j];
-            newShell[i * shells.size() + j].setMatId(i);
+            newShell[i * shells.size() + j].setMatId(static_cast<int>(i));
         }
     }
     QBitArray isUsed(static_cast<int>(newShell.size()));
