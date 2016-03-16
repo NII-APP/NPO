@@ -71,6 +71,19 @@ CVector CVector::operator+(const CVector& v) const
     return result;
 }
 
+CVector CVector::operator-(const CVector& v)
+{
+
+if ( this->capacity() != v.capacity()){
+throw "Length vector error";
+}
+CVector result(this->capacity());
+for (int i(0); i < result.capacity(); i++) {
+result[i] = v[i] - this->at(i);
+}
+return result;
+}
+
 CVector CVector::transposed() const
 {
     CVector r(*this);
