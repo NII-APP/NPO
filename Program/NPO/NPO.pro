@@ -20,8 +20,9 @@ win32 {
             LIBS += -lExtSolInterface
             PRE_TARGETDEPS += $$PWD/../igolib/ExtSolInterface.lib
         } else {
-            message("Kiselev lib doesn't compiled as *.a (gcc) lib")
-            DEFINES += "DISABLE_KISELEV_SOLVER"
+            message("Kiselev lib doesn't compiled as *.a (gcc) lib. Now it's compiled from our sources")
+
+            SOURCES += $$PWD\..\igolib\*.cpp
         }
     } else {
         message("x86_64 build")
