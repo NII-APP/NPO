@@ -71,6 +71,18 @@ CVector CVector::operator+(const CVector& v) const
     return result;
 }
 
+CVector CVector::operator-(const CVector& v)
+{
+    CVector result(*this);
+    const iterator tail(result.end());
+    const_iterator j(v.begin());
+    iterator i(result.begin());
+    for (; i != tail; ++i, ++j) {
+        *i -= *j;
+    }
+    return result;
+}
+
 CVector CVector::transposed() const
 {
     CVector r(*this);
