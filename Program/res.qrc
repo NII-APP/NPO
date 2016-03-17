@@ -1,0 +1,34 @@
+<RCC>
+    <qresource prefix="/media">
+        <file>resource/images/togleOff.png</file>
+        <file>resource/images/togleOn.png</file>
+        <file>resource/images/hill.png</file>
+        <file>resource/images/view.png</file>
+        <file>resource/images/pair.png</file>
+        <file>resource/images/busy.gif</file>
+        <file>resource/images/pause-512px.svg</file>
+        <file>resource/images/play-512px.svg</file>
+        <file>resource/images/stop-512px.svg</file>
+        <file>resource/images/list-add-512px.svg</file>
+        <file>resource/images/panel_pair.svg</file>
+        <file>resource/images/plane_model.svg</file>
+        <file>resource/images/open.png</file>
+        <file>resource/images/orientation.png</file>
+        <file>resource/images/warning.svg</file>
+        <file>resource/images/amp.png</file>
+        <file>resource/images/average.png</file>
+        <file>resource/images/re.png</file>
+        <file>resource/images/im.png</file>
+    </qresource>
+    <qresource prefix="/css" lang="css">
+        <file>resource/css.css</file>
+    </qresource>
+    <qresource prefix="/json">
+        <file>resource/main.json</file>
+    </qresource>
+    <qresource prefix="/docs">
+        <file>resource/identificationMethodsDiscription/manual rus.htm</file>
+        <file>resource/identificationMethodsDiscription/img/ok.png</file>
+        <file>resource/identificationMethodsDiscription/view rus.htm</file>
+    </qresource>
+</RCC>

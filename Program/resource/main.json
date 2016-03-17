@@ -1,0 +1,263 @@
+{
+    "py" : "C:/Python34/python.exe",
+    "BDFParse" : "../../NPO/readBDF.py",
+    "main window title rus" : "ModalView %1[*]",
+    "organization name eng" : "simmetrics",
+    "organization name rus" : "simmetrics",
+    "organization domain eng" : "simmetrics.ru",
+    "organization domain rus" : "simmetrics.ru",
+    "application name eng" : "ModalView",
+    "application name rus" : "ModalView",
+    "language": "rus",
+    "file menu" : {
+        "rus" : "Файл",
+        "eng" : "File",
+        "items" : [
+            {
+                "signal" : "close",
+                "rus" : "Закрыть текущий проект",
+                "eng" : "Close current project",
+                "hotkey" : "ctrl+n"
+            },
+            {
+                "signal" : "open",
+                "rus" : "Открыть проект",
+                "eng" : "Open project",
+                "hotkey" : "ctrl+o"
+            },
+            {
+                "signal" : "save",
+                "rus" : "Сохранить проект",
+                "eng" : "Save project",
+                "hotkey" : "ctrl+s"
+            },
+            {
+                "signal" : "save as",
+                "rus" : "Сохранить проект как...",
+                "eng" : "Save project as...",
+                "hotkey" : "ctrl+shift+s"
+            },
+            {
+                "signal" : "import",
+                "rus" : "Импортировать модель",
+                "eng" : "Model import",
+                "hotkey" : "ctrl+i"
+            }
+        ]
+    },
+    "FileNameEdit" : {
+        "tooltip eng" : "Chose file",
+        "tooltip rus" : "Указать файл",
+        "warning tooltip rus" : "Файл не задан",
+        "warning tooltip eng" : "Current file doesn't exist",
+        "open file icon" : ":/media/resource/images/open.png",
+        "warning icon" : ":/media/resource/images/warning.svg"
+    },
+    "tab view eng" : "View",
+    "tab view rus" : "Просмотр",
+    "tab view icon" : ":/media/resource/images/plane_model.svg",
+    "tab pair eng" : "Mode pairs",
+    "tab pair rus" : "Модальные пары",
+    "tab pair icon" : ":/media/resource/images/panel_pair.svg",
+    "geometries model add rus" : "Добавить модель . . .",
+    "geometries model add eng" : "Add FEM . . .",
+    "geometry widget no data image" : ":/media/resource/images/hill.png",
+    "form selector label eng" : "Mode %1 (%2 Hz)",
+    "form selector label rus" : "Форма %1 (%2 Гц)",
+    "chose model" : {
+        "caption rus" : "Укажите файл модели",
+        "caption eng" : "Chose mesh file",
+        "filter" : "mesh(*.bdf *.unv *.dat)"
+    },
+    "chose modes" : {
+        "caption rus" : "Укажите файл форм колебаний (не обязательно)",
+        "caption eng" : "Chose mesh file (optioanl)",
+        "filter" : "modes(*.f06 *.txt)"
+    },
+    "save project" : {
+        "caption rus" : "Сохранить проект",
+        "caption eng" : "Save project",
+        "filter" : "project(*.pro)"
+    },
+    "load project" : {
+        "caption rus" : "Открытие проекта",
+        "caption eng" : "Open project",
+        "filter" : "project(*.pro)"
+    },
+    "can't save file rus" : "Невозможно открыть файл для записи (отказано в доступе)",
+    "can't save file eng" : "Can't open file for writing (acces denied)",
+    "hertz eng" : "Hz",
+    "hertz rus" : "Гц",
+    "cant open" : {
+        "text rus" : "Не удалось открыть для чтеиия файл \"%1\"",
+        "text eng" : "Can't read file \"%1\"",
+        "title rus" : "Возникла ошибка при открытии файла",
+        "title eng" : "File error"
+    },
+    "close modified" : {
+        "text rus" : "Вы хотите сохранить изменения в проекте?",
+        "text eng" : "Would you save the changes in project?",
+        "title rus" : "Сохранение изменений",
+        "title eng" : "Changes saving"
+    },
+    "cant start python" : {
+        "text rus" : "Не удалось запустить модуль PyNastran \"%1\"",
+        "text eng" : "Can't start PyNastran module \"%1\"",
+        "title rus" : "Структурная ошибка приложения",
+        "title eng" : "Program error"
+    },
+    "wrong file" : {
+        "text rus" : "Файл \"%1\" не является проектом, поддерживаемым данным приложением",
+        "text eng" : "Can't open this file \"%1\" as a projecto of this application",
+        "title rus" : "Возникла ошибка при открытии файла",
+        "title eng" : "File error"
+    },
+    "obsolete program" : {
+        "text rus" : "Проект \"%1\" создан в более новой версии приложения",
+        "text eng" : "Project \"%1\" was saved in newer sersion of application",
+        "title rus" : "Возникла ошибка при открытии файла",
+        "title eng" : "File error"
+    },
+    "import progress dialog" : {
+        "program start rus" : "Запуск модуля pyNastran...",
+        "program start eng" : "Start the pyNastran...",
+        "open file rus" : "Открытие файла \"%1\"...",
+        "open file eng" : "File \"%1\"...",
+        "parsing rus" : "Разбор файла...",
+        "parsing eng" : "Parsing...",
+        "transmit rus" : "Передача данных...",
+        "transmit eng" : "Transmit the data..."
+    },
+    "add item" : ":/media/resource/images/list-add-512px.svg",
+    "viewer model" : {
+        "mac rus" : "Aвто-МАC",
+        "mac eng" : "Auto-MAC",
+    	"vertexes rus" : "Узлы (%1)",
+    	"vertexes eng" : "Nodes (%1)",
+    	"modes rus" : "Собственные формы (%1)",
+    	"modes eng" : "Eigen modes (%1)",
+    	"import rus" : "Импортировать собственные формы...",
+    	"import eng" : "Import eigen modes...",
+    	"identification rus" : "Идентифицировать собственные формы...",
+        "identification eng" : "Eigen modes import...",
+        "models list eng" : "Avalible models",
+        "models list rus" : "Модели",
+        "compute rus" : "Расчитать собственные формы...",
+        "compute eng" : "Compute eigen modes..."
+    },
+
+    "pair tab" : {
+        "model" : {
+            "title rus" : "Модальные пары",
+            "title eng" : "Modal pairs",
+            "item rus" : "Пара №%0",
+            "item eng" : "Pair #%0",
+            "MAC rus" : "МАC",
+            "MAC eng" : "МАC",
+            "add item rus" : "Добавить пару . . .",
+            "add item eng" : "Add new pair . . .",
+            "project is null rus" : "Не обнаружен проект для отображения",
+            "project is null eng" : "Project toesn't suggested"
+        }
+    },
+
+    "FEMViewer" : {
+        "frequency rus" : "Частота анимации",
+        "frequency eng" : "Animation frequency",
+        "magnitude rus" : "Амплитуда анимации",
+        "magnitude eng" : "Animation magnitude",
+        "stop rus" : "Выключить анимацию",
+        "stop eng" : "Disable animation",
+        "play rus" : "Запустить",
+        "play eng" : "Play",
+        "pause rus" : "Пауза",
+        "pause eng" : "Pause",
+        "mode rus" : "Форма",
+        "mode eng" : "Mode"
+    },
+
+    "modes identification wizard" : {
+        "select file eng" : "File",
+        "select file rus" : "Файл",
+        "accept eng" : "Accept",
+        "accept rus" : "Принять",
+        "cancel eng" : "Cancel",
+        "cancel rus" : "Отмена",
+        "file dialog" : {
+            "caption eng" : "Select file with amplitude-response curves",
+            "caption rus" : "Укажите файл результатов испытаний",
+            "filter" : "Universal File Format(*.unv)"
+        },
+        "size warning" : {
+            "title rus" : "Обнаружено несоответствие исходных данных",
+            "title eng" : "Wrong dataset",
+            "text rus" : "Количество узлов модели (%1) не совпадает с количеством амплитудно-частотных характеристик (%2) в файле \"%3\"",
+            "text eng" : "Number of vertexes of model (%1) must be equal to AFR sets count (%2) in file \"%3\""
+        },
+        "file warning" : {
+            "title rus" : "Файл не содержит необходимых данных",
+            "title eng" : "Wrong dataset",
+            "text rus" : "Не обнаружено результатов модальных испытаний в формате unv:58 в файле \"%1\"",
+            "text eng" : "Required dataset (unv:58) doesn't finded in file \"%1\""
+        },
+        "orientation icon" : ":/media/resource/images/orientation.png",
+        "orientation tooltip eng" : "Change splitter orientation",
+        "orientation tooltip rus" : "Изменить направление разделителя",
+        "chart" : {
+            "xLabel eng" : "Frequency [Hz]",
+            "xLabel rus" : "Частота [Гц]",
+            "yLabel rus" : "Амплитуда",
+            "yLabel eng" : "Amplitude",
+            "title eng" : "Amplitude-frequency response",
+            "title rus" : "Амплитудно-частотная характеристика",
+            "average rus" : "Среднее значение",
+            "average eng" : "Average",
+            "re rus" : "Действительная часть",
+            "re eng" : "Real part",
+            "im rus" : "Мнимая часть",
+            "im eng" : "Imaginary part",
+            "amplitude rus" : "Модуль",
+            "amplitude eng" : "Amplitude"
+        },
+        "methods selector" : {
+            "title eng" : "<h2>Eigen modes identification methods</h2>",
+            "title rus" : "<h2>Методы идентификации собственных форм</h2>",
+            "export button eng" : "Modes export",
+            "export button rus" : "Экспорт форм",
+            "result template rus" : "Частота №%1: %2 Гц (ζ=%3)",
+            "result template eng" : "Mode #%1: %2 Hz (ζ=%3)"
+        },
+
+        "methods" : [
+            {
+                "name" : "viewing",
+                "title rus" : "Режим просмотра",
+                "title eng" : "Viewing mode",
+                "disabled" : false,
+                "discription file eng" : "filename",
+                "discription file rus" : ":/docs/identificationMethodsDiscription/view rus.htm"
+            },
+            {
+                "name" : "picking",
+                "title rus" : "Метод выделения тона",
+                "title eng" : "Peak picking",
+                "params" : [],
+                "disabled" : false,
+                "discription file eng" : "filename",
+                "discription file rus" : ":/docs/identificationMethodsDiscription/manual rus.htm"
+            },
+            {
+                "title rus" : "Метод полиномиальной аппроксимации",
+                "title eng" : "Least square curve fitting",
+                "params" : [],
+                "disabled" : true
+            },
+            {
+                "title rus" : "Метод сингулярного разложения",
+                "title eng" : "Frequency domain decomposition",
+                "params" : [],
+                "disabled" : true
+            }
+        ]
+    }
+}

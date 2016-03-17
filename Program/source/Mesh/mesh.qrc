@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/scripts">
+        <file>meshSummator.vert</file>
+        <file>readBDF.py</file>
+    </qresource>
+</RCC>
