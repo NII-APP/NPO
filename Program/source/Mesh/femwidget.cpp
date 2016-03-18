@@ -170,7 +170,8 @@ void FEMWidget::play() {
 }
 
 void FEMWidget::MeshBuffer::setCurrentMode(int form) {
-    if (modes().size() > form && form >= 0) {
+    if (modes().size() > form && form >= 0 && modes()[form].form().size() >=
+            vertexSize / sizeof(CVertexes::value_type)) {
         proxyDefoultMagnitude = 0.0f;
         colorize(form);
         mode = form;

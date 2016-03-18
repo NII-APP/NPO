@@ -167,6 +167,25 @@ float CParse::fixFloat(int fixLen)
     return num * sign;
 }
 
+int CParse::fixInt(const int fixLen)
+{
+    bool positive(true);
+    int result(0);
+    while (fixLen && *d && *d != '\n') {
+        switch (*d)
+        {
+        case '-':
+            positive = false;
+            break;
+        case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+            result *= 10;
+            result += *d - '0';
+            break;
+        }
+    }
+    return result;
+}
+
 std::string CParse::string()
 {
     char* start(d);

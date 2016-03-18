@@ -31,13 +31,17 @@ public:
 
     T range() const { return this->second - this->first; }
 
-    void include(const T& v) {
-        this->first = std::min(v, this->first);
-        this->second = std::max(v, this->second);
+    void include(const T& v) {\
+        if (v == v && fabs(v) != std::numeric_limits<T>::infinity()) {
+            this->first = std::min(v, this->first);
+            this->second = std::max(v, this->second);
+        }
     }
     void include(const std::vector<T>& v) {
         for (typename std::vector<T>::const_iterator it(v.begin()), end(v.end()); it != end; ++it) {
-            include(*it);
+            if (isfinite(*it)) {
+                include(*it);
+            }
         }
     }
 

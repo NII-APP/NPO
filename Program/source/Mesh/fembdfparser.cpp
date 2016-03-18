@@ -116,25 +116,22 @@ void FEM::nativeBDFParser(const QString& fileName) {
             trace[id]->setShell(m);
             f.skipRow();
         } else if (type == "CHEXA") {
-            int id(f.integer());
+            f += 4;
+            int id(f.fixFloat8());
             if (trace.size() <= id) {
                 trace.resize(id + 100, 0);
             }
-            int m(f.integer());
+            int m(f.fixFloat8());
             int indexex[8];
             int i(0);
-            while (*f != '+' && i < 8) {
+            while (*f != '+' && i < 6) {
                 indexex[i] = f.fixFloat8();
                 ++i;
             }
-            if (*f == '+') {
-                ++f;
-                const int fId(f.integer());
-                const int fId2(f.integer());
-                assert(fId2 == fId);
-            }
+                f.skipRow();
+                f += 8;
             while (i < 8) {
-                indexex[i] = f.fixFloat8();
+                indexex[i] = f.integer();
                 ++i;
             }
             trace[id] = new core::Hexa(indexex[0],indexex[1],indexex[2],indexex[3],
@@ -264,11 +261,9 @@ void FEM::nativeBDFParser(const QString& fileName) {
     }
     delete memory;
 
-    qDebug() << "parser";
-    //*
     for (CoordinateLinks::const_iterator l(linksPoint.begin()), end(linksPoint.end()); l != end; ++l) {
         if (systems.contains(l->first)) {
             systems[l->first]->toGlobal(vertexes(l->second));
         }
     }
-}\
+}

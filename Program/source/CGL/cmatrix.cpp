@@ -95,12 +95,14 @@ void CMatrix::plusInRow(int r, const T& val) {
         mass[i] += val;
 }
 
-void CMatrix::plusInColumn(int c, const T& val) {
+void CMatrix::plusInColumn(int c, const T& val)
+{
     for (T* it(memory.data() + c), *end(it + memory.size()); it != end; it += wid)
         *it += val;
 }
 
-void CMatrix::excludeRow(int r) {
+void CMatrix::removeRow(int r)
+{
     if (height() <= r)
         return;
     for (T* it(m[r]), *dest(it + wid), *end(memory.data() + memory.size()); dest < end; ++it, ++dest)
@@ -113,7 +115,8 @@ void CMatrix::excludeRow(int r) {
         *this = CMatrix();
 }
 
-void CMatrix::excludeColumn(int c) {
+void CMatrix::removeColumn(int c)
+{
     if (width() <= c)
         return;
     if (width() == 1) {
@@ -136,7 +139,24 @@ void CMatrix::excludeColumn(int c) {
     repoint();
 }
 
-void CMatrix::nanToInf() {
+void CMatrix::fill(const T& val)
+{
+    std::fill(memory.begin(), memory.end(), val);
+}
+
+int CMatrix::finiteCount() const
+{
+    int count(0);
+    for (Data::const_iterator it(memory.begin()); it != memory.end(); ++it) {
+        if (isfinite(*it)) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+void CMatrix::nanToInf()
+{
     for (Data::iterator it(memory.begin()); it != memory.end(); ++it) {
         if (!(*it == *it)) {
             *it = std::numeric_limits<T>::infinity();
@@ -317,7 +337,7 @@ CMatrix CMatrix::inversed() const {
     for (int i(0); i < height(); i++){
         for (int j(0); j < width(); j++)
         {
-                matrixE[i][j] = 0.0;
+            matrixE[i][j] = 0.0;
             if (i == j){
                 matrixE[i][j] = 1.0;
             }
@@ -347,7 +367,7 @@ CMatrix CMatrix::inversed() const {
                   m[i][j] -= m[k][j] * temp;
                   matrixE[i][j] -= matrixE[k][j] * temp;
             }
-          }
+        }
     }
     return matrixE;
 }
@@ -376,7 +396,7 @@ CMatrix CMatrix::transposed() const{
             result[i][j] = m[j][i];
         }
     }
-     return result;
+    return result;
 }
 
 CMatrix CMatrix::pseudoInversed() const{

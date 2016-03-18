@@ -3,7 +3,7 @@
 #include <QLayout>
 
 MACDisplay::MACDisplay(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent, Qt::Dialog)
     , __chart(new CGL::C3dColumnChart(this))
 {
     this->setLayout(new QVBoxLayout(this));

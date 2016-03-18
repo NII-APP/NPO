@@ -25,10 +25,10 @@ FEMViewer::FEMViewer(QWidget* parent)
     , mode(new FEMViewerModeInput(this, toolbox))
     , frequency(new FEMViewerFrequencyInput(toolbox))
     , magnitude(new FEMViewerMagnitudeInput(toolbox))
-    , pause(Identity::fromSvg(":/media/images/pause-512px.svg"))
-    , play(Identity::fromSvg(":/media/images/play-512px.svg"))
+    , pause(Identity::fromSvg(":/media/resource/images/pause-512px.svg"))
+    , play(Identity::fromSvg(":/media/resource/images/play-512px.svg"))
     , run(new QAction(pause, Application::identity()->tr("pause", "FEMViewer"),toolbox))
-    , stop(new QAction(Identity::fromSvg(":/media/images/stop-512px.svg"), Application::identity()->tr("stop", "FEMViewer"),toolbox))
+    , stop(new QAction(Identity::fromSvg(":/media/resource/images/stop-512px.svg"), Application::identity()->tr("stop", "FEMViewer"),toolbox))
 {
     femWidget->setVisible(false);
     femWidget->move(0,0);
@@ -129,7 +129,7 @@ void FEMViewer::paintEvent(QPaintEvent *)
     if (femWidget->isVisible()) {
         return;
     }
-    static const QPixmap bg(":/media/images/hill.png");
+    static const QPixmap bg(":/media/resource/images/hill.png");
     QPainter painter(this);
     painter.drawPixmap(QRect(QPoint(this->width() / 2.0 - bg.width() / 2.0, this->height() / 2.0 - bg.height() / 2.0), bg.size()), bg);
 }
@@ -145,6 +145,7 @@ void FEMViewer::setModel(const FEM* m) const
 
 void FEMViewer::setMode(const int m)
 {
+    updateToolBar();
     femWidget->setMode(m);
 }
 

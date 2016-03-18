@@ -23,6 +23,7 @@ public:
     float fixFloat8() { return fixFloat(8); }
     float fixFloat16() { return fixFloat(16); }
     float fixFloat(const int fixLen);
+    int fixInt(const int fixLen);
 
     void skipRow();
     void skipRows(int);

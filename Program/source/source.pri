@@ -5,7 +5,6 @@ INCLUDEPATH += $$PWD
 
 HEADERS += $$PWD/*.h \
     $$PWD/gui/viewerTab/viewermodel.h \
-    $$PWD/gui/viewerTab/viewernode.h \
     $$PWD/gui/viewerTab/viewertab.h \
     $$PWD/gui/viewerTab/viewerview.h \
     $$PWD/gui/toolbox/filenameedit.h \
@@ -28,7 +27,6 @@ HEADERS += $$PWD/*.h \
     $$PWD/gui/mainWindow/mainwindow.h
 SOURCES += $$PWD/*.cpp \
     $$PWD/gui/viewerTab/viewermodel.cpp \
-    $$PWD/gui/viewerTab/viewernode.cpp \
     $$PWD/gui/viewerTab/viewertab.cpp \
     $$PWD/gui/viewerTab/viewerview.cpp \
     $$PWD/gui/toolbox/filenameedit.cpp \

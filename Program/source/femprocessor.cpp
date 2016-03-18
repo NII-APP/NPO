@@ -12,7 +12,6 @@
 FEMProcessor::FEMProcessor(FEM *model, QObject *parent)
     : QObject(parent)
     , __model(model)
-    , __t(new QThread(this))
 {
 
 }
@@ -25,11 +24,21 @@ void FEMProcessor::read(const QString& filename) {
     FEMWorker* w(new FEMWorker(__model, this));
     w->setFileName(filename);
     connect(w, SIGNAL(finished()), w, SLOT(deleteLater()));
-    connect(w, &FEMWorker::modelReaded, [this]() { emit modelReaded(this->__model); });
+    connect(w, &FEMWorker::modesReaded, [this]() { emit modesReaded(this->__model); });
     connect(w, &FEMWorker::MACUpdated, [this]() { emit MACUpdated(); });
     connect(w, &FEMWorker::MACEstimated, [this]() { emit MACEstimated(); emit finished(); });
 
     w->start();
+
+    QTimer* t(new QTimer(this));
+    t->start(100);
+
+    connect(t, &QTimer::timeout, [this, t]() {
+        if (!this->__model->getModes().empty()) {
+            emit this->modesInited();
+            delete t;
+        }
+    });
 }
 
 void FEMProcessor::calculateModes()
@@ -50,7 +59,7 @@ void FEMProcessor::FEMWorker::setFileName(const QString& f) { fName = f; }
 void FEMProcessor::FEMWorker::run()
 {
     __model->read(fName);
-    emit modelReaded();
+    emit modesReaded();
 #ifndef QT_NO_DEBUG
     qDebug() << "Estimate auto MAC";
     QTime start(QTime::currentTime());

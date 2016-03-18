@@ -4,31 +4,37 @@
 #include <QTreeView>
 
 class ViewerModel;
+class QPushButton;
+class FEMProcessor;
 
 class ViewerView : public QTreeView
 {
     Q_OBJECT
     void mousePressEvent(QMouseEvent*);
     void currentChanged(const QModelIndex & current, const QModelIndex & previous);
+
 private:
     ViewerModel* myModel() const;
 public:
     ViewerView(QWidget* parent = 0);
 
 signals:
-    void addModelPressed();
     void currentModelChanged(int);
     void currentModeChanged(int, int);
-    void importModesPressed(int);
     void modesIdentificationPressed(int);
-    void MACPressed(int);
+    void MACPressed(int, FEMProcessor*);
     void calcModes(int);
 
 public slots:
+    void addFEM();
+    void importModes(int id);
+
     void update();
-    void updateCurrentModel();
-    void updateModel(int id);
     void acceptNewProject();
+
+private:
+    typedef QMap<int, FEMProcessor*> Processors;
+    Processors buf;
 };
 
 #endif // VIEWERVIEW_H

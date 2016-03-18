@@ -2,6 +2,7 @@
 #include "fem.h"
 #include "eigenmodes.h"
 #include <QTime>
+#include <cassert>
 
 const QString Project::INSURANCE_ROW = "In vino veritas, in aqua sanitas";
 
@@ -17,7 +18,7 @@ Project::~Project()
 #endif
 }
 
-Project::ConstModels Project::modelsList() const {
+Project::ConstModels Project::FEMList() const {
     ConstModels m(geometries.size());
     for (int i(0); i != m.size(); ++i) {
         m[i] = geometries[i];
@@ -25,8 +26,12 @@ Project::ConstModels Project::modelsList() const {
     return m;
 }
 
-void Project::pushModel(FEM * const g) {
-    geometries.push_back(g);
+void Project::deleteFEM(int id)
+{
+    assert(id < geometries.size() && id >= 0);
+    FEM* const m(geometries[id]);
+    geometries.erase(geometries.begin() + id);
+    delete m;
 }
 
 bool Project::isOwnProject(const QString& filename) {

@@ -132,6 +132,8 @@
     "viewer model" : {
         "mac rus" : "Aвто-МАC",
         "mac eng" : "Auto-MAC",
+        "mac calc rus" : "Идёт рассчет авто-MAC (%1/%2)",
+        "mac calc eng" : "Auto-MAC computing (%1/%2)",
     	"vertexes rus" : "Узлы (%1)",
     	"vertexes eng" : "Nodes (%1)",
     	"modes rus" : "Собственные формы (%1)",

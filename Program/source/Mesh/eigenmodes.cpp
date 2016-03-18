@@ -231,6 +231,7 @@ void EigenModes::MACEstimationPrepare() {
     for (EigenModes::iterator it(begin()); it != end(); ++it) {
         it->updatePreMac();
     }
+    mac.fill(std::numeric_limits<CMatrix::T>::quiet_NaN());
 }
 
 void EigenModes::estimateAutoMAC(int i, int j) {

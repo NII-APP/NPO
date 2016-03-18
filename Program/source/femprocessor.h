@@ -20,7 +20,6 @@ class FEMProcessor : public QObject
     Q_OBJECT
 
     FEM* const __model;
-    QThread* const __t;
 
     class FEMWorker;
     class FEMCalculateModes;
@@ -28,8 +27,11 @@ public:
     FEMProcessor(FEM* model, QObject* parent);
     ~FEMProcessor();
 
+    FEM* model() const { return __model; }
+
 signals:
-    void modelReaded(FEM*);
+    void modesReaded(FEM*);
+    void modesInited();
     void MACUpdated();
     void MACEstimated();
     void finished();
@@ -51,7 +53,7 @@ public:
     void setFileName(const QString&);
     void run() Q_DECL_OVERRIDE;
 signals:
-    void modelReaded();
+    void modesReaded();
     void MACUpdated();
     void MACEstimated();
 };

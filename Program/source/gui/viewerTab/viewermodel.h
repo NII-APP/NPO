@@ -4,6 +4,8 @@
 #include <QAbstractItemModel>
 
 class Project;
+class FEM;
+class FEMProcessor;
 
 class ViewerModel : public QAbstractItemModel
 {
@@ -22,7 +24,7 @@ public:
 private:
     enum ModelRowsCount {
         WithModes = 3,
-        WithoutModes = 3
+        WithoutModes = 4
     };
 public:
     static bool isRootIndex(const QModelIndex&);
@@ -35,12 +37,19 @@ public:
 
     ViewerModel(const Project*, QObject* parent = 0);
 
+    QModelIndex FEMIndex(int femId);
+    QModelIndex FEMIndex(FEM*);
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex	parent(const QModelIndex & index) const;
     int	rowCount(const QModelIndex & parent = QModelIndex()) const;
     int	columnCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+    bool removeFEM(int id);
+    void addFEM(const QString&);
+    FEMProcessor* importModes(int, const QString&);
 
     void setProject(const Project*);
     const Project* getProject();

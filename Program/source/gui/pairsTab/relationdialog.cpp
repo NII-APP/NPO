@@ -8,8 +8,8 @@
 
 RelationDialog::RelationDialog(FEMPair *forEdit, QWidget *parent)
   : QWidget(parent)
-  , toggleOff(":/media/images/togleOff.png")
-  , toggleOn(":/media/images/togleOn.png")
+  , toggleOff(":/media/resource/images/togleOff.png")
+  , toggleOn(":/media/resource/images/togleOn.png")
   , pair(forEdit)
   , leftL(0)
   , rightL(0)

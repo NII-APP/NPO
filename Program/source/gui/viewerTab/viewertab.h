@@ -17,14 +17,7 @@ class ViewerTab : public QSplitter
     Q_OBJECT
     ViewerView* const femView;
     /// @todo wrap the ViewerNode to SplitCascade
-    ViewerNode* const cascadeNode;
-
-    //you can see MAC when it still not estimated. this map allow to find coresponding widget to update it
-    typedef QMap<const FEM*, MACDisplay*> MACMap;
-    MACMap MACs;
-
-    typedef QMap<const FEM*, FEMProcessor*> FEMProcessors;
-    FEMProcessors processors;
+    FEMViewer* const cascadeNode;
 
 public:
     enum EnapledItems {
@@ -41,19 +34,11 @@ public:
 signals:
 
 public slots:
-    void addModel();
-    void addModes(int meshId);
     void identificateModes(int meshId);
     void acceptNewProject();
     void setMode(int);
     void setModel(const FEM *);
     void setModel(int id);
-    void showMAC(int id);
-
-private slots:
-    void forgetMACWidget();
-    void forgetFEMProcessor();
-    void updateMACWidget();
 };
 
 #endif // VIEWERTAB_H

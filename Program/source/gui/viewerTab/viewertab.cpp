@@ -15,7 +15,6 @@
 #include "application.h"
 #include "project.h"
 #include "gui/toolbox/femviewer/femviewer.h"
-#include "viewernode.h"
 #include "femprocessor.h"
 #include <c3dcolumnchart.h>
 #include <fem.h>
@@ -25,21 +24,30 @@
 ViewerTab::ViewerTab(QWidget *parent)
     : QSplitter(Qt::Horizontal, parent)
     , femView(new ViewerView(this))
-    , cascadeNode(new ViewerNode(this))
+    , cascadeNode(new FEMViewer(this))
 {
-    this->connect(femView, SIGNAL(addModelPressed()), SLOT(addModel()));
-    this->connect(femView, SIGNAL(currentModelChanged(int)), SLOT(setModel(int)));
-    this->connect(femView, SIGNAL(importModesPressed(int)), SLOT(addModes(int)));
     this->connect(femView, SIGNAL(currentModeChanged(int, int)), SLOT(setMode(int)));
-    this->connect(femView, SIGNAL(MACPressed(int)), SLOT(showMAC(int)));
+    this->connect(femView, SIGNAL(currentModelChanged(int)), SLOT(setModel(int)));
+    this->connect(femView, &ViewerView::MACPressed, [this](int id, FEMProcessor* p) {
+        MACDisplay* chart(new MACDisplay(this));
+        chart->setData(Application::project()->toFEM(id)->getModes().getMAC());
+        if (p) {
+            connect(p, &FEMProcessor::MACUpdated, [chart, p](){
+                FEM* const model(p->model());
+                chart->setData(model->getModes().getMAC());
+            });
+        }
+        chart->connect(chart, &MACDisplay::closed, &MACDisplay::deleteLater);
+        chart->show();
+    });
     this->connect(femView, SIGNAL(modesIdentificationPressed(int)), SLOT(identificateModes(int)));
-    this->connect(femView,&ViewerView::calcModes, [this](int v) {
+    this->connect(femView, &ViewerView::calcModes, [this](int v) {
         QMessageBox* const hold(new QMessageBox(this));
         hold->setModal(true);
         hold->setStandardButtons(QMessageBox::NoButton);
         hold->setText("Ща посчитаю");
         QEventLoop* const loop(new QEventLoop(hold));
-        FEMProcessor p(Application::nonConstProject()->modelsList()[v], hold);
+        FEMProcessor p(Application::nonConstProject()->FEMList()[v], hold);
         connect(&p, &FEMProcessor::finished, [loop](){
             loop->exit();
         });
@@ -59,65 +67,8 @@ ViewerTab::~ViewerTab()
 
 }
 
-void ViewerTab::showMAC(int id) {
-    const FEM* const model(Application::project()->modelsList().at(id));
-    MACMap::iterator i(MACs.find(model));
-    if (i != MACs.end()) {
-        i.value()->raise();
-        return;
-    }
-    MACDisplay* chart(new MACDisplay(0));
-    chart->setData(Application::project()->modelsList().at(id)->getModes().getMAC());
-    MACs.insert(model, chart);
-
-    connect(chart, SIGNAL(closed()), chart, SLOT(deleteLater()));
-    connect(chart, SIGNAL(closed()), this, SLOT(forgetMACWidget()));
-    if (processors.contains(model)) {
-        connect(processors[model], SIGNAL(MACUpdated()), this, SLOT(updateMACWidget()));
-    }
-
-    chart->show();
-}
-
 void ViewerTab::identificateModes(int meshId) {
-    ModesIdentificationWizard::identifyModes(Application::project()->modelsList().at(meshId), reinterpret_cast<QWidget*>(Application::mainWindow()));
-}
-
-void ViewerTab::updateMACWidget() {
-    FEMProcessor* sender(dynamic_cast<FEMProcessor*>(QObject::sender()));
-    if (sender == 0) {
-        return;
-    }
-    const FEM* const model(processors.key(sender));
-    if (MACs.contains(model)) {
-        MACs[model]->setData(model->getModes().getMAC());
-    }
-}
-
-void ViewerTab::forgetMACWidget() {
-    MACDisplay* sender(dynamic_cast<MACDisplay*>(QObject::sender()));
-    const FEM* const p(MACs.key(sender, 0));
-    if (p) {
-        MACs.remove(p);
-    }
-}
-void ViewerTab::forgetFEMProcessor() {
-    const FEM* const p(processors.key(dynamic_cast<FEMProcessor*>(QObject::sender()), 0));
-    if (p) {
-        processors.remove(p);
-    }
-}
-
-void ViewerTab::addModel() {
-    FEM* fem(new FEM);
-    QString bdf(Application::identity()->choseModelFile());
-    if (!QFile::exists(bdf)) {
-        return;
-    }
-    fem->read(bdf);
-    Application::nonConstProject()->pushModel(fem);
-    femView->update();
-    femView->setCurrentIndex(femView->model()->index(static_cast<int>(Application::project()->modelsList().size()) - 1, 0));
+    ModesIdentificationWizard::identifyModes(Application::project()->FEMList().at(meshId), reinterpret_cast<QWidget*>(Application::mainWindow()));
 }
 
 void ViewerTab::setModel(const FEM* model) {
@@ -126,7 +77,7 @@ void ViewerTab::setModel(const FEM* model) {
 
 void ViewerTab::setModel(int id) {
     try {
-        setModel(Application::project()->modelsList().at(id));
+        setModel(Application::project()->FEMList().at(id));
     } catch(...) {
         qFatal("setModel invalid id");
     }
@@ -138,23 +89,5 @@ void ViewerTab::setMode(int v) {
 
 void ViewerTab::acceptNewProject() {
     femView->acceptNewProject();
-    setModel(Application::project()->modelsList().empty() ? 0 : Application::project()->modelsList().front());
-}
-
-void ViewerTab::addModes(int meshId) {
-    QString file(Application::identity()->choseModesFile());
-    if (!QFile::exists(file)) {
-        return;
-    }
-    FEM* model(Application::nonConstProject()->modelsList().at(meshId));
-    FEMProcessor* p(new FEMProcessor(model, this));
-    connect(p, SIGNAL(modelReaded()), cascadeNode, SLOT(update()));
-    connect(p, SIGNAL(modelReaded()), femView, SLOT(updateCurrentModel()));
-    connect(p, SIGNAL(finished()), p, SLOT(deleteLater()));
-    connect(p, SIGNAL(finished()), this, SLOT(forgetFEMProcessor()));
-    processors.insert(model, p);
-    if (MACs.contains(model)) {
-        connect(p, SIGNAL(MACUpdated()), this, SLOT(updateMACWidget()));
-    }
-    p->read(file);
+    setModel(Application::project()->FEMList().empty() ? 0 : Application::project()->FEMList().front());
 }

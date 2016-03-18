@@ -29,11 +29,15 @@ public:
     Project();
     ~Project();
 
-    ConstModels modelsList() const;
-    Models& modelsList() { return geometries; }
+    ConstModels FEMList() const;
+    Models& FEMList() { return geometries; }
     const FEMPairs& pairsList() const { return pairs; }
-    void pushModel(FEM* const);
+    void pushFEM(FEM* const g) { geometries.push_back(g); }
+    void deleteFEM(const FEM * const m) { deleteFEM(std::find(geometries.begin(), geometries.end(), m) - geometries.begin()); }
+    void deleteFEM(int id);
 
+    int FEMCount() const { return static_cast<int>(geometries.size()); }
+    const FEM* toFEM(int id) const { return geometries.at(id); }
     int toId(const FEM* const val) const { return std::find(geometries.begin(), geometries.end(), val) - geometries.begin(); }
     FEM* constCast(const FEM* v) { Q_ASSERT(geometries[toId(v)] == v); return geometries[toId(v)]; }
 

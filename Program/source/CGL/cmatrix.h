@@ -46,8 +46,10 @@ public:
     CRealRange estimateRange() const;
     void plusInRow(int r, const T& val);
     void plusInColumn(int c, const T& val);
-    void excludeRow(int r);
-    void excludeColumn(int c);
+    void removeRow(int r);
+    void removeColumn(int c);
+    void fill(const T&);
+    int finiteCount() const;
 
 
     CMatrix pseudoInversed() const;
