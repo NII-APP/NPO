@@ -124,12 +124,12 @@ QModelIndex ViewerModel::index(int row, int column, const QModelIndex &parent) c
     }
 }
 
-QModelIndex ViewerModel::FEMIndex(int femId)
+QModelIndex ViewerModel::FEMIndex(int femId) const
 {
     return index(femId, 0, QModelIndex());
 }
 
-QModelIndex ViewerModel::FEMIndex(FEM* femId)
+QModelIndex ViewerModel::FEMIndex(const FEM* femId) const
 {
     return index(__project->toId(femId), 0, QModelIndex());
 }
@@ -256,26 +256,46 @@ void ViewerModel::addFEM(const QString& fname)
     endInsertRows();
 }
 
+void ViewerModel::beginAddModes(const FEM* model)
+{
+    beginAddModes(FEMIndex(model));
+}
+
+void ViewerModel::endAddModes(const FEM* model)
+{
+    endAddModes(FEMIndex(model));
+}
+
+void ViewerModel::beginAddModes(const QModelIndex & i)
+{
+    if (WithoutModes < WithModes) {
+        beginInsertRows(i, WithoutModes, WithModes - 1);
+    } else {
+        beginRemoveRows(i, WithModes, WithoutModes - 1);
+    }
+}
+
+void ViewerModel::endAddModes(const QModelIndex& i)
+{
+    if (WithoutModes < WithModes) {
+        endInsertRows();
+    } else {
+        endRemoveRows();
+    }
+    const QModelIndex index(this->index(2, 0, i));
+    emit this->dataChanged(index, index, QVector<int>{ Qt::DisplayRole });
+}
+
 FEMProcessor* ViewerModel::importModes(int meshId, const QString& file)
 {
-    FEM* model(Application::nonConstProject()->FEMList().at(meshId));
+    FEM* const model(Application::nonConstProject()->FEMList().at(meshId));
     FEMProcessor* p(new FEMProcessor(model, this));
     connect(p, SIGNAL(finished()), p, SLOT(deleteLater()));
 
-    if (WithoutModes < WithModes) {
-        beginInsertRows(FEMIndex(meshId), WithoutModes, WithModes - 1);
-    } else {
-        beginRemoveRows(FEMIndex(meshId), WithModes, WithoutModes - 1);
-    }
+    beginAddModes(FEMIndex(model));
     p->read(file);
     connect(p, &FEMProcessor::modesInited, [this, p]() {
-        if (WithoutModes < WithModes) {
-            endInsertRows();
-        } else {
-            endRemoveRows();
-        }
-        const QModelIndex index(this->index(2, 0, FEMIndex(p->model())));
-        emit this->dataChanged(index, index, QVector<int>{ Qt::DisplayRole });
+        this->endAddModes(FEMIndex(p->model()));
     });
     connect(p, &FEMProcessor::MACUpdated, [this, p]() {
         const QModelIndex index(this->index(1, 0, FEMIndex(p->model())));

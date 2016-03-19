@@ -37,8 +37,8 @@ public:
 
     ViewerModel(const Project*, QObject* parent = 0);
 
-    QModelIndex FEMIndex(int femId);
-    QModelIndex FEMIndex(FEM*);
+    QModelIndex FEMIndex(int femId) const;
+    QModelIndex FEMIndex(const FEM *) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex	parent(const QModelIndex & index) const;
     int	rowCount(const QModelIndex & parent = QModelIndex()) const;
@@ -53,6 +53,10 @@ public:
 
     void setProject(const Project*);
     const Project* getProject();
+    void beginAddModes(const QModelIndex&);
+    void endAddModes(const QModelIndex&);
+    void beginAddModes(const FEM*);
+    void endAddModes(const FEM*);
 private:
     const Project* __project;
 };

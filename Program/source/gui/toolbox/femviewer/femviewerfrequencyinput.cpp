@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QEvent>
+#include <QPicture>
 
 #include "application.h"
 #include "identity.h"
@@ -17,7 +18,16 @@ FEMViewer::FEMViewerFrequencyInput::FEMViewerFrequencyInput(QWidget* parent)
     , numeric(new QDoubleSpinBox(this))
     , slider(new QSlider(Qt::Horizontal, this)) {
     this->setLayout(new QHBoxLayout(this));
-    this->layout()->addWidget(new QLabel(Application::identity()->tr("frequency", "FEMViewer"), this));
+    this->layout()->addWidget(([this]()->QWidget* {
+                                   QLabel* const l(new QLabel(this));
+                                   static const QPixmap icon(([this]()->QPixmap{
+                                       QPixmap m(":/media/resource/images/freq.png");
+                                       return m.scaled(this->height(), this->height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                                   })());
+                                   l->setToolTip(Application::identity()->tr("frequency", "FEMViewer"));
+                                   l->setPixmap(icon);
+                                   return l;
+    })());
     this->layout()->addWidget(slider);
     this->layout()->addWidget(numeric);
     this->layout()->addWidget(new QLabel(Application::identity()->hertz()));

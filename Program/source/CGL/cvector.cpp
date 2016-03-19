@@ -37,6 +37,18 @@ CVector& CVector::operator+=(const value_type& v)
     return *this;
 }
 
+double CVector::euclideanNorm() const
+{
+    double r(0.0);
+    const const_iterator tail(end());
+    const_iterator i(begin());
+    for (; i != tail; ++i) {
+        const value_type& v(*i);
+        r += v * v;
+    }
+    return sqrt(r);
+}
+
 CVector& CVector::operator+=(const CVector& v)
 {
     const iterator tail(end());
@@ -71,7 +83,7 @@ CVector CVector::operator+(const CVector& v) const
     return result;
 }
 
-CVector CVector::operator-(const CVector& v)
+CVector CVector::operator-(const CVector& v) const
 {
     CVector result(*this);
     const iterator tail(result.end());

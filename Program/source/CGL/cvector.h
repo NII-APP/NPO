@@ -24,7 +24,9 @@ public:
 
     CVector operator+(const value_type& v) const;
     CVector operator+(const CVector& v) const;
-    CVector operator-(const CVector& v);
+    CVector operator-(const CVector& v) const;
+
+    double euclideanNorm() const;
 
 private:
     Orientation orientation;

@@ -34,7 +34,7 @@ void C3dColumnChart::paintCGL() {
     qreal y0(0.5 * (data.height() - size));
     for (int i(0); i != data.height(); ++i) {
         for (int j(0); j != data.width(); ++j) {
-            if (isfinite(data[i][j])) {
+            if (std::isfinite(data[i][j])) {
                 QRgb c(color(data[i][j]) | 0xFF000000);
                 glColor4ubv(static_cast<unsigned char*>(static_cast<void*>(&c)));
                 drawParallelepiped(CParallelepiped(x0 + i + REGILAR_MARGIN, x0 + i + 1 - REGILAR_MARGIN,

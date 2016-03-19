@@ -9,6 +9,9 @@
 #include "viewermodel.h"
 #include "project.h"
 #include "femprocessor.h"
+#include "gui/modesIdentificationWizard/modesidentificationwizard.h"
+#include "eigenmodes.h"
+#include "fem.h"
 
 ViewerView::ViewerView(QWidget *parent)
     : QTreeView(parent)
@@ -39,12 +42,35 @@ void ViewerView::mousePressEvent(QMouseEvent* e) {
     if (r == ViewerModel::ImportModes) {
         importModes(modelId);
     } else if (r == ViewerModel::ModesIdentification) {
-        emit modesIdentificationPressed(modelId);
+        identificateModes(modelId);
     } else if (r == ViewerModel::MAC) {
         emit MACPressed(modelId, buf.contains(modelId) ? buf[modelId] : nullptr);
     } else if (r == ViewerModel::ModesCompute) {
         emit calcModes(modelId);
     }
+}
+
+void ViewerView::identificateModes(int meshId)
+{
+    ModesIdentificationWizard* w(new ModesIdentificationWizard(Application::project()->FEMList().at(meshId), reinterpret_cast<QWidget*>(Application::mainWindow())));
+
+    QEventLoop* loop(new QEventLoop(w));
+    loop->connect(w, SIGNAL(finished(int)), SLOT(quit()));
+
+    w->show();
+
+    loop->exec();
+
+    if ((w->result() & QDialog::Accepted) && w->currentResult()) {
+        const FEM* const fem(Application::project()->FEMList().at(meshId));
+        myModel()->beginAddModes(fem);
+        EigenModes* solution(w->currentResult());
+        solution->estimateAutoMAC();
+        Application::nonConstProject()->constCast(fem)->getModes() = *w->currentResult();
+        myModel()->endAddModes(fem);
+    }
+
+    w->deleteLater();
 }
 
 void ViewerView::importModes(int meshId)

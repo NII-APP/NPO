@@ -28,6 +28,7 @@ signals:
 public slots:
     void addFEM();
     void importModes(int id);
+    void identificateModes(int meshId);
 
     void update();
     void acceptNewProject();

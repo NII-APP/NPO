@@ -29,11 +29,11 @@ class ModesIdentificationWizard : public QDialog
 
     void accept();
     void reject();
+
 public:
     ModesIdentificationWizard(const FEM* who, QWidget* parent = 0);
     ~ModesIdentificationWizard();
-
-    static void identifyModes(const FEM* who, QWidget* parent = 0);
+    EigenModes* currentResult() const;
 
     enum IdentificationMode {
         View,

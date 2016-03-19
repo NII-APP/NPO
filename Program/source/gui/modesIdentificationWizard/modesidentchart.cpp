@@ -24,7 +24,7 @@ ModesIdentChart::ModesIdentChart(QWidget *parent)
     , __im(new QAction(Application::identity()->icon(":/media/resource/images/im.png"), Application::identity()->tr("modes identification wizard/chart/im"), __toolbar))
     , __am(new QAction(Application::identity()->icon(":/media/resource/images/amp.png"), Application::identity()->tr("modes identification wizard/chart/amplitude"), __toolbar))
     , __average(new QAction(Application::identity()->icon(":/media/resource/images/average.png"), Application::identity()->tr("modes identification wizard/chart/average"), __toolbar))
-    , __pickFreq(new QAction(QIcon(":/docs/identificationMethodsDiscription/img/ok.png"), "", __toolbar))
+    , __pickFreq(new QAction(QIcon(":/docs/resource/identificationMethodsDiscription/img/ok.png"), "", __toolbar))
     , __data(nullptr)
 {
     qApp->installEventFilter(this);

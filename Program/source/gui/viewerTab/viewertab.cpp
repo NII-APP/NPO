@@ -19,7 +19,6 @@
 #include <c3dcolumnchart.h>
 #include <fem.h>
 #include "gui/toolbox/macdisplay.h"
-#include "gui/modesIdentificationWizard/modesidentificationwizard.h"
 
 ViewerTab::ViewerTab(QWidget *parent)
     : QSplitter(Qt::Horizontal, parent)
@@ -40,7 +39,6 @@ ViewerTab::ViewerTab(QWidget *parent)
         chart->connect(chart, &MACDisplay::closed, &MACDisplay::deleteLater);
         chart->show();
     });
-    this->connect(femView, SIGNAL(modesIdentificationPressed(int)), SLOT(identificateModes(int)));
     this->connect(femView, &ViewerView::calcModes, [this](int v) {
         QMessageBox* const hold(new QMessageBox(this));
         hold->setModal(true);
@@ -65,10 +63,6 @@ ViewerTab::ViewerTab(QWidget *parent)
 ViewerTab::~ViewerTab()
 {
 
-}
-
-void ViewerTab::identificateModes(int meshId) {
-    ModesIdentificationWizard::identifyModes(Application::project()->FEMList().at(meshId), reinterpret_cast<QWidget*>(Application::mainWindow()));
 }
 
 void ViewerTab::setModel(const FEM* model) {

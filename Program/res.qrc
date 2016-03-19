@@ -19,8 +19,10 @@
         <file>resource/images/average.png</file>
         <file>resource/images/re.png</file>
         <file>resource/images/im.png</file>
+        <file>resource/images/magnitude.png</file>
+        <file>resource/images/freq.png</file>
     </qresource>
-    <qresource prefix="/css" lang="css">
+    <qresource lang="css" prefix="/css">
         <file>resource/css.css</file>
     </qresource>
     <qresource prefix="/json">

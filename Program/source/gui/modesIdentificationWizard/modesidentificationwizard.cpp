@@ -138,6 +138,11 @@ ModesIdentificationWizard::MethodSelector::~MethodSelector()
 {
 }
 
+EigenModes* ModesIdentificationWizard::currentResult() const
+{
+    return __controller->currentResult();
+}
+
 void ModesIdentificationWizard::MethodSelector::setCurrentMode(ModesIdentificationWizard::IdentificationMode t)
 {
     switch (t) {
@@ -280,26 +285,6 @@ void ModesIdentificationWizard::stylize()
         setStyleSheet("ModesIdentificationWizard { background: transparent; }");
     }
 #endif
-}
-
-void ModesIdentificationWizard::identifyModes(const FEM* who, QWidget* parent)
-{
-    ModesIdentificationWizard* w(new ModesIdentificationWizard(who, parent));
-
-    QEventLoop* loop(new QEventLoop(w));
-    loop->connect(w, SIGNAL(finished(int)), SLOT(quit()));
-
-    w->show();
-
-    loop->exec();
-
-    if ((w->result() & Accepted) && w->__controller->currentResult()) {
-        EigenModes* solution(w->__controller->currentResult());
-        solution->estimateAutoMAC();
-        Application::nonConstProject()->constCast(who)->getModes() = *w->__controller->currentResult();
-    }
-
-    w->deleteLater();
 }
 
 EigenModes* ModesIdentificationWizard::ManualController::currentResult() {

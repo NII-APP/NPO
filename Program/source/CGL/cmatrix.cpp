@@ -148,7 +148,7 @@ int CMatrix::finiteCount() const
 {
     int count(0);
     for (Data::const_iterator it(memory.begin()); it != memory.end(); ++it) {
-        if (isfinite(*it)) {
+        if (std::isfinite(*it)) {
             ++count;
         }
     }

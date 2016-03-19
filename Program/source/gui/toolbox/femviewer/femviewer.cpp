@@ -146,7 +146,7 @@ void FEMViewer::setModel(const FEM* m) const
 void FEMViewer::setMode(const int m)
 {
     updateToolBar();
-    femWidget->setMode(m);
+    mode->setValue(m);
 }
 
 void FEMViewer::updateToolBar() const

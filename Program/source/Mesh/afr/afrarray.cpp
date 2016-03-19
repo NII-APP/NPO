@@ -73,15 +73,9 @@ EigenMode AFRArray::getMode(const double freq) const
                 const FrequencyMagnitude::Amplitude& left(it.at(i - 1).amplitude);
                 result.form()(j) = QVector3D(0.0, toScalar(left + (it.at(i).amplitude - left) * k), 0.0);
             }
-            ///@todo fix it for each node...
-            qDebug() << std::find(begin(), end(), it) - begin();
-            try {
-            result.setDamping(it.damping(freq), i);
-            } catch(...) {
-                qDebug() << "WRONG";
-            }
 
-            qDebug() << "\tright";
+            const double v(it.damping(freq));
+            result.setDamping(v, j);
         }
         ++j;
     }
@@ -89,9 +83,7 @@ EigenMode AFRArray::getMode(const double freq) const
     result.updateExtremums();
     result.updatePreMac();
 
-    qDebug() << "average";
     result.setAverageDamping(average().damping(freq));
-    qDebug() << "right also";
     return result;
 }
 

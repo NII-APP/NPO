@@ -1,9 +1,13 @@
 #include "femviewermagnitudeinput.h"
-#include <cscale.h>
+
+#include <cassert>
 #include <QSlider>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QEvent>
+#include <QPainter>
+
+#include <cscale.h>
 
 #include "application.h"
 #include "identity.h"
@@ -18,7 +22,16 @@ FEMViewer::FEMViewerMagnitudeInput::FEMViewerMagnitudeInput(QWidget *parent)
     , slider(new QSlider(Qt::Horizontal, this))
 {
     this->setLayout(new QHBoxLayout(this));
-    this->layout()->addWidget(new QLabel(Application::identity()->tr("magnitude", "FEMViewer"), this));
+    this->layout()->addWidget(([this]()->QWidget* {
+                                   QLabel* const l(new QLabel(this));
+                                   static const QPixmap icon(([this]()->QPixmap{
+                                       QPixmap m(":/media/resource/images/magnitude.png");
+                                       return m.scaled(this->height(), this->height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                                   })());
+                                   l->setToolTip(Application::identity()->tr("magnitude", "FEMViewer"));
+                                   l->setPixmap(icon);
+                                   return l;
+    })());
     this->layout()->addWidget(slider);
 
     slider->setMinimum(SLIDER_SCALE.getDomain().getMin());
@@ -31,6 +44,11 @@ FEMViewer::FEMViewerMagnitudeInput::FEMViewerMagnitudeInput(QWidget *parent)
 
 FEMViewer::FEMViewerMagnitudeInput::~FEMViewerMagnitudeInput()
 {
+}
+
+void FEMViewer::FEMViewerMagnitudeInput::resizeEvent(QResizeEvent* e)
+{
+    QFrame::resizeEvent(e);
 }
 
 void FEMViewer::FEMViewerMagnitudeInput::changeEvent(QEvent * e) {

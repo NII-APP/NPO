@@ -10,9 +10,12 @@ class FEMViewer::FEMViewerMagnitudeInput : public QFrame
 {
     Q_OBJECT
 
-    QSlider* slider;
+    QSlider* const slider;
+
 
     void changeEvent(QEvent *);
+
+    void resizeEvent(QResizeEvent*);
 public:
     explicit FEMViewerMagnitudeInput(QWidget *parent = 0);
     ~FEMViewerMagnitudeInput();
