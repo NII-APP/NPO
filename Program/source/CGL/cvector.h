@@ -34,6 +34,8 @@ private:
 
 #ifndef NOT_QT_AVAILABLE
 QDebug operator<<(QDebug out, const CVector& m);
+QDataStream& operator<< (QDataStream& out, const CVector& m);
+QDataStream& operator>> (QDataStream& in, CVector& m);
 #endif
 
 #endif // CVECTOR_H

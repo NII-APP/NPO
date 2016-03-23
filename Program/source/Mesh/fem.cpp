@@ -17,7 +17,6 @@
 #include "elements/quad.h"
 #include "elements/tetra.h"
 #include "elements/tria.h"
-#include "elements/lines.h"
 #include "elements/hexa.h"
 #include "elements/bar.h"
 
@@ -39,7 +38,7 @@ FEM::FEM(const FEM& g)
     , isTraced(g.isTraced)
     , file(g.file)
     , name(g.name)
-    , shells(g.shells)
+    , sections(g.sections)
     , materials(g.materials)
     , UNVTransformations(g.UNVTransformations)
     , colors(g.colors)
@@ -49,21 +48,15 @@ FEM::FEM(const FEM& g)
     , linksSolution(g.linksSolution)
     , constraints(g.constraints)
     , superElementsId(g.superElementsId)
+    , constrains(g.constrains)
 {
-    Trace::const_iterator s(g.trace.begin());
-    Trace::iterator d(trace.begin());
-    Trace::iterator end(trace.end());
-    while (d != end) {
-        *d = *s ? (*s)->clone() : 0;
-        ++d;
-        ++s;
-    }
     CoordinateSystems::const_iterator i(g.systems.begin());
     CoordinateSystems::const_iterator end2(g.systems.end());
     while (i != end2) {
         systems.insert(i.key(), i.value()->clone());
         ++i;
     }
+
 }
 
 bool FEM::read(const QString &fileName) {
@@ -101,7 +94,6 @@ bool FEM::read(const QString &fileName) {
 }
 
 FEM::~FEM() {
-    qDeleteAll(trace);
     qDeleteAll(systems);
 }
 
@@ -117,7 +109,7 @@ void FEM::setName(const QString & n)
 void FEM::estimateTraced()
 {
     isTraced.fill(false, static_cast<int>(vertexes.length()));
-    for (Trace::const_iterator i(trace.begin()), end(trace.end()); i != end; ++i) {
+    for (FinitElements::const_iterator i(trace.begin()), end(trace.end()); i != end; ++i) {
         if (*i) {
             (*i)->fillTraced(isTraced);
         }
@@ -414,14 +406,14 @@ void FEM::render() const {
 
     if (colorizedElements()) {
         const unsigned char* color(colors.data());
-        for (Trace::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it, color += 3) {
+        for (FinitElements::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it, color += 3) {
             glColor3ubv(color);
             if (*it) {
                 (*it)->render();
             }
         }
     } else {
-        for (Trace::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) {
+        for (FinitElements::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) {
             if (*it) {
                 (*it)->render();
             }
@@ -446,7 +438,7 @@ void FEM::render() const {
 void FEM::renderNet() const {
     glDisableClientState(GL_COLOR_ARRAY);
     glColor3ub(0x00,0x88,0x88);
-    for (Trace::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) {
+    for (FinitElements::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) {
         if (*it) {
             (*it)->renderNet();
         }
@@ -527,11 +519,11 @@ CArray FEM::extractElasticityModulus() {
 
     for (size_t i = 0; i != elasticyModulus.size(); ++i) {
         if (trace.at(i)) {
-            if (trace[i]->getShell() >= shells.size()) {
-            } else if (static_cast<int>(materials.size()) <= shells[trace[i]->getShell()].getMatId()) {
-            } else {
-                elasticyModulus[i] = materials[shells[trace[i]->getShell()].getMatId()][Material::MAT1_E];
-            }
+#ifndef QT_NO_DEBUG
+            assert(trace[i]->getSection() >= sections.size());
+            assert(static_cast<int>(materials.size()) <= sections[trace[i]->getSection()]->getMatId());
+#endif
+            elasticyModulus[i] = materials[sections[trace[i]->getSection()]->getMatId()][Material::MAT1_E];
         }
     }
     return elasticyModulus;
@@ -582,34 +574,9 @@ bool operator==(const FEM &l, const FEM &r)
 #ifndef QT_NO_DEBUG
     qDebug() << "meshes comparation (is" << &l << "==" << &r << ")";
 #endif
-    if (l.trace.size() != r.trace.size()){
+
+    if (l.trace != r.trace) {
         return false;
-    }
-
-    for (size_t i = 0; i < l.trace.size(); ++i){
-        if (!l.trace[i]) continue;
-
-        size_t leftSize = l.trace[i]->nodesCount();
-        size_t rightSize = r.trace[i]->nodesCount();
-
-        if (leftSize != rightSize) {
-#ifndef QT_NO_DEBUG
-            qDebug() << '\t' << i << " " << leftSize << " " << rightSize;
-#endif
-            return false;
-        }
-
-        quint32* left = l.trace[i]->nodes();
-        quint32* right = r.trace[i]->nodes();
-
-        for (size_t j = 0; j < leftSize; ++j) {
-            if (left[j] != right[j]) {
-#ifndef QT_NO_DEBUG
-                qDebug() << '\t' << i << " " << left[j] << " " << right[j];
-#endif
-                return false;
-            }
-        }
     }
 
     if (l.systems.size() != r.systems.size()){
@@ -641,21 +608,6 @@ bool operator==(const FEM &l, const FEM &r)
         ++systemRight;
     }
 
-    if (l.shells.size() != r.shells.size()){
-#ifndef QT_NO_DEBUG
-        qDebug() << "\tshells size " << l.shells.size() << " " << r.shells.size();
-#endif
-        return false;
-    }
-    for (size_t i = 0; i < l.shells.size(); ++i) {
-        if (!(l.shells[i] == r.shells[i])) {
-#ifndef QT_NO_DEBUG
-            qDebug() << "\tshells i " << i;
-#endif
-            return false;
-        }
-    }
-
     if (l.materials.size() != r.materials.size()){
 #ifndef QT_NO_DEBUG
         qDebug() << "\tmaterials size " << l.materials.size() << " " << r.materials.size();
@@ -685,6 +637,20 @@ bool operator==(const FEM &l, const FEM &r)
             return false;
         }
     }
+
+    if (l.constrains.size() != r.constrains.size()) {
+        return false;
+    }
+    Constrains::const_iterator constrIt1(l.constrains.begin());
+    Constrains::const_iterator constrIt2(r.constrains.begin());
+    while (constrIt1 != l.constrains.end()) {
+        if (*constrIt1 != *constrIt2) {
+            return false;
+        }
+        ++constrIt1;
+        ++constrIt2;
+    }
+
     if ((l.sqre == r.sqre) && (l.isTraced == r.isTraced) &&
             (l.measurment == r.measurment) && (l.file == r.file) && (l.modelType == r.modelType) &&
             (l.vertexes == r.vertexes) && (l.colors == r.colors)) {
@@ -716,15 +682,7 @@ QDataStream& operator << (QDataStream& out, const FEM& g) {
 
     out << g.vertexes << g.colors;
 
-
-    quint32 shellsSize;
-    shellsSize = static_cast<quint32>(g.shells.size());
-    out << shellsSize;
-
-    for (size_t i = 0; i < shellsSize; ++i) {
-        out << g.shells[i];
-
-    }
+    out << g.sections;
 
     quint32 materialsSize;
     materialsSize = static_cast<quint32>(g.materials.size());
@@ -743,19 +701,9 @@ QDataStream& operator << (QDataStream& out, const FEM& g) {
         out << g.linksPoint[i].second;
     }
 
-    out << static_cast<quint32>(g.trace.size());
-    quint32 realCount(0);
-    for (FEM::Trace::const_iterator it(g.trace.begin()), end(g.trace.end()); it != end; ++it) {
-        realCount += *it != nullptr;
-    }
-    out << realCount;
+    out << g.trace;
 
-    for (quint32 i(0); i != g.trace.size(); ++i) {
-        if (g.trace[i] != nullptr) {
-            out << i;
-            out << *g.trace[i];
-        }
-    }
+    out << g.constrains;
 
     out << g.systems.size();
 
@@ -798,12 +746,7 @@ QDataStream& operator >> (QDataStream& in, FEM& g)
     g.modelType = static_cast<FEM::ModelType>(modelType);
     in >> g.vertexes >> g.colors;
 
-    quint32 shellsSize;
-    in >> shellsSize;
-    g.shells.resize(shellsSize);
-    for (size_t i = 0; i < shellsSize; ++i) {
-        in >> g.shells[i];
-    }
+    in >> g.sections;
 
     quint32 materialsSize;
     in >> materialsSize;
@@ -820,20 +763,9 @@ QDataStream& operator >> (QDataStream& in, FEM& g)
         in >> g.linksPoint[i].second;
     }
 
+    in >> g.trace;
 
-    quint32 size;
-    in >> size;
-
-    quint32 realCount;
-    in >> realCount;
-
-    g.trace.resize(size, 0);
-    for (size_t i(0); i != realCount; ++i) {
-        quint32 id;
-        in >> id;
-        g.trace[id] = FinitElement::load(in);
-        Q_ASSERT(g.trace[id] && "type element fail");
-    }
+    in >> g.constrains;
 
     FEM::CoordinateSystems::size_type s;
     in >> s;
@@ -878,142 +810,6 @@ void FEM::scaleTo(double v) {
     box().multX(k);
     box().multY(k);
     box().multZ(k);
-}
-
-
-void FEM::layToBDF(const QString& source, const QString& dest, const CArray& dE, const int difference)
-{
-    Materials newMat;
-    newMat.resize(difference, materials.at(1));
-
-    std::map<CArray::value_type, int> find;
-
-    int k(0);
-    for (size_t i(0); i != dE.size(); ++i) {
-        if (find.find(dE.at(i)) == find.end()) {
-            find[dE.at(i)] = k;
-            newMat[k][Material::MAT1_E] += dE.at(i);
-            newMat[k][Material::MAT1_E] = fabs(newMat[k][Material::MAT1_E]);
-            newMat[k][Material::MAT1_G] = newMat[k][Material::MAT1_E] / 2.0 / (1.0 + newMat[k][Material::MAT1_NU]);
-            ++k;
-        }
-    }
-
-    Shells newShell(shells.size() * newMat.size());
-    for (size_t i(0); i != newMat.size(); ++i) {
-        for (size_t j(0); j != shells.size(); ++j) {
-            newShell[i * shells.size() + j] = shells[j];
-            newShell[i * shells.size() + j].setMatId(static_cast<int>(i));
-        }
-    }
-    QBitArray isUsed(static_cast<int>(newShell.size()));
-
-
-    QFile base(source);
-    if (!base.open(QFile::ReadOnly | QFile::Text)) {
-        return;
-    }
-    QByteArray data(base.readAll().append('\0'));
-    CParse f(data.data());
-    char* begin(f.data());
-
-
-    std::vector<std::string> shellStrings(shells.size());
-    std::vector<int> usedId;
-
-
-    while (!f.testPrew("ENDDATA")) {
-        std::string type(f.word());
-        if (type == "CQUAD4"
-         || type == "CTRIA3") {
-            char* write(f.data() + 10 + (type == "CHEXA"));
-            int i(f.integer());
-            int shellId(static_cast<int>(trace.at(i)->getShell() + shells.size() * find[dE.at(i)]));
-            if (std::find(usedId.begin(), usedId.end(), shellId) == usedId.end()) {
-                usedId.push_back(shellId);
-                isUsed.setBit(shellId);
-            }
-            std::stringstream convertor;
-            convertor << shellId + shells.size();
-            std::string buf(convertor.str());
-            const char* m(buf.c_str());
-            while (*m) {
-                *write = *m;
-                ++m;
-                ++write;
-            }
-        } else if (type == "PSHELL") {
-            int id(CParse(f).integer());
-            shellStrings[id] = type + ' ' + f.string() + '\n';
-        } else {
-            ++f;
-            f.skipRow();
-        }
-    }
-    QString newString;
-    for (size_t i(0); i != newMat.size(); ++i) {
-        std::stringstream buf;
-        buf << newMat[i][Material::MAT1_E];
-        std::string s1("MAT1*    1              2.+11           7.69231+10      .3\n");
-        static const std::string s2("*       7800.\n");
-        static const int where(24);
-        std::string num(buf.str());
-        for (size_t j(0); j != num.size(); ++j) {
-            s1[j + where] = num[j];
-        }
-        static const int whereG(40);
-        std::stringstream bufG;
-        bufG << newMat[i][Material::MAT1_G];
-        std::string numG(bufG.str());
-        for (size_t j(0); j != numG.size(); ++j) {
-            s1[j + whereG] = numG[j];
-        }
-        static const int whereId(9);
-        std::stringstream bufId;
-        bufId << i + materials.size() + 1;
-        std::string numId(bufId.str());
-        for (size_t j(0); j != numId.size(); ++j) {
-            s1[j + whereId] = numId[j];
-        }
-        newString += QString::fromStdString(s1);
-        newString += QString::fromStdString(s2);
-    }
-    for (size_t it(0); it != usedId.size(); ++it) {
-        int matrixId(usedId[it]);
-        int i(matrixId / static_cast<int>(shells.size()));
-        int j(matrixId % shells.size());
-
-        int id(static_cast<int>(usedId[it] + shells.size()));
-        std::string data = shellStrings[j];
-        if (!data.empty()) {
-            std::stringstream bufId;
-            bufId << id;
-            std::string idNum(bufId.str());
-            static const int whereId(9);
-            for (size_t k(0); k != idNum.size(); ++k) {
-                data[k + whereId] = idNum[k];
-            }
-            std::stringstream buf;
-            buf << i + 1;
-            std::string num(buf.str());
-            static const int where(17);
-            for (size_t k(0); k != num.size(); ++k) {
-                data[k + where] = num[k];
-            }
-            newString = newString + QString::fromStdString(data);
-        } else {
-        }
-    }
-
-    data.insert(f - data.data(), newString);
-
-
-
-    QFile result(dest);
-    if (!result.open(QFile::WriteOnly | QFile::Text)) {
-        return;
-    }
-    result.write(begin);
 }
 
 std::vector<int> FEM::truncationIndexVector(const FEM& a, const FEM& b)

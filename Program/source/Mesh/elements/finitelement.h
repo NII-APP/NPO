@@ -49,6 +49,11 @@ public:
     virtual quint32 nodesCount() const = 0;
     ///posibility to suggest the count of vertexes (for pseudo-elements like a "lines"). Ignoded basicaly
     virtual void setNodesCount(quint32, quint32  = 0) { return; }
+    virtual quint32* midsideNodes() { return nullptr; }
+    virtual const quint32* midsideNodes() const { return nullptr; }
+    virtual bool isHaveMidsideNodes() const { return false; }
+    virtual quint32 midsideNodesCount() const { return 0; }
+    virtual void initMidsideNodes() {}
 
     /// synonnym from stl style
     quint32* data() { return nodes(); }
@@ -56,17 +61,22 @@ public:
     quint32 size() const { return nodesCount(); }
     void resize(quint32 newSize, quint32 defaultIndex = 0) { return setNodesCount(newSize, defaultIndex); }
 
+    virtual const quint32& operator[](quint32 id) const { return nodes()[id]; }
     virtual quint32& operator[](quint32 id) { return nodes()[id]; }
     virtual quint32* begin() { return nodes(); }
     virtual quint32* end() { return nodes() + nodesCount(); }
     virtual const quint32* begin() const { return nodes(); }
     virtual const quint32* end() const { return nodes() + nodesCount(); }
+    virtual quint32* midsideBegin() { return midsideNodes(); }
+    virtual quint32* midsideEnd() { return midsideNodes() + midsideNodesCount(); }
+    virtual const quint32* midsideBegin() const { return midsideNodes(); }
+    virtual const quint32* midsideEnd() const { return midsideNodes() + midsideNodesCount(); }
 
     ///+= n to each index
     void moveIndexes(quint32 n);
 
     void setShell(const quint32& v);
-    quint32 getShell() const;
+    quint32 getSection() const;
     quint32& shell();
     const quint32& shell() const;
 };

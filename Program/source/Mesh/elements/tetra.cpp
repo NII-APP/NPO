@@ -9,7 +9,9 @@ namespace core {
 Tetra::Tetra()
 {
 }
-Tetra::Tetra(quint32 n1, quint32 n2, quint32 n3, quint32 n4) {
+Tetra::Tetra(quint32 n1, quint32 n2, quint32 n3, quint32 n4)
+    : midside(nullptr)
+{
     n[0] = n1;
     n[1] = n2;
     n[2] = n3;

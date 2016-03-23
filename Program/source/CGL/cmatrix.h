@@ -35,6 +35,7 @@ public:
 
     CMatrix& operator =(const CMatrix &);
 
+    T** pointers() { return m.data(); }
     T* operator [](int r) { return m[r]; }
     const T* operator [](int r) const { return m[r]; }
 

@@ -51,7 +51,7 @@ FEMPair::~FEMPair() {
 
 void FEMPair::makeMac(const EigenModes &practic, const EigenModes &trunc)
 {
-    mac.resize(practic.size(), trunc.size());
+    mac.resize(static_cast<int>(practic.size()), static_cast<int>(trunc.size()));
     for (int i = 0; i != mac.height(); ++i) {
         for (int j = 0; j != mac.width(); ++j) {
             mac[i][j] = EigenModes::MAC(practic.at(j), trunc.at(i));
@@ -71,7 +71,7 @@ void FEMPair::makeMac(const FEMPair::Relation& r)
     size_t minSize = std::min(trunc->getModes().size(), second->getModes().size());
     minSize = std::min(relationLength, minSize);
 
-    mac.resize(minSize, minSize);
+    mac.resize(static_cast<int>(minSize), static_cast<int>(minSize));
     for (int i = 0; i != mac.height(); ++i) {
         for (int j = 0; j != r.size(); ++j) {
             if (r[j] != -1) {

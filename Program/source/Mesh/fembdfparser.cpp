@@ -3,6 +3,8 @@
 #include "elements/tetra.h"
 #include "elements/tria.h"
 #include "elements/hexa.h"
+#include "section/shell.h"
+#include "section/solid.h"
 
 #include <cassert>
 
@@ -25,15 +27,32 @@ void FEM::nativeBDFParser(const QString& fileName) {
 
     //parce each datum
     static const int BORDER_FIELD_SIZE(8);
+#ifndef QT_NO_DEBUG
+    QMap<QString, int> types;
+#endif
+
+    bool bulkData(false);
     while (*f && !f.testPrew("ENDDATA")) {
         std::string type(f.word());
+#ifndef QT_NO_DEBUG
+        if (!types.contains(QString::fromStdString(type))) {
+            types.insert(QString::fromStdString(type), 0);
+        } else {
+            types[QString::fromStdString(type)]++;
+        }
+#endif
         bool highAccuracy(false);
         if (type[type.length() - 1] == '*') {
             highAccuracy = true;
             type.resize(type.size() - 1);
         }
         const int wordSize(BORDER_FIELD_SIZE << (highAccuracy ? 1 : 0));
-        if (std::find(type.begin(), type.end(), ',') != type.end()) {
+        if (type == "BEGIN") {
+            if (f.word() == "BULK") {
+                bulkData = true;
+            }
+            f.skipRow();
+        } else if (std::find(type.begin(), type.end(), ',') != type.end()) {
             std::string::iterator tail(std::find(type.begin(), type.end(), ',') + 1);
             std::string inRowType(type.begin(), tail - 1);
             char* row = new char[type.end() - tail + 1];
@@ -104,6 +123,13 @@ void FEM::nativeBDFParser(const QString& fileName) {
             }
             int m(f.integer());
             trace[id] = new core::Tetra(f.integer(), f.integer(), f.integer(), f.integer());
+            if (*f != '\n' || *f != '\r') {
+                core::FinitElement* const e(trace[id]);
+                e->initMidsideNodes();
+                for (quint32* i(e->midsideBegin()); e->midsideEnd() != i; ++i) {
+                    *i = f.integer();
+                }
+            }
             trace[id]->setShell(m);
             f.skipRow();
         } else if (type == "CTRIA3") {
@@ -172,14 +198,45 @@ void FEM::nativeBDFParser(const QString& fileName) {
             superElementsId[id] = static_cast<int>(f.fixFloat(wordSize));\
             f.skipRow();
         } else if (type == "PSHELL") {
+            f++;
+            f++;
             int id(f.integer());
-            if (shells.size() <= id)
-                shells.resize(id + 1);
-            int matId = f.integer();
-            int width = f.real();
-            int anyOther = f.integer();
-            int someOneElse = f.integer();
-            shells[id] = Shell(id, matId, width, anyOther, someOneElse);
+            sections.reachOut(id);
+            const int matId(f.fixInt8());
+            const double s(f.fixFloat8());
+            Shell* const itm(new Shell(matId, s));
+            sections[id] = itm;
+            const int matId2(f.fixInt8());
+            if (matId2) {
+                itm->setProperty(Shell::MID2, matId2);
+                const double bendStif(f.fixFloat8());
+                if (bendStif) {
+                    itm->setProperty(Shell::BendingStiffness, bendStif);
+                }
+                const int matId3(f.fixFloat8());
+                if (matId3) {
+                    itm->setProperty(Shell::MID3, matId3);
+                }
+            }
+
+            f.skipRow();
+        } else if (type == "PSOLID") {
+            ++f;
+            ++f;
+            int id(f.integer());
+            sections.reachOut(id);
+            Solid* const itm(new Solid);
+            const int matId(f.fixInt8());
+            itm->setProperty(Solid::MID, matId);
+            int count(5);
+            int i(1);
+            while (count && *f != '\n' && *f != '\n') {
+                const int v(f.fixInt8());
+                itm->setProperty(i, v);
+                --count;
+                ++i;
+            }
+            sections[id] = itm;
             f.skipRow();
         } else if (type == "CORD2R") {
             f += BORDER_FIELD_SIZE - static_cast<int>(type.length()) - (highAccuracy ? 1 : 0);
@@ -255,10 +312,45 @@ void FEM::nativeBDFParser(const QString& fileName) {
                 }
                 f.skipRow();
             }
+        } else if (type == "MAT1") {
+            f += 4;
+            int id(f.fixInt8());
+            if (materials.size() <= id) {
+                materials.resize(id + 1);
+            }
+            int number(0);
+            materials[id] = Material(Material::MAT1);
+            while (*f != '\n' && *f != '\r') {
+                materials[id][number] = f.fixFloat8();
+                ++number;
+            }
+            f.skipRow();
+        } else if (type == "SPC" && bulkData) {
+            f += 8 - static_cast<int>(type.size());
+            Constrain c;
+            //constrain set id ignored now
+            f += 8;//const int sId(f.fixInt8());
+            const int nodeId(f.fixInt8());
+            int i(0);
+            while (i != 8 && *f != '\r' && *f != '\n') {
+                if (*f >= '1' && *f <= '6') {
+                    c.addConstrain(*f - '0');
+                }
+                ++f;
+                ++i;
+            }
+            if (*f != '\r' && *f != '\n') {
+                c.setMobility(f.fixFloat8());
+            }
+            constrains.insert({nodeId, c});
+            f.skipRow();
         } else {
             f.skipRow();
         }
     }
+#ifndef QT_NO_DEBUG
+    qDebug() << types;
+#endif
     delete memory;
 
     for (CoordinateLinks::const_iterator l(linksPoint.begin()), end(linksPoint.end()); l != end; ++l) {

@@ -125,7 +125,7 @@ float CParse::fixFloat(int fixLen)
     float k3(1.0f);
     float num(0.0f);
     bool exp(false);
-    while (fixLen && *d && *d != '\n') {
+    while (fixLen && *d != '\0' && *d != '\r' && *d != '\n') {
         switch (*d)
         {
         case ' ':
@@ -166,12 +166,12 @@ float CParse::fixFloat(int fixLen)
     num *= pow(expK, expV);
     return num * sign;
 }
-
-int CParse::fixInt(const int fixLen)
+#include <QDebug>
+int CParse::fixInt(int fixLen)
 {
     bool positive(true);
     int result(0);
-    while (fixLen && *d && *d != '\n') {
+    while (fixLen && *d != '\0' && *d != '\r' && *d != '\n') {
         switch (*d)
         {
         case '-':
@@ -182,8 +182,10 @@ int CParse::fixInt(const int fixLen)
             result += *d - '0';
             break;
         }
+        --fixLen;
+        ++d;
     }
-    return result;
+    return positive ? result : -result;
 }
 
 std::string CParse::string()

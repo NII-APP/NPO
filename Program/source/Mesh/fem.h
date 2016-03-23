@@ -9,8 +9,8 @@
 #include <QTimer>
 #include <QGLWidget>
 #include "cgl.h"
-#include "elements/finitelement.h"
-#include "shell.h"
+#include "elements/finitelements.h"
+#include "section/sections.h"
 #include <QStack>
 #include <QMatrix4x4>
 #include <cmath>
@@ -19,6 +19,7 @@
 #include "eigenmodes.h"
 #include "bdfentity.h"
 #include <ccoordinatesystem.h>
+#include "constrain.h"
 
 using namespace core;
 class FEM
@@ -30,11 +31,9 @@ public:
         Practic,
         Truncated
     };
+    typedef std::vector<Material> Materials;
 
-    typedef std::vector<core::FinitElement*> FinitElements;
 private:
-    typedef FinitElements Trace;
-    typedef std::vector<Shell> Shells;
     typedef std::vector<int> TraceBufer;
     typedef std::vector<int> IntegerArray;
     //first is coordinateSystem id, second - vertex id
@@ -47,7 +46,7 @@ private:
     ModelType modelType;
 
     CGL::CVertexes vertexes;
-    Trace trace;
+    FinitElements trace;
     //smallest box which contain all vertexes
     CParallelepiped sqre;
     //is [i] point included in some trace
@@ -56,10 +55,9 @@ private:
     QString file;
     //name
     QString name;
-    //list of shells
-    Shells shells;
+    //list of sections
+    Sections sections;
     //map of matherials
-    typedef std::vector<Material> Materials;
     Materials materials;
     //UNV can store the transformation matrices for forms coordinate systems.
     std::vector<QMatrix3x3> UNVTransformations;
@@ -79,6 +77,8 @@ private:
     IntegerArray constraints;
     //basicaly it's 0 for each node((
     IntegerArray superElementsId;
+
+    Constrains constrains;
 
     static int arriveKnownUNVBlock(CParse& f);
     
@@ -120,7 +120,6 @@ public:
     //reading that formsts
     bool readBDF(const QString &fileName);
     bool readUNV(const QString &fileName);
-    void layToBDF(const QString& source, const QString& dest, const CArray &dE, const int difference);
     static void usePythonParser() { usePyParser = true; }
     static void useNativeParser() { usePyParser = false; }
 
@@ -150,12 +149,22 @@ public:
     CGL::CVertexes& getNodes() { return vertexes; }
     void setNodes(const CGL::CVertexes& v) { vertexes = v; }
 
-    //shells
-    const Shells& getShells() const { return shells; }
-    Shells& getShells() { return shells; }
-    void setShells(const Shells& v) { shells = v; }
-    const Shell& getShell(const int p) const { return shells.at(p); }
-    Shell& getShell(const int p) { return shells.at(p); }
+    //node coordinates
+    const Constrains& getConstrains() const { return constrains; }
+    Constrains& getConstrains() { return constrains; }
+
+    //sections
+    const Sections& getSections() const { return sections; }
+    Sections& getSections() { return sections; }
+    void setSections(const Sections& v) { sections = v; }
+    const Section* getSection(const int p) const { return sections.at(p); }
+    Section* getSection(const int p) { return sections.at(p); }
+
+    //materials
+    const Materials& getMaterials() const { return materials; }
+    Materials& getMaterials() { return materials; }
+    void setMaterials(const Materials& v) { materials = v; }
+    const Material& getMaterial(const int p) const { return materials.at(p); }
 
     //colorss
     const CGL::Colors& getColors() const { return colors; }

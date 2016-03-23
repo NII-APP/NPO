@@ -8,7 +8,6 @@
 #include <QBitArray>
 #include <QIODevice>
 
-#include "lines.h"
 #include "hexa.h"
 #include "quad.h"
 #include "tetra.h"
@@ -24,14 +23,20 @@ FinitElement::FinitElement()
 
 
 void FinitElement::setShell(const quint32 &v) { shellIndex = v; }
-quint32 FinitElement::getShell() const { return shellIndex; }
+quint32 FinitElement::getSection() const { return shellIndex; }
 quint32& FinitElement::shell() { return shellIndex; }
 const quint32& FinitElement::shell() const { return shellIndex; }
 
 QDataStream& operator<<(QDataStream& out, const FinitElement& element) {
     out << static_cast<quint32>(element.type())
-        << element.getShell() << element.size();
+        << element.getSection() << element.size();
     out.writeRawData(static_cast<const char*>(static_cast<const void*>(element.begin())), element.size() * sizeof(quint32));
+    if (element.isHaveMidsideNodes()) {
+        out << true;
+        out.writeRawData(static_cast<const char*>(static_cast<const void*>(element.midsideBegin())), element.midsideNodesCount() * sizeof(quint32));
+    } else {
+        out << false;
+    }
     return out;
 }
 
@@ -43,6 +48,12 @@ QDataStream& operator>>(QDataStream& in, FinitElement& element){
     in >> size;
     element.resize(size);
     in.readRawData(static_cast<char*>(static_cast<void*>(element.begin())), element.size() * sizeof(quint32));
+    bool isHaveMidside;
+    in >> isHaveMidside;
+    if (isHaveMidside) {
+        element.initMidsideNodes();
+        in.readRawData(static_cast<char*>(static_cast<void*>(element.midsideBegin())), element.midsideNodesCount() * sizeof(quint32));
+    }
     return in;
 }
 
@@ -55,8 +66,6 @@ void FinitElement::fillTraced(QBitArray & a) const {
 FinitElement* FinitElement::resolveType(int type)
 {
     switch (type) {
-    case LinesType:
-        return new Lines;
     case QuadType:
         return new Quad;
     case TetraType:
@@ -125,10 +134,18 @@ FinitElement* FinitElement::load(QIODevice& in) {
 
 void FinitElement::moveIndexes(quint32 n) {
     quint32* it(this->begin());
-    quint32* lim(this->end());
+    quint32* const lim(this->end());
     while (it != lim) {
         *it += n;
         ++it;
+    }
+    if (isHaveMidsideNodes()) {
+        quint32* jt(this->midsideBegin());
+        quint32* const jim(this->midsideEnd());
+        while (jt != jim) {
+            *jt += n;
+            ++jt;
+        }
     }
 }
 

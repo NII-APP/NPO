@@ -22,8 +22,10 @@ public:
     std::string word();
     float fixFloat8() { return fixFloat(8); }
     float fixFloat16() { return fixFloat(16); }
-    float fixFloat(const int fixLen);
-    int fixInt(const int fixLen);
+    float fixFloat(int fixLen);
+    int fixInt8() { return fixInt(8); }
+    int fixInt16() { return fixInt(16); }
+    int fixInt(int fixLen);
 
     void skipRow();
     void skipRows(int);

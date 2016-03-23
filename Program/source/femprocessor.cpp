@@ -1,5 +1,7 @@
 #include "femprocessor.h"
 
+#include <cassert>
+
 #include <QLabel>
 
 #include <fem.h>
@@ -86,8 +88,38 @@ FEMProcessor::FEMCalculateModes::FEMCalculateModes(FEM* model, QObject* parent)
     : QThread(parent)
     , __model(model) { }
 
+namespace {
+
+int igoTypeId(const FinitElement* const element) {
+    enum {
+        Tetra4 = 10,
+        Hexa8 = 12,
+        Tetra10 = 24,
+        Hexa20 = 25,
+        Bar2 = 3,
+        Tria3 = 5
+    };
+    switch (element->type()) {
+    case FinitElement::TetraType:
+        return element->isHaveMidsideNodes() ? Tetra10 : Tetra4;
+    case FinitElement::HexaType:
+        return element->isHaveMidsideNodes() ? Hexa20 : Hexa8;
+    case FinitElement::BarType:
+        assert(!element->isHaveMidsideNodes());
+        return Bar2;
+    case FinitElement::TriaType:
+        assert(!element->isHaveMidsideNodes());
+        return Tria3;
+    default:
+        return -1;
+    };
+}
+
+}
+
 void FEMProcessor::FEMCalculateModes::run()
 {
+    qDebug() << "begin";
     EFEMS pefems;
 
     static QByteArray tempDir("C:\\igolibTrash");
@@ -96,6 +128,7 @@ void FEMProcessor::FEMCalculateModes::run()
 
     //запуск решателя, инициализация каналов связи
     pefems.StartLocalSolverAndConnect(tempDirList, exeFile.data());
+    qDebug() << "1";
     //pefems.ConnectToSolver();
     //передача настроек решения
     // 1 - число паралелльных потоков при обработке 1 СЭ
@@ -106,6 +139,7 @@ void FEMProcessor::FEMCalculateModes::run()
     // 6 - [(float)мегабайт] предельный разрешенный объем оперативной памяти (не гарантирующая настройка)
     // 7 - [(float)мегабайт] примерный максимальный размер 1 блока данных при расчете матриц СЭ
     pefems.SendParallelSettings(4,4,4,1,&tempDirList,3000.0,1000.0);
+    qDebug() << "2";
 
     //создание объекта КЭ модели на стороне решателя
     pefems.CreatFEmodel(tempDirList);
@@ -113,40 +147,88 @@ void FEMProcessor::FEMCalculateModes::run()
     // 1 - число узлов
     // 2 - число координат в узле
     // 3 - массив координат узлов размером NN*KORT: X,Y,Z последовательно для каждого узла
-    typedef std::vector<double> DoubleArray;
-    DoubleArray m(__model->getNodes().size());
+    CArray m(__model->getNodes().size());
     std::copy(m.begin(), m.end(), __model->getNodes().begin());
     pefems.SendFEMnodesCRD(__model->getNodes().length(), 3, m.data());
+    qDebug() << "3";
+
+    FEM::Materials materials(__model->getMaterials());
+    // materials may have undefined members (just to save native bdf id in array).
+    // Kiselev program can't work with fake materials. To resolve this problem
+    // we remove it from this array and make index-reorder array
+    FEM::Materials::const_iterator matIt(materials.begin());
+    std::vector<int> renumbering(materials.size());
+    for (int i(0); i != renumbering.size(); ++i) {
+        renumbering[i] = i;
+    }
+    while (matIt != materials.end()) {
+        qDebug() << "test" << matIt->getType() << Material::Undefined;
+        while (matIt != materials.end() && matIt->getType() == Material::Undefined) {
+            matIt = materials.erase(matIt);
+            int id(matIt - materials.begin() + 1);
+            while (id != renumbering.size()) {
+                renumbering[id]--;
+                ++id;
+            }
+        }
+        ++matIt;
+    }
+    qDebug() << "renumbering" << materials.size();
+    for (auto& i : renumbering) {
+        qDebug() << '\t' << i;
+    }
+    qDebug() << ";;;";
 
     // передача матрицы индексов и другой информации об элементах
     typedef std::vector<int> FEDatum;
     typedef std::vector<FEDatum> FEData;
     typedef std::vector<int*> FEMemory;
-    const FEM::FinitElements& elements(__model->getElements());
-    FEData trase(elements.size());
+    const FinitElements& elements(__model->getElements());
+    FEData trase(elements.usefulSize());
     FEMemory mem(trase.size());
     QSet<int> typesSet;
-    for(int i(0); i != elements.size(); ++i)
+    int i(0);
+    for(const FinitElement* element : elements)
     {
         // для каждого элемента создается массив размером = число узлов + 3
-        trase[i].resize(elements.at(i)->size() + 3);
-        mem[i] = trase.at(i).data();
-        trase[i][0] = __model->getShell(elements.at(i)->getShell()).getMatId();
-        trase[i][1] = !true && !false;
-        trase[i][2] = elements.at(i)->size();
-        int* trIt(trase[i].data() + 3);
-        for (const quint32* it(elements.at(i)->begin()); it != elements.at(i)->end(); ++it, ++trIt) {
-            *trIt = *it;
+        if (element != nullptr) {
+            trase[i].resize(element->size() + 3 + element->isHaveMidsideNodes() * element->midsideNodesCount());
+            mem[i] = trase.at(i).data();
+            trase[i][0] = renumbering[__model->getSection(element->getSection())->getMatId()];
+            trase[i][1] = igoTypeId(element);
+            assert(trase[i][1] != -1);
+            trase[i][2] = element->size();
+            int* trIt(trase[i].data() + 3);
+            for (const quint32* it(element->begin()); it != element->end(); ++it, ++trIt) {
+                *trIt = *it;
+            }
+            if (element->isHaveMidsideNodes()) {
+                for (const quint32* it(element->midsideBegin()); it != element->midsideEnd(); ++it, ++trIt) {
+                    *trIt = *it;
+                }
+            }
+            typesSet.insert(element->type());
+            ++i;
         }
-        typesSet.insert(elements.at(i)->type());
     }
     // 1 - число элементов
     // 2 - число типов элементов в модели
     // 3 - массив подготовленный, как показано выше
+    qDebug() << "nodes collected" << typesSet.size();
     pefems.SendFEMelements(mem.size(), typesSet.size(), mem.data());
+    qDebug() << "4";
 
     //передача закреплений
-    ///pefems.SendFEMfixing(NN,KORT,FIX,UFIX);
+    const Constrains& cnr(__model->getConstrains());
+    static const int dimensionCount(3);
+    std::vector<int> fix(__model->getNodes().size(), 0);
+    std::vector<double> ufix(__model->getNodes().size(), 0.0);
+    for (const std::pair<const int, Constrain>& i : cnr) {
+        fix[i.first]     = i.second.isConstrained(Constrain::X);
+        fix[i.first + 1] = i.second.isConstrained(Constrain::Y);
+        fix[i.first + 2] = i.second.isConstrained(Constrain::Z);
+    }
+    pefems.SendFEMfixing(__model->getNodes().size(), dimensionCount, fix.data(), ufix.data());
     // FIX - целочисленный массив размером NN*KORT показывает
     // FIX[i*KORT+j] == 0 - закрепления нет для узла i и степени свободы j
     // FIX[i*KORT+j] == 1 - закрепление есть для узла i и степени свободы j
@@ -158,7 +240,14 @@ void FEMProcessor::FEMCalculateModes::run()
     // 1 - количество материалов
     // 2 - массив упругих свойств
     // [номер материала][0 - модуль упругости, 1 - коэф Пуассона, 2 - плотность]
-    ///pefems.SendFEMmaterials(nmat,elastprop);
+    CMatrix matMatrix(3, materials.size());
+    for (int i(0); i < matMatrix.height(); ++i) {
+        matMatrix[i][0] = materials.at(i).youngModulus();
+        matMatrix[i][1] = materials.at(i).poissonRatio();
+        matMatrix[i][2] = materials.at(i).density();
+    }
+
+    pefems.SendFEMmaterials(materials.size(), matMatrix.pointers());
 
     //создание упер-элементной модели
     // 1 - примерное число элементов в СЭ нулевого уровня
@@ -171,22 +260,22 @@ void FEMProcessor::FEMCalculateModes::run()
     // 2 - погрешность (параметр сходимости) квадрата частоты
     // 3 - размер блока поиска СЧ (если нужно найти большое число СЧ, расчет будет осуществляться поблочно)
     //     12..15 рекомендуемый диапазон в независимости от параметра 1
-    pefems.EIGFR_SSI(5,0.00001,15);
+    const int encount(5);
+    pefems.EIGFR_SSI(encount,0.00001,1500);
+    qDebug() << "some";
     //информация о процессе решения обновляется в текстовом файле
     //Eigen_SSI_SE_listing.lst в рабочей директории модели
 
     // получение найденных СЧ
-    /*double *frherz = new double[nfr];
-    int nfrobtained = pefems.GetFreqRes(nfr,frherz);
-    if ( nfr != nfrobtained )
-    {
-        printf("\nRequired number of freq %d cannot be determind...\n%d freq obtained...\n\n");
+    CArray frherz(encount);
+    const int nfrobtained(pefems.GetFreqRes(encount,frherz.data()));
+    if (encount != nfrobtained) {
+        qDebug() << nfrobtained << "modes obtained...";
     }
-    printf("\nFREQ RESULTS [Hz]:\n");
-    for (i=0; i<nfrobtained; i++)
-    {
-        printf("i=%d\t\tfr=%e\n",i,frherz[i]);
-    }
+    qDebug() << "\nFREQ RESULTS [Hz]:";
+    for (i=0; i<nfrobtained; i++) {
+        qDebug() << i << "\t\tfr=" << frherz[i];
+    }/*
     //собственные частоты выводятся в текстовый файл freq.lst в директории модели
 
     // получение собственных форм

@@ -9,13 +9,13 @@ class Material
 public:
     enum Type {
         MAT1 = 0,
-        MAT8 = 1
+        MAT9 = 1,
+        Undefined
     };
 private:
     Type type;
     std::vector<double> values;
 
-    //static const int VECTOR_SIZES[];
 public:
     enum MAT1Indexes {
         MAT1_E = 0,
@@ -55,8 +55,14 @@ public:
     };
 
     Material(Type t);
-    Material(){}
+    Material() : type(Undefined) {}
     double& operator[](int where) { if (static_cast<int>(values.size()) <= where) { values.resize(where + 1, 0.0); } return values[where]; }
+    Type getType() const { return type; }
+
+    double density() const;
+    double poissonRatio() const;
+    double shearModulus() const;
+    double youngModulus() const;
 
     friend QDataStream& operator >> (QDataStream&, Material&);
     friend QDataStream& operator << (QDataStream&, const Material&);

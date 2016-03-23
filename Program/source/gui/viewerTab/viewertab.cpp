@@ -19,6 +19,7 @@
 #include <c3dcolumnchart.h>
 #include <fem.h>
 #include "gui/toolbox/macdisplay.h"
+#include "gui/mainWindow/mainwindow.h"
 
 ViewerTab::ViewerTab(QWidget *parent)
     : QSplitter(Qt::Horizontal, parent)
@@ -27,8 +28,8 @@ ViewerTab::ViewerTab(QWidget *parent)
 {
     this->connect(femView, SIGNAL(currentModeChanged(int, int)), SLOT(setMode(int)));
     this->connect(femView, SIGNAL(currentModelChanged(int)), SLOT(setModel(int)));
-    this->connect(femView, &ViewerView::MACPressed, [this](int id, FEMProcessor* p) {
-        MACDisplay* chart(new MACDisplay(this));
+    this->connect(femView, &ViewerView::MACPressed, [](int id, FEMProcessor* p) {
+        MACDisplay* chart(new MACDisplay(static_cast<MainWindow*>(Application::mainWindow())));
         chart->setData(Application::project()->toFEM(id)->getModes().getMAC());
         if (p) {
             connect(p, &FEMProcessor::MACUpdated, [chart, p](){
@@ -39,8 +40,8 @@ ViewerTab::ViewerTab(QWidget *parent)
         chart->connect(chart, &MACDisplay::closed, &MACDisplay::deleteLater);
         chart->show();
     });
-    this->connect(femView, &ViewerView::calcModes, [this](int v) {
-        QMessageBox* const hold(new QMessageBox(this));
+    this->connect(femView, &ViewerView::calcModes, [](int v) {
+        QMessageBox* const hold(new QMessageBox(static_cast<MainWindow*>(Application::mainWindow())));
         hold->setModal(true);
         hold->setStandardButtons(QMessageBox::NoButton);
         hold->setText("Ща посчитаю");

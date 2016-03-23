@@ -133,4 +133,21 @@ QDebug operator<<(QDebug out, const CVector& m)
         return out;
     }
 }
+
+QDataStream& operator<< (QDataStream& out, const CVector& m)
+{
+    out << static_cast<const CArray&>(m);
+    out << static_cast<quint32>(m.getOrientation());
+    return out;
+}
+
+QDataStream& operator>> (QDataStream& in, CVector& m)
+{
+    in >> static_cast<CArray&>(m);
+    quint32 o;
+    in >> o;
+    m.setOrientation(static_cast<CVector::Orientation>(o));
+    return in;
+}
+
 #endif
