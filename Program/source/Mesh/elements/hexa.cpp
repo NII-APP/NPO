@@ -30,17 +30,6 @@ FinitElement::FinitElementType Hexa::type() const {
     return HexaType;
 }
 
-void Hexa::getTraced(QBitArray& b) const {
-    b.setBit(n[0]);
-    b.setBit(n[1]);
-    b.setBit(n[2]);
-    b.setBit(n[3]);
-    b.setBit(n[4]);
-    b.setBit(n[5]);
-    b.setBit(n[6]);
-    b.setBit(n[7]);
-}
-
 void Hexa::render() const {
     quint32 m[24] = { n[0], n[1], n[2], n[3],
                       n[4], n[5], n[6], n[7],

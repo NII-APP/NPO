@@ -40,22 +40,6 @@ ViewerTab::ViewerTab(QWidget *parent)
         chart->connect(chart, &MACDisplay::closed, &MACDisplay::deleteLater);
         chart->show();
     });
-    this->connect(femView, &ViewerView::calcModes, [](int v) {
-        QMessageBox* const hold(new QMessageBox(static_cast<MainWindow*>(Application::mainWindow())));
-        hold->setModal(true);
-        hold->setStandardButtons(QMessageBox::NoButton);
-        hold->setText("Ща посчитаю");
-        QEventLoop* const loop(new QEventLoop(hold));
-        FEMProcessor p(Application::nonConstProject()->FEMList()[v], hold);
-        connect(&p, &FEMProcessor::finished, [loop](){
-            loop->exit();
-        });
-        connect(hold, &QMessageBox::finished, [loop]() { loop->exit(); });
-        hold->show();
-        p.calculateModes();
-        loop->exec();
-        hold->deleteLater();
-    });
     this->addWidget(femView);
     this->addWidget(cascadeNode);
     this->setSizes(QList<int>() << 300 << 1000);

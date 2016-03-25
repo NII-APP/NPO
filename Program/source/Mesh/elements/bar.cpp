@@ -40,10 +40,4 @@ FinitElement::FinitElementType Bar::type() const
     return BarType;
 }
 
-void Bar::getTraced(QBitArray& b) const
-{
-    b.setBit(n[0]);
-    b.setBit(n[1]);
-}
-
 }

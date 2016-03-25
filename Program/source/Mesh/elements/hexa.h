@@ -15,7 +15,6 @@ public:
     void renderNet() const;
     FinitElement* clone() const;
     FinitElementType type() const;
-    void getTraced(QBitArray&) const;
 \
     const quint32* nodes() const { return n; }
     quint32* nodes() { return n; }

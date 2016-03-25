@@ -61,6 +61,11 @@ void FinitElement::fillTraced(QBitArray & a) const {
     for(const quint32& val: *this) {
         a.setBit(val);
     }
+    if (isHaveMidsideNodes()) {
+        for (const quint32* i(midsideBegin()); i != midsideEnd(); ++i) {
+            a.setBit(*i);
+        }
+    }
 }
 
 FinitElement* FinitElement::resolveType(int type)

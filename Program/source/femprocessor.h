@@ -30,6 +30,7 @@ public:
     FEM* model() const { return __model; }
 
 signals:
+    void startSetupModes();
     void modesReaded(FEM*);
     void modesInited();
     void MACUpdated();
@@ -67,7 +68,11 @@ public:
     FEMCalculateModes(FEM* model, QObject* parent);
     void run() Q_DECL_OVERRIDE;
 signals:
-    void calculated();
+    void startSetupModes();
+    void modesInited();
+    void MACUpdated();
+    void MACEstimated();
+    void finished();
 };
 
 #endif // FEMPROCESSOR_H

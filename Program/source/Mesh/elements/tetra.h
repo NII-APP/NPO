@@ -19,7 +19,6 @@ public:
     void renderNet() const;
     FinitElement* clone() const;
     FinitElementType type() const;
-    void getTraced(QBitArray&) const;
 
     const quint32* nodes() const { return n; }
     quint32* nodes() { return n; }
@@ -28,7 +27,7 @@ public:
     void initMidsideNodes() { midside = new quint32[midsideNodesCount()]; }
     quint32* midsideNodes() { return midside; }
     const quint32* midsideNodes() const { return midside; }
-    bool isHaveMidsideNodes() const { return midside; }
+    bool isHaveMidsideNodes() const { return midside != nullptr; }
     quint32 midsideNodesCount() const { return 6; }
 };
 

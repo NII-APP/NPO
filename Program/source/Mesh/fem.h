@@ -148,6 +148,7 @@ public:
     const CGL::CVertexes& getNodes() const { return vertexes; }
     CGL::CVertexes& getNodes() { return vertexes; }
     void setNodes(const CGL::CVertexes& v) { vertexes = v; }
+    bool isTracedNode(const int id) const { return isTraced.testBit(id); }
 
     //node coordinates
     const Constrains& getConstrains() const { return constrains; }

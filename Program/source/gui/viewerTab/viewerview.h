@@ -23,12 +23,12 @@ signals:
     void currentModeChanged(int, int);
     void modesIdentificationPressed(int);
     void MACPressed(int, FEMProcessor*);
-    void calcModes(int);
 
 public slots:
     void addFEM();
     void importModes(int id);
     void identificateModes(int meshId);
+    void calcModes(int);
 
     void update();
     void acceptNewProject();

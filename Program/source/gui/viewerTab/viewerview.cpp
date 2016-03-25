@@ -12,6 +12,7 @@
 #include "gui/modesIdentificationWizard/modesidentificationwizard.h"
 #include "eigenmodes.h"
 #include "fem.h"
+#include "gui/mainWindow/mainwindow.h"
 
 ViewerView::ViewerView(QWidget *parent)
     : QTreeView(parent)
@@ -46,8 +47,26 @@ void ViewerView::mousePressEvent(QMouseEvent* e) {
     } else if (r == ViewerModel::MAC) {
         emit MACPressed(modelId, buf.contains(modelId) ? buf[modelId] : nullptr);
     } else if (r == ViewerModel::ModesCompute) {
-        emit calcModes(modelId);
+        calcModes(modelId);
     }
+}
+
+void ViewerView::calcModes(int v)
+{
+    //QMessageBox* const hold(new QMessageBox(static_cast<MainWindow*>(Application::mainWindow())));
+    //hold->setModal(true);
+    //hold->setStandardButtons(QMessageBox::NoButton);
+    //hold->setText("Ща посчитаю");
+    QEventLoop* const loop(new QEventLoop(this));
+    FEMProcessor* p(new FEMProcessor(Application::nonConstProject()->FEMList()[v], this));
+    connect(p, &FEMProcessor::finished, [loop]() { loop->exit(); });
+    connect(p, &FEMProcessor::startSetupModes, [this, p]() { this->myModel()->beginAddModes(p->model()); });
+    connect(p, &FEMProcessor::modesInited, [this, p]() { this->myModel()->endAddModes(p->model()); });//hold->close(); });
+    //hold->show();
+    p->calculateModes();
+    loop->exec();
+    //hold->deleteLater();
+    //p->deleteLater();
 }
 
 void ViewerView::identificateModes(int meshId)

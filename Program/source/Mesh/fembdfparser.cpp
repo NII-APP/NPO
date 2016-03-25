@@ -122,7 +122,12 @@ void FEM::nativeBDFParser(const QString& fileName) {
                 trace.resize(id + 100, 0);
             }
             int m(f.integer());
-            trace[id] = new core::Tetra(f.integer(), f.integer(), f.integer(), f.integer());
+            int ids[4];
+            ids[0] = f.integer();
+            ids[1] = f.integer();
+            ids[2] = f.integer();
+            ids[3] = f.integer();
+            trace[id] = new core::Tetra(ids[0], ids[1], ids[2], ids[3]);
             if (*f != '\n' || *f != '\r') {
                 core::FinitElement* const e(trace[id]);
                 e->initMidsideNodes();

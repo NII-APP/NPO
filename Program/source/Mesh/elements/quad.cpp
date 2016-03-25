@@ -26,13 +26,6 @@ FinitElement::FinitElementType Quad::type() const {
     return QuadType;
 }
 
-void Quad::getTraced(QBitArray& b) const {
-    b.setBit(n[0]);
-    b.setBit(n[1]);
-    b.setBit(n[2]);
-    b.setBit(n[3]);
-}
-
 void Quad::render() const {
     glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, n);
 }

@@ -166,7 +166,7 @@ float CParse::fixFloat(int fixLen)
     num *= pow(expK, expV);
     return num * sign;
 }
-#include <QDebug>
+
 int CParse::fixInt(int fixLen)
 {
     bool positive(true);

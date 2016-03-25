@@ -61,9 +61,10 @@ void EFEMS::StartLocalSolverAndConnect(char *strlocworkpath, char *strexename)
 	ZeroMemory(&start_info,sizeof(STARTUPINFO));
 	start_info.dwFlags = NULL;
 	sprintf_s(strnewdest,256*sizeof(char),"%s\\%s\0",strlocworkpath,strexename);
+	puts(strnewdest);
 	dw_priority = BELOW_NORMAL_PRIORITY_CLASS;
 	//CreateProcessA(strnewdest,NULL,NULL,NULL,TRUE,CREATE_NO_WINDOW,NULL,strlocworkpath,&start_info,&proc_info);
-	CreateProcessA(strnewdest,NULL,NULL,NULL,TRUE,CREATE_NEW_CONSOLE,NULL,strlocworkpath,&start_info,&proc_info);
+    CreateProcessA(strnewdest,NULL,NULL,NULL,TRUE,CREATE_NEW_CONSOLE,NULL,strlocworkpath,&start_info,&proc_info);
 	
 	SetPriorityClass(proc_info.hProcess,dw_priority);
 	CloseHandle(proc_info.hThread);

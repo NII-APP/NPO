@@ -16,11 +16,6 @@ Tria::Tria(quint32 n1, quint32 n2, quint32 n3) {
 
 FinitElement* Tria::clone() const { return new Tria(*this); }
 FinitElement::FinitElementType Tria::type() const { return TriaType; }
-void Tria::getTraced(QBitArray& b) const {
-    b.setBit(n[0]);
-    b.setBit(n[1]);
-    b.setBit(n[2]);
-}
 
 void Tria::render() const {
     glDrawElements(GL_TRIANGLES, 3, GL_INT, n);
