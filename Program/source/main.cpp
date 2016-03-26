@@ -20,6 +20,5 @@ int main(int argc, char *argv[])
 #else
     w.showMaximized();
 #endif
-
     return a.exec();
 }

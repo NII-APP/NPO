@@ -179,7 +179,7 @@ void ModesIdentificationWizard::MethodSelector::updateCurrentResults(EigenModes*
     for (int i(0); i != r->size(); ++i) {
         result += stencil.arg(QString::number(i + 1),
                               QString::number(r->at(i).frequency()),
-                              QString::number(r->at(i).averageDamping())) + "<br/>";
+                              QString::number(r->at(i).averageDamping() * 100)) + "%<br/>";
     }
     __resultDisplays[this->currentIndex()]->setHtml(result);
 }
@@ -252,12 +252,12 @@ void ModesIdentificationWizard::ManualController::setAFR(QString filename)
                                 .arg(filename));
         return;
     }
-    if (__afr->size() - 1 != __viewer->getModel()->getNodes().length()) {
+    if (__afr->size() != __viewer->getModel()->getNodes().length()) {
         QMessageBox::warning(static_cast<QWidget*>(this->parent()),
                              Application::identity()->tr("modes identification wizard/size warning/title"),
                              Application::identity()->tr("modes identification wizard/size warning/text")
                                 .arg(QString::number(__viewer->getModel()->getNodes().length()),
-                                     QString::number(__afr->size() - 1),
+                                     QString::number(__afr->size()),
                                      filename));
     }
 

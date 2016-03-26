@@ -89,7 +89,6 @@ EigenMode AFRArray::getMode(const double freq) const
 
 void AFRArray::read(const QString& filename, int nodesCount) {
     this->resize(nodesCount);
-#define AFR_ARRAY_READER_DEBUG
     QFile file(filename);
     if (!file.open(QFile::ReadOnly)) {
         throw QFile::OpenError;

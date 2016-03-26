@@ -17,22 +17,22 @@ void Constrain::addConstrain(const int v)
 {
     switch (v) {
     case 1:
-        fixedSides |= Xp;
+        fixedSides |= X;
         break;
     case 2:
-        fixedSides |= Xm;
+        fixedSides |= Y;
         break;
     case 3:
-        fixedSides |= Yp;
+        fixedSides |= Z;
         break;
     case 4:
-        fixedSides |= Ym;
+        fixedSides |= rX;
         break;
     case 5:
-        fixedSides |= Zp;
+        fixedSides |= rY;
         break;
     case 6:
-        fixedSides |= Zm;
+        fixedSides |= rZ;
         break;
     default:
 #ifndef QT_NO_DEBUG

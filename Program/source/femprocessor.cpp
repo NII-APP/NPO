@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include <QLabel>
+#include <QDir>
 
 #include <fem.h>
 #include <cmatrix.h>
@@ -124,17 +125,29 @@ int igoTypeId(const FinitElement* const element) {
 
 void FEMProcessor::FEMCalculateModes::run()
 {
-    qDebug() << "begin";
     EFEMS pefems;
 
-    static QByteArray tempDir("C:\\igolibTrash");
+    static const QString localTempDir("kisdir");
+    static QByteArray tempDir((QDir::currentPath() + "/" + localTempDir).toLocal8Bit());
+    qDebug() << tempDir;
     static QByteArray exeFile("PSE_Client.exe");
+    if (!QFile::exists(QString(tempDir) + "/" + QString(exeFile))) {
+        if (!QDir::current().exists(localTempDir)) {
+            QDir::current().mkdir(localTempDir);
+        }
+        if (!QFile::copy(":/exe/lib/igolib/PSE_Client.exe", QDir::currentPath() + "/" + localTempDir + "/PSE_Client.exe")) {
+            qFatal("can't write to kisdir (tmp direcroty for Kiselev solver");
+        }
+    }
     static char* tempDirList(tempDir.data());
 
     //запуск решателя, инициализация каналов связи
+    this->sleep(1);
     pefems.StartLocalSolverAndConnect(tempDirList, exeFile.data());
+    this->sleep(1);
     qDebug() << "solver started";
-    //pefems.ConnectToSolver();
+
+    ///pefems.ConnectToSolver();
     //передача настроек решения
     // 1 - число паралелльных потоков при обработке 1 СЭ
     // 2 - число параллельно рассчитываемых матриц СЭ
@@ -199,7 +212,6 @@ void FEMProcessor::FEMCalculateModes::run()
         ++matIt;
     }
 
-    // передача матрицы индексов и другой информации об элементах
     typedef std::vector<int> FEDatum;
     typedef std::vector<FEDatum> FEData;
     typedef std::vector<int*> FEMemory;
@@ -210,7 +222,6 @@ void FEMProcessor::FEMCalculateModes::run()
     int i(0);
     for(const FinitElement* element : elements)
     {
-        // для каждого элемента создается массив размером = число узлов + 3
         if (element != nullptr) {
             trase[i].resize(element->size() + 3 + element->isHaveMidsideNodes() * element->midsideNodesCount());
             mem[i] = trase.at(i).data();
@@ -231,38 +242,20 @@ void FEMProcessor::FEMCalculateModes::run()
             ++i;
         }
     }
-    // 1 - число элементов
-    // 2 - число типов элементов в модели
-    // 3 - массив подготовленный, как показано выше
-    qDebug() << "nodes collected" << typesSet.size();
+
     assert(i == trase.size());
     pefems.SendFEMelements(i, typesSet.size(), mem.data());
-
-    qDebug() << "build constrains array";
-    //передача закреплений
     const Constrains& cnr(__model->getConstrains());
     static const int dimensionCount(3);
     std::vector<int> fix(m.size(), 0);
     std::vector<double> ufix(m.size(), 0.0);
     for (const std::pair<const int, Constrain>& i : cnr) {
-        fix[vertexRenumbering[i.first]]     = i.second.isConstrained(Constrain::X);
-        fix[vertexRenumbering[i.first] + 1] = i.second.isConstrained(Constrain::Y);
-        fix[vertexRenumbering[i.first] + 2] = i.second.isConstrained(Constrain::Z);
+        fix[vertexRenumbering[i.first] * 3]     = i.second.isConstrained(Constrain::X);
+        fix[vertexRenumbering[i.first] * 3 + 1] = i.second.isConstrained(Constrain::Y);
+        fix[vertexRenumbering[i.first] * 3 + 2] = i.second.isConstrained(Constrain::Z);
     }
-    qDebug() << "send it for peFems";
     pefems.SendFEMfixing(m.size(), dimensionCount, fix.data(), ufix.data());
-    // FIX - целочисленный массив размером NN*KORT показывает
-    // FIX[i*KORT+j] == 0 - закрепления нет для узла i и степени свободы j
-    // FIX[i*KORT+j] == 1 - закрепление есть для узла i и степени свободы j
-    // для специфических закреплений могут быть другие флаги
-    // UFIX - массив заданных принудительных перемещений по степенм свободы
-    // считываются только степени свободы для которых соответствующий элемент в FIX == 1
 
-    //передача материалов (упругих свойств)
-    // 1 - количество материалов
-    // 2 - массив упругих свойств
-    // [номер материала][0 - модуль упругости, 1 - коэф Пуассона, 2 - плотность]
-    qDebug() << "build materials array";
     CMatrix matMatrix(3, materials.size());
     for (int i(0); i < matMatrix.height(); ++i) {
         matMatrix[i][0] = materials.at(i).youngModulus();
@@ -270,33 +263,20 @@ void FEMProcessor::FEMCalculateModes::run()
         matMatrix[i][2] = materials.at(i).density();
     }
 
-    qDebug() << "setup materials";
     pefems.SendFEMmaterials(materials.size(), matMatrix.pointers());
 
-    //создание упер-элементной модели
-    // 1 - примерное число элементов в СЭ нулевого уровня
-    // 2 - примерное полное число узлов в СЭ старших уровней
-    // 3 - примерное число граничных узлов в СЭ стурших уровней
-    qDebug() << "create SE";
     pefems.CreateAutoSE(3000,5000,2000);
 
-    //расчет собственных частот и форм
-    // 1 - количество частот, которые требуется искать
-    // 2 - погрешность (параметр сходимости) квадрата частоты
-    // 3 - размер блока поиска СЧ (если нужно найти большое число СЧ, расчет будет осуществляться поблочно)
-    //     12..15 рекомендуемый диапазон в независимости от параметра 1
-    const int encount(5);
-    qDebug() << "compute" << encount << "modes";
+    const int encount(15);
     pefems.EIGFR_SSI(encount,0.00001,15);
-    qDebug() << "calculation finished";
-    //информация о процессе решения обновляется в текстовом файле
-    //Eigen_SSI_SE_listing.lst в рабочей директории модели
 
     // получение найденных СЧ
     CArray frherz(encount);
     const int nfrobtained(pefems.GetFreqRes(encount,frherz.data()));
     if (encount != nfrobtained) {
         qDebug() << nfrobtained << "modes obtained...";
+        emit finished();
+        return;
     }
     qDebug() << "FREQ RESULTS [Hz]:";
     for (int i=0; i<nfrobtained; i++) {

@@ -433,6 +433,17 @@ void FEM::render() const {
         glColor3ub(0x22,0x22,0x22);
         glDrawElements(GL_POINTS, static_cast<GLsizei>(indexes.size()), GL_UNSIGNED_INT, indexes.data());
     }
+
+    if (true) {
+        std::vector<GLuint> indexes;
+        indexes.reserve(constrains.size());
+        for (const std::pair<int, Constrain>& i : constrains) {
+            indexes.push_back(i.first);
+        }
+        glDisableClientState(GL_COLOR_ARRAY);
+        glColor3ub(0x22,0x22,0x22);
+        glDrawElements(GL_POINTS, static_cast<GLsizei>(indexes.size()), GL_UNSIGNED_INT, indexes.data());
+    }
 }
 
 void FEM::renderNet() const {

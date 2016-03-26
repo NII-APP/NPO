@@ -35,7 +35,7 @@ FEMViewer::FEMViewerModeInput::~FEMViewerModeInput()
 void FEMViewer::FEMViewerModeInput::holdValue(int v) {
     try {
         if (static_cast<FEMViewer*>(this->parentViewer)->getModel()) {
-            hzValue->setText(("%1 " + Application::identity()->tr("hertz")).arg(static_cast<FEMViewer*>(this->parentViewer)->getModel()->getModes().at(v).frequency()));
+            hzValue->setText(("%1 " + Application::identity()->tr("hertz")).arg(static_cast<FEMViewer*>(this->parentViewer)->getModel()->getModes().at(v - 1).frequency()));
             emit valueChanged(getValue());
         } else {
             throw std::exception();

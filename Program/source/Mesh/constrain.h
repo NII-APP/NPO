@@ -14,15 +14,12 @@ public:
     ~Constrain();
 
     enum Sides {
-        Xp = 0x1,
-        Xm = 0x2,
-        X = 0x3,
-        Yp = 0x4,
-        Ym = 0x8,
-        Y = 0xC,
-        Zp = 0x10,
-        Zm = 0x20,
-        Z = 0x30,
+        X = 0x1,
+        Y = 0x2,
+        Z = 0x4,
+        rX = 0x8,
+        rY = 0x10,
+        rZ = 0x20,
 
         All = 0x3F
     };

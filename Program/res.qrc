@@ -22,7 +22,7 @@
         <file>resource/images/magnitude.png</file>
         <file>resource/images/freq.png</file>
     </qresource>
-    <qresource lang="css" prefix="/css">
+    <qresource prefix="/css" lang="css">
         <file>resource/css.css</file>
     </qresource>
     <qresource prefix="/json">
@@ -32,5 +32,8 @@
         <file>resource/identificationMethodsDiscription/manual rus.htm</file>
         <file>resource/identificationMethodsDiscription/img/ok.png</file>
         <file>resource/identificationMethodsDiscription/view rus.htm</file>
+    </qresource>
+    <qresource prefix="/exe">
+        <file>lib/igolib/PSE_Client.exe</file>
     </qresource>
 </RCC>
