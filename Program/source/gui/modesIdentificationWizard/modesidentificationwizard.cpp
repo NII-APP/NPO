@@ -179,7 +179,7 @@ void ModesIdentificationWizard::MethodSelector::updateCurrentResults(EigenModes*
     for (int i(0); i != r->size(); ++i) {
         result += stencil.arg(QString::number(i + 1),
                               QString::number(r->at(i).frequency()),
-                              QString::number(r->at(i).averageDamping() * 100)) + "%<br/>";
+                              QString::number(r->at(i).averageDamping() * 100) + '%') + "<br/>";
     }
     __resultDisplays[this->currentIndex()]->setHtml(result);
 }
