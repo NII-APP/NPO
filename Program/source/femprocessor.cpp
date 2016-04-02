@@ -58,6 +58,16 @@ void FEMProcessor::calculateModes()
     w->start();
 }
 
+void FEMProcessor::syncCalculateModes(FEM* const model)
+{
+    FEMProcessor proc(model);
+    QEventLoop* loop(new QEventLoop(&proc));
+    connect(&proc, &FEMProcessor::finished, loop, &QEventLoop::quit);
+
+    proc.calculateModes();
+    loop->exec();
+}
+
 FEMProcessor::FEMWorker::FEMWorker(FEM* model, QObject* parent)
     : QThread(parent)
     , __model(model) { }

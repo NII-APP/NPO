@@ -24,7 +24,7 @@ class FEMProcessor : public QObject
     class FEMWorker;
     class FEMCalculateModes;
 public:
-    FEMProcessor(FEM* model, QObject* parent);
+    FEMProcessor(FEM* model, QObject* parent = 0);
     ~FEMProcessor();
 
     FEM* model() const { return __model; }
@@ -40,6 +40,7 @@ signals:
 public slots:
     void read(const QString& filename);
     void calculateModes();
+    static void syncCalculateModes(FEM* const model);
 };
 
 class FEMProcessor::FEMWorker : public QThread   {
