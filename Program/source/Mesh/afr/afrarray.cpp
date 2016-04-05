@@ -101,6 +101,7 @@ void AFRArray::read(const QString& filename, int nodesCount) {
         p.skipRow();
         const int datasetId(p.integer());
         if (datasetId != 58) {
+            //http://www.svibs.com/resources/ARTeMIS_Modal_Help/UFF%20Data%20Set%20Number%2058.html
 #ifdef AFR_ARRAY_READER_DEBUG
             qDebug() << "skip dataset" << datasetId;
 #endif
@@ -108,12 +109,12 @@ void AFRArray::read(const QString& filename, int nodesCount) {
                 p.skipRow();
             }
         } else {
-            p.skipRow();
-            p.skipRow();
-            p.skipRow();
-            p.skipRow();
-            p.skipRow();
-            p.integer();
+            p.skipRows(5);
+            const int functionType(p.integer());
+            if (functionType != 4 && functionType != 12) {
+                throw std::exception(
+                            QString("Unknown uff-58 data function type (%1)!").arg(functionType).toLocal8Bit().data());
+            }
             p.integer();
             p.integer();
             p.integer();
@@ -125,25 +126,83 @@ void AFRArray::read(const QString& filename, int nodesCount) {
                 this->resize(nodeId + 1);
             }
             AFR& array(this->at(nodeId));
+            const int direction(p.integer());
+            enum Directions {
+                X = 1,
+                Xminus = -1,
+                Y = 2,
+                Yminus = -2,
+                Z = 3,
+                Zminus = -3,
+                XRotation = 4,
+                XminusRotation = -4,
+                YRotation = 5,
+                YminusRotation = -5,
+                ZRotation = 6,
+                ZminusRotation = -6,
+            };
+
+            switch(direction) {
+            case X:
+                array.setDirection(QVector3D(1,0,0));
+                break;
+            case Y:
+                array.setDirection(QVector3D(0,1,0));
+                break;
+            case Z:
+                array.setDirection(QVector3D(0,0,1));
+                break;
+            case Xminus:
+                array.setDirection(QVector3D(-1,0,0));
+                break;
+            case Yminus:
+                array.setDirection(QVector3D(0,-1,0));
+                break;
+            case Zminus:
+                array.setDirection(QVector3D(0,0,-1));
+                break;
+            default:
+                throw std::exception("Wrong uff-58 direction id");
+            }
+
             p.skipRow();
-            p.integer();
+            const int dataType(p.integer());
+            if (dataType != 5 && dataType != 6) {
+                throw std::exception("unsuported uff-58 data type (onlu complex suported)");
+            }
             array.resize(p.integer());
-            p.skipRow();
-            p.skipRow();
-            p.skipRow();
-            p.skipRow();
-            p.skipRow();
-            for (AFR::iterator it(array.begin()); it != array.end(); ++it) {
-                it->frequency = p.real();
-                it->amplitude.real(p.real());
-                it->amplitude.imag(p.real());
+            const int evenAbscissa(p.integer() == 1);
+            if (!evenAbscissa) {
+                p.skipRows(5);
+                for (AFR::iterator it(array.begin()); it != array.end(); ++it) {
+                    it->frequency = p.real();
+                    it->amplitude.real(p.real());
+                    it->amplitude.imag(p.real());
+                }
+                int lim(10);
+                while (!p.testPrew("    -1") && --lim) {
+                    p.skipRow();
+                }
+                Q_ASSERT(lim);
+                std::sort(array.begin(), array.end(), [](const FrequencyMagnitude& a, const FrequencyMagnitude& b)->bool{ return a.frequency < b.frequency; });
+            } else {
+                CRange<double> freqRange;
+                freqRange.setMin(p.real());
+                freqRange.setMax(p.real());
+                p.skipRows(5);
+                double id(0);
+                for (FrequencyMagnitude& it : array) {
+                    it.amplitude.real(p.real());
+                    it.amplitude.imag(p.real());
+                    it.frequency = freqRange(id / array.size());
+                    ++id;
+                }
+                int lim(2);
+                while (!p.testPrew("    -1") && --lim) {
+                    p.skipRow();
+                }
+                Q_ASSERT(lim);
             }
-            int lim(10);
-            while (!p.testPrew("    -1") && --lim) {
-                p.skipRow();
-            }
-            Q_ASSERT(lim);
-            std::sort(array.begin(), array.end(), [](const FrequencyMagnitude& a, const FrequencyMagnitude& b)->bool{ return a.frequency < b.frequency; });
         }
         Q_ASSERT(p.testPrew("    -1"));
         p.skipRow();
@@ -155,23 +214,27 @@ void AFRArray::read(const QString& filename, int nodesCount) {
 
 AFR AFRArray::average() const {
     //first array should be empty
-    if (this->size() < 2) {
-        return AFR();
-    }
-    AFR result(this->at(1));
-    if (this->size() == 2) {
-        return result;
-    }
-    int i(2);
-    for (; i != this->size(); ++i) {
-        const AFR& one(this->at(i));
-        AFR::iterator acceptor(result.begin());
-        for (AFR::const_iterator it(one.begin()); it != one.end(); ++it, ++acceptor) {
-            //acceptor->amplitude += std::complex<double>(fabs(it->amplitude.real()), fabs(it->amplitude.imag()));
-            acceptor->amplitude += it->amplitude;
+    const_iterator init(begin());
+    for (const_iterator it(this->begin()); it != end(); ++it) {
+        if (init->size() < it->size()) {
+            init = it;
         }
     }
-    const double k(i - 1);
+    if (init->empty()) {
+        return AFR();
+    }
+    AFR result(*init);
+    double k(1.0);
+    for (const AFR& one : *this) {
+        if (one.size() == result.size() && &one != &*init) {
+            ++k;
+            AFR::iterator acceptor(result.begin());
+            for (AFR::const_iterator it(one.begin()); it != one.end(); ++it, ++acceptor) {
+                //acceptor->amplitude += std::complex<double>(fabs(it->amplitude.real()), fabs(it->amplitude.imag()));
+                acceptor->amplitude += it->amplitude;
+            }
+        }
+    }
     for (AFR::iterator i(result.begin()); i != result.end(); ++i) {
         i->amplitude /= k;
     }

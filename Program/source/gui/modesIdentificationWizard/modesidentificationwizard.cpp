@@ -234,17 +234,27 @@ ModesIdentificationWizard::ManualController::~ManualController()
 
 void ModesIdentificationWizard::ManualController::setModeFrequency(double v)
 {
-    __viewer->setProxyMode(__afr->getMode(v));
+    if (__viewer->isVisible()) {
+        __viewer->setProxyMode(__afr->getMode(v));
+    }
 }
 
 void ModesIdentificationWizard::ManualController::setAFR(QString filename)
 {
-    if (filename.split('.').last().toLower() != "unv") {
+    if (filename.split('.').last().toLower() != "unv"
+     && filename.split('.').last().toLower() != "uff") {
         return;
     }
     delete __afr;
     __afr = new AFRArray;
-    __afr->read(filename);
+    try {
+        __afr->read(filename);
+    } catch (std::exception e) {
+        QMessageBox::warning(static_cast<QWidget*>(this->parent()),
+                      Application::identity()->tr("modes identification wizard/file warning/title"),
+                      e.what());
+    }
+
     if (__afr->size() == 0) {
         QMessageBox::warning(static_cast<QWidget*>(this->parent()),
                              Application::identity()->tr("modes identification wizard/file warning/title"),
@@ -259,9 +269,13 @@ void ModesIdentificationWizard::ManualController::setAFR(QString filename)
                                 .arg(QString::number(__viewer->getModel()->getNodes().length()),
                                      QString::number(__afr->size()),
                                      filename));
+        __viewer->hide();
+        __chart->setData(*__afr, false);
+    } else {
+        __viewer->show();
+        __chart->setData(*__afr, true);
     }
 
-    __chart->setData(*__afr);
 
 }
 

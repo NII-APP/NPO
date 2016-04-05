@@ -50,6 +50,11 @@ ViewerTab::~ViewerTab()
 
 }
 
+void ViewerTab::addModel()
+{
+    femView->addFEM();
+}
+
 void ViewerTab::setModel(const FEM* model) {
     cascadeNode->setModel(model);
 }

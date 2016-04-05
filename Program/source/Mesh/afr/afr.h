@@ -5,6 +5,7 @@
 #include <vector>
 #include <crange.h>
 #include "../CGL/cslider.h"
+#include <QVector3D>
 
 class QString;
 class RealRange;
@@ -24,12 +25,18 @@ struct FrequencyMagnitude {
 class AFR : public std::vector<FrequencyMagnitude>
 {
     FrequencyMagnitude maxItem(const AFR::const_iterator start, const AFR::const_iterator finish) const;
+
+    QVector3D direct;
 public:
     AFR();
     AFR(const size_t size);
     ~AFR();
     FrequencyMagnitude findEigenFreq(const CRealRange& range) const;
     double damping(const double &freq) const;
+
+    void setDirection(const QVector3D direction) { direct = direction; }
+    const QVector3D& rDirection() const { return direct; }
+    QVector3D direction() const { return direct; }
 
     enum IntegralParts {
         Real = 0x1,

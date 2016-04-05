@@ -90,7 +90,7 @@ void ModesIdentChart::resizeEvent(QResizeEvent *)
     __chart->resize(this->size() -= QSize(0, __toolbar->height() * __toolbar->isVisible()));
 }
 
-void ModesIdentChart::setData(const AFRArray &afrArray)
+void ModesIdentChart::setData(const AFRArray &afrArray, bool isConsistent)
 {
     __afr.amplitude = afrArray.toChartData(AFR::Amplitude);
     __afr.imaginary = afrArray.toChartData(AFR::Imaginary);
@@ -100,7 +100,8 @@ void ModesIdentChart::setData(const AFRArray &afrArray)
     __averageAfr.imaginary = average.toChartData(AFR::Imaginary);
     __averageAfr.real = average.toChartData(AFR::Real);
 
-    if (afrArray.size() > 1) {
+    __pickFreq->setEnabled(isConsistent);
+    if (afrArray.size() > 1 && isConsistent) {
         int i(0);
         while (afrArray.at(i).empty() && i <  afrArray.size()) {
             ++i;
@@ -110,8 +111,13 @@ void ModesIdentChart::setData(const AFRArray &afrArray)
             const AFR& afr(afrArray.at(i));
             __purview = CRealRange(afr.front().frequency, afr.back().frequency);
             for (auto s : __sliders.keys()) {
+                s->show();
                 s->setPurview(__purview);
             }
+        }
+    } else if (isConsistent) {
+        for (auto s : __sliders.keys()) {
+            s->hide();
         }
     }
     update();

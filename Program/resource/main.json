@@ -67,7 +67,7 @@
     "chose model" : {
         "caption rus" : "Укажите файл модели",
         "caption eng" : "Chose mesh file",
-        "filter" : "mesh(*.bdf *.unv *.dat)"
+        "filter" : "mesh(*.bdf *.dat *.unv *.uff);; test(*.unv *.uff);; FEM(*.bdf *.dat)"
     },
     "chose modes" : {
         "caption rus" : "Укажите файл форм колебаний (не обязательно)",

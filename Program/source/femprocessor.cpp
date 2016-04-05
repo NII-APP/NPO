@@ -139,7 +139,9 @@ void FEMProcessor::FEMCalculateModes::run()
 
     static const QString localTempDir("kisdir");
     static QByteArray tempDir((QDir::currentPath() + "/" + localTempDir).toLocal8Bit());
-    qDebug() << tempDir;
+#ifndef QT_NO_DEBUG
+    qDebug() << tempDir << "tmp dir for kiselev";
+#endif
     static QByteArray exeFile("PSE_Client.exe");
     if (!QFile::exists(QString(tempDir) + "/" + QString(exeFile))) {
         if (!QDir::current().exists(localTempDir)) {
@@ -158,22 +160,9 @@ void FEMProcessor::FEMCalculateModes::run()
     qDebug() << "solver started";
 
     ///pefems.ConnectToSolver();
-    //передача настроек решения
-    // 1 - число паралелльных потоков при обработке 1 СЭ
-    // 2 - число параллельно рассчитываемых матриц СЭ
-    // 3 - число параллельно обрабатываемых СЭ при обратном проходе
-    // 4 - число временных рабочих директорий для хранения матриц (на 1 физический жесткий диск - 1 директоряи)
-    // 5 - пути к временным директориям (последняя заданная в пути папка создается автоматически)
-    // 6 - [(float)мегабайт] предельный разрешенный объем оперативной памяти (не гарантирующая настройка)
-    // 7 - [(float)мегабайт] примерный максимальный размер 1 блока данных при расчете матриц СЭ
     pefems.SendParallelSettings(4,4,4,1,&tempDirList,3000.0,1000.0);
 
-    //создание объекта КЭ модели на стороне решателя
     pefems.CreatFEmodel(tempDirList);
-    //передача координат узлов
-    // 1 - число узлов
-    // 2 - число координат в узле
-    // 3 - массив координат узлов размером NN*KORT: X,Y,Z последовательно для каждого узла
     CArray m(__model->getNodes().size());
     std::copy(__model->getNodes().begin(), __model->getNodes().end(), m.begin());
     CArray::const_iterator it(m.end());
@@ -204,10 +193,14 @@ void FEMProcessor::FEMCalculateModes::run()
         }
     }
     qDebug() << "test passed";
+    qDebug() << m << "nodes vector";
 #endif
     assert(m.size() / 3 == vertexRenumbering.back() + 1);
     pefems.SendFEMnodesCRD(m.size() / 3, 3, m.data());
 
+#ifndef QT_NO_DEBUG
+    qDebug() << "prepare materials";
+#endif
     FEM::Materials materials(__model->getMaterials());
     // materials may have undefined members (just to save native bdf id in array).
     // Kiselev program can't work with fake materials. To resolve this problem
@@ -221,6 +214,9 @@ void FEMProcessor::FEMCalculateModes::run()
         }
         ++matIt;
     }
+#ifndef QT_NO_DEBUG
+    qDebug() << "mat prepared" << materials.size() << materialsRenumbering;
+#endif
 
     typedef std::vector<int> FEDatum;
     typedef std::vector<FEDatum> FEData;
@@ -253,18 +249,27 @@ void FEMProcessor::FEMCalculateModes::run()
         }
     }
 
+#ifndef QT_NO_DEBUG
+    qDebug() << "send trase";
+#endif
     assert(i == trase.size());
     pefems.SendFEMelements(i, typesSet.size(), mem.data());
     const Constrains& cnr(__model->getConstrains());
     static const int dimensionCount(3);
-    std::vector<int> fix(m.size(), 0);
-    std::vector<double> ufix(m.size(), 0.0);
+    CIndexes fix(m.size(), 0);
+    CArray ufix(m.size(), 0.0);
     for (const std::pair<const int, Constrain>& i : cnr) {
-        fix[vertexRenumbering[i.first] * 3]     = i.second.isConstrained(Constrain::X);
-        fix[vertexRenumbering[i.first] * 3 + 1] = i.second.isConstrained(Constrain::Y);
-        fix[vertexRenumbering[i.first] * 3 + 2] = i.second.isConstrained(Constrain::Z);
+        fix[vertexRenumbering[i.first] * dimensionCount]     = i.second.isConstrained(Constrain::X);
+        fix[vertexRenumbering[i.first] * dimensionCount + 1] = i.second.isConstrained(Constrain::Y);
+        fix[vertexRenumbering[i.first] * dimensionCount + 2] = i.second.isConstrained(Constrain::Z);
     }
-    pefems.SendFEMfixing(m.size(), dimensionCount, fix.data(), ufix.data());
+#ifndef QT_NO_DEBUG
+    qDebug() << "Send FEM fixing" << m.size() / dimensionCount << dimensionCount << fix << ufix;
+#endif
+    pefems.SendFEMfixing(m.size() / dimensionCount, dimensionCount, fix.data(), ufix.data());
+#ifndef QT_NO_DEBUG
+    qDebug() << "Send FEM fixing end";
+#endif
 
     CMatrix matMatrix(3, materials.size());
     for (int i(0); i < matMatrix.height(); ++i) {
@@ -273,6 +278,9 @@ void FEMProcessor::FEMCalculateModes::run()
         matMatrix[i][2] = materials.at(i).density();
     }
 
+#ifndef QT_NO_DEBUG
+    qDebug() << "Send materials" << materials.size();
+#endif
     pefems.SendFEMmaterials(materials.size(), matMatrix.pointers());
 
     pefems.CreateAutoSE(3000,5000,2000);

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <sstream>
 #include <cassert>
+#include <complex>
 
 #include <QFile>
 #include <QTextStream>
@@ -332,18 +333,105 @@ bool FEM::readUNV(const QString &fileName)
             }
         } break;
         case 55: {
-            f.skipRows(7);
-            modes.push_back(EigenMode(f.real()));
-            EigenMode& mode(modes.back());
-            f.skipRow();
-            while (!f.testPrew("    -1")) {
-                const int v(f.integer());
-                mode.form().reachOut(v);
-                const float x(f.real());
-                const float y(f.real());
-                const float z(f.real());
-                mode.form()(v) = QVector3D(x, y, z);
-                ++f;
+            f.skipRows(5);
+            const int modelType(f.integer());
+            const int analysisType(f.integer());
+            const int dataCharacteristic(f.integer());
+            const int specificDataType(f.integer());
+            const int dataType(f.integer());
+            const int ndv(f.integer());
+            //it's mean 3DOF Translation vector of data
+            //http://www.svibs.com/resources/ARTeMIS_Modal_Help/UFF%20Data%20Set%20Number%2055.html
+            if (modelType != 1
+                    || (analysisType != 3 && analysisType != 2 && analysisType != 5)
+                    || dataCharacteristic != 2
+                    || (specificDataType != 8 && specificDataType != 0)
+                    || ndv != 3) {
+                throw std::exception("Unknown uff-55 data specification!");
+            }
+            const int intNum(f.integer());
+            const int realNum(f.integer());
+            const int loadCaseNumber(f.integer());
+            const int modeNumber(f.integer());
+            enum DataType {
+                Real = 2,
+                Complex = 5
+            };
+
+            if (intNum != 2
+         || (   (realNum != 6 || dataType != Complex)
+             && (realNum != 4 || dataType != Real)
+             && (analysisType != 5 || realNum != 1))) {
+                throw std::exception("Unconsistent uff-55 note!");
+            }
+            if (loadCaseNumber != 0) {
+                throw std::exception("uff plural load case unv not suported");
+            }
+#ifndef QT_NO_DEBUG
+            assert(modes.size() == modeNumber);
+#endif
+            typedef std::complex<double> Domplex;
+            /** @todo add suport of it
+             * for real
+             * Field 1
+             * Frequency (Hertz)
+             * Field 2
+             * Modal Mass
+             * Field 3
+             * Modal Viscous Damping Ratio
+             * Field 4
+             * Modal Hysteretic Damping Ratio
+             *
+             * for complex
+             * Field 1
+             * Real Part Eigenvalue
+             * Field 2
+             * Imaginary Part Eigenvalue
+             * Field 3
+             * Real Part Of Modal A
+             * Field 4
+             * Imaginary Part Of Modal A
+             * Field 5
+             * Real Part Of Modal B
+             * Field 6
+             * Imaginary Part Of Modal B*/
+            if (dataType == Complex) {
+                Domplex complex;
+                if (realNum == 1) {
+                    modes.push_back(EigenMode(f.real()));
+                } else {
+                    complex.real(f.real());
+                    complex.imag(f.real());
+                    modes.push_back(EigenMode(abs(complex)));
+                }
+                EigenMode& mode(modes.back());
+                f.skipRow();
+                while (!f.testPrew("    -1")) {
+                    const int v(f.integer());
+                    mode.form().reachOut(v);
+                    complex.real(f.real());
+                    complex.imag(f.real());
+                    mode.form()(v).setX(abs(complex));
+                    complex.real(f.real());
+                    complex.imag(f.real());
+                    mode.form()(v).setY(abs(complex));
+                    complex.real(f.real());
+                    complex.imag(f.real());
+                    mode.form()(v).setZ(abs(complex));
+                    ++f;
+                }
+            } else {
+                modes.push_back(EigenMode(f.real()));
+                EigenMode& mode(modes.back());
+                f.skipRow();
+                while (!f.testPrew("    -1")) {
+                    const int v(f.integer());
+                    mode.form().reachOut(v);
+                    mode.form()(v).setX(f.real());
+                    mode.form()(v).setY(f.real());
+                    mode.form()(v).setZ(f.real());
+                    ++f;
+                }
             }
         } break;
         case -1:

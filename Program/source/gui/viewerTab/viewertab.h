@@ -38,6 +38,7 @@ public slots:
     void setMode(int);
     void setModel(const FEM *);
     void setModel(int id);
+    void addModel();
 };
 
 #endif // VIEWERTAB_H

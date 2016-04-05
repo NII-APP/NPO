@@ -1,14 +1,17 @@
 #include "viewermodel.h"
 
 #include <cassert>
+#include <exception>
 
 #include <QModelIndex>
+#include <QDialog>
 
 #include <fem.h>
 #include "identity.h"
 #include "application.h"
 #include "project.h"
 #include "femprocessor.h"
+#include "gui/mainWindow/mainwindow.h"
 
 
 ViewerModel::ViewerModel(const Project * p, QObject* parent)
@@ -245,7 +248,14 @@ void ViewerModel::addFEM(const QString& fname)
 {
     FEM* fem(new FEM);
     try {
-        fem->read(fname);
+        try {
+            fem->read(fname);
+        } catch (std::exception e) {
+            QMessageBox::warning(static_cast<QWidget*>(Application::mainWindow()),
+                                 Application::identity()->tr("modes identification wizard/file warning/title"),
+                                 QString(e.what()));
+            return;
+        }
     } catch(...) {
         return;
     }

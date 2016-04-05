@@ -44,7 +44,7 @@ signals:
     void currentResultChanged(EigenModes*);
 
 public slots:
-    void setData(const AFRArray&);
+    void setData(const AFRArray&, bool isConsistent);
     void update();
     void setIdentMode(ModesIdentificationWizard::IdentificationMode);
 
