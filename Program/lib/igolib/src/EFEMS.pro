@@ -6,7 +6,24 @@
 
 QT       -= core gui
 
-TARGET = EFEMS
+
+win32 {
+    !contains(QMAKE_TARGET.arch, x86_64) {
+        message("x86_32 build")
+
+        !win32-g++ {
+            TARGET = ../../../ExtSolInterface
+        } else {
+            TARGET = ../../../libEFEMS.a
+        }
+    } else {
+        TARGET = ../../../ExtSolInterface64
+    }
+} else {
+    message("nix build doesn't allow winextras and Kiselev solver")
+    DEFINES += "DISABLE_KISELEV_SOLVER"
+}
+
 TEMPLATE = lib
 
 CONFIG += staticlib
