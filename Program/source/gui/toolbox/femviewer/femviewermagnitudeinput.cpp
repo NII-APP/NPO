@@ -32,6 +32,7 @@ FEMViewer::FEMViewerMagnitudeInput::FEMViewerMagnitudeInput(QWidget *parent)
                                    l->setPixmap(icon);
                                    return l;
     })());
+    this->setMinimumWidth(200);
     this->layout()->addWidget(slider);
 
     slider->setMinimum(SLIDER_SCALE.getDomain().getMin());

@@ -56,6 +56,7 @@ FEMViewer::FEMViewer(QWidget* parent)
     toolbox->addSeparator();
 
     connect(mode, SIGNAL(valueChanged(int)), femWidget, SLOT(setMode(int)));
+    connect(mode, &FEMViewerModeInput::valueChanged, [this](int i) { femWidget->colorize(i); });
     toolbox->addWidget(mode);
 
     toolbox->addSeparator();

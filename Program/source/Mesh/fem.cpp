@@ -42,8 +42,6 @@ FEM::FEM(const FEM& g)
     , sections(g.sections)
     , materials(g.materials)
     , UNVTransformations(g.UNVTransformations)
-    , colors(g.colors)
-    , measurment(g.measurment)
     , modes(g.modes)
     , linksPoint(g.linksPoint)
     , linksSolution(g.linksSolution)
@@ -189,6 +187,7 @@ bool FEM::readBDF(const QString &fileName)
     } else {
         nativeBDFParser(fileName);
     }
+    qDebug() << "return";
 
     name = (file = fileName).split('/').last();
     estimateTraced();
@@ -462,7 +461,7 @@ void FEM::UNVTransformation(EigenModes &f) const {
     for (EigenModes::iterator it(f.begin()); it != f.end(); ++it) {
         if (it->form().length() == UNVTransformations.size()) {
             std::vector<QMatrix3x3>::const_iterator m(UNVTransformations.begin());
-            CGL::CVertexes& v(it->form());
+            CVertexes& v(it->form());
             for (int i(0); i != v.length(); ++i) {
                 v(i) = QVector3D(v(i).x() * ((*m)(0,0) + (*m)(1,0) + (*m)(2,0)),
                                  v(i).y() * ((*m)(0,1) + (*m)(1,1) + (*m)(2,1)),
@@ -473,38 +472,10 @@ void FEM::UNVTransformation(EigenModes &f) const {
     }
 }
 
-bool FEM::colorized() const {
-    return !colors.empty();
-}
-
-bool FEM::colorizedElements() const {
-    return colors.size() == trace.size() * 3;
-}
-
-
 void FEM::render() const {
-    if (colorized()) {
-        glEnableClientState(GL_COLOR_ARRAY);
-        glColorPointer(3, GL_UNSIGNED_BYTE, 0, colors.data());
-    } else {
-        glDisableClientState(GL_COLOR_ARRAY);
-        glColor3ub(0x00,0xFF,0x88);
-    }
-
-
-    if (colorizedElements()) {
-        const unsigned char* color(colors.data());
-        for (FinitElements::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it, color += 3) {
-            glColor3ubv(color);
-            if (*it) {
-                (*it)->render();
-            }
-        }
-    } else {
-        for (FinitElements::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) {
-            if (*it) {
-                (*it)->render();
-            }
+    for (FinitElements::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) {
+        if (*it) {
+            (*it)->render();
         }
     }
 
@@ -552,67 +523,6 @@ void FEM::renderSelectLabel(int vertex) const {
     glEnd();
 }
 
-void FEM::colorize(const CArray &v, const QString& mes) const
-{
-    if (static_cast<int>(v.size()) != vertexes.length()) {
-        colors.resize(0);
-        return;
-    }
-    measurment = mes;
-
-    colorizeFromArray(v);
-}
-
-void FEM::colorizeFromArray(const CArray& v) const
-{
-
-    CRealRange range(v.estimateRange());
-
-    range.flatProof();
-
-    const float minV(range.getMin());
-    const float height(range.range());
-    const float heightp2(height / 2.0f);
-    const float heightp4(height / 4.0f);
-    const float height3p4(height / 4.0f * 3.0f);
-
-    colors.resize(v.size() * 3);
-    CGL::Colors::iterator i(colors.begin());
-    for (CArray::const_iterator it(v.begin()), end(v.end()); it != end; ++it)
-    {
-        const float z(*it - minV);
-        unsigned char r, g, b;
-        if (z != z) {
-            r = g = b = 0;
-        } else if (z <= 0) {
-            r = g = 0;
-            b = 255;
-        } else if (z >= height) {
-            r = 255;
-            g = b = 0;
-        } else {
-            b = z <= heightp4 ? 255 : z < heightp2 ? (heightp2 - z ) * 1024.0f / height : 0;
-            g = z < heightp4 ? z * 1024.0f / height : z <= height3p4 ? 255 : ( height - z ) * 1024.0f / height;
-            r = z < heightp2 ? 0 : z < height3p4 ? ( z - heightp2 ) * 1024.0f / height : 255;
-        }
-        *i = r;
-        ++i;
-        *i = g;
-        ++i;
-        *i = b;
-        ++i;
-    }
-}
-
-void FEM::colorizeElements(const CArray &v, const QString& mes) const
-{
-    if (v.size() != static_cast<size_t>(trace.size())) {
-        return;
-    }
-    measurment = mes;
-
-    colorizeFromArray(v);
-}
 CArray FEM::extractElasticityModulus() {
     CArray elasticyModulus(static_cast<int>(trace.size()));
 
@@ -626,46 +536,6 @@ CArray FEM::extractElasticityModulus() {
         }
     }
     return elasticyModulus;
-}
-
-void FEM::colorize(const CGL::CVertexes &v, const QString& mes) const
-{
-    measurment = mes;
-
-    CRealRange range(v.estimateRange().flatProof());
-
-    const float height(range.range());
-    const float heightp2(height / 2.0f);
-    const float heightp4(height / 4.0f);
-    const float height3p4(height / 4.0f * 3.0f);
-
-    colors.resize(std::min(v.size(), vertexes.size()));
-    CGL::Colors::iterator i(colors.begin());
-    for (int j(0), length(static_cast<int>(colors.size() / 3)); j != length; ++j)
-    {
-        const float z(v(j).length());
-        unsigned char r, g, b;
-        if(z <= 0) {
-            r = g = 0;
-            b = 255;
-        }
-        else if(z >= height) {
-            r = 255;
-            g = b = 0;
-        }
-        else
-        {
-            b = z <= heightp4 ? 255 : z < heightp2 ? (heightp2 - z ) * 1024.0f / height : 0;
-            g = z < heightp4 ? z * 1024.0f / height : z <= height3p4 ? 255 : ( height - z ) * 1024.0f / height;
-            r = z < heightp2 ? 0 : z < height3p4 ? ( z - heightp2 ) * 1024.0f / height : 255;
-        }
-        *i = r;
-        ++i;
-        *i = g;
-        ++i;
-        *i = b;
-        ++i;
-    }
 }
 
 bool operator==(const FEM &l, const FEM &r)
@@ -751,8 +621,8 @@ bool operator==(const FEM &l, const FEM &r)
     }
 
     if ((l.sqre == r.sqre) && (l.isTraced == r.isTraced) &&
-            (l.measurment == r.measurment) && (l.file == r.file) && (l.modelType == r.modelType) &&
-            (l.vertexes == r.vertexes) && (l.colors == r.colors)) {
+            (l.file == r.file) && (l.modelType == r.modelType) &&
+            (l.vertexes == r.vertexes)) {
 #ifndef QT_NO_DEBUG
             qDebug() << "meses is equal";
 #endif
@@ -775,11 +645,11 @@ QDataStream& operator << (QDataStream& out, const FEM& g) {
     }
 #endif
 
-    out << g.sqre << g.isTraced << g.measurment << g.file << static_cast<int>(g.modelType);
+    out << g.sqre << g.isTraced << g.file << static_cast<int>(g.modelType);
 
     out << g.name;
 
-    out << g.vertexes << g.colors;
+    out << g.vertexes;
 
     out << g.sections;
 
@@ -837,13 +707,13 @@ QDataStream& operator >> (QDataStream& in, FEM& g)
     }
 #endif
     int modelType;
-    in >> g.sqre >> g.isTraced >> g.measurment >> g.file >> modelType;
+    in >> g.sqre >> g.isTraced >> g.file >> modelType;
     in >> g.name;
 #ifndef QT_NO_DEBUG
     qDebug() << "    read model " << g.name;
 #endif
     g.modelType = static_cast<FEM::ModelType>(modelType);
-    in >> g.vertexes >> g.colors;
+    in >> g.vertexes;
 
     in >> g.sections;
 
@@ -903,7 +773,7 @@ void FEM::scaleTo(double v) {
         return;
     }
     double k(v / box().size());
-    for(CGL::CVertexes::iterator i(vertexes.begin()), end(vertexes.end()); i != end; ++i) {
+    for(CVertexes::iterator i(vertexes.begin()), end(vertexes.end()); i != end; ++i) {
         *i *= k;
     }
     box().multX(k);
@@ -961,8 +831,8 @@ FEM* FEM::truncation(const FEM& a, const FEM& b) {
     EigenModes::iterator receiver(result->modes.begin());
     for (EigenModes::const_iterator source(a.modes.begin()), end(a.modes.end()); source != end; ++source, ++receiver) {
         receiver->setFrequency(source->frequency());
-        const CGL::CVertexes& theoryForm(source->form());
-        CGL::CVertexes& truncatedForm(receiver->form());
+        const CVertexes& theoryForm(source->form());
+        CVertexes& truncatedForm(receiver->form());
         truncatedForm.resize(interrelations.size() * 3);
         int i(0);
         for (std::vector<int>::const_iterator interrelation(interrelations.begin()), end(interrelations.end()); interrelation != end; ++interrelation, ++i) {

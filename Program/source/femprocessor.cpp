@@ -163,7 +163,7 @@ void FEMProcessor::FEMCalculateModes::run()
     pefems.SendParallelSettings(4,4,4,1,&tempDirList,3000.0,1000.0);
 
     pefems.CreatFEmodel(tempDirList);
-    CArray m(__model->getNodes().size());
+    CArray m(static_cast<int>(__model->getNodes().size()));
     std::copy(__model->getNodes().begin(), __model->getNodes().end(), m.begin());
     CArray::const_iterator it(m.end());
     CIndexes vertexRenumbering(CIndexes::indexes(__model->getNodes().length()));
@@ -196,7 +196,7 @@ void FEMProcessor::FEMCalculateModes::run()
     qDebug() << m << "nodes vector";
 #endif
     assert(m.size() / 3 == vertexRenumbering.back() + 1);
-    pefems.SendFEMnodesCRD(m.size() / 3, 3, m.data());
+    pefems.SendFEMnodesCRD(static_cast<int>(m.size() / 3), 3, m.data());
 
 #ifndef QT_NO_DEBUG
     qDebug() << "prepare materials";
@@ -206,7 +206,7 @@ void FEMProcessor::FEMCalculateModes::run()
     // Kiselev program can't work with fake materials. To resolve this problem
     // we remove it from this array and make index-reorder array
     FEM::Materials::const_iterator matIt(materials.begin());
-    CIndexes materialsRenumbering(CIndexes::indexes(materials.size()));
+    CIndexes materialsRenumbering(CIndexes::indexes(static_cast<int>(materials.size())));
     while (matIt != materials.end()) {
         while (matIt != materials.end() && matIt->getType() == Material::Undefined) {
             matIt = materials.erase(matIt);
@@ -234,7 +234,7 @@ void FEMProcessor::FEMCalculateModes::run()
             trase[i][0] = materialsRenumbering[__model->getSection(element->getSection())->getMatId()];
             trase[i][1] = igoTypeId(element);
             assert(trase[i][1] != -1);
-            trase[i][2] = trase[i].size() - 3;
+            trase[i][2] = static_cast<int>(trase[i].size()) - 3;
             int* trIt(trase[i].data() + 3);
             for (const quint32* it(element->begin()); it != element->end(); ++it, ++trIt) {
                 *trIt = vertexRenumbering[*it];
@@ -256,8 +256,8 @@ void FEMProcessor::FEMCalculateModes::run()
     pefems.SendFEMelements(i, typesSet.size(), mem.data());
     const Constrains& cnr(__model->getConstrains());
     static const int dimensionCount(3);
-    CIndexes fix(m.size(), 0);
-    CArray ufix(m.size(), 0.0);
+    CIndexes fix(static_cast<int>(m.size()), 0);
+    CArray ufix(static_cast<int>(m.size()), 0.0);
     for (const std::pair<const int, Constrain>& i : cnr) {
         fix[vertexRenumbering[i.first] * dimensionCount]     = i.second.isConstrained(Constrain::X);
         fix[vertexRenumbering[i.first] * dimensionCount + 1] = i.second.isConstrained(Constrain::Y);
@@ -266,12 +266,12 @@ void FEMProcessor::FEMCalculateModes::run()
 #ifndef QT_NO_DEBUG
     qDebug() << "Send FEM fixing" << m.size() / dimensionCount << dimensionCount << fix << ufix;
 #endif
-    pefems.SendFEMfixing(m.size() / dimensionCount, dimensionCount, fix.data(), ufix.data());
+    pefems.SendFEMfixing(static_cast<int>(m.size() / dimensionCount), dimensionCount, fix.data(), ufix.data());
 #ifndef QT_NO_DEBUG
     qDebug() << "Send FEM fixing end";
 #endif
 
-    CMatrix matMatrix(3, materials.size());
+    CMatrix matMatrix(3, static_cast<int>(materials.size()));
     for (int i(0); i < matMatrix.height(); ++i) {
         matMatrix[i][0] = materials.at(i).youngModulus();
         matMatrix[i][1] = materials.at(i).poissonRatio();
@@ -281,7 +281,7 @@ void FEMProcessor::FEMCalculateModes::run()
 #ifndef QT_NO_DEBUG
     qDebug() << "Send materials" << materials.size();
 #endif
-    pefems.SendFEMmaterials(materials.size(), matMatrix.pointers());
+    pefems.SendFEMmaterials(static_cast<int>(materials.size()), matMatrix.pointers());
 
     pefems.CreateAutoSE(3000,5000,2000);
 
@@ -303,8 +303,8 @@ void FEMProcessor::FEMCalculateModes::run()
     //собственные частоты выводятся в текстовый файл freq.lst в директории модели
     // получение собственных форм
     // в виде векторов перемещений узлов по степеням свободы
-    CMatrix forms(m.size(), encount);
-    const int nfrdetermind(pefems.GetFormRes(encount, m.size() / 3, 3, forms.pointers()));
+    CMatrix forms(static_cast<int>(m.size()), encount);
+    const int nfrdetermind(pefems.GetFormRes(encount, static_cast<int>(m.size() / 3), 3, forms.pointers()));
     if (encount != nfrdetermind) {
         qDebug() << "Required number of freq cannot be determind..." << nfrobtained << '/' << encount;
     }
@@ -312,7 +312,7 @@ void FEMProcessor::FEMCalculateModes::run()
     pefems.DisconnectAndCloseSolver();
 
 
-    CIndexes numbering(m.size() / 3);
+    CIndexes numbering(static_cast<int>(m.size() / 3));
 
     i = 0;
     int j(0);
@@ -323,7 +323,6 @@ void FEMProcessor::FEMCalculateModes::run()
         }
         ++i;
     }
-    qDebug() << numbering;
     assert(j == m.size() / 3);
     assert(j == numbering.size());
     assert(j == forms.width() / 3);
@@ -333,7 +332,7 @@ void FEMProcessor::FEMCalculateModes::run()
     for (int i(0); i < nfrobtained; ++i) {
         EigenMode& mode(modes[i]);
         mode.setFrequency(frherz[i]);
-        mode.resize(__model->getNodes().size());
+        mode.resize(__model->getNodes().length());
         for (int j(0); j != numbering.size(); ++j) {
             mode.form()(numbering[j]) = QVector3D(forms[i][j + j + j], forms[i][j + j + j + 1], forms[i][j + j + j + 2]);
         }

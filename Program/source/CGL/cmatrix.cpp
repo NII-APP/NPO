@@ -372,27 +372,27 @@ CMatrix CMatrix::inversed() const {
     return matrixE;
 }
 
-CMatrix CMatrix::dotTransposed() const{
+CMatrix CMatrix::dotTransposed() const {
     CMatrix tempM(this->height(),this->height());
-    for(int i(0); i < height(); i++){
-        for(int j(0); j < height(); j++){
-            tempM[i][j] = 0.0;
-        }
-    }
-    for(int k(0); k < height(); k++){
-        for( int i(0); i < height(); i++){
-            for(int j(0); j < width(); j++){
-                tempM[k][i] += m[k][j] * m[i][j];
+    tempM.fill(0.0);
+    for (int k(0); k < height(); k++) {
+        const T* const mk(m[k]);
+        T* const rk(tempM[k]);
+        for (int i(0); i < height(); i++) {
+            const T* const mi(m[i]);
+            T& v(rk[i]);
+            for (int j(0); j < width(); j++) {
+                v += mk[j] * mi[j];
             }
         }
     }
     return tempM;
 }
 
-CMatrix CMatrix::transposed() const{
+CMatrix CMatrix::transposed() const {
     CMatrix result(height(),width());
-    for (int i(0); i < width(); i++){
-        for (int j(0); j < height(); j++){
+    for (int i(0); i < width(); i++) {
+        for (int j(0); j < height(); j++) {
             result[i][j] = m[j][i];
         }
     }
@@ -400,11 +400,5 @@ CMatrix CMatrix::transposed() const{
 }
 
 CMatrix CMatrix::pseudoInversed() const{
-    CMatrix result(height(),width());
-    result = *this;
-    CMatrix tempM(height(), height());
-    tempM = dotTransposed();
-    tempM = tempM.inversed();
-    result = tempM * result;
-    return result;
+    return dotTransposed().inversed() * *this;
 }

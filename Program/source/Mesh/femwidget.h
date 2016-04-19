@@ -8,6 +8,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QWheelEvent>
 #include <cparallelepiped.h>
+#include <QString>
 
 class FEMWidget : public CGLWidget
 {
@@ -20,12 +21,16 @@ private:
     typedef QList<MeshBuffer*> MeshBuffers;
     MeshBuffers meshes;
     QOpenGLShaderProgram* shader;
-    int currentMode;
     QTimer* repaintLoop;
 
     AnimationOptions* animation;
 
     void wheelEvent(QWheelEvent * event);
+
+    //measurment of value which presented as color
+    QString measurment;
+
+    static const QRgb DEFAULT_COLOR;
 
 protected:
     void initializeCGL();
@@ -41,15 +46,19 @@ public:
     void setData(const FEM& model) { setData(&model); }
     void setData(const QList<const FEM*>& model);
     QList<const FEM*> getData() const;
-    void setProxyMode(const EigenMode &);
+    void setProxyMode(const EigenMode &, const FEM* const mesh = nullptr);
 
-    void reloadColors(const FEM* forWho);
+    //estimate colors value as form interpolation in range [red : green : blue]
+    void colorize(const CVertexes& v, const QString& mes = "", const FEM* const mesh = nullptr);
+    void colorize(const CArray& v, const QString& mes = "", const FEM* const mesh = nullptr);
+    void colorizeElements(const CArray &, const QString& = "", const FEM* const = nullptr);
+    void colorize(int m, const QString& = "", const FEM* const mesh = nullptr);
+    //void colorize(const int mode, const QString& meas= "", const FEM* const mesh = nullptr) const);
 signals:
     void magnitudeChanged(double);
     void frequencyChanged(double);
 public slots:
-    void setMode(int);
-    void colorize(int);
+    void setMode(int, const FEM* const mesh = nullptr);
     void setMagnitude(double);
     void setFrequency(double);
     void pause();
@@ -76,11 +85,13 @@ public:
     int getCurrentMode() const { return mode; }
     float getCurrentDefoultMagnitude() const { try { return self->getModes().at(mode).defoultMagnitude(); } catch(...) { return proxyDefoultMagnitude; } }
     double getDefaultMagnitude() const;
-    void colorize(int);
+    void colorize(const QRgb);
+    void colorize(const CVertexes& v);
+    void colorize(const CArray& v);
     void setProxyMode(const EigenMode& imposter);
 
     void uploadMode();
-    void uploadColors();
+    void uploadColors(const Colors &);
     void uploadVertexes();
 };
 

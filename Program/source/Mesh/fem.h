@@ -45,7 +45,7 @@ private:
 
     ModelType modelType;
 
-    CGL::CVertexes vertexes;
+    CVertexes vertexes;
     FinitElements trace;
     //smallest box which contain all vertexes
     CParallelepiped sqre;
@@ -61,11 +61,6 @@ private:
     Materials materials;
     //UNV can store the transformation matrices for forms coordinate systems.
     std::vector<QMatrix3x3> UNVTransformations;
-    //colorize... may be equal to size of vertexes or trace...
-    /// @todo remove this shit
-    mutable CGL::Colors colors;
-    //measurment of colorzed value
-    mutable QString measurment;
     //modes. May be or not...
     EigenModes modes;
 
@@ -86,18 +81,12 @@ private:
     void estimateBox();
     void estimateQuadTraceBufer();
 
-    void colorizeFromArray(const CArray& v) const;
-
     void nativeBDFParser(const QString &);
     void scarfUp(PyParse::BDFEntity &entity);
 protected:
     //coordinate systems. firest is the ordering number of coordinate system, second is correspond coordinate system
     typedef QMap<int, CCoordinateSystem*> CoordinateSystems;
     CoordinateSystems systems;
-
-
-    bool colorized() const;
-    bool colorizedElements() const;
 
     size_t sizeOf();
 
@@ -123,14 +112,6 @@ public:
     static void usePythonParser() { usePyParser = true; }
     static void useNativeParser() { usePyParser = false; }
 
-    //estimate colors value as form interpolation in range [red : green : blue]
-    void colorize(const CGL::CVertexes& v, const QString& mes = "") const;
-    void colorize(const CArray& v, const QString& mes = "") const;
-    void colorize(int i) const {
-        try { colorize(modes.at(i).form()); } catch (...) { Q_ASSERT("colorize model mode id fail"); }
-    }
-    void colorizeElements(const CArray &v, const QString& mes = "") const;
-
     //rendering
     void render() const;
     void renderNet() const;
@@ -145,9 +126,9 @@ public:
     CParallelepiped getBox() const { return sqre; }
 
     //node coordinates
-    const CGL::CVertexes& getNodes() const { return vertexes; }
-    CGL::CVertexes& getNodes() { return vertexes; }
-    void setNodes(const CGL::CVertexes& v) { vertexes = v; }
+    const CVertexes& getNodes() const { return vertexes; }
+    CVertexes& getNodes() { return vertexes; }
+    void setNodes(const CVertexes& v) { vertexes = v; }
     bool isTracedNode(const int id) const { return isTraced.testBit(id); }
 
     //node coordinates
@@ -167,20 +148,12 @@ public:
     void setMaterials(const Materials& v) { materials = v; }
     const Material& getMaterial(const int p) const { return materials.at(p); }
 
-    //colorss
-    const CGL::Colors& getColors() const { return colors; }
-    CGL::Colors& getColors() { return colors; }
-    void setColors(const CGL::Colors& v) { colors = v; }
-
     //elements
     FinitElements& elements() { return trace; }
     const FinitElements& elements() const { return trace; }
     //synonyms for elements assess functions
     FinitElements& getElements() { return trace; }
     const FinitElements& getElements() const { return trace; }
-
-    inline const QString& getMeasurment() { return measurment; }
-    inline void setMeasurment(const QString& m) { measurment = m; }
 
     //Science operations
     //set position of center of rect to (0,0,0) point

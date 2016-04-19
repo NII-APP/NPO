@@ -55,7 +55,7 @@ void EigenModes::readTXT(const QString &fileName)
     while ((pos = numbers.indexIn(head, pos)) != -1) {
         ++count;
         if (!--togle){
-            push_back(EigenMode(numbers.cap().toFloat(), CGL::CVertexes()));
+            push_back(EigenMode(numbers.cap().toFloat(), CVertexes()));
             togle = 4;
         }
         pos += numbers.matchedLength();
@@ -97,19 +97,20 @@ void EigenModes::readTXT(const QString &fileName)
 void EigenModes::readF06(const QString& fileName)
 {   
 #ifndef QT_NO_DEBUG
-    std::clog << "f06 parsing" << std::endl;
+    qDebug() << "f06 parsing";
     QTime loop(QTime::currentTime());
 #endif
     QFile file(EigenModes::file = fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        std::clog << "\tcan't open file " << file.fileName().toStdString();
+        throw QFileDevice::OpenError;
         return;
     }
     QByteArray fileArray(file.readAll());
     file.close();
     fileArray.append('\0');
     CParse f(fileArray.data());
+    this->clear();
 
 
     f.skipTo("R E A L   E I G E N V A L U E S");
@@ -128,6 +129,7 @@ void EigenModes::readF06(const QString& fileName)
     int j = 0;
     for (EigenModes::iterator it(begin()); it != end(); ++it)
     {
+        it->initVertexesCharacteristic(EigenMode::toKey(EigenMode::Band));
         ++j;
         int i(0);
         int block(50);
@@ -136,21 +138,17 @@ void EigenModes::readF06(const QString& fileName)
         f.skipRow();
         f += QString("          CYCLES =  6.917653E-03         R E A L   E I G E N V E C T O R   N O .     ").length();
         int current = f.integer();
-        f.skipRow();
-        f.skipRow();
-        f.skipRow();
+        f.skipRows(3);
         QString type("G");
         int s;
-        while (j == current && type == "G")
-        {
+        while (j == current && type == "G") {
             s = f.integer() * 3 + 3;
             if (it->size() < s) {
-                it->resize(s);
+                it->resize(s / 3);
             }
             type = QString::fromStdString(f.word());
             ++f;
-            if (type == "G")
-            {
+            if (type == "G") {
                 it->form()[s - 3] = f.real();
                 it->form()[s - 2] = f.real();
                 it->form()[s - 1] = f.real();
@@ -159,17 +157,11 @@ void EigenModes::readF06(const QString& fileName)
                 it->band()[s - 1] = f.real();
                 ++f;
             }
-            if (!--block)
-            {
-                f.skipRow();
-                f.skipRow();
-                f.skipRow();
-                f.skipRow();
+            if (!--block) {
+                f.skipRows(4);
                 f += QString("          CYCLES =  6.917653E-03         R E A L   E I G E N V E C T O R   N O .     ").length();
                 current = f.integer();
-                f.skipRow();
-                f.skipRow();
-                f.skipRow();
+                f.skipRows(3);
                 block = 50;
             }
             i += 3;
@@ -241,8 +233,8 @@ void EigenModes::estimateAutoMAC(int i, int j) {
         mac[i][j] = mac[j][i];
     } else {
         float nm(0.0f);
-        const CGL::CVertexes::const_iterator end(operator[](i).form().end());
-        for (CGL::CVertexes::const_iterator it(operator[](i).form().begin()), it2(operator[](j).form().begin()); it != end; ++it, ++it2)
+        const CVertexes::const_iterator end(operator[](i).form().end());
+        for (CVertexes::const_iterator it(operator[](i).form().begin()), it2(operator[](j).form().begin()); it != end; ++it, ++it2)
             nm += *it * *it2;
         mac[i][j] = nm * nm / operator[](i).preMac() / operator[](j).preMac();
     }
@@ -272,13 +264,13 @@ void EigenModes::estimateAutoMAC()
 float EigenModes::MAC(const EigenMode& a, const EigenMode& b)
 {
     Q_ASSERT(a.form().size() == b.form().size());
-    const CGL::CVertexes& x(a.form());
-    const CGL::CVertexes& y(b.form());
+    const CVertexes& x(a.form());
+    const CVertexes& y(b.form());
 
     float k(a.defoultMagnitude() / b.defoultMagnitude());
 
     float s(0.0f);
-    for (CGL::CVertexes::const_iterator it(x.begin()), jt(y.begin()), end(x.end()); it != end; ++it, ++jt) {
+    for (CVertexes::const_iterator it(x.begin()), jt(y.begin()), end(x.end()); it != end; ++it, ++jt) {
         s += *it * *jt * k;
     }
     return s * s / a.preMac() / b.preMac() / k / k;

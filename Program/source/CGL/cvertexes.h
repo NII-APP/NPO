@@ -5,8 +5,6 @@
 class QVector3D;
 class QDataStream;
 
-namespace CGL {
-
 class CVertexes : public std::vector<float>
 {
 public:
@@ -24,10 +22,6 @@ public:
 
     void push_vector_back(const QVector3D&);
 };
-
-}
-
-using CGL::CVertexes;
 
 QDebug operator<<(QDebug out, const CVertexes& m);
 

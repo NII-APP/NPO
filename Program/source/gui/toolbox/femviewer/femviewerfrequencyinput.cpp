@@ -28,6 +28,7 @@ FEMViewer::FEMViewerFrequencyInput::FEMViewerFrequencyInput(QWidget* parent)
                                    l->setPixmap(icon);
                                    return l;
     })());
+    this->setMinimumWidth(200);
     this->layout()->addWidget(slider);
     this->layout()->addWidget(numeric);
     this->layout()->addWidget(new QLabel(Application::identity()->hertz()));

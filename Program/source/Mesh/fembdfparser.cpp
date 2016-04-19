@@ -36,7 +36,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
         std::string type(f.word());
 #ifndef QT_NO_DEBUG
         if (!types.contains(QString::fromStdString(type))) {
-            types.insert(QString::fromStdString(type), 0);
+            types.insert(QString::fromStdString(type), 1);
         } else {
             types[QString::fromStdString(type)]++;
         }
@@ -128,7 +128,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
             ids[2] = f.integer();
             ids[3] = f.integer();
             trace[id] = new core::Tetra(ids[0], ids[1], ids[2], ids[3]);
-            if (*f != '\n' || *f != '\r') {
+            if (*f != '\n' && *f != '\r') {
                 core::FinitElement* const e(trace[id]);
                 e->initMidsideNodes();
                 for (quint32* i(e->midsideBegin()); e->midsideEnd() != i; ++i) {

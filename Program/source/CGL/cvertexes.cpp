@@ -3,10 +3,6 @@
 #include "cgl.h"
 #include <cmath>
 #include <QDataStream>
-namespace CGL {
-
-
-
 
 CVertexes::CVertexes(int size, float val) : std::vector<float>(size, val) { }
 QVector3D& CVertexes::operator ()(int p) {
@@ -58,7 +54,6 @@ void CVertexes::push_vector_back(const QVector3D& v) {
     push_back(v.z());
 }
 
-}
 
 QDebug operator<<(QDebug out, const CVertexes& m)
 {
