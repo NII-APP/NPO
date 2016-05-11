@@ -129,7 +129,6 @@ void EigenModes::readF06(const QString& fileName)
     int j = 0;
     for (EigenModes::iterator it(begin()); it != end(); ++it)
     {
-        it->initVertexesCharacteristic(EigenMode::toKey(EigenMode::Band));
         ++j;
         int i(0);
         int block(50);

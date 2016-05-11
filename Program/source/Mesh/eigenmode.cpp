@@ -1,15 +1,11 @@
 #include "eigenmode.h"
 #include <QDataStream>
 #include "cgl.h"
+#include <cassert>
 
 EigenMode::EigenMode()
 {
 }
-
-EigenMode::EigenMode(const EigenMode& v)
-    : freq(v.freq)
-    , formVal(v.formVal)
-    , extremums(v.extremums) { }
 
 EigenMode::EigenMode(float f, const CVertexes& v)
     : freq(f)
@@ -26,8 +22,8 @@ EigenMode::EigenMode(float f, int size)
 QDataStream& operator<<(QDataStream& out, const EigenMode& f) {
     out << f.freq;
     out << f.formVal;
-    out << f.vertexesData;
-    out << f.nodesData;
+    out << f.vectorNodeData;
+    out << f.nodeData;
     out << f.scalars;
     out << f.extremums;
     out << f.elementsData;
@@ -36,8 +32,8 @@ QDataStream& operator<<(QDataStream& out, const EigenMode& f) {
 QDataStream& operator>>(QDataStream& in, EigenMode& f) {
     in >> f.freq;
     in >> f.formVal;
-    in >> f.vertexesData;
-    in >> f.nodesData;
+    in >> f.vectorNodeData;
+    in >> f.nodeData;
     in >> f.scalars;
     in >> f.extremums;
     in >> f.elementsData;
@@ -68,10 +64,10 @@ void EigenMode::updateExtremums() {
 
 void EigenMode::resize(CArray::size_type s) {
     formVal.resize(s + s + s);
-    for (VertexesData::iterator it(vertexesData.begin()); it != vertexesData.end(); ++it) {
+    for (VertexesData::iterator it(vectorNodeData.begin()); it != vectorNodeData.end(); ++it) {
         it->resize(formVal.size());
     }
-    for (ArrayData::iterator it(nodesData.begin()); it != nodesData.end(); ++it) {
+    for (ArrayData::iterator it(nodeData.begin()); it != nodeData.end(); ++it) {
         it->resize(s);
     }
 }
@@ -94,19 +90,75 @@ QString EigenMode::toKey(const int c)
     }
 }
 
+CArray& EigenMode::nodeR(const QString& key)
+{
+    ArrayData::iterator p(nodeData.find(key));
+    if (p == nodeData.end()) {
+        p = nodeData.insert(key, CArray(formVal.length()));
+    }
+    return p.value();
+}
+
+double& EigenMode::scalarR(const QString& key)
+{
+    Scalars::iterator p(scalars.find(key));
+    if (p == scalars.end()) {
+        p = scalars.insert(key, std::numeric_limits<double>::quiet_NaN());
+    }
+    return p.value();
+}
+
+CVertexes& EigenMode::vectorR(const QString& key)
+{
+    VertexesData::iterator p(vectorNodeData.find(key));
+    if (p == vectorNodeData.end()) {
+        p = vectorNodeData.insert(key, CVertexes(formVal.size()));
+    }
+    return p.value();
+}
+
+CArray& EigenMode::dampingR()
+{
+    static const QString key(toKey(Damping));
+    return nodeR(key);
+}
+
+double& EigenMode::averageDampingR()
+{
+    static const QString name(toKey(AverageDamping));
+    return scalarR(name);
+}
+
+const CArray& EigenMode::damping() const
+{
+    static const QString key(toKey(Damping));
+#ifndef QT_NO_DEBUG
+    assert(nodeData.find(key) != nodeData.end());
+#endif
+    return nodeData.find(key).value();
+}
+
+void EigenMode::setDamping(const double value, const int id)
+{
+#ifndef QT_NO_DEBUG
+    assert(dampingR().size() > id);
+#endif
+    dampingR()[id] = value;
+}
+
 CArray& EigenMode::initElementsCharacteristic(const QString& s, int size)
 {
     return *elementsData.insert(s, CArray(size));
 }
 
-CVertexes &EigenMode::initVertexesCharacteristic(const QString& s)
+CVertexes &EigenMode::initVectorNodeCharacteristic(const QString& s)
 {
-    return *vertexesData.insert(s, CVertexes(static_cast<int>(formVal.size())));
+    return *vectorNodeData.insert(s, CVertexes(static_cast<int>(formVal.size())));
 }
 
-CArray& EigenMode::initNodesCharacteristic(const QString& s)
+CArray& EigenMode::initNodeCharacteristic(const QString& s)
 {
-    return *nodesData.insert(s, CArray(formVal.length()));
+    return *nodeData.insert(s, CArray(formVal.length()));
 }
 
 double& EigenMode::initScalarCharacteristic(const QString& s)
@@ -117,27 +169,19 @@ double& EigenMode::initScalarCharacteristic(const QString& s)
 bool EigenMode::haveCharacteristic(const QString& s)
 {
     return scalars.find(s) != scalars.end() ||
-            nodesData.find(s) != nodesData.end() ||
-            vertexesData.find(s) != vertexesData.end() ||
+            nodeData.find(s) != nodeData.end() ||
+            vectorNodeData.find(s) != vectorNodeData.end() ||
             elementsData.find(s) != elementsData.end();
 }
 
-CVertexes& EigenMode::getVertexesCharacteristic(const QString& s)
+CVertexes& EigenMode::getVectorNodeCharacteristic(const QString& s)
 {
-    if (vertexesData.find(s) != vertexesData.end()) {
-        return vertexesData.find(s).value();
-    } else {
-        return initVertexesCharacteristic(s);
-    }
+    return vectorR(s);
 }
 
-CArray& EigenMode::getNodesCharacteristic(const QString& s)
+CArray& EigenMode::getNodeCharacteristic(const QString& s)
 {
-    if (nodesData.find(s) != nodesData.end()) {
-        return nodesData.find(s).value();
-    } else {
-        return initNodesCharacteristic(s);
-    }
+    return nodeR(s);
 }
 
 CArray& EigenMode::getElementsCharacteristic(const QString& s)
@@ -160,8 +204,8 @@ double& EigenMode::getScalarCharacteristic(const QString& s)
 
 void EigenMode::removeCharacteristic(const QString& s)
 {
-    vertexesData.remove(s);
-    nodesData.remove(s);
+    vectorNodeData.remove(s);
+    nodeData.remove(s);
     elementsData.remove(s);
     scalars.remove(s);
 }

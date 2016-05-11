@@ -15,15 +15,21 @@ class EigenMode
     typedef QMap<QString, CVertexes> VertexesData;
     typedef QMap<QString, CArray> ArrayData;
     typedef QMap<QString, double> Scalars;
-    VertexesData vertexesData;
-    ArrayData nodesData;
+    VertexesData vectorNodeData;
+    ArrayData nodeData;
     ArrayData elementsData;
     Scalars scalars;
 
     CDiapason extremums;
+
+    double& scalarR(const QString& s);
+    CVertexes& vectorR(const QString& s);
+    CArray& nodeR(const QString& s);
+    CArray& elementsR(const QString& s);
+    CArray& dampingR();
+    double& averageDampingR();
 public:
     EigenMode();
-    EigenMode(const EigenMode&);
     EigenMode(float f, const CVertexes&);
     EigenMode(float f, int size = 0);
 
@@ -46,17 +52,17 @@ public:
     void  setFrequency(double v) { freq = v; }
 
     double averageDamping() const { return scalars.find(toKey(AverageDamping)).value(); }
-    void setAverageDamping(const double v) { scalars.find(toKey(AverageDamping)).value() = v; }
+    void setAverageDamping(const double v) { averageDampingR() = v; }
 
-    const CArray& damping() const { return nodesData.find(toKey(Damping)).value(); }
-    void setDamping(const double value, const int id) { nodesData.find(toKey(Damping)).value()[id] = value; }
+    const CArray& damping() const;
+    void setDamping(const double value, const int id);
 
     CVertexes& form() { return formVal; }
     const CVertexes& form() const { return formVal; }
     CArray& strainEnergy() { return elementsData.find(toKey(StrainEnergy)).value(); }
     const CArray& strainEnergy() const { return elementsData.find(toKey(StrainEnergy)).value(); }
-    CVertexes& band() { return vertexesData.find(toKey(Band)).value(); }
-    const CVertexes& band() const { return vertexesData.find(toKey(Band)).value(); }
+    CVertexes& band() { return vectorR(toKey(Band)); }
+    const CVertexes& band() const { return vectorNodeData.find(toKey(Band)).value(); }
 
     void updateExtremums();
     const CDiapason& extremumIds() const { return extremums; }
@@ -71,15 +77,15 @@ public:
     friend QDataStream& operator<<(QDataStream&, const EigenMode&);
     friend QDataStream& operator>>(QDataStream&, EigenMode&);
 
-    CVertexes& initVertexesCharacteristic(const QString&);
-    CArray& initNodesCharacteristic(const QString&);
+    CVertexes& initVectorNodeCharacteristic(const QString&);
+    CArray& initNodeCharacteristic(const QString&);
     CArray& initElementsCharacteristic(const QString&, int size = 0);
     double& initScalarCharacteristic(const QString&);
 
     bool haveCharacteristic(const QString&);
 
-    CVertexes& getVertexesCharacteristic(const QString&);
-    CArray& getNodesCharacteristic(const QString&);
+    CVertexes& getVectorNodeCharacteristic(const QString&);
+    CArray& getNodeCharacteristic(const QString&);
     CArray& getElementsCharacteristic(const QString&);
     double& getScalarCharacteristic(const QString&);
 

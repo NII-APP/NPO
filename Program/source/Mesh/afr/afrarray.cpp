@@ -53,8 +53,9 @@ EigenMode AFRArray::getMode(const double freq) const
         if (it.empty()) {
             //it must be the first item (it was stored to make from 1 indexes...)
             //but actualy it's skiped dataset or some enother shit... Don't worry. just set zero...
+            result.resize(result.length());
             result.form()(j) = QVector3D(0.0, 0.0, 0.0);
-            result.resize(result.length() - 1);
+            result.setDamping(std::numeric_limits<double>::quiet_NaN(), j);
         } else {
             while (i < it.size() && freq >= it.at(i).frequency) {
                 ++i;
@@ -73,8 +74,9 @@ EigenMode AFRArray::getMode(const double freq) const
                 result.form()(j) = QVector3D(0.0, toScalar(left + (it.at(i).amplitude - left) * k), 0.0);
             }
 
-            const double v(it.damping(freq));
-            result.setDamping(v, j);
+            //qDebug() << j << this->size();
+            //const double v(std::numeric_limits<double>::quiet_NaN());//it.damping(freq));
+            //result.setDamping(v, j);
         }
         ++j;
     }

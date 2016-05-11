@@ -235,7 +235,8 @@ ModesIdentificationWizard::ManualController::~ManualController()
 void ModesIdentificationWizard::ManualController::setModeFrequency(double v)
 {
     if (__viewer->isVisible()) {
-        __viewer->setProxyMode(__afr->getMode(v));
+        const EigenMode mode(__afr->getMode(v));
+        __viewer->setProxyMode(mode);
     }
 }
 
