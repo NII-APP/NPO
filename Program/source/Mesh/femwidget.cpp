@@ -223,18 +223,12 @@ void FEMWidget::MeshBuffer::setCurrentMode(int form)
 
 void FEMWidget::MeshBuffer::setProxyMode(const EigenMode& imposter)
 {
-#ifndef QT_NO_DEBUG
-    qDebug() << "let's set FEMWidget::MeshBuffer::proxy mode" << imposter.size() << self->getNodes().size();
-#endif
     proxyDefoultMagnitude = imposter.defoultMagnitude();
     array->bind();
     vertex.bind();
     vertex.write(colorsSize + vertexSize, imposter.form().data(), vertexSize);
     colorize(imposter.form());
     array->release();
-#ifndef QT_NO_DEBUG
-    qDebug() << "\tfine";
-#endif
 }
 
 void FEMWidget::MeshBuffer::uploadMode() {

@@ -58,10 +58,35 @@ int EFEMS::GetFormRes(int nfr, int NN, int NORT, double **eigform)
 	for (i=0; i<nfconv; i++)
 	{
 		ReadFile(hPSEdatapipe,eigform[i],NN*NORT*sizeof(double),&cb,NULL);
+		WriteFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
 	}
 	
 	//ожидание конца выполнения команды решателем
 	ReadFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
 
 	return(nfconv);
+}
+
+int EFEMS::GetFormEnergy(int NEL, double **eigfen)
+{
+	int i,j,message,nfconv;
+	DWORD cb;
+
+	message = 44;
+	WriteFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
+	
+	//передача количества найденных частот
+	ReadFile(hPSEdatapipe,&nfconv,sizeof(int),&cb,NULL);
+
+	for (i=0; i<nfconv; i++)
+	{
+		ReadFile(hPSEdatapipe,eigfen[i],NEL*sizeof(double),&cb,NULL);
+		WriteFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
+	}
+	
+	//ожидание конца выполнения команды решателем
+	ReadFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
+
+	return(nfconv);
+
 }

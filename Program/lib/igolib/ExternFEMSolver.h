@@ -47,6 +47,7 @@ public:
 	void EIGFR_SSI(int nfr, double eps, int nblock); 
 	int GetFreqRes(int nfr, double *eigfr);
 	int GetFormRes(int nfr, int NN, int NORT, double **eigform);
+	int GetFormEnergy(int NEL, double **eigfen);
 
 	// Полная очистка решателя от последней решенной задачи
 	void ClearExtSolver(); //очистка от решенной задачи и ожидание следующего задания

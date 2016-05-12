@@ -64,6 +64,7 @@ void EFEMS::SendFEMfixing(int NN, int NORT, int *FIXFLAG, double *FIXDISP)
 	WriteFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
 
 	WriteFile(hPSEdatapipe,FIXFLAG,NN*NORT*sizeof(int),&cb,NULL);
+	ReadFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL); //синхронизация
 	WriteFile(hPSEdatapipe,FIXDISP,NN*NORT*sizeof(double),&cb,NULL);
 
 	//ожидание конца выполнения команды решателем

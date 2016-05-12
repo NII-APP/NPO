@@ -151,9 +151,9 @@ void EigenModes::readF06(const QString& fileName)
                 it->form()[s - 3] = f.real();
                 it->form()[s - 2] = f.real();
                 it->form()[s - 1] = f.real();
-                it->band()[s - 3] = f.real();
-                it->band()[s - 2] = f.real();
-                it->band()[s - 1] = f.real();
+                it->setBand(f.real(), s - 3);
+                it->setBand(f.real(), s - 2);
+                it->setBand(f.real(), s - 1);
                 ++f;
             }
             if (!--block) {

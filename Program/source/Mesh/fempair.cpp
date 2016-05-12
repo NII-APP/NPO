@@ -3,7 +3,8 @@
 #include <eigenmodes.h>
 
 FEMPair::FEMPair(const FEM *theory, const FEM *practic)
-    : std::pair<FEM* const, FEM* const>(new FEM(*theory), new FEM(*practic))
+    : first(new FEM(*theory))
+    , second(new FEM(*practic))
 {
     first->alignZero();
     second->alignZero();

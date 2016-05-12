@@ -5,11 +5,13 @@
 #include <fem.h>
 
 
-class FEMPair: std::pair<FEM* const, FEM* const>
+class FEMPair
 {
 public:
     typedef std::vector<int> Relation;
 private:
+    FEM* const first;
+    FEM* const second;
     Relation relation;
     FEM* trunc;
     CMatrix mac;

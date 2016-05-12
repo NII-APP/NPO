@@ -64,7 +64,7 @@ void EigenMode::updateExtremums() {
 
 void EigenMode::resize(CArray::size_type s) {
     formVal.resize(s + s + s);
-    for (VertexesData::iterator it(vectorNodeData.begin()); it != vectorNodeData.end(); ++it) {
+    for (VectorData::iterator it(vectorNodeData.begin()); it != vectorNodeData.end(); ++it) {
         it->resize(formVal.size());
     }
     for (ArrayData::iterator it(nodeData.begin()); it != nodeData.end(); ++it) {
@@ -110,96 +110,101 @@ double& EigenMode::scalarR(const QString& key)
 
 CVertexes& EigenMode::vectorR(const QString& key)
 {
-    VertexesData::iterator p(vectorNodeData.find(key));
+    VectorData::iterator p(vectorNodeData.find(key));
     if (p == vectorNodeData.end()) {
-        p = vectorNodeData.insert(key, CVertexes(formVal.size()));
+        p = vectorNodeData.insert(key, CVertexes(static_cast<int>(formVal.size())));
     }
     return p.value();
 }
 
-CArray& EigenMode::dampingR()
+CArray& EigenMode::elementsR(const QString& key)
 {
-    static const QString key(toKey(Damping));
-    return nodeR(key);
+    ArrayData::iterator p(elementsData.find(key));
+    if (p == elementsData.end()) {
+        p = elementsData.insert(key, CArray());
+    }
+    return p.value();
 }
 
-double& EigenMode::averageDampingR()
+const QString& EigenMode::dampingK() const
+{
+    static const QString key(toKey(Damping));
+    return key;
+}
+
+const QString& EigenMode::averageDampingK() const
 {
     static const QString name(toKey(AverageDamping));
-    return scalarR(name);
+    return name;
 }
 
-const CArray& EigenMode::damping() const
+const QString& EigenMode::strainEnergyK() const
 {
-    static const QString key(toKey(Damping));
-#ifndef QT_NO_DEBUG
-    assert(nodeData.find(key) != nodeData.end());
-#endif
-    return nodeData.find(key).value();
+    static const QString key(toKey(StrainEnergy));
+    return key;
 }
 
-void EigenMode::setDamping(const double value, const int id)
+const QString& EigenMode::bandK() const
 {
-#ifndef QT_NO_DEBUG
-    assert(dampingR().size() > id);
-#endif
-    dampingR()[id] = value;
+    static const QString key(toKey(Band));
+    return key;
 }
 
-CArray& EigenMode::initElementsCharacteristic(const QString& s, int size)
+void EigenMode::updatePreMac()
 {
-    return *elementsData.insert(s, CArray(size));
+    double& pMac(scalarR(toKey(PreMac)));
+    pMac = 0.0;
+    for (CVertexes::const_iterator i(formVal.begin()), end(formVal.end()); i != end; ++i) {
+        pMac += *i * *i;
+    }
 }
 
-CVertexes &EigenMode::initVectorNodeCharacteristic(const QString& s)
+const CVertexes& EigenMode::getVectorNodeCharacteristic(const QString& key) const
 {
-    return *vectorNodeData.insert(s, CVertexes(static_cast<int>(formVal.size())));
+    VectorData::const_iterator p(vectorNodeData.find(key));
+    if (p == vectorNodeData.end()) {
+        static const CVertexes nope;
+        return nope;
+    }
+    return p.value();
 }
 
-CArray& EigenMode::initNodeCharacteristic(const QString& s)
+
+const CArray& EigenMode::getNodeCharacteristic(const QString& key) const
 {
-    return *nodeData.insert(s, CArray(formVal.length()));
+    ArrayData::const_iterator p(nodeData.find(key));
+    if (p == nodeData.end()) {
+        static const CArray nope;
+        return nope;
+    }
+    return p.value();
 }
 
-double& EigenMode::initScalarCharacteristic(const QString& s)
+const CArray& EigenMode::getElementsCharacteristic(const QString& key) const
 {
-    return *scalars.insert(s, 0.0);
+    ArrayData::const_iterator p(elementsData.find(key));
+    if (p == elementsData.end()) {
+        static const CArray nope;
+        return nope;
+    }
+    return p.value();
 }
 
-bool EigenMode::haveCharacteristic(const QString& s)
+double EigenMode::getScalarCharacteristic(const QString& key) const
+{
+    Scalars::const_iterator p(scalars.find(key));
+    if (p == scalars.end()) {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+    return p.value();
+}
+
+bool EigenMode::isHaveCharacteristic(const QString& s)
 {
     return scalars.find(s) != scalars.end() ||
             nodeData.find(s) != nodeData.end() ||
             vectorNodeData.find(s) != vectorNodeData.end() ||
             elementsData.find(s) != elementsData.end();
-}
-
-CVertexes& EigenMode::getVectorNodeCharacteristic(const QString& s)
-{
-    return vectorR(s);
-}
-
-CArray& EigenMode::getNodeCharacteristic(const QString& s)
-{
-    return nodeR(s);
-}
-
-CArray& EigenMode::getElementsCharacteristic(const QString& s)
-{
-    if (elementsData.find(s) != elementsData.end()) {
-        return elementsData.find(s).value();
-    } else {
-        return initElementsCharacteristic(s);
-    }
-}
-
-double& EigenMode::getScalarCharacteristic(const QString& s)
-{
-    if (scalars.find(s) != scalars.end()) {
-        return scalars.find(s).value();
-    } else {
-        return initScalarCharacteristic(s);
-    }
 }
 
 void EigenMode::removeCharacteristic(const QString& s)
@@ -210,10 +215,58 @@ void EigenMode::removeCharacteristic(const QString& s)
     scalars.remove(s);
 }
 
-void EigenMode::updatePreMac() {
-    double& pMac(preMac());
-    pMac = 0.0;
-    for (CVertexes::const_iterator i(formVal.begin()), end(formVal.end()); i != end; ++i) {
-        pMac += *i * *i;
-    }
+void EigenMode::setVectorNodeCharacteristic(const QString& key, const double& v, int id)
+{
+    CVertexes& m(vectorR(key));
+#ifndef QT_NO_DEBUG
+    assert(m.size() > id);
+#endif
+    m[id] = v;
+}
+
+void EigenMode::setVectorNodeCharacteristic(const QString& key, const QVector3D& v, int id)
+{
+    CVertexes& m(vectorR(key));
+#ifndef QT_NO_DEBUG
+    assert(m.length() > id);
+#endif
+    m(id) = v;
+}
+
+void EigenMode::setVectorNodeCharacteristic(const QString& key, const CVertexes& v)
+{
+#ifndef QT_NO_DEBUG
+    assert(v.size() == formVal.size());
+#endif
+    vectorR(key) = v;
+}
+
+void EigenMode::setNodeCharacteristic(const QString& key, const double& v, int id)
+{
+    CArray& m(nodeR(key));
+#ifndef QT_NO_DEBUG
+    assert(m.size() > id);
+#endif
+    m[id] = v;
+}
+
+void EigenMode::setNodeCharacteristic(const QString& key, const CArray& v)
+{
+#ifndef QT_NO_DEBUG
+    assert(v.size() == formVal.length());
+#endif
+    nodeR(key) = v;
+}
+
+void EigenMode::setElementsCharacteristic(const QString& key, const CArray& v)
+{
+#ifndef QT_NO_DEBUG
+    assert(elementsData.empty() || elementsData.first().size() == v.size());
+#endif
+    elementsR(key) = v;
+}
+
+void EigenMode::setScalarCharacteristic(const QString& key, const double& v)
+{
+    scalarR(key) = v;
 }

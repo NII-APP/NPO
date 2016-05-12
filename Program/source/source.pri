@@ -1,5 +1,6 @@
 include(CGL/sharedCGL.pri)
 include(Mesh/sharedMesh.pri)
+include(../lib/igolib.pri)
 
 INCLUDEPATH += $$PWD
 

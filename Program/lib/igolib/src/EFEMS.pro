@@ -9,14 +9,15 @@ QT       -= core gui
 
 win32 {
     !contains(QMAKE_TARGET.arch, x86_64) {
-        message("x86_32 build")
-
         !win32-g++ {
+            message("32")
             TARGET = ../../../ExtSolInterface
         } else {
-            TARGET = ../../../libEFEMS.a
+            message("32gnu")
+            TARGET = ../../../EFEMS
         }
     } else {
+        message("64")
         TARGET = ../../../ExtSolInterface64
     }
 } else {

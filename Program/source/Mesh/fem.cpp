@@ -78,7 +78,9 @@ bool FEM::read(const QString &fileName) {
                 for (EigenMode& m : modes) {
                     try {
                         s->toGlobal(m.form()(l.second));
-                        s->toGlobal(m.band()(l.second));
+                        QVector3D tmp(m.band()(l.second));
+                        s->toGlobal(tmp);
+                        m.setBand(tmp, l.second);
                     } catch (std::out_of_range&) { qWarning() << "form or band of any mode haven't node " + l.second; }
                 };
             } else {
