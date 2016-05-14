@@ -222,20 +222,22 @@ void FEMProcessor::FEMCalculateModes::run()
     typedef std::vector<FEDatum> FEData;
     typedef std::vector<int*> FEMemory;
     const FinitElements& elements(__model->getElements());
-    FEData trase(elements.usefulSize());
-    FEMemory mem(trase.size());
+    FEData trace(elements.usefulSize());
+    FEMemory mem(trace.size());
     QSet<int> typesSet;
     int i(0);
+    int j(0);
+    CIndexes elementsNumbering(trace.size());
     for(const FinitElement* element : elements)
     {
         if (element != nullptr) {
-            trase[i].resize(element->size() + 3 + element->isHaveMidsideNodes() * element->midsideNodesCount());
-            mem[i] = trase.at(i).data();
-            trase[i][0] = materialsRenumbering[__model->getSection(element->getSection())->getMatId()];
-            trase[i][1] = igoTypeId(element);
-            assert(trase[i][1] != -1);
-            trase[i][2] = static_cast<int>(trase[i].size()) - 3;
-            int* trIt(trase[i].data() + 3);
+            trace[i].resize(element->size() + 3 + element->isHaveMidsideNodes() * element->midsideNodesCount());
+            mem[i] = trace.at(i).data();
+            trace[i][0] = materialsRenumbering[__model->getSection(element->getSection())->getMatId()];
+            trace[i][1] = igoTypeId(element);
+            assert(trace[i][1] != -1);
+            trace[i][2] = static_cast<int>(trace[i].size()) - 3;
+            int* trIt(trace[i].data() + 3);
             for (const quint32* it(element->begin()); it != element->end(); ++it, ++trIt) {
                 *trIt = vertexRenumbering[*it];
             }
@@ -245,14 +247,16 @@ void FEMProcessor::FEMCalculateModes::run()
                 }
             }
             typesSet.insert(element->type());
+            elementsNumbering[i] = j;
             ++i;
         }
+        ++j;
     }
 
 #ifndef QT_NO_DEBUG
-    qDebug() << "send trase";
+    qDebug() << "send trace";
 #endif
-    assert(i == trase.size());
+    assert(i == trace.size());
     pefems.SendFEMelements(i, typesSet.size(), mem.data());
     const Constrains& cnr(__model->getConstrains());
     static const int dimensionCount(3);
@@ -308,6 +312,8 @@ void FEMProcessor::FEMCalculateModes::run()
     if (encount != nfrdetermind) {
         qDebug() << "Required number of freq cannot be determind..." << nfrobtained << '/' << encount;
     }
+    CMatrix energy(static_cast<int>(trace.size()), encount);
+    pefems.GetFormEnergy(static_cast<int>(trace.size()), energy.pointers());
     pefems.ClearExtSolver();
     pefems.DisconnectAndCloseSolver();
 
@@ -315,7 +321,7 @@ void FEMProcessor::FEMCalculateModes::run()
     CIndexes numbering(static_cast<int>(m.size() / 3));
 
     i = 0;
-    int j(0);
+    j = 0;
     while (i != __model->getNodes().length()) {
         numbering[j] = i;
         if (__model->isTracedNode(i)) {
@@ -336,6 +342,11 @@ void FEMProcessor::FEMCalculateModes::run()
         for (int j(0); j != numbering.size(); ++j) {
             mode.form()(numbering[j]) = QVector3D(forms[i][j + j + j], forms[i][j + j + j + 1], forms[i][j + j + j + 2]);
         }
+        CArray nrg(static_cast<int>(elements.size()));
+        for (int j(0); j != trace.size(); ++j) {
+            nrg[elementsNumbering[j]] = energy[i][j];
+        }
+        mode.setStrainEnergy(nrg);
     }
 
     modes.estimateDefoultMagnitudes();

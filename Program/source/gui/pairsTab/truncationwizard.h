@@ -36,7 +36,7 @@ private slots:
 public slots:
     void newMac(const FEMPair::Relation& r) {
         current->makeMac(r);
-        chart->setData(current->getMac());
+        chart->setData(current->mac());
     }
 };
 

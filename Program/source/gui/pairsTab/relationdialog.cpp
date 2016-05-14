@@ -34,7 +34,7 @@ void RelationDialog::setPair(FEMPair *p) {
         qDeleteAll(rightL);
         return;
     }
-    popupConfig(leftP, leftF, *pair->base());
+    popupConfig(leftP, leftF, *pair->updater());
     popupConfig(rightP, rightF, *pair->truncated());
 
     foreach (QLabel* l, leftL)
@@ -50,7 +50,7 @@ void RelationDialog::setPair(FEMPair *p) {
     this->setPalette(palette);
     this->setMouseTracking(true);
 
-    popupConfig(leftP, leftF, *pair->base());
+    popupConfig(leftP, leftF, *pair->updater());
     popupConfig(rightP, rightF, *pair->truncated());
 
     if (relation().size() != leftL.size()) {

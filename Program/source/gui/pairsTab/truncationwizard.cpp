@@ -64,7 +64,7 @@ void TruncationWizard::previewPatrol()
     if (first->current() && second->current()) {
         current = new FEMPair(first->current(), second->current());
         relation->setPair(current);
-        chart->setData(current->getMac());
+        chart->setData(current->mac());
     } else {
         current = 0;
     }

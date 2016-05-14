@@ -14,19 +14,18 @@ private:
     FEM* const second;
     Relation relation;
     FEM* trunc;
-    CMatrix mac;
+    CMatrix macMatrix;
 public:
     Relation& relations() { return relation; }
 
-    const FEM* base() const { return first; }
-    const FEM* truncated() const { return second; }
-    FEM* trunced() { return trunc; }
+    const CMatrix& mac() const { return macMatrix; }
 
-    const CMatrix& getMac() const { return mac; }
-
-    void createTuncationForm();
     FEMPair(const FEM *theory, const FEM *practic);
     ~FEMPair();
+
+    const FEM* updater() const { return first->getNodes().size() > second->getNodes().size() ? first : second; }
+    const FEM* underUpdate() const { return first->getNodes().size() < second->getNodes().size() ? first : second; }
+    const FEM* truncated() const { return trunc; }
 
     void makeMac(const Relation& r);
     void makeMac(const EigenModes&, const EigenModes&);

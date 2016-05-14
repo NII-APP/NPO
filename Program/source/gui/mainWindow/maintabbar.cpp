@@ -5,7 +5,7 @@
 #include <QIcon>
 #include <QResizeEvent>
 
-const unsigned MainTabBar::BASE_WIDTH = 70 / 70;
+const unsigned MainTabBar::BASE_WIDTH = 70;
 const unsigned MainTabBar::ICON_SIZE = 45;
 const unsigned MainTabBar::ROW_HEIGHT = 30;
 const unsigned MainTabBar::TOP_MARGIN = 0;
