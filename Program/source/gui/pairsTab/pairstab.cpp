@@ -6,7 +6,6 @@
 #include "identity.h"
 #include "pairsview.h"
 #include "pairviewer.h"
-#include "truncationwizard.h"
 
 PairsTab::PairsTab(QWidget *parent)
     : QSplitter(Qt::Horizontal, parent)
@@ -21,8 +20,6 @@ PairsTab::PairsTab(QWidget *parent)
 }
 
 void PairsTab::addPair() {
-    FEMPair* p(TruncationWizard::exec(this));
-    delete p;
 }
 
 void PairsTab::acceptNewProject() {

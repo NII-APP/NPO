@@ -815,7 +815,9 @@ FEM* FEM::truncation(const FEM& a, const FEM& b) {
     const FEM& base         (a.vertexes.size() > b.vertexes.size() ? a : b);
     //Afer thet we may be shure in one statement: forTruncation.vertexes.size() < base.vertexes.size()
     //make copy from the base geometry.
+    qDebug() << "cpy";
     FEM* result = new FEM(base);
+    qDebug() << "name";
     //then set up the name and filename no signe the model as a result of truncation
     result->name = "truncated(" + a.name + " x " + b.name + ")";
     result->file = "truncated";
@@ -823,15 +825,19 @@ FEM* FEM::truncation(const FEM& a, const FEM& b) {
 
     if (result->modes.empty()) {
         //if it's haven't modes no reason to do any thing.
+        qDebug() << "no modes";
         return result;
     }
     //select vertexes in  the first mech form which will be associate with the second mech form
+    qDebug() << "vector";
     std::vector<int> interrelations(FEM::truncationIndexVector(a, b));
+    qDebug() << "vector end";
     //and now just copy the form values from theory
     // a.form.size()
     result->modes.resize(a.modes.size());
     EigenModes::iterator receiver(result->modes.begin());
     for (EigenModes::const_iterator source(a.modes.begin()), end(a.modes.end()); source != end; ++source, ++receiver) {
+        qDebug() << "\tit" << (source - a.modes.begin());
         receiver->setFrequency(source->frequency());
         const CVertexes& theoryForm(source->form());
         CVertexes& truncatedForm(receiver->form());

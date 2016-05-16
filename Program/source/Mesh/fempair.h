@@ -20,7 +20,7 @@ public:
 
     const CMatrix& mac() const { return macMatrix; }
 
-    FEMPair(const FEM *theory, const FEM *practic);
+    FEMPair(const FEM *a, const FEM *b, bool align = true, bool scale = true);
     ~FEMPair();
 
     const FEM* updater() const { return first->getNodes().size() > second->getNodes().size() ? first : second; }

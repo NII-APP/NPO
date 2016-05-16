@@ -4,6 +4,7 @@
 #include <cstddef>
 #include "carray.h"
 #include "cvector.h"
+#include "cbasicmatrix.h"
 
 #ifdef QT_VERSION
 class QDebug;
@@ -11,33 +12,17 @@ class QDataStream;
 #endif
 class CRealRange;
 
-class CMatrix
+class CMatrix : public CBasicMatrix<double>
 {
 public:
     typedef double T;
 private:
-    typedef std::vector<T> Data;
-    typedef std::vector<T*> Pointers;
-
-
-    Data memory;
-    Pointers m;
-    int wid;
-    void repoint();
 
     CMatrix dotTransposed() const;
 public:
     CMatrix();
     CMatrix(int w, int h);
     CMatrix(const CMatrix&);
-
-    void resize(int w, int h);
-
-    CMatrix& operator =(const CMatrix &);
-
-    T** pointers() { return m.data(); }
-    T* operator [](int r) { return m[r]; }
-    const T* operator [](int r) const { return m[r]; }
 
     T minInRow(int r) const;
     T minInColumn(int c) const;
@@ -47,9 +32,6 @@ public:
     CRealRange estimateRange() const;
     void plusInRow(int r, const T& val);
     void plusInColumn(int c, const T& val);
-    void removeRow(int r);
-    void removeColumn(int c);
-    void fill(const T&);
     int finiteCount() const;
 
 
@@ -60,13 +42,6 @@ public:
     CVector operator* (const CVector&) const;
     T det();
     void nanToInf();
-
-    int width() const { return wid; }
-    int height() const { return static_cast<int>(m.size()); }
-    int size() const { return static_cast<int>(memory.size()); }
-    bool empty() const { return memory.empty(); }
-    T* data() { return memory.data(); }
-    const T* data() const { return memory.data(); }
 
 
     friend CVector operator*(const CVector&, const CMatrix&);
@@ -83,8 +58,6 @@ CVector operator* (const CVector&, const CMatrix&);
 #ifdef QT_VERSION
 QDataStream& operator<< (QDataStream&, const CMatrix&);
 QDataStream& operator>> (QDataStream&, CMatrix&);
-
-QDebug operator<< (QDebug out, const CMatrix &obj);
 #endif
 
 #endif // CMatrix_H

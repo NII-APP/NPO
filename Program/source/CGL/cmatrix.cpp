@@ -4,37 +4,17 @@
 #include "crange.h"
 #include <algorithm>
 #include "cvector.h"
+#include "cgl.h"
 #ifdef QT_VERSION
 #include <QDebug>
 #include <QDataStream>
 #endif
 
-CMatrix::CMatrix() : wid(0) { }
+CMatrix::CMatrix() { }
 CMatrix::CMatrix(const CMatrix& m) { this->operator =(m); }
 CMatrix::CMatrix(int w, int h)
 {
     resize(w, h);
-}
-
-void CMatrix::resize(int w, int h) {
-    wid = w;
-    m.resize(h);
-    memory.resize(w * h, 0.0);
-    repoint();
-}
-
-CMatrix& CMatrix::operator =(const CMatrix& m) {
-    memory = m.memory;
-    wid = m.wid;
-    this->m.resize(m.m.size());
-    repoint();
-    return *this;
-}
-
-void CMatrix::repoint() {
-    int i(0);
-    for (Pointers::iterator it(m.begin()); it != m.end(); ++it)
-        *it = memory.data() + i++ * wid;
 }
 
 CMatrix::T CMatrix::minInRow(int r) const {
@@ -101,49 +81,6 @@ void CMatrix::plusInColumn(int c, const T& val)
         *it += val;
 }
 
-void CMatrix::removeRow(int r)
-{
-    if (height() <= r)
-        return;
-    for (T* it(m[r]), *dest(it + wid), *end(memory.data() + memory.size()); dest < end; ++it, ++dest)
-        *it = *dest;
-    m.resize(m.size() - 1);
-    memory.resize(memory.size() - wid);
-    if (memory.size())
-        repoint();
-    else
-        *this = CMatrix();
-}
-
-void CMatrix::removeColumn(int c)
-{
-    if (width() <= c)
-        return;
-    if (width() == 1) {
-        *this = CMatrix();
-        return;
-    }
-    int i(0);
-    T* it(m[0] + c), *dest(it), *end(memory.data() + memory.size());
-    while (dest < end) {
-        if (m[i] + c == dest) {
-            ++i;
-            ++dest;
-        }
-        *it = *dest;
-        ++it;
-        ++dest;
-    }
-    --wid;
-    memory.resize(memory.size() - m.size());
-    repoint();
-}
-
-void CMatrix::fill(const T& val)
-{
-    std::fill(memory.begin(), memory.end(), val);
-}
-
 int CMatrix::finiteCount() const
 {
     int count(0);
@@ -165,88 +102,6 @@ void CMatrix::nanToInf()
 }
 
 #ifndef NOT_QT_AVAILABLE
-namespace {
-
-QDataStream& operator<< (QDataStream& out, const std::vector<CMatrix::T>& m) {
-    out << static_cast<const quint32>(m.size());
-    const int writed(out.writeRawData(static_cast<const char*>(static_cast<const void*>(m.data())),
-                                      static_cast<int>(m.size() * sizeof(CMatrix::T))));
-    if (writed != static_cast<int>(m.size() * sizeof(CMatrix::T))) {
-        out.setStatus(QDataStream::WriteFailed);
-    }
-    return out;
-}
-
-QDataStream& operator>> (QDataStream& in, std::vector<CMatrix::T>& m) {
-    quint32 size;
-    in >> size;
-    m.resize(size);
-    const int readed(in.readRawData(static_cast<char*>(static_cast<void*>(m.data())),
-                                    static_cast<int>(m.size() * sizeof(CMatrix::T))));
-    if (readed != static_cast<int>(m.size() * sizeof(CMatrix::T))) {
-        in.setStatus(QDataStream::ReadCorruptData);
-    }
-    return in;
-}
-
-}
-
-namespace {
-
-void writeRow(QDebug out, const double* m, const int width)
-{
-    switch (width) {
-    case 1:
-        out << '\t' << m[0] << '\n';
-        return;
-    case 2:
-        out << '\t' << m[0] << ',' << m[1] << '\n';
-        return;
-    case 3:
-        out << '\t' << m[0] << ',' << m[1] << ',' << m[2] << '\n';
-        return;
-    case 4:
-        out << '\t' << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << '\n';
-        return;
-    case 5:
-        out << '\t' << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << ',' << m[4] << '\n';
-        return;
-    case 6:
-        out << '\t' << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << ',' << m[4] << ',' << m[5] << '\n';
-        return;
-    default:
-        out << '\t' << m[0] << ',' << m[1] << ',' << m[2] << "..." << m[width - 3] << ',' << m[width - 2] << ',' << m[width - 1] << '\n';
-        return;
-    }
-}
-
-}
-
-QDebug operator<< (QDebug out, const CMatrix &obj) {
-    if (obj.height() == 0 || obj.width() == 0) {
-        out << "CMatrix(" << obj.height() << ',' << obj.width() << ") { }\n";
-        return out;
-    }
-    if (obj.height() <= 10) {
-        out << "CMatrix(" << obj.height() << ',' << obj.width() << ") {\n";
-        for (int i(0); i != obj.height(); ++i) {
-            writeRow(out, obj[i], obj.width());
-        }
-        out << "}\n";
-    } else {
-        out << "CMatrix(" << obj.height() << ',' << obj.width() << ") {\n";
-        for (int i(0); i != 5; ++i) {
-            writeRow(out, obj[i], obj.width());
-        }
-        out << "\t\t...\n";
-        for (int i(obj.height() - 5); i != obj.height(); ++i) {
-            writeRow(out, obj[i], obj.width());
-        }
-        out << "}\n";
-    }
-    return out;
-}
-
 QDataStream& operator<< (QDataStream& out, const CMatrix& m) {
     return out << m.memory << m.wid;
 }

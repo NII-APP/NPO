@@ -163,6 +163,19 @@
         }
     },
 
+    "pair wizard" : {
+        "accept eng" : "Accept",
+        "accept rus" : "Принять",
+        "cancel eng" : "Cancel",
+        "cancel rus" : "Отмена",
+        "auto scale eng" : "auto scale",
+        "auto scale rus" : "авто-масштабирование",
+        "auto align eng" : "auto align",
+        "auto align rus" : "авто-выравнивание",
+        "reset relations eng" : "Reset relations",
+        "reset relations rus" : "Восстановить по умаолчанию"
+    },
+
     "FEMViewer" : {
         "frequency rus" : "Частота анимации",
         "frequency eng" : "Animation frequency",

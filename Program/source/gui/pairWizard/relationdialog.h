@@ -50,7 +50,6 @@ class RelationDialog : public QWidget
     bool eventFilter(QObject *, QEvent *);
 
     void bgUpdate();
-    void popupConfig(QFrame *&, ViewerTab *&, const FEM &v);
 
     void mouseMoveEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
@@ -58,9 +57,8 @@ class RelationDialog : public QWidget
     void updateLines();
 
 public:
-    RelationDialog(FEMPair* forEdit, QWidget *parent = 0);
+    RelationDialog(QWidget *parent = 0);
     void setPair(FEMPair* p);
-    static void run(FEMPair *forEdit, QWidget* parent = 0);
     
 signals:
     void updateMac(const FEMPair::Relation&);

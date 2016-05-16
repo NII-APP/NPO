@@ -9,12 +9,16 @@
 #include <cdimensioninterval.h>
 
 #include "gui/toolbox/filenameedit.h"
+#include "gui/pairWizard/truncationwizard.h"
 
 int main(int argc, char *argv[])
 {
     Application a(argc, argv);
 
     MainWindow w;
+
+    delete TruncationWizard::exec();
+    return 0;
 #ifndef QT_NO_DEBUG
     w.show();
 #else

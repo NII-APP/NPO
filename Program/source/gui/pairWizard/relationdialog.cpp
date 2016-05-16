@@ -6,11 +6,11 @@
 #include "application.h"
 #include "identity.h"
 
-RelationDialog::RelationDialog(FEMPair *forEdit, QWidget *parent)
+RelationDialog::RelationDialog(QWidget *parent)
   : QWidget(parent)
   , toggleOff(":/media/resource/images/togleOff.png")
   , toggleOn(":/media/resource/images/togleOn.png")
-  , pair(forEdit)
+  , pair(nullptr)
   , leftL(0)
   , rightL(0)
   , maxW(0)
@@ -34,13 +34,13 @@ void RelationDialog::setPair(FEMPair *p) {
         qDeleteAll(rightL);
         return;
     }
-    popupConfig(leftP, leftF, *pair->updater());
-    popupConfig(rightP, rightF, *pair->truncated());
 
-    foreach (QLabel* l, leftL)
+    foreach (QLabel* l, leftL) {
         l->resize(maxW, l->height());
-    foreach (QLabel* l, rightL)
+    }
+    foreach (QLabel* l, rightL) {
         l->resize(maxW, l->height());
+    }
 
     //this->setMinimumSize(maxW * 2 + 200, leftL.first()->height() * (leftL.size() > rightL.size() ? leftL.size() : rightL.size()));
     //this->resize(this->minimumWidth(), this->minimumHeight());
@@ -49,9 +49,6 @@ void RelationDialog::setPair(FEMPair *p) {
     palette.setColor(QPalette::Background, QColor(0x00,0x00,0xFF));
     this->setPalette(palette);
     this->setMouseTracking(true);
-
-    popupConfig(leftP, leftF, *pair->updater());
-    popupConfig(rightP, rightF, *pair->truncated());
 
     if (relation().size() != leftL.size()) {
         relation().resize(leftL.size());
@@ -75,20 +72,6 @@ void RelationDialog::bgUpdate()
             leftL[i]->setBackgroundRole(QPalette::Dark);
         }
     }
-}
-
-void RelationDialog::popupConfig(QFrame*& p, ViewerTab *&f, const FEM &v)
-{
-    p = new QFrame(this, Qt::Popup);
-    p->setContentsMargins(0,0,0,0);
-    p->setFrameStyle(QFrame::Plain | QFrame::StyledPanel);
-    p->setLineWidth(1);
-    p->setFixedSize(maxW, maxW);
-    f = new ViewerTab(p);
-    f->setModel(&v);
-    p->setLayout(new QHBoxLayout(p));
-    p->layout()->setMargin(0);
-    p->layout()->addWidget(f);
 }
 
 void RelationDialog::buildLabels(Labels &lbls, const FEM& g)
@@ -288,6 +271,9 @@ void RelationDialog::updateLines()
 
 void RelationDialog::mousePressEvent(QMouseEvent *)
 {
+    if (pair == nullptr) {
+        return;
+    }
     if (underToggle >= 0 && lineingState < 0)
     {
         lineingState = underToggle;
@@ -328,13 +314,4 @@ void RelationDialog::mousePressEvent(QMouseEvent *)
 
     bgUpdate();
     updateLines();
-}
-
-void RelationDialog::run(FEMPair* forEdit, QWidget* parent)
-{
-    QEventLoop* l(new QEventLoop(parent));
-    RelationDialog* dialog(new RelationDialog(forEdit, parent));
-    l->connect(dialog, SIGNAL(finished(int)), SLOT(quit()));
-    dialog->show();
-    l->exec();
 }

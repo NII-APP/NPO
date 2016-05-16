@@ -1,0 +1,86 @@
+#include "modelspicker.h"
+#include "project.h"
+#include "application.h"
+#include <QComboBox>
+#include <QVBoxLayout>
+#include <cassert>
+#include "fem.h"
+
+ModelsPicker::ModelsPicker(QWidget *parent)
+    : QWidget(parent)
+    , first(new QComboBox(this))
+    , second(new QComboBox(this))
+{
+    this->setLayout(new QVBoxLayout(this));
+    this->layout()->addWidget(first);
+    this->layout()->addWidget(second);
+
+    auto update = [this](QComboBox* const w2, QComboBox* const w1){
+        w1->blockSignals(true);
+        int cur(w1->currentIndex());
+        while (w1->count()) {
+            w1->removeItem(0);
+        }
+        int j(1);
+        for (const FEM* const i : Application::project()->FEMList()) {
+            if (i->getName() != w2->currentText()) {
+                w1->insertItem(w1->count(), i->getName(), QVariant(j));
+            }
+            ++j;
+        }
+        w1->setCurrentIndex(cur);
+        w1->blockSignals(false);
+        emit modelsPicked(std::pair<const FEM*, const FEM*>(a(), b()));
+    };
+    update(first, second);
+    update(second, first);
+    void (QComboBox:: *indexChangedSignal)(int) = &QComboBox::currentIndexChanged;
+    connect(first,  indexChangedSignal, [this, update]() { update(first, second); });
+    connect(second, indexChangedSignal, [this, update]() { update(second, first); });
+}
+
+const FEM* ModelsPicker::a()
+{
+    if (first->currentData().toInt()) {
+        return Application::project()->FEMList().at(first->currentData().toInt() - 1);
+    } else {
+        return nullptr;
+    }
+}
+
+const FEM* ModelsPicker::b()
+{
+    if (second->currentData().toInt()) {
+        return Application::project()->FEMList().at(second->currentData().toInt() - 1);
+    } else {
+        return nullptr;
+    }
+}
+
+void ModelsPicker::setPick(const std::pair<const FEM*, const FEM*>& p)
+{
+    int a(-1);
+    int b(-1);
+    int i(0);
+    Project::ConstModels l(Application::project()->FEMList());
+    while ((a < 0 || b < 0) && i < l.size()) {
+        if (l[i] == p.first) {
+            a = i;
+        }
+        if (l[i] == p.second) {
+            b = i;
+        }
+        ++i;
+    }
+    assert(a >= 0 && b >= 0);
+    first->blockSignals(true);
+    first->setCurrentIndex(a);
+    first->blockSignals(false);
+    second->setCurrentIndex(b);
+}
+
+ModelsPicker::~ModelsPicker()
+{
+
+}
+
