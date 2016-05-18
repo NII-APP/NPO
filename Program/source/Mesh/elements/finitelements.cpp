@@ -6,6 +6,7 @@
 namespace core {
 
 FinitElements::FinitElements(const FinitElements& op)
+    : std::vector<FinitElement*>(op.size())
 {
     FinitElements::const_iterator s(op.begin());
     FinitElements::iterator d(begin());
@@ -63,6 +64,7 @@ bool FinitElements::operator==(const FinitElements& op) const
             }
         }
     }
+    return true;
 }
 
 int FinitElements::usefulSize() const

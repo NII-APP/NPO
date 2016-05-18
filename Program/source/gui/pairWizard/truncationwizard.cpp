@@ -36,17 +36,18 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     buttons->addWidget(cancelB);
     connect(cancelB, SIGNAL(clicked()), SLOT(reject()));
 
-    QWidget* const leftSide(new QWidget(base));
     leftSide->setLayout(new QVBoxLayout(leftSide));
     leftSide->layout()->addWidget(picker);
     align->setChecked(true);
     leftSide->layout()->addWidget(align);
     scale->setChecked(true);
     leftSide->layout()->addWidget(scale);
-    leftSide->layout()->addWidget(relations);
+    static_cast<QVBoxLayout*>(leftSide->layout())->addWidget(relations, 200);
     leftSide->layout()->addWidget(new QPushButton(Application::identity()->tr("reset relations", "pair wizard"), leftSide));
     base->addWidget(leftSide);
     base->addWidget(viewer);
+    base->setSizes(QList<int>() << 300 << 1000);
+    this->resize(1300,800);
 
     this->setLayout(new QVBoxLayout(this));
     this->layout()->addWidget(base);
@@ -72,6 +73,7 @@ void TruncationWizard::update()
         result = nullptr;
     }
     relations->setPair(result);
+    viewer->setPair(result);
 }
 
 FEMPair* TruncationWizard::exec(QWidget* parent)

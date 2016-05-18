@@ -5,6 +5,7 @@
 #include <QDir>
 #include "application.h"
 #include "identity.h"
+#include "gui/toolbox/femviewer/popupmode.h"
 
 RelationDialog::RelationDialog(QWidget *parent)
   : QWidget(parent)
@@ -14,17 +15,20 @@ RelationDialog::RelationDialog(QWidget *parent)
   , leftL(0)
   , rightL(0)
   , maxW(0)
+  , leftP(nullptr)//new PopupMode(this))
+  , rightP(nullptr)//new PopupMode(this))
+  , title1(new QLabel(this))
+  , title2(new QLabel(this))
   , underToggle(-1)
   , underLeftToggle(false)
   , lineingState(-1)
   , lineingLeft(false)
-  , title1(new QLabel(this))
-  , title2(new QLabel(this))
 {
     this->setContentsMargins(10, 0, 10, 0);
 }
 
-void RelationDialog::setPair(FEMPair *p) {
+void RelationDialog::setPair(FEMPair *p)
+{
     pair = p;
 
     qDebug() << "set pair" << p;
@@ -35,16 +39,17 @@ void RelationDialog::setPair(FEMPair *p) {
         return;
     }
 
-    foreach (QLabel* l, leftL) {
-        l->resize(maxW, l->height());
-    }
-    foreach (QLabel* l, rightL) {
-        l->resize(maxW, l->height());
-    }
+    buildLabels(leftL, *pair->a());
+    buildLabels(rightL, *pair->b());
 
-    //this->setMinimumSize(maxW * 2 + 200, leftL.first()->height() * (leftL.size() > rightL.size() ? leftL.size() : rightL.size()));
-    //this->resize(this->minimumWidth(), this->minimumHeight());
-    
+    foreach (QLabel* l, leftL)
+        l->resize(maxW, l->height());
+    foreach (QLabel* l, rightL)
+        l->resize(maxW, l->height());
+
+    this->setMinimumSize(maxW * 2 + 200, leftL.isEmpty() ? 0 : (leftL.first()->height() * (leftL.size() > rightL.size() ? leftL.size() : rightL.size())));
+    this->resize(this->minimumWidth(), this->minimumHeight());
+
     QPalette palette(this->palette());
     palette.setColor(QPalette::Background, QColor(0x00,0x00,0xFF));
     this->setPalette(palette);
@@ -76,17 +81,14 @@ void RelationDialog::bgUpdate()
 
 void RelationDialog::buildLabels(Labels &lbls, const FEM& g)
 {
-    qDebug() << "built labels";
     qDeleteAll(lbls);
     lbls.resize(static_cast<int>(g.getModes().size()));
-    qDebug() << "\t " << lbls.size();
 
     QPalette p(this->palette());
     p.setBrush(QPalette::Light, QColor(0xFF,0xFF,0xFF));
     p.setBrush(QPalette::Dark, QColor(0x88,0x88,0x88));
 
     for (int i = 0; i != lbls.size(); ++i) {
-        qDebug() << "label it" << i;
         QLabel* l(new QLabel(Application::identity()->tr("form selector label").arg(QString::number(i + 1), QString::number(g.getModes().at(i).frequency())),this));
         l->resize(l->sizeHint());
         l->setFrameStyle(QFrame::Plain | QFrame::StyledPanel);
@@ -128,38 +130,39 @@ bool RelationDialog::eventFilter(QObject* o, QEvent* e)
     if (!o || e->type() != QEvent::MouseButtonPress)
         return false;
     QMouseEvent* me(static_cast<QMouseEvent*>(e));
-    if (me->button() == Qt::LeftButton)
+    if (me->button() == Qt::LeftButton) {
         showForm(o);
+    }
     return true;
 }
 void RelationDialog::showForm(QObject* s)
 {
     QWidget* wgt(0);
     int i, d;
-    for (i = 0; i != leftL.size(); ++i)
-    {
-        if (leftL[i] == s)
-            wgt = leftL[d = i];
+    for (i = 0; i != leftL.size(); ++i) if (leftL[i] == s) {
+        wgt = leftL[d = i];
     }
-    if (wgt)
-    {
-        leftP->move(this->mapToGlobal(QPoint(0,0)) + wgt->geometry().bottomLeft() - QPoint(0,
-                                   (wgt->height() + leftP->height()) * (d - 1 > leftL.size() / 2)));
-        leftF->setMode(d);
-        leftP->show();
+    if (wgt) {
+        PopupMode* popup(new PopupMode);
+        popup->move(this->mapToGlobal(QPoint(0,0)) + wgt->geometry().bottomLeft());
+        popup->setModel(pair->a());
+        popup->resize(maxW, maxW);
+        popup->setMode(d);
+        popup->show();
+        connect(popup, &PopupMode::closed, popup, &QObject::deleteLater);
         return;
     }
-    for (i = 0; i != rightL.size(); ++i)
-    {
-        if (rightL[i] == s)
-            wgt = rightL[d = i];
+    for (i = 0; i != rightL.size(); ++i) if (rightL[i] == s) {
+        wgt = rightL[d = i];
     }
-    if (wgt)
-    {
-        rightP->move(this->mapToGlobal(QPoint(0,0)) + wgt->geometry().bottomLeft() - QPoint(0,
-                                   (wgt->height() + rightP->height()) * (d - 1 > rightL.size() / 2)));
-        rightF->setMode(d);
-        rightP->show();
+    if (wgt) {
+        PopupMode* popup(new PopupMode);
+        popup->move(this->mapToGlobal(QPoint(0,0)) + wgt->geometry().bottomLeft());
+        popup->setModel(pair->b());
+        popup->resize(maxW, maxW);
+        popup->setMode(d);
+        popup->show();
+        connect(popup, &PopupMode::closed, popup, &QObject::deleteLater);
         return;
     }
 }
@@ -271,9 +274,6 @@ void RelationDialog::updateLines()
 
 void RelationDialog::mousePressEvent(QMouseEvent *)
 {
-    if (pair == nullptr) {
-        return;
-    }
     if (underToggle >= 0 && lineingState < 0)
     {
         lineingState = underToggle;
@@ -314,4 +314,14 @@ void RelationDialog::mousePressEvent(QMouseEvent *)
 
     bgUpdate();
     updateLines();
+}
+
+void RelationDialog::run(FEMPair* forEdit, QWidget* parent)
+{
+    QEventLoop* l(new QEventLoop(parent));
+    RelationDialog* dialog(new RelationDialog(parent));
+    dialog->setPair(forEdit);
+    l->connect(dialog, SIGNAL(finished(int)), SLOT(quit()));
+    dialog->show();
+    l->exec();
 }

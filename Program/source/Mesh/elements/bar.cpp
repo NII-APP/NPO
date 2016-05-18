@@ -1,6 +1,7 @@
 #include "bar.h"
 #include <qopengl.h>
 #include <QBitArray>
+#include <QDebug>
 
 namespace core {
 

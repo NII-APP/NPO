@@ -32,7 +32,7 @@ ViewerTab::ViewerTab(QWidget *parent)
         MACDisplay* chart(new MACDisplay(static_cast<MainWindow*>(Application::mainWindow())));
         chart->setData(Application::project()->toFEM(id)->getModes().getMAC());
         if (p) {
-            connect(p, &FEMProcessor::MACUpdated, [chart, p](){
+            p->connect(p, &FEMProcessor::MACUpdated, [chart, p](){
                 FEM* const model(p->model());
                 chart->setData(model->getModes().getMAC());
             });

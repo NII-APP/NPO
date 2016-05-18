@@ -6,10 +6,10 @@
 
 CVertexes::CVertexes(int size, float val) : std::vector<float>(size, val) { }
 QVector3D& CVertexes::operator ()(int p) {
-    return *static_cast<QVector3D*>(static_cast<void*>(this->data() + p * 3));
+    return *static_cast<QVector3D*>(static_cast<void*>(this->data() + p + p + p));
 }
 const QVector3D& CVertexes::operator ()(int p) const {
-    return *static_cast<const QVector3D*>(static_cast<const void*>(this->data() + p * 3));
+    return *static_cast<const QVector3D*>(static_cast<const void*>(this->data() + p + p + p));
 }
 
 
@@ -81,7 +81,7 @@ QDebug operator<<(QDebug out, const CVertexes& m)
         return out;
     default:
         out << "CVertexes(" << m.length() << "* 3 ) {" << m(0) << ',' << m(1)
-            << "..." << m(static_cast<int>(m.size()) - 2) << ',' << m(static_cast<int>(m.size()) - 1) << "}";
+            << "..." << m(static_cast<int>(m.length()) - 2) << ',' << m(static_cast<int>(m.length()) - 1) << "}";
         return out;
     }
 }

@@ -10,6 +10,8 @@
 #include <QLabel>
 #include <QPushButton>
 
+class PopupMode;
+
 class RelationDialog : public QWidget
 {
     Q_OBJECT
@@ -20,16 +22,14 @@ class RelationDialog : public QWidget
     FEMPair::Relation& relation() const { return pair->relations(); }
 
     typedef QVector<QLabel*> Labels;
-    Labels  leftL;
-    Labels  rightL;
+    Labels leftL;
+    Labels rightL;
     int maxW;
 
-    ViewerTab* leftF;
-    ViewerTab* rightF;
-    QFrame* leftP;
-    QFrame* rightP;
-    QLabel* title1;
-    QLabel* title2;
+    PopupMode* const leftP;
+    PopupMode* const rightP;
+    QLabel* const title1;
+    QLabel* const title2;
 
     float leftCapacity;
     float rightCapacity;
@@ -59,14 +59,15 @@ class RelationDialog : public QWidget
 public:
     RelationDialog(QWidget *parent = 0);
     void setPair(FEMPair* p);
-    
+    static void run(FEMPair *forEdit, QWidget* parent = 0);
+
 signals:
     void updateMac(const FEMPair::Relation&);
 
 public slots:
 
     void showForm(QObject *w);
-    
+
 };
 
 #endif // RELATIONDIALOG_H

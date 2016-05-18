@@ -97,7 +97,7 @@ QDataStream& operator >> (QDataStream& out, Material& m) {
 }
 QDataStream& operator << (QDataStream& in, const Material& m) {
     in << static_cast<int>(m.type);
-    quint32 size = m.values.size();
+    quint32 size = static_cast<quint32>(m.values.size());
     in << size;
     for (size_t i = 0; i < size; ++i ) {
         in << m.values[i];

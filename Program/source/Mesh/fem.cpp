@@ -13,6 +13,7 @@
 #include <cgl.h>
 #include <cparse.h>
 #include <ccylindercoordinatesystem.h>
+#include <cindexes.h>
 
 #include "eigenmode.h"
 #include "elements/quad.h"
@@ -34,7 +35,7 @@ FEM::FEM(const QString& fileName) : modelType(Undefined) {
 FEM::FEM(const FEM& g)
     : modelType(g.modelType)
     , vertexes(g.vertexes)
-    , trace(g.trace.size())
+    , trace(g.trace)
     , sqre(g.sqre)
     , isTraced(g.isTraced)
     , file(g.file)
@@ -510,10 +511,8 @@ void FEM::render() const {
 void FEM::renderNet() const {
     glDisableClientState(GL_COLOR_ARRAY);
     glColor3ub(0x00,0x88,0x88);
-    for (FinitElements::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) {
-        if (*it) {
-            (*it)->renderNet();
-        }
+    for (FinitElements::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) if (*it) {
+         (*it)->renderNet();
     }
 }
 
@@ -783,27 +782,26 @@ void FEM::scaleTo(double v) {
     box().multZ(k);
 }
 
-std::vector<int> FEM::truncationIndexVector(const FEM& a, const FEM& b)
+CIndexes FEM::truncationIndexVector(const FEM& a, const FEM& b)
 {
     const CGL::Vertexes& am(a.vertexes);
     const CGL::Vertexes& bm(b.vertexes);
     int aDimension(static_cast<int>(am.length()));
     int bDimension(static_cast<int>(bm.length()));
-    CGL::Matrix dest(aDimension, bDimension);
 
+    CIndexes numbers(bDimension, -1);
     for (int i(0); i != bDimension; ++i) {
-        for (int j = 0; j != aDimension; ++j) {
-            dest[i][j] = (am(j) - bm(i)).lengthSquared();
-        }
-    }
-
-    std::vector<int> numbers(bDimension, 0);
-    for (int i(0); i != bDimension; ++i) {
-        for (int j(0); j != aDimension; ++j) {
-            if (dest[i][j] < dest[i][numbers.at(i)] && a.isTraced.testBit(j)) {
+        float minD(std::numeric_limits<float>::infinity());
+        for (int j(1); j != aDimension; ++j) if (a.isTraced.testBit(j)) {
+            const float d((bm(i) - am(j)).lengthSquared());
+            if (d < minD) {
                 numbers[i] = j;
+                minD = d;
             }
         }
+#ifndef QT_NO_DEBUG
+        assert(minD != std::numeric_limits<float>::infinity());
+#endif
     }
     return numbers;
 }
@@ -811,13 +809,11 @@ std::vector<int> FEM::truncationIndexVector(const FEM& a, const FEM& b)
 FEM* FEM::truncation(const FEM& a, const FEM& b) {
     //first step consist of solution of one question. We must to deside whitch of models must be truncated.
     //Hi-vertexes model must be truncated to low-vertexes model obvuisly.
-    const FEM& forTruncation(a.vertexes.size() > b.vertexes.size() ? b : a);
-    const FEM& base         (a.vertexes.size() > b.vertexes.size() ? a : b);
+    const FEM& forTruncation(a.vertexes.size() > b.vertexes.size() ? a : b);
+    const FEM& base         (a.vertexes.size() < b.vertexes.size() ? a : b);
     //Afer thet we may be shure in one statement: forTruncation.vertexes.size() < base.vertexes.size()
     //make copy from the base geometry.
-    qDebug() << "cpy";
     FEM* result = new FEM(base);
-    qDebug() << "name";
     //then set up the name and filename no signe the model as a result of truncation
     result->name = "truncated(" + a.name + " x " + b.name + ")";
     result->file = "truncated";
@@ -825,25 +821,22 @@ FEM* FEM::truncation(const FEM& a, const FEM& b) {
 
     if (result->modes.empty()) {
         //if it's haven't modes no reason to do any thing.
-        qDebug() << "no modes";
         return result;
     }
     //select vertexes in  the first mech form which will be associate with the second mech form
-    qDebug() << "vector";
-    std::vector<int> interrelations(FEM::truncationIndexVector(a, b));
-    qDebug() << "vector end";
+    CIndexes interrelations(FEM::truncationIndexVector(forTruncation, base));
+
     //and now just copy the form values from theory
     // a.form.size()
-    result->modes.resize(a.modes.size());
+    result->modes.resize(forTruncation.modes.size());
     EigenModes::iterator receiver(result->modes.begin());
-    for (EigenModes::const_iterator source(a.modes.begin()), end(a.modes.end()); source != end; ++source, ++receiver) {
-        qDebug() << "\tit" << (source - a.modes.begin());
+    for (EigenModes::const_iterator source(forTruncation.modes.begin()), end(forTruncation.modes.end()); source != end; ++source, ++receiver) {
         receiver->setFrequency(source->frequency());
         const CVertexes& theoryForm(source->form());
         CVertexes& truncatedForm(receiver->form());
         truncatedForm.resize(interrelations.size() * 3);
         int i(0);
-        for (std::vector<int>::const_iterator interrelation(interrelations.begin()), end(interrelations.end()); interrelation != end; ++interrelation, ++i) {
+        for (CIndexes::const_iterator interrelation(interrelations.begin()), end(interrelations.end()); interrelation != end; ++interrelation, ++i) {
             truncatedForm(i) = theoryForm(*interrelation);
         }
         receiver->updateExtremums();

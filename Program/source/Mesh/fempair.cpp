@@ -6,19 +6,14 @@ FEMPair::FEMPair(const FEM *b, const FEM *a, bool align, bool scale)
     : first(new FEM(*b))
     , second(new FEM(*a))
 {
-    qDebug() << "copy";
     if (align) {
         first->alignZero();
         second->alignZero();
     }
-    qDebug() << "align";
     if (scale) {
         second->scaleTo(first->box().size());
     }
-    qDebug() << "scale";
     trunc = FEM::truncation(*updater(), *underUpdate());
-    qDebug() << "trunc";
-
     //estimate macMatrix
     makeMac(first->getModes(), trunc->getModes());
 
@@ -60,7 +55,6 @@ FEMPair::~FEMPair() {
 
 void FEMPair::makeMac(const EigenModes &practic, const EigenModes &trunc)
 {
-    qDebug() << "FEMPair MAC " << practic.front().size() << trunc.front().size();
     macMatrix.resize(static_cast<int>(practic.size()), static_cast<int>(trunc.size()));
     for (int i = 0; i != macMatrix.height(); ++i) {
         for (int j = 0; j != macMatrix.width(); ++j) {

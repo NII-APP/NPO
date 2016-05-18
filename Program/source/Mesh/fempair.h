@@ -26,6 +26,8 @@ public:
     const FEM* updater() const { return first->getNodes().size() > second->getNodes().size() ? first : second; }
     const FEM* underUpdate() const { return first->getNodes().size() < second->getNodes().size() ? first : second; }
     const FEM* truncated() const { return trunc; }
+    const FEM* a() const { return first; }
+    const FEM* b() const { return second; }
 
     void makeMac(const Relation& r);
     void makeMac(const EigenModes&, const EigenModes&);

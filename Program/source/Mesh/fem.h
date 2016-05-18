@@ -21,6 +21,8 @@
 #include <ccoordinatesystem.h>
 #include "constrain.h"
 
+class CIndexes;
+
 using namespace core;
 class FEM
 {
@@ -165,7 +167,7 @@ public:
     //a + b...
     static FEM composition(const FEM &, const FEM &, const QVector<int> &relation);
 
-    static std::vector<int> truncationIndexVector(const FEM& from, const FEM& to);
+    static CIndexes truncationIndexVector(const FEM& from, const FEM& to);
     static FEM* truncation(const FEM& a, const FEM& b);
 
     friend QDataStream& operator << (QDataStream&, const FEM&);

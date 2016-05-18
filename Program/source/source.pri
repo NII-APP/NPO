@@ -27,7 +27,8 @@ HEADERS += $$PWD/*.h \
     $$PWD/gui/toolbox/femviewer/fempairviewer.h \
     $$PWD/gui/pairWizard/truncationwizard.h \
     $$PWD/gui/pairWizard/relationdialog.h \
-    $$PWD/gui/pairWizard/modelspicker.h
+    $$PWD/gui/pairWizard/modelspicker.h \
+    $$PWD/gui/toolbox/femviewer/popupmode.h
 SOURCES += $$PWD/*.cpp \
     $$PWD/gui/viewerTab/viewermodel.cpp \
     $$PWD/gui/viewerTab/viewertab.cpp \
@@ -51,4 +52,5 @@ SOURCES += $$PWD/*.cpp \
     $$PWD/gui/toolbox/femviewer/fempairviewer.cpp \
     $$PWD/gui/pairWizard/truncationwizard.cpp \
     $$PWD/gui/pairWizard/relationdialog.cpp \
-    $$PWD/gui/pairWizard/modelspicker.cpp
+    $$PWD/gui/pairWizard/modelspicker.cpp \
+    $$PWD/gui/toolbox/femviewer/popupmode.cpp

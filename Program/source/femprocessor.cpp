@@ -227,7 +227,7 @@ void FEMProcessor::FEMCalculateModes::run()
     QSet<int> typesSet;
     int i(0);
     int j(0);
-    CIndexes elementsNumbering(trace.size());
+    CIndexes elementsNumbering(static_cast<int>(trace.size()));
     for(const FinitElement* element : elements)
     {
         if (element != nullptr) {
