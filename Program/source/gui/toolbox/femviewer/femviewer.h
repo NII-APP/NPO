@@ -2,33 +2,19 @@
 #define FEMVIEWER_H
 
 #include <QWidget>
-#include <QIcon>
 
-class QToolBar;
 class FEMWidget;
 class FEM;
 class QAction;
 class EigenMode;
+class ToolBar;
 
 class FEMViewer : public QWidget
 {
     Q_OBJECT
 
-    class FEMViewerModeInput;
-    class FEMViewerFrequencyInput;
-    class FEMViewerMagnitudeInput;
-
     FEMWidget* const femWidget;
-    QToolBar* const toolbox;
-
-    FEMViewerModeInput* const mode;
-    FEMViewerFrequencyInput* const frequency;
-    FEMViewerMagnitudeInput* const magnitude;
-
-    const QIcon pause;
-    const QIcon play;
-    QAction* run;
-    QAction* stop;
+    ToolBar* const toolbox;
 
     bool eventFilter(QObject *, QEvent *);
 
@@ -54,11 +40,6 @@ signals:
 public slots:
     void colorize(int);
     void updateToolBar() const;
-
-private slots:
-    void runTrigger();
-    void runEnable();
-    void stopTrigger(bool);
 };
 
 struct FEMViewerState {

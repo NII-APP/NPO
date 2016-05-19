@@ -6,18 +6,18 @@
 class QLabel;
 class QSpinBox;
 
-class FEMViewer::FEMViewerModeInput : public QFrame
+class ModeInput : public QFrame
 {
     Q_OBJECT
 
-    FEMViewer* const parentViewer;
+    FEMWidget* const parentViewer;
     QLabel* const hzValue;
     QSpinBox* const value;
 
     void changeEvent(QEvent *);
 public:
-    FEMViewerModeInput(FEMViewer *viewer, QWidget *parent = 0);
-    ~FEMViewerModeInput();
+    ModeInput(FEMWidget *viewer, QWidget *parent = 0);
+    ~ModeInput();
 
     int getValue() const;
     void setValue(int value);

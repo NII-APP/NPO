@@ -19,6 +19,7 @@ public:
     void setMode(const int v);
 
     QSize minimumSizeHint();
+
 private:
     FEMWidget* const screen;
     const FEMPair* data;

@@ -3,20 +3,20 @@
 
 #include <map>
 #include <fem.h>
-
+#include <cindexes.h>
 
 class FEMPair
 {
-public:
-    typedef std::vector<int> Relation;
 private:
     FEM* const first;
     FEM* const second;
-    Relation relation;
+    CIndexes relation;
     FEM* trunc;
     CMatrix macMatrix;
 public:
-    Relation& relations() { return relation; }
+    const CIndexes& relations() const { return relation; }
+    void setRelations(const CIndexes& v) { relation = v; }
+    void calculateRelations();
 
     const CMatrix& mac() const { return macMatrix; }
 
@@ -29,7 +29,7 @@ public:
     const FEM* a() const { return first; }
     const FEM* b() const { return second; }
 
-    void makeMac(const Relation& r);
+    void makeMac(const CIndexes &r);
     void makeMac(const EigenModes&, const EigenModes&);
 
 };

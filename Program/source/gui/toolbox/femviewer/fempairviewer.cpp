@@ -17,6 +17,11 @@ QSize FEMPairViewer::minimumSizeHint()
 
 void FEMPairViewer::setPair(const FEMPair* p)
 {
+    qDebug() << "set FEM pair";
+    if (p == nullptr) {
+        screen->setData(nullptr);
+        return;
+    }
     screen->setData(QList<const FEM*>() << p->underUpdate() << p->updater() << p->truncated());
 }
 

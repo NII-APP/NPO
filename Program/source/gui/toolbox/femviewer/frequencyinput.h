@@ -8,14 +8,14 @@
 class QDoubleSpinBox;
 class QSlider;
 
-class FEMViewer::FEMViewerFrequencyInput : public QFrame {
+class FrequencyInput : public QFrame {
     Q_OBJECT
 
     void changeEvent(QEvent * e);
 public:
     typedef CScale<int, double> ToRealScale;
-    explicit FEMViewerFrequencyInput(QWidget* parent = 0);
-    ~FEMViewerFrequencyInput();
+    explicit FrequencyInput(QWidget* parent = 0);
+    ~FrequencyInput();
 signals:
     void valueChanged(double val);
 public slots:

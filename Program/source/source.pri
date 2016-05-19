@@ -12,9 +12,6 @@ HEADERS += $$PWD/*.h \
     $$PWD/gui/toolbox/macdisplay.h \
     $$PWD/gui/toolbox/pixmapwidget.h \
     $$PWD/gui/toolbox/femviewer/femviewer.h \
-    $$PWD/gui/toolbox/femviewer/femviewerfrequencyinput.h \
-    $$PWD/gui/toolbox/femviewer/femviewermagnitudeinput.h \
-    $$PWD/gui/toolbox/femviewer/femviewermodeinput.h \
     $$PWD/gui/pairsTab/pairsmodel.h \
     $$PWD/gui/pairsTab/pairstab.h \
     $$PWD/gui/pairsTab/pairsview.h \
@@ -28,7 +25,11 @@ HEADERS += $$PWD/*.h \
     $$PWD/gui/pairWizard/truncationwizard.h \
     $$PWD/gui/pairWizard/relationdialog.h \
     $$PWD/gui/pairWizard/modelspicker.h \
-    $$PWD/gui/toolbox/femviewer/popupmode.h
+    $$PWD/gui/toolbox/femviewer/popupmode.h \
+    $$PWD/gui/toolbox/femviewer/toolbar.h \
+    $$PWD/gui/toolbox/femviewer/modeinput.h \
+    $$PWD/gui/toolbox/femviewer/magnitudeinput.h \
+    $$PWD/gui/toolbox/femviewer/frequencyinput.h
 SOURCES += $$PWD/*.cpp \
     $$PWD/gui/viewerTab/viewermodel.cpp \
     $$PWD/gui/viewerTab/viewertab.cpp \
@@ -37,9 +38,6 @@ SOURCES += $$PWD/*.cpp \
     $$PWD/gui/toolbox/macdisplay.cpp \
     $$PWD/gui/toolbox/pixmapwidget.cpp \
     $$PWD/gui/toolbox/femviewer/femviewer.cpp \
-    $$PWD/gui/toolbox/femviewer/femviewerfrequencyinput.cpp \
-    $$PWD/gui/toolbox/femviewer/femviewermagnitudeinput.cpp \
-    $$PWD/gui/toolbox/femviewer/femviewermodeinput.cpp \
     $$PWD/gui/pairsTab/pairsmodel.cpp \
     $$PWD/gui/pairsTab/pairstab.cpp \
     $$PWD/gui/pairsTab/pairsview.cpp \
@@ -53,4 +51,8 @@ SOURCES += $$PWD/*.cpp \
     $$PWD/gui/pairWizard/truncationwizard.cpp \
     $$PWD/gui/pairWizard/relationdialog.cpp \
     $$PWD/gui/pairWizard/modelspicker.cpp \
-    $$PWD/gui/toolbox/femviewer/popupmode.cpp
+    $$PWD/gui/toolbox/femviewer/popupmode.cpp \
+    $$PWD/gui/toolbox/femviewer/toolbar.cpp \
+    $$PWD/gui/toolbox/femviewer/modeinput.cpp \
+    $$PWD/gui/toolbox/femviewer/magnitudeinput.cpp \
+    $$PWD/gui/toolbox/femviewer/frequencyinput.cpp

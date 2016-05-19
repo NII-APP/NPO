@@ -12,11 +12,6 @@
 EigenModes::EigenModes()
 { }
 
-EigenModes::EigenModes(const EigenModes& op)
-    : std::vector<EigenMode>(op)
-    , mac(op.mac)
-    , file(op.file) { }
-
 int EigenModes::findNext(CParse& i)
 {
     //if the pointer not in the start of string

@@ -9,6 +9,7 @@
 #include <QFrame>
 #include <QLabel>
 #include <QPushButton>
+#include "cindexes.h"
 
 class PopupMode;
 
@@ -19,7 +20,6 @@ class RelationDialog : public QWidget
     const QImage toggleOff;
 
     FEMPair* pair;
-    FEMPair::Relation& relation() const { return pair->relations(); }
 
     typedef QVector<QLabel*> Labels;
     Labels leftL;
@@ -41,6 +41,8 @@ class RelationDialog : public QWidget
     QPoint source;
     QPoint tracking;
 
+    CIndexes relation;
+
     void buildLabels(Labels&, const FEM &);
     void renderLabels();
 
@@ -56,16 +58,20 @@ class RelationDialog : public QWidget
 
     void updateLines();
 
+    static CIndexes inverseRelations(const CIndexes& v, int newSize);
+    CIndexes belchRelations() const;
+    void emitRelationsUpdated();
 public:
     RelationDialog(QWidget *parent = 0);
+    ~RelationDialog();
     void setPair(FEMPair* p);
     static void run(FEMPair *forEdit, QWidget* parent = 0);
 
 signals:
-    void updateMac(const FEMPair::Relation&);
+    void relationsUpdated(const CIndexes&);
 
 public slots:
-
+    void scarfUpRelations();
     void showForm(QObject *w);
 
 };

@@ -11,24 +11,18 @@
 #include <femwidget.h>
 #include <fem.h>
 
-#include "femviewerfrequencyinput.h"
-#include "femviewermodeinput.h"
-#include "femviewermagnitudeinput.h"
+#include "frequencyinput.h"
+#include "modeinput.h"
+#include "magnitudeinput.h"
 #include "identity.h"
 #include "application.h"
 #include "identity.h"
+#include "toolbar.h"
 
 FEMViewer::FEMViewer(QWidget* parent)
     : QWidget(parent)
     , femWidget(new FEMWidget(this))
-    , toolbox(new QToolBar(this))
-    , mode(new FEMViewerModeInput(this, toolbox))
-    , frequency(new FEMViewerFrequencyInput(toolbox))
-    , magnitude(new FEMViewerMagnitudeInput(toolbox))
-    , pause(Identity::fromSvg(":/media/resource/images/pause-512px.svg"))
-    , play(Identity::fromSvg(":/media/resource/images/play-512px.svg"))
-    , run(new QAction(pause, Application::identity()->tr("pause", "FEMViewer"),toolbox))
-    , stop(new QAction(Identity::fromSvg(":/media/resource/images/stop-512px.svg"), Application::identity()->tr("stop", "FEMViewer"),toolbox))
+    , toolbox(new ToolBar(femWidget, this))
 {
     femWidget->setVisible(false);
     femWidget->move(0,0);
@@ -36,69 +30,11 @@ FEMViewer::FEMViewer(QWidget* parent)
     femWidget->installEventFilter(this);
 
     toolbox->move(0,0);
-    toolbox->setAutoFillBackground(true);
-    toolbox->setVisible(false);
-    toolbox->layout()->setMargin(0);
-
-    magnitude->setValue(femWidget->getAnimationOptions()->getMagnitude());
-    connect(magnitude, SIGNAL(valueChanged(double)), femWidget, SLOT(setMagnitude(double)));
-    connect(femWidget, SIGNAL(magnitudeChanged(double)), magnitude, SLOT(setValue(double)));
-    toolbox->addWidget(magnitude);
-
-    toolbox->addSeparator();
-
-    frequency->setValue(femWidget->getAnimationOptions()->getFrequency());
-    connect(frequency, SIGNAL(valueChanged(double)), femWidget, SLOT(setFrequency(double)));
-    connect(frequency, SIGNAL(valueChanged(double)), this, SLOT(runEnable()));
-    connect(femWidget, SIGNAL(frequencyChanged(double)), frequency, SLOT(setValue(double)));
-    toolbox->addWidget(frequency);
-
-    toolbox->addSeparator();
-
-    connect(mode, SIGNAL(valueChanged(int)), femWidget, SLOT(setMode(int)));
-    connect(mode, &FEMViewerModeInput::valueChanged, [this](int i) { femWidget->colorize(i); });
-    toolbox->addWidget(mode);
-
-    toolbox->addSeparator();
-
-    stop->setCheckable(true);
-    run->setDisabled(true);
-    stop->setDisabled(true);
-    toolbox->addActions(QList<QAction*>() << run << stop);
-    this->connect(run, SIGNAL(triggered(bool)), SLOT(runTrigger()));
-    this->connect(stop, SIGNAL(toggled(bool)), SLOT(stopTrigger(bool)));
-
     toolbox->adjustSize();
 }
 
 FEMViewer::~FEMViewer()
 {
-}
-
-void FEMViewer::runTrigger()
-{
-    if (femWidget->getAnimationOptions()->isPaused()) {
-        femWidget->getAnimationOptions()->play();
-        run->setText(Application::identity()->tr("play", "FEMViewer"));
-        run->setIcon(pause);
-    } else {
-        femWidget->getAnimationOptions()->pause();
-        run->setText(Application::identity()->tr("pause", "FEMViewer"));
-        run->setIcon(play);
-    }
-}
-void FEMViewer::runEnable()
-{
-    if (femWidget->getAnimationOptions()->isPaused()) {
-        femWidget->getAnimationOptions()->play();
-        run->setIcon(pause);
-    }
-}
-
-void FEMViewer::stopTrigger(bool v)
-{
-    run->setDisabled(v);
-    femWidget->getAnimationOptions()->setMagnitude(magnitude->getValue() * !v);
 }
 
 QSize FEMViewer::sizeHint() const
@@ -122,6 +58,7 @@ void FEMViewer::leaveEvent(QEvent *)
 void FEMViewer::resizeEvent(QResizeEvent *)
 {
     toolbox->resize(this->size().width(), toolbox->height());
+    femWidget->move(0,0);
     femWidget->resize(this->size());
 }
 
@@ -146,21 +83,12 @@ void FEMViewer::setModel(const FEM* m) const
 
 void FEMViewer::setMode(const int m)
 {
-    updateToolBar();
-    mode->setValue(m);
+    toolbox->setMode(m);
 }
 
 void FEMViewer::updateToolBar() const
 {
-    mode->updateValueBounds();
-    bool isHaveModes(false);
-    for (const FEM* i : femWidget->getData()) {
-        isHaveModes = isHaveModes || (i && !i->getModes().empty());
-    }
-    frequency->setEnabled(isHaveModes);
-    magnitude->setEnabled(isHaveModes);
-    run->setEnabled(isHaveModes);
-    stop->setEnabled(isHaveModes);
+    toolbox->refresh();
 }
 
 void FEMViewer::colorize(int m)
@@ -179,10 +107,6 @@ const FEM* FEMViewer::getModel() const
 
 void FEMViewer::setProxyMode(const EigenMode& m)
 {
-    mode->hide();
     femWidget->setProxyMode(m);
-    frequency->setEnabled(true);
-    magnitude->setEnabled(true);
-    run->setEnabled(true);
-    stop->setEnabled(true);
+    toolbox->setProxyModeState();
 }

@@ -6,7 +6,7 @@
 
 class QSlider;
 
-class FEMViewer::FEMViewerMagnitudeInput : public QFrame
+class MagnitudeInput : public QFrame
 {
     Q_OBJECT
 
@@ -15,8 +15,8 @@ class FEMViewer::FEMViewerMagnitudeInput : public QFrame
     void changeEvent(QEvent *);
     void resizeEvent(QResizeEvent*);
 public:
-    explicit FEMViewerMagnitudeInput(QWidget *parent = 0);
-    ~FEMViewerMagnitudeInput();
+    explicit MagnitudeInput(QWidget *parent = 0);
+    ~MagnitudeInput();
 
     double getValue() const;
 signals:

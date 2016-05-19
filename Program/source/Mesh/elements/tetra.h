@@ -12,6 +12,7 @@ class Tetra : public FinitElement
     quint32* midside;
 public:
     Tetra();
+    Tetra(const Tetra&);
     Tetra(quint32 n1, quint32 n2, quint32 n3, quint32 n4);
     ~Tetra() { delete[] midside; }
 

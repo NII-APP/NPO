@@ -1,4 +1,4 @@
-#include "femviewerfrequencyinput.h"
+#include "frequencyinput.h"
 #include <QDoubleSpinBox>
 #include <QSlider>
 #include <QHBoxLayout>
@@ -9,11 +9,11 @@
 #include "application.h"
 #include "identity.h"
 
-const FEMViewer::FEMViewerFrequencyInput::ToRealScale FEMViewer::FEMViewerFrequencyInput::SLIDER_SCALE =
-        FEMViewer::FEMViewerFrequencyInput::ToRealScale(FEMViewer::FEMViewerFrequencyInput::ToRealScale::InRange(0, 10000),
-                                             FEMViewer::FEMViewerFrequencyInput::ToRealScale::OutRange(0.2, 5.0));
+const FrequencyInput::ToRealScale FrequencyInput::SLIDER_SCALE =
+        FrequencyInput::ToRealScale(FrequencyInput::ToRealScale::InRange(0, 10000),
+                                             FrequencyInput::ToRealScale::OutRange(0.2, 5.0));
 
-FEMViewer::FEMViewerFrequencyInput::FEMViewerFrequencyInput(QWidget* parent)
+FrequencyInput::FrequencyInput(QWidget* parent)
     : QFrame(parent)
     , numeric(new QDoubleSpinBox(this))
     , slider(new QSlider(Qt::Horizontal, this)) {
@@ -43,15 +43,15 @@ FEMViewer::FEMViewerFrequencyInput::FEMViewerFrequencyInput(QWidget* parent)
     this->setEnabled(false);
 }
 
-FEMViewer::FEMViewerFrequencyInput::~FEMViewerFrequencyInput()
+FrequencyInput::~FrequencyInput()
 {
 }
 
-void FEMViewer::FEMViewerFrequencyInput::setValue(double v) {
+void FrequencyInput::setValue(double v) {
     numeric->setValue(v);
 }
 
-void FEMViewer::FEMViewerFrequencyInput::holdSlider(int v) {
+void FrequencyInput::holdSlider(int v) {
     if (SLIDER_SCALE(v) != numeric->value()) {
         numeric->blockSignals(true);
         numeric->setValue(SLIDER_SCALE(v));
@@ -60,7 +60,7 @@ void FEMViewer::FEMViewerFrequencyInput::holdSlider(int v) {
     }
 }
 
-void FEMViewer::FEMViewerFrequencyInput::holdSpinner(double v) {
+void FrequencyInput::holdSpinner(double v) {
     if (SLIDER_SCALE[v] != slider->value()) {
         slider->blockSignals(true);
         slider->setValue(SLIDER_SCALE[v]);
@@ -70,7 +70,7 @@ void FEMViewer::FEMViewerFrequencyInput::holdSpinner(double v) {
 }
 
 
-void FEMViewer::FEMViewerFrequencyInput::changeEvent(QEvent * e) {
+void FrequencyInput::changeEvent(QEvent * e) {
     if (e->type() == QEvent::EnabledChange) {
         for (auto& i : this->children()) {
             if (dynamic_cast<QWidget*>(i)) {

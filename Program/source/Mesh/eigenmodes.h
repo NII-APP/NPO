@@ -17,10 +17,8 @@ class EigenModes : public std::vector<EigenMode>
 
     static int findNext(CParse &i);//Just for readCRD()
 
-    class MacAsyncEngine;
 public:
     EigenModes();
-    EigenModes(const EigenModes&);
 
     const CMatrix& getMAC() const;
 

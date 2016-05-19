@@ -17,19 +17,22 @@ ModelsPicker::ModelsPicker(QWidget *parent)
 
     auto update = [this](QComboBox* const w2, QComboBox* const w1){
         w1->blockSignals(true);
-        int cur(w1->currentIndex());
+        int cur(w1->currentData().toInt());
         while (w1->count()) {
             w1->removeItem(0);
         }
         int j(1);
         for (const FEM* const i : Application::project()->FEMList()) {
-            if (i->getName() != w2->currentText()) {
+            if (j != w2->currentData().toInt()) {
                 w1->insertItem(w1->count(), i->getName(), QVariant(j));
             }
             ++j;
         }
-        w1->setCurrentIndex(cur);
+        w1->setCurrentIndex(cur - 1 - (cur > w2->currentData().toInt()));
         w1->blockSignals(false);
+#ifndef QT_NO_DEBUG
+        qDebug() << "picked new modesPair" << (a() ? a()->getName() : "null") << (b() ? b()->getName() : "null");
+#endif
         emit modelsPicked(std::pair<const FEM*, const FEM*>(a(), b()));
     };
     update(first, second);
@@ -59,24 +62,20 @@ const FEM* ModelsPicker::b()
 
 void ModelsPicker::setPick(const std::pair<const FEM*, const FEM*>& p)
 {
-    int a(-1);
-    int b(-1);
     int i(0);
+    bool k(0);
     Project::ConstModels l(Application::project()->FEMList());
-    while ((a < 0 || b < 0) && i < l.size()) {
+    while (i < l.size()) {
         if (l[i] == p.first) {
-            a = i;
+            first->setCurrentIndex(i - k);
+            ++k;
         }
         if (l[i] == p.second) {
-            b = i;
+            second->setCurrentIndex(i - k);
+            ++k;
         }
         ++i;
     }
-    assert(a >= 0 && b >= 0);
-    first->blockSignals(true);
-    first->setCurrentIndex(a);
-    first->blockSignals(false);
-    second->setCurrentIndex(b);
 }
 
 ModelsPicker::~ModelsPicker()

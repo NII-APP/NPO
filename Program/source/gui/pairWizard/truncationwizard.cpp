@@ -43,7 +43,12 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     scale->setChecked(true);
     leftSide->layout()->addWidget(scale);
     static_cast<QVBoxLayout*>(leftSide->layout())->addWidget(relations, 200);
-    leftSide->layout()->addWidget(new QPushButton(Application::identity()->tr("reset relations", "pair wizard"), leftSide));
+    QPushButton* const resetRelations(new QPushButton(Application::identity()->tr("reset relations", "pair wizard"), leftSide));
+    connect(resetRelations, &QPushButton::clicked, [this]() {
+        result->calculateRelations();
+        relations->scarfUpRelations();
+    });
+    leftSide->layout()->addWidget(resetRelations);
     base->addWidget(leftSide);
     base->addWidget(viewer);
     base->setSizes(QList<int>() << 300 << 1000);

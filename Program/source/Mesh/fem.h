@@ -87,7 +87,11 @@ private:
     void scarfUp(PyParse::BDFEntity &entity);
 protected:
     //coordinate systems. firest is the ordering number of coordinate system, second is correspond coordinate system
-    typedef QMap<int, CCoordinateSystem*> CoordinateSystems;
+    struct CoordinateSystems : public QMap<int, CCoordinateSystem*> {
+        CoordinateSystems() {}
+        CoordinateSystems(const CoordinateSystems& cpy);
+        ~CoordinateSystems();
+    };
     CoordinateSystems systems;
 
     size_t sizeOf();
@@ -98,9 +102,8 @@ protected:
 public:
     FEM();
     FEM(const QString& fileName);
-    FEM(const FEM& g);
     virtual bool read(const QString &fileName);
-    virtual ~FEM();
+    virtual ~FEM() { }
 
     virtual QString getName() const;
     virtual void setName(const QString&);

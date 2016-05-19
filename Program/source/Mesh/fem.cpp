@@ -32,31 +32,19 @@ FEM::FEM(const QString& fileName) : modelType(Undefined) {
     read(fileName);
 }
 
-FEM::FEM(const FEM& g)
-    : modelType(g.modelType)
-    , vertexes(g.vertexes)
-    , trace(g.trace)
-    , sqre(g.sqre)
-    , isTraced(g.isTraced)
-    , file(g.file)
-    , name(g.name)
-    , sections(g.sections)
-    , materials(g.materials)
-    , UNVTransformations(g.UNVTransformations)
-    , modes(g.modes)
-    , linksPoint(g.linksPoint)
-    , linksSolution(g.linksSolution)
-    , constraints(g.constraints)
-    , superElementsId(g.superElementsId)
-    , constrains(g.constrains)
+FEM::CoordinateSystems::CoordinateSystems(const CoordinateSystems& cpy)
 {
-    CoordinateSystems::const_iterator i(g.systems.begin());
-    CoordinateSystems::const_iterator end2(g.systems.end());
-    while (i != end2) {
-        systems.insert(i.key(), i.value()->clone());
+    CoordinateSystems::const_iterator i(cpy.begin());
+    CoordinateSystems::const_iterator end(cpy.end());
+    while (i != end) {
+        insert(i.key(), i.value() ? i.value()->clone() : nullptr);
         ++i;
     }
+}
 
+FEM::CoordinateSystems::~CoordinateSystems()
+{
+    qDeleteAll(*this);
 }
 
 bool FEM::read(const QString &fileName) {
@@ -93,10 +81,6 @@ bool FEM::read(const QString &fileName) {
     }
 
     return false;
-}
-
-FEM::~FEM() {
-    qDeleteAll(systems);
 }
 
 QString FEM::getName() const
@@ -807,6 +791,10 @@ CIndexes FEM::truncationIndexVector(const FEM& a, const FEM& b)
 }
 
 FEM* FEM::truncation(const FEM& a, const FEM& b) {
+#ifndef QT_NO_DEBUG
+    qDebug() << "\ttruncation";
+    const QTime begin(QTime::currentTime());
+#endif
     //first step consist of solution of one question. We must to deside whitch of models must be truncated.
     //Hi-vertexes model must be truncated to low-vertexes model obvuisly.
     const FEM& forTruncation(a.vertexes.size() > b.vertexes.size() ? a : b);
@@ -824,7 +812,15 @@ FEM* FEM::truncation(const FEM& a, const FEM& b) {
         return result;
     }
     //select vertexes in  the first mech form which will be associate with the second mech form
+#ifndef QT_NO_DEBUG
+    qDebug() << "\t\tInitialization delay" << begin.msecsTo(QTime::currentTime());
+    const QTime interrelationsBegin(QTime::currentTime());
+#endif
     CIndexes interrelations(FEM::truncationIndexVector(forTruncation, base));
+#ifndef QT_NO_DEBUG
+    qDebug() << "\t\tInterrelations delay" << interrelationsBegin.msecsTo(QTime::currentTime());
+    const QTime modesBegin(QTime::currentTime());
+#endif
 
     //and now just copy the form values from theory
     // a.form.size()
@@ -842,8 +838,15 @@ FEM* FEM::truncation(const FEM& a, const FEM& b) {
         receiver->updateExtremums();
         receiver->updatePreMac();
     }
+#ifndef QT_NO_DEBUG
+    qDebug() << "\t\tModes delay" << modesBegin.msecsTo(QTime::currentTime());
+#endif
 
     result->modes.estimateAutoMAC();
+#ifndef QT_NO_DEBUG
+    qDebug() << "\t\tAutoMAC delay" << modesBegin.msecsTo(QTime::currentTime());
+    qDebug() << "\tdelay" << begin.msecsTo(QTime::currentTime());
+#endif
 
     return result;
 }

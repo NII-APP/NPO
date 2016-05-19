@@ -1,4 +1,4 @@
-#include "femviewermodeinput.h"
+#include "modeinput.h"
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSpinBox>
@@ -10,8 +10,9 @@
 
 #include "application.h"
 #include "identity.h"
+#include "femwidget.h"
 
-FEMViewer::FEMViewerModeInput::FEMViewerModeInput(FEMViewer *viewer, QWidget* parent)
+ModeInput::ModeInput(FEMWidget *viewer, QWidget* parent)
     : QFrame(parent)
     , parentViewer(viewer)
     , hzValue(new QLabel(this))
@@ -27,15 +28,13 @@ FEMViewer::FEMViewerModeInput::FEMViewerModeInput(FEMViewer *viewer, QWidget* pa
     updateValueBounds(0);
 }
 
-FEMViewer::FEMViewerModeInput::~FEMViewerModeInput()
-{
-}
+ModeInput::~ModeInput() { }
 
-
-void FEMViewer::FEMViewerModeInput::holdValue(int v) {
+void ModeInput::holdValue(int v) {
     try {
-        if (static_cast<FEMViewer*>(this->parentViewer)->getModel()) {
-            hzValue->setText(("%1 " + Application::identity()->tr("hertz")).arg(static_cast<FEMViewer*>(this->parentViewer)->getModel()->getModes().at(v - 1).frequency()));
+        const QList<const FEM*> models(parentViewer->getData());
+        if (models.size() == 1) {
+            hzValue->setText(("%1 " + Application::identity()->tr("hertz")).arg(models.first()->getModes().at(v - 1).frequency()));
             emit valueChanged(getValue());
         } else {
             throw std::exception();
@@ -45,12 +44,15 @@ void FEMViewer::FEMViewerModeInput::holdValue(int v) {
     }
 }
 
-void FEMViewer::FEMViewerModeInput::updateValueBounds() {
-    const FEM* const m(static_cast<FEMViewer*>(this->parentViewer)->getModel());
-    updateValueBounds(m ? static_cast<int>(m->getModes().size()) : 0);
+void ModeInput::updateValueBounds() {
+    const QList<const FEM*> models(parentViewer->getData());
+    if (models.size() == 1) {
+        const FEM* const m(models.first());
+        updateValueBounds(m ? static_cast<int>(m->getModes().size()) : 0);
+    }
 }
 
-void FEMViewer::FEMViewerModeInput::updateValueBounds(int modesCount) {
+void ModeInput::updateValueBounds(int modesCount) {
     if (modesCount <= 0) {
         this->setDisabled(true);
     } else {
@@ -61,17 +63,17 @@ void FEMViewer::FEMViewerModeInput::updateValueBounds(int modesCount) {
 
 }
 
-void FEMViewer::FEMViewerModeInput::changeEvent(QEvent * e) {
+void ModeInput::changeEvent(QEvent * e) {
     if (e->type() == QEvent::EnabledChange) {
         value->setEnabled(this->isEnabled());
         hzValue->setEnabled(this->isEnabled());
     }
 }
 
-int FEMViewer::FEMViewerModeInput::getValue() const {
+int ModeInput::getValue() const {
     return value->value() - 1;
 }
-void FEMViewer::FEMViewerModeInput::setValue(int value) {
+void ModeInput::setValue(int value) {
     this->value->setValue(value + 1);
     emit valueChanged(getValue());
 }

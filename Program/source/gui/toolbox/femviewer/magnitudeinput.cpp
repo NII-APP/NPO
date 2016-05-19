@@ -1,4 +1,4 @@
-#include "femviewermagnitudeinput.h"
+#include "magnitudeinput.h"
 
 #include <cassert>
 #include <QSlider>
@@ -17,7 +17,7 @@ typedef CScale<int, double> ToRealScale;
 static const ToRealScale SLIDER_SCALE = ToRealScale(ToRealScale::InRange(0, 1000), ToRealScale::OutRange(-5.0, 5.0));
 }
 
-FEMViewer::FEMViewerMagnitudeInput::FEMViewerMagnitudeInput(QWidget *parent)
+MagnitudeInput::MagnitudeInput(QWidget *parent)
     : QFrame(parent)
     , slider(new QSlider(Qt::Horizontal, this))
 {
@@ -43,16 +43,16 @@ FEMViewer::FEMViewerMagnitudeInput::FEMViewerMagnitudeInput(QWidget *parent)
     this->setDisabled(true);
 }
 
-FEMViewer::FEMViewerMagnitudeInput::~FEMViewerMagnitudeInput()
+MagnitudeInput::~MagnitudeInput()
 {
 }
 
-void FEMViewer::FEMViewerMagnitudeInput::resizeEvent(QResizeEvent* e)
+void MagnitudeInput::resizeEvent(QResizeEvent* e)
 {
     QFrame::resizeEvent(e);
 }
 
-void FEMViewer::FEMViewerMagnitudeInput::changeEvent(QEvent * e) {
+void MagnitudeInput::changeEvent(QEvent * e) {
     if (e->type() == QEvent::EnabledChange) {
         for (auto& i : this->children()) {
             if (dynamic_cast<QWidget*>(i)) {
@@ -62,14 +62,14 @@ void FEMViewer::FEMViewerMagnitudeInput::changeEvent(QEvent * e) {
     }
 }
 
-double FEMViewer::FEMViewerMagnitudeInput::getValue() const {
+double MagnitudeInput::getValue() const {
     return SLIDER_SCALE(slider->value());
 }
 
-void FEMViewer::FEMViewerMagnitudeInput::setValue(double val) {
+void MagnitudeInput::setValue(double val) {
     slider->setValue(SLIDER_SCALE[val]);
 }
 
-void FEMViewer::FEMViewerMagnitudeInput::holdSlider(int val) {
+void MagnitudeInput::holdSlider(int val) {
     emit valueChanged(SLIDER_SCALE(val));
 }

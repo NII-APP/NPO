@@ -2,10 +2,33 @@
 
 #include <eigenmodes.h>
 
+namespace {
+
+typedef std::pair<int, int> MatrixPos;
+MatrixPos findMaxWithConstrains(const CMatrix& m, const QBitArray& firstConstrain, const QBitArray& secondConstrain)
+{
+    MatrixPos rez(-1, -1);
+    for (int i(0); i != m.height(); ++i) if (!firstConstrain.testBit(i)) {
+        for (int j(0); j != m.width(); ++j) if (!secondConstrain.testBit(j)) {
+            if (rez == MatrixPos(-1, -1) || m[rez.first][rez.second] < m[i][j]) {
+                rez = MatrixPos(i, j);
+            }
+        }
+    }
+    return rez;
+}
+
+}
+
 FEMPair::FEMPair(const FEM *b, const FEM *a, bool align, bool scale)
     : first(new FEM(*b))
     , second(new FEM(*a))
+    , trunc(nullptr)
 {
+#ifndef QT_NO_DEBUG
+    qDebug() << "construct pair" << a << b;
+    QTime begin(QTime::currentTime());
+#endif
     if (align) {
         first->alignZero();
         second->alignZero();
@@ -15,39 +38,32 @@ FEMPair::FEMPair(const FEM *b, const FEM *a, bool align, bool scale)
     }
     trunc = FEM::truncation(*updater(), *underUpdate());
     //estimate macMatrix
-    makeMac(first->getModes(), trunc->getModes());
+    makeMac(underUpdate()->getModes(), trunc->getModes());
 
+    calculateRelations();
+#ifndef QT_NO_DEBUG
+    qDebug() << "construct pair delay" << begin.msecsTo(QTime::currentTime()) << "ms";
+#endif
+}
+
+void FEMPair::calculateRelations()
+{
     //estimate relations
     relation.clear();
     relation.resize(macMatrix.height(),-1);
     size_t minForm(std::min(macMatrix.width(), macMatrix.height()));
-    QBitArray taked;
-    QBitArray taked2;
-    taked.fill(false, static_cast<int>(macMatrix.width()));
-    taked2.fill(false, static_cast<int>(macMatrix.height()));
-    int max(-1), max2(-1);
-    for (int kontrol(0); kontrol != relation.size(); ++kontrol)
-    {
-        for (int i = 0; i != minForm; ++i) {
-            if (!taked2.testBit(i)) {
-                for (int j = 0; j != std::min(macMatrix.width(), macMatrix.height()); ++j) {
-                    if (!taked.testBit(j)) {
-                        if (max == -1 || max2 == -1 || macMatrix[max2][max] < macMatrix[i][j]) {
-                            max = j;max2 = i;
-                        }
-                    }
-                }
-            }
-        }
-        if (max == -1) continue;
-
-        relation[max] = max2;
-        taked2.setBit(max2);
-        taked.setBit(max);
-        max = -1; max2 = -1;
+    QBitArray taked(static_cast<int>(macMatrix.height()), false);
+    QBitArray taked2(static_cast<int>(macMatrix.width()), false);
+    for (int kontrol(0); kontrol != minForm; ++kontrol) {
+        const MatrixPos max(findMaxWithConstrains(macMatrix, taked, taked2));
+        relation[max.first] = max.second;
+        taked.setBit(max.first);
+        taked2.setBit(max.second);
     }
 }
-FEMPair::~FEMPair() {
+
+FEMPair::~FEMPair()
+{
     delete first;
     delete second;
     delete trunc;
@@ -63,7 +79,7 @@ void FEMPair::makeMac(const EigenModes &practic, const EigenModes &trunc)
     }
 }
 
-void FEMPair::makeMac(const FEMPair::Relation& r)
+void FEMPair::makeMac(const CIndexes& r)
 {
     size_t relationLength = 0;
     for (size_t i = 0; i < r.size(); ++i) {

@@ -1,11 +1,15 @@
 #include "relationdialog.h"
+
+#include <cassert>
 #include <QHBoxLayout>
 #include <QEvent>
 #include <QMouseEvent>
 #include <QDir>
+
 #include "application.h"
 #include "identity.h"
 #include "gui/toolbox/femviewer/popupmode.h"
+
 
 RelationDialog::RelationDialog(QWidget *parent)
   : QWidget(parent)
@@ -15,8 +19,8 @@ RelationDialog::RelationDialog(QWidget *parent)
   , leftL(0)
   , rightL(0)
   , maxW(0)
-  , leftP(nullptr)//new PopupMode(this))
-  , rightP(nullptr)//new PopupMode(this))
+  , leftP(new PopupMode)
+  , rightP(new PopupMode)
   , title1(new QLabel(this))
   , title2(new QLabel(this))
   , underToggle(-1)
@@ -55,13 +59,50 @@ void RelationDialog::setPair(FEMPair *p)
     this->setPalette(palette);
     this->setMouseTracking(true);
 
-    if (relation().size() != leftL.size()) {
-        relation().resize(leftL.size());
-        for (int i(0); i < static_cast<int>(relation().size()); ++i) {
-            relation()[i] = rightL.size() > i ? i : -1;
-        }
+    scarfUpRelations();
+}
+
+CIndexes RelationDialog::inverseRelations(const CIndexes& v, int newSize)
+{
+#ifndef QT_NO_DEBUG
+    assert(*std::max_element(v.begin(), v.end()) <= newSize);
+#endif
+    CIndexes r(newSize, -1);
+    for (size_t i(0); i != v.size(); ++i) if (v[i] >= 0) {
+        r[v[i]] = i;
+    }
+    return r;
+}
+
+CIndexes RelationDialog::belchRelations() const
+{
+    if (pair == nullptr) {
+        return CIndexes();
+    }
+    if (pair->a() != pair->updater()) {
+        return inverseRelations(relation, static_cast<int>(pair->updater()->getModes().size()));
+    } else {
+        return relation;
+    }
+}
+
+void RelationDialog::scarfUpRelations()
+{
+    if (pair == nullptr) {
+        return;
+    }
+    if (pair->a() != pair->updater()) {
+        relation = inverseRelations(pair->relations(), static_cast<int>(pair->a()->getModes().size()));
+    } else {
+        relation = pair->relations();
     }
     bgUpdate();
+}
+
+RelationDialog::~RelationDialog()
+{
+    leftP->deleteLater();
+    rightP->deleteLater();
 }
 
 void RelationDialog::bgUpdate()
@@ -70,8 +111,8 @@ void RelationDialog::bgUpdate()
         rightL[i]->setBackgroundRole(QPalette::Dark);
     }
     for (int i(0); i != leftL.size(); ++i) {
-        if (relation()[i] >= 0) {
-            rightL[relation()[i]]->setBackgroundRole(QPalette::Light);
+        if (relation[i] >= 0) {
+            rightL[relation[i]]->setBackgroundRole(QPalette::Light);
             leftL[i]->setBackgroundRole(QPalette::Light);
         } else {
             leftL[i]->setBackgroundRole(QPalette::Dark);
@@ -102,6 +143,9 @@ void RelationDialog::buildLabels(Labels &lbls, const FEM& g)
         if (maxW < l->sizeHint().width())
             maxW = l->sizeHint().width();
     }
+
+    leftP->resize(maxW, maxW);
+    rightP->resize(maxW, maxW);
 
     renderLabels();
 }
@@ -143,26 +187,20 @@ void RelationDialog::showForm(QObject* s)
         wgt = leftL[d = i];
     }
     if (wgt) {
-        PopupMode* popup(new PopupMode);
-        popup->move(this->mapToGlobal(QPoint(0,0)) + wgt->geometry().bottomLeft());
-        popup->setModel(pair->a());
-        popup->resize(maxW, maxW);
-        popup->setMode(d);
-        popup->show();
-        connect(popup, &PopupMode::closed, popup, &QObject::deleteLater);
+        leftP->move(this->mapToGlobal(QPoint(0,0)) + wgt->geometry().bottomLeft());
+        leftP->setModel(pair->a());
+        leftP->setMode(d);
+        leftP->show();
         return;
     }
     for (i = 0; i != rightL.size(); ++i) if (rightL[i] == s) {
         wgt = rightL[d = i];
     }
     if (wgt) {
-        PopupMode* popup(new PopupMode);
-        popup->move(this->mapToGlobal(QPoint(0,0)) + wgt->geometry().bottomLeft());
-        popup->setModel(pair->b());
-        popup->resize(maxW, maxW);
-        popup->setMode(d);
-        popup->show();
-        connect(popup, &PopupMode::closed, popup, &QObject::deleteLater);
+        rightP->move(this->mapToGlobal(QPoint(0,0)) + wgt->geometry().bottomLeft());
+        rightP->setModel(pair->b());
+        rightP->setMode(d);
+        rightP->show();
         return;
     }
 }
@@ -193,12 +231,12 @@ void RelationDialog::paintEvent(QPaintEvent *)
     p.setPen(pen);
     //p.fillRect(this->rect(), QColor(rand() % 0x100, rand() % 0x100, rand() % 0x100));
     p.fillRect(this->rect(), QColor(0xF0, 0xF0, 0xF0));
-    for (int i = 0; i != relation().size(); ++i)
+    for (int i = 0; i != relation.size(); ++i)
     {
-        if (relation()[i] >= 0)
+        if (relation[i] >= 0)
         {
             p.drawLine(this->contentsMargins().left() + maxW + 24, leftCapacity * (i + .5f) + 20,
-                       this->width() - this->contentsMargins().right() - maxW - 24, rightCapacity * (relation()[i] + .5f) + 20);
+                       this->width() - this->contentsMargins().right() - maxW - 24, rightCapacity * (relation[i] + .5f) + 20);
         }
     }
     pen.setColor(QColor(0x88,0xFF, 0x88));
@@ -272,6 +310,12 @@ void RelationDialog::updateLines()
               QPoint(rightL.last()->geometry().left(), (leftCapacity > rightCapacity ? rightL : leftL).last()->geometry().bottom())));
 }
 
+void RelationDialog::emitRelationsUpdated()
+{
+    pair->setRelations(belchRelations());
+    emit relationsUpdated(pair->relations());
+}
+
 void RelationDialog::mousePressEvent(QMouseEvent *)
 {
     if (underToggle >= 0 && lineingState < 0)
@@ -279,37 +323,37 @@ void RelationDialog::mousePressEvent(QMouseEvent *)
         lineingState = underToggle;
         lineingLeft = underLeftToggle;
         if (underLeftToggle) {
-            relation()[underToggle] = -1;
+            relation[underToggle] = -1;
             source = QPoint(this->contentsMargins().left() + maxW + 24, leftCapacity * (underToggle + .5f) + 20);
         } else {
-            FEMPair::Relation::iterator elem(qFind(relation().begin(), relation().end(), underToggle));
-            if (elem != relation().end())
+            CIndexes::iterator elem(qFind(relation.begin(), relation.end(), underToggle));
+            if (elem != relation.end())
                 *elem = -1;
             source = QPoint(this->width() - this->contentsMargins().right() - maxW - 24, rightCapacity * (underToggle + .5f) + 20);
         }
-        emit updateMac(relation());
+        emitRelationsUpdated();
     }
     else if (underToggle >= 0 && underLeftToggle != lineingLeft)
     {
         if (underLeftToggle)
         {
-            relation()[underToggle] = lineingState;
+            relation[underToggle] = lineingState;
         }
         else
         {
-            FEMPair::Relation::iterator esc(qFind(relation().begin(), relation().end(), underToggle));
-            if (esc != relation().end())
+            CIndexes::iterator esc(qFind(relation.begin(), relation.end(), underToggle));
+            if (esc != relation.end())
                 *esc = -1;
-            relation()[lineingState] = underToggle;
+            relation[lineingState] = underToggle;
         }
         lineingState = -1;
 
-        emit updateMac(relation());
+        emitRelationsUpdated();
     }
     else if (lineingState >= 0)
     {
         lineingState = -1;
-        emit updateMac(relation());
+        emitRelationsUpdated();
     }
 
     bgUpdate();
