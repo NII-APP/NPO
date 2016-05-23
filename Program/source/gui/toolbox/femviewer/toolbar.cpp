@@ -99,6 +99,11 @@ void ToolBar::setProxyModeState()
     stop->setEnabled(true);
 }
 
+ModeInput* ToolBar::modeInput()
+{
+    return mode;
+}
+
 ToolBar::~ToolBar()
 {
 

@@ -4,6 +4,7 @@
 
 Material::Material(Type t)
     : type(t)
+    , values(t == MAT1 ? MAT1_IndexesCount : MAT9_IndexesCount, std::numeric_limits<double>::quiet_NaN())
 {
 
 }

@@ -1,28 +1,21 @@
 #ifndef FEMVIEWER_H
 #define FEMVIEWER_H
 
-#include <QWidget>
-#include <QIcon>
+#include "femscreen.h"
 
 class QToolBar;
 class FEMWidget;
 class FEMPair;
 class EigenMode;
+class ToolBar;
 
-class FEMPairViewer : public QWidget
+class FEMPairViewer : public FEMScreen
 {
-    void resizeEvent(QResizeEvent *);
 public:
     FEMPairViewer(QWidget* parent = 0);
 
     void setPair(const FEMPair*);
     void setMode(const int v);
-
-    QSize minimumSizeHint();
-
-private:
-    FEMWidget* const screen;
-    const FEMPair* data;
 };
 
 

@@ -797,11 +797,11 @@ FEM* FEM::truncation(const FEM& a, const FEM& b) {
 #endif
     //first step consist of solution of one question. We must to deside whitch of models must be truncated.
     //Hi-vertexes model must be truncated to low-vertexes model obvuisly.
-    const FEM& forTruncation(a.vertexes.size() > b.vertexes.size() ? a : b);
-    const FEM& base         (a.vertexes.size() < b.vertexes.size() ? a : b);
-    //Afer thet we may be shure in one statement: forTruncation.vertexes.size() < base.vertexes.size()
-    //make copy from the base geometry.
-    FEM* result = new FEM(base);
+    const FEM& theory   (a.vertexes.size() > b.vertexes.size() ? a : b);
+    const FEM& practical(a.vertexes.size() < b.vertexes.size() ? a : b);
+    //Afer thet we may be shure in one statement: theory.vertexes.size() < practical.vertexes.size()
+    //make copy from the practical geometry.
+    FEM* result = new FEM(practical);
     //then set up the name and filename no signe the model as a result of truncation
     result->name = "truncated(" + a.name + " x " + b.name + ")";
     result->file = "truncated";
@@ -816,7 +816,7 @@ FEM* FEM::truncation(const FEM& a, const FEM& b) {
     qDebug() << "\t\tInitialization delay" << begin.msecsTo(QTime::currentTime());
     const QTime interrelationsBegin(QTime::currentTime());
 #endif
-    CIndexes interrelations(FEM::truncationIndexVector(forTruncation, base));
+    CIndexes interrelations(FEM::truncationIndexVector(theory, practical));
 #ifndef QT_NO_DEBUG
     qDebug() << "\t\tInterrelations delay" << interrelationsBegin.msecsTo(QTime::currentTime());
     const QTime modesBegin(QTime::currentTime());
@@ -824,9 +824,9 @@ FEM* FEM::truncation(const FEM& a, const FEM& b) {
 
     //and now just copy the form values from theory
     // a.form.size()
-    result->modes.resize(forTruncation.modes.size());
+    result->modes.resize(theory.modes.size());
     EigenModes::iterator receiver(result->modes.begin());
-    for (EigenModes::const_iterator source(forTruncation.modes.begin()), end(forTruncation.modes.end()); source != end; ++source, ++receiver) {
+    for (EigenModes::const_iterator source(theory.modes.begin()), end(theory.modes.end()); source != end; ++source, ++receiver) {
         receiver->setFrequency(source->frequency());
         const CVertexes& theoryForm(source->form());
         CVertexes& truncatedForm(receiver->form());

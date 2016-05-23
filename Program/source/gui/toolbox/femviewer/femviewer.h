@@ -1,7 +1,7 @@
 #ifndef FEMVIEWER_H
 #define FEMVIEWER_H
 
-#include <QWidget>
+#include "femscreen.h"
 
 class FEMWidget;
 class FEM;
@@ -9,21 +9,9 @@ class QAction;
 class EigenMode;
 class ToolBar;
 
-class FEMViewer : public QWidget
+class FEMViewer : public FEMScreen
 {
     Q_OBJECT
-
-    FEMWidget* const femWidget;
-    ToolBar* const toolbox;
-
-    bool eventFilter(QObject *, QEvent *);
-
-    void resizeEvent(QResizeEvent*);
-    void leaveEvent(QEvent *);
-
-    void paintEvent(QPaintEvent *);
-
-    QSize sizeHint() const;
 public:
     struct FEMViewerState;
 

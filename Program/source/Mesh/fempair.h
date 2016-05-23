@@ -7,6 +7,7 @@
 
 class FEMPair
 {
+public:
 private:
     FEM* const first;
     FEM* const second;
@@ -31,7 +32,6 @@ public:
 
     void makeMac(const CIndexes &r);
     void makeMac(const EigenModes&, const EigenModes&);
-
 };
 
 #endif // FEMPAIR_H

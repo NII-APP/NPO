@@ -1,37 +1,45 @@
 #include "fempairviewer.h"
 
+#include <cassert>
+
+#include <QMouseEvent>
+#include <QLabel>
+#include <QResizeEvent>
+#include <QWidgetAction>
+
 #include "femwidget.h"
 #include "fempair.h"
+#include "toolbar.h"
+#include "modeinput.h"
+#include "relationmodeinput.h"
 
 FEMPairViewer::FEMPairViewer(QWidget* parent)
-    : QWidget(parent)
-    , screen(new FEMWidget(this))
+    : FEMScreen(parent)
 {
-    this->setMinimumWidth(100);
-}
-
-QSize FEMPairViewer::minimumSizeHint()
-{
-    return QSize(500,500);
+    //toolbox->modeInput()->hide();
+    for (QAction* i : toolbox->actions()) if (dynamic_cast<QWidgetAction*>(i)) {
+        if (dynamic_cast<QWidgetAction*>(i)->defaultWidget() == toolbox->modeInput()) {
+            toolbox->modeInput()->hide();
+            toolbox->insertWidget(i, new RelationModeInput(toolbox));
+            toolbox->removeAction(i);
+        }
+    }
+    assert(toolbox->modeInput()->isHidden());
 }
 
 void FEMPairViewer::setPair(const FEMPair* p)
 {
     qDebug() << "set FEM pair";
+    femWidget->setVisible(p);
     if (p == nullptr) {
-        screen->setData(nullptr);
+        femWidget->setData(nullptr);
         return;
     }
-    screen->setData(QList<const FEM*>() << p->underUpdate() << p->updater() << p->truncated());
+    femWidget->setData(QList<const FEM*>() << p->underUpdate() << p->updater() << p->truncated());
+    updateToolBar();
 }
 
 void FEMPairViewer::setMode(const int v)
 {
-    screen->setMode(v);
-}
-
-void FEMPairViewer::resizeEvent(QResizeEvent *)
-{
-    screen->move(QPoint(0,0));
-    screen->resize(this->size());
+    femWidget->setMode(v);
 }

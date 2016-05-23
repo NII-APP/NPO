@@ -29,7 +29,9 @@ HEADERS += $$PWD/*.h \
     $$PWD/gui/toolbox/femviewer/toolbar.h \
     $$PWD/gui/toolbox/femviewer/modeinput.h \
     $$PWD/gui/toolbox/femviewer/magnitudeinput.h \
-    $$PWD/gui/toolbox/femviewer/frequencyinput.h
+    $$PWD/gui/toolbox/femviewer/frequencyinput.h \
+    $$PWD/gui/toolbox/femviewer/femscreen.h \
+    $$PWD/gui/toolbox/femviewer/relationmodeinput.h
 SOURCES += $$PWD/*.cpp \
     $$PWD/gui/viewerTab/viewermodel.cpp \
     $$PWD/gui/viewerTab/viewertab.cpp \
@@ -55,4 +57,6 @@ SOURCES += $$PWD/*.cpp \
     $$PWD/gui/toolbox/femviewer/toolbar.cpp \
     $$PWD/gui/toolbox/femviewer/modeinput.cpp \
     $$PWD/gui/toolbox/femviewer/magnitudeinput.cpp \
-    $$PWD/gui/toolbox/femviewer/frequencyinput.cpp
+    $$PWD/gui/toolbox/femviewer/frequencyinput.cpp \
+    $$PWD/gui/toolbox/femviewer/femscreen.cpp \
+    $$PWD/gui/toolbox/femviewer/relationmodeinput.cpp

@@ -20,56 +20,12 @@
 #include "toolbar.h"
 
 FEMViewer::FEMViewer(QWidget* parent)
-    : QWidget(parent)
-    , femWidget(new FEMWidget(this))
-    , toolbox(new ToolBar(femWidget, this))
+    : FEMScreen(parent)
 {
-    femWidget->setVisible(false);
-    femWidget->move(0,0);
-    femWidget->setMouseTracking(true);
-    femWidget->installEventFilter(this);
-
-    toolbox->move(0,0);
-    toolbox->adjustSize();
 }
 
 FEMViewer::~FEMViewer()
 {
-}
-
-QSize FEMViewer::sizeHint() const
-{
-    return QSize(500,500);
-}
-
-bool FEMViewer::eventFilter(QObject * o, QEvent * e)
-{
-    if (o == femWidget && e->type() == QEvent::MouseMove) {
-        toolbox->setVisible(toolbox->geometry().contains(static_cast<QMouseEvent*>(e)->pos()));
-    }
-    return !true && !false;
-}
-
-void FEMViewer::leaveEvent(QEvent *)
-{
-    toolbox->setVisible(false);
-}
-
-void FEMViewer::resizeEvent(QResizeEvent *)
-{
-    toolbox->resize(this->size().width(), toolbox->height());
-    femWidget->move(0,0);
-    femWidget->resize(this->size());
-}
-
-void FEMViewer::paintEvent(QPaintEvent *)
-{
-    if (femWidget->isVisible()) {
-        return;
-    }
-    static const QPixmap bg(":/media/resource/images/hill.png");
-    QPainter painter(this);
-    painter.drawPixmap(QRect(QPoint(this->width() / 2.0 - bg.width() / 2.0, this->height() / 2.0 - bg.height() / 2.0), bg.size()), bg);
 }
 
 void FEMViewer::setModel(const FEM* m) const

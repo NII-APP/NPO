@@ -29,6 +29,7 @@ public:
     void refresh();
     void setProxyModeState();
     void setMode(const int);
+    ModeInput* modeInput();
 };
 
 #endif // TOOLBAR_H
