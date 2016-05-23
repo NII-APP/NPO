@@ -45,6 +45,7 @@ public:
 
 
     friend CVector operator*(const CVector&, const CMatrix&);
+    friend CVector operator*(const CVector&, const CMatrix&);
 
 #ifdef QT_VERSION
     friend QDebug operator<< (QDebug out, const CMatrix &obj);

@@ -24,8 +24,10 @@ public:
     FEMPair(const FEM *a, const FEM *b, bool align = true, bool scale = true);
     ~FEMPair();
 
-    const FEM* updater() const { return first->getNodes().size() > second->getNodes().size() ? first : second; }
-    const FEM* underUpdate() const { return first->getNodes().size() < second->getNodes().size() ? first : second; }
+    const FEM* theory() const { return first->getNodes().size() > second->getNodes().size() ? first : second; }
+    const FEM* practic() const { return first->getNodes().size() < second->getNodes().size() ? first : second; }
+    FEM* theory() { return first->getNodes().size() > second->getNodes().size() ? first : second; }
+    FEM* practic() { return first->getNodes().size() < second->getNodes().size() ? first : second; }
     const FEM* truncated() const { return trunc; }
     const FEM* a() const { return first; }
     const FEM* b() const { return second; }

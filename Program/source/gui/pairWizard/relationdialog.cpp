@@ -79,8 +79,8 @@ CIndexes RelationDialog::belchRelations() const
     if (pair == nullptr) {
         return CIndexes();
     }
-    if (pair->a() != pair->updater()) {
-        return inverseRelations(relation, static_cast<int>(pair->updater()->getModes().size()));
+    if (pair->a() != pair->theory()) {
+        return inverseRelations(relation, static_cast<int>(pair->theory()->getModes().size()));
     } else {
         return relation;
     }
@@ -91,7 +91,7 @@ void RelationDialog::scarfUpRelations()
     if (pair == nullptr) {
         return;
     }
-    if (pair->a() != pair->updater()) {
+    if (pair->a() != pair->theory()) {
         relation = inverseRelations(pair->relations(), static_cast<int>(pair->a()->getModes().size()));
     } else {
         relation = pair->relations();

@@ -35,7 +35,8 @@ void FEMPairViewer::setPair(const FEMPair* p)
         femWidget->setData(nullptr);
         return;
     }
-    femWidget->setData(QList<const FEM*>() << p->underUpdate() << p->updater() << p->truncated());
+
+    femWidget->setData(QList<const FEM*>() << p->practic() << p->theory() << p->truncated());
     updateToolBar();
 }
 

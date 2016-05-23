@@ -36,9 +36,9 @@ FEMPair::FEMPair(const FEM *b, const FEM *a, bool align, bool scale)
     if (scale) {
         second->scaleTo(first->box().size());
     }
-    trunc = FEM::truncation(*updater(), *underUpdate());
+    trunc = FEM::truncation(*theory(), *practic());
     //estimate macMatrix
-    makeMac(underUpdate()->getModes(), trunc->getModes());
+    makeMac(practic()->getModes(), trunc->getModes());
 
     calculateRelations();
 #ifndef QT_NO_DEBUG
