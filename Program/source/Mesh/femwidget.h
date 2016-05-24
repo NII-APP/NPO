@@ -25,12 +25,16 @@ private:
 
     AnimationOptions* animation;
 
+    QBitArray visible;
+
     void wheelEvent(QWheelEvent * event);
 
     //measurment of value which presented as color
     QString measurment;
 
     static const QRgb DEFAULT_COLOR;
+
+    int toId(const FEM*) const;
 
 protected:
     void initializeCGL();
@@ -47,6 +51,13 @@ public:
     void setData(const QList<const FEM*>& model);
     QList<const FEM*> getData() const;
     void setProxyMode(const EigenMode &, const FEM* const mesh = nullptr);
+
+    bool isVisible(const int modelId) const;
+    bool isVisible(const FEM* const model) const;
+    bool isVisible() const { return CGLWidget::isVisible(); }
+    void setVisible(const bool, const int modelId);
+    void setVisible(const bool, const FEM* const model);
+    void setVisible(bool v) { CGLWidget::setVisible(v); }
 
     //estimate colors value as form interpolation in range [red : green : blue]
     void colorize(const CVertexes& v, const QString& mes = "", const FEM* const mesh = nullptr);
@@ -75,10 +86,11 @@ class FEMWidget::MeshBuffer : public QObject
     int mode;
     const EigenModes& modes() const { return self->getModes(); }
     float proxyDefoultMagnitude;
+    QOpenGLShaderProgram* const shader;
 public:
     MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader, QObject* parent);
 
-    void bind() { array->bind(); }
+    void bind();
     void release() { array->release(); }
     const FEM* fem() const { return self; }
     void setCurrentMode(int form);

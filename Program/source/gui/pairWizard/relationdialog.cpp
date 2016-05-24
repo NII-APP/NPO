@@ -52,7 +52,10 @@ void RelationDialog::setPair(FEMPair *p)
         l->resize(maxW, l->height());
 
     this->setMinimumSize(maxW * 2 + 200, leftL.isEmpty() ? 0 : (leftL.first()->height() * (leftL.size() > rightL.size() ? leftL.size() : rightL.size())));
-    this->resize(this->minimumWidth(), this->minimumHeight());
+    const QSize minSize(std::max(this->minimumWidth(), this->width()), std::max(this->minimumHeight(), this->height()));
+    if (minSize != this->size()) {
+        this->resize(minSize);
+    }
 
     QPalette palette(this->palette());
     palette.setColor(QPalette::Background, QColor(0x00,0x00,0xFF));
@@ -69,7 +72,7 @@ CIndexes RelationDialog::inverseRelations(const CIndexes& v, int newSize)
 #endif
     CIndexes r(newSize, -1);
     for (size_t i(0); i != v.size(); ++i) if (v[i] >= 0) {
-        r[v[i]] = i;
+        r[v[i]] = static_cast<int>(i);
     }
     return r;
 }
@@ -97,6 +100,8 @@ void RelationDialog::scarfUpRelations()
         relation = pair->relations();
     }
     bgUpdate();
+    updateLines();
+    emitRelationsUpdated();
 }
 
 RelationDialog::~RelationDialog()
@@ -314,6 +319,7 @@ void RelationDialog::emitRelationsUpdated()
 {
     pair->setRelations(belchRelations());
     emit relationsUpdated(pair->relations());
+    emit relationsModified(relations());
 }
 
 void RelationDialog::mousePressEvent(QMouseEvent *)

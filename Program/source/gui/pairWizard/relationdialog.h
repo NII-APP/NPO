@@ -59,7 +59,6 @@ class RelationDialog : public QWidget
     void updateLines();
 
     static CIndexes inverseRelations(const CIndexes& v, int newSize);
-    CIndexes belchRelations() const;
     void emitRelationsUpdated();
 public:
     RelationDialog(QWidget *parent = 0);
@@ -67,8 +66,11 @@ public:
     void setPair(FEMPair* p);
     static void run(FEMPair *forEdit, QWidget* parent = 0);
 
+    CIndexes belchRelations() const;
+    const CIndexes& relations() const { return relation; }
 signals:
     void relationsUpdated(const CIndexes&);
+    void relationsModified(const CIndexes&);
 
 public slots:
     void scarfUpRelations();

@@ -21,6 +21,7 @@
         <file>resource/images/im.png</file>
         <file>resource/images/magnitude.png</file>
         <file>resource/images/freq.png</file>
+        <file>resource/images/panel_raw.svg</file>
     </qresource>
     <qresource prefix="/css" lang="css">
         <file>resource/css.css</file>

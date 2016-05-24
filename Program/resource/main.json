@@ -191,6 +191,18 @@
         "mode eng" : "Mode"
     },
 
+    "FEMPairViewer" : {
+        "hi rus" : "Подробная модэль",
+        "hi eng" : "Hi-resolution model",
+        "hi icon" : ":/media/resource/images/plane_model.svg",
+        "low rus" : "Лаконичная модель",
+        "low end" : "Low-resolution model",
+        "low icon" : ":/media/resource/images/panel_raw.svg",
+        "trunc rus" : "Усеченная модель",
+        "trunc eng" : "Truncated model",
+        "trunc icon" : ":/media/resource/images/panel_pair.svg"
+    },
+
     "modes identification wizard" : {
         "select file eng" : "File",
         "select file rus" : "Файл",

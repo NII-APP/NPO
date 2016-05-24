@@ -30,7 +30,7 @@ FEMViewer::~FEMViewer()
 
 void FEMViewer::setModel(const FEM* m) const
 {
-    femWidget->setVisible(m);
+    femWidget->setVisible(m != nullptr);
     femWidget->setData(m);
     updateToolBar();
 

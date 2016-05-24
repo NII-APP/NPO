@@ -55,9 +55,42 @@ void FEMWidget::initializeCGL()
     shader->setUniformValue("k", 2.0f);
     repaintLoop->start();
 }
+
+int FEMWidget::toId(const FEM* m) const
+{
+    int i(0);
+    while (i < meshes.size() && meshes[i]->fem() != m) {
+        ++i;
+    }
+    return i;
+}
+
+bool FEMWidget::isVisible(const int modelId) const
+{
+    return visible.testBit(modelId);
+}
+
+bool FEMWidget::isVisible(const FEM* const model) const
+{
+    return visible.testBit(toId(model));
+}
+
+void FEMWidget::setVisible(const bool v, const int modelId)
+{
+    visible.setBit(modelId, v);
+}
+
+void FEMWidget::setVisible(const bool v, const FEM* const model)
+{
+    visible.setBit(toId(model), v);
+}
+
 void FEMWidget::setData(const FEM* model)
 {
     qDeleteAll(meshes);
+    if (visible.size() != 1) {
+        visible.fill(true, 1);
+    }
     meshes.clear();
     if (!shader) {
         this->initializeGL();
@@ -123,6 +156,9 @@ void FEMWidget::setData(const QList<const FEM *> &models)
 {
     qDeleteAll(meshes);
     meshes.clear();
+    if (visible.size() != models.size()) {
+        visible.fill(true, models.size());
+    }
     if (!shader) {
         this->initializeGL();
     }
@@ -143,7 +179,8 @@ void FEMWidget::drawUnityQuad() {
 void FEMWidget::paintCGL()
 {
     QTime now(QTime::currentTime());
-    for (MeshBuffer* item : meshes) {
+    int i(0);
+    for (MeshBuffer* item : meshes) if (visible.testBit(i++)) {
         item->bind();
         shader->setUniformValue("k", static_cast<GLfloat>(item->fem()->getBox().size() / 10.0f * item->getCurrentDefoultMagnitude() * animation->now(now)));
 
@@ -164,12 +201,11 @@ FEMWidget::MeshBuffer::MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader,
     , vertexSize(static_cast<int>(data->getNodes().size()) * sizeof(CVertexes::value_type))
     , colorsSize(static_cast<int>(data->getNodes().size()) * sizeof(CGL::Colors::value_type))
     , proxyDefoultMagnitude(0.0f)
+    , shader(shader)
 {
     array->create();
     array->bind();
-    if (!vertex.isCreated()) {
-        vertex.create();
-    }
+    vertex.create();
     vertex.bind();
     vertex.allocate(vertexSize + colorsSize + vertexSize);
     vertex.write(0, static_cast<const void*>(data->getNodes().data()), vertexSize);
@@ -182,6 +218,14 @@ FEMWidget::MeshBuffer::MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader,
     shader->enableAttributeArray("in_Form");
     setCurrentMode(0);
     array->release();
+}
+
+void FEMWidget::MeshBuffer::bind()
+{
+    array->bind();
+    vertex.bind();
+    shader->setAttributeBuffer("in_Color", GL_UNSIGNED_BYTE, vertexSize, 3);
+    shader->enableAttributeArray("in_Color");
 }
 
 void FEMWidget::setMode(int m, const FEM * const mesh)
@@ -231,7 +275,8 @@ void FEMWidget::MeshBuffer::setProxyMode(const EigenMode& imposter)
     array->release();
 }
 
-void FEMWidget::MeshBuffer::uploadMode() {
+void FEMWidget::MeshBuffer::uploadMode()
+{
     array->bind();
     vertex.bind();
     vertex.write(colorsSize + vertexSize, modes()[mode].form().data(), vertexSize);

@@ -7,8 +7,6 @@
 
 class FEMPair
 {
-public:
-private:
     FEM* const first;
     FEM* const second;
     CIndexes relation;

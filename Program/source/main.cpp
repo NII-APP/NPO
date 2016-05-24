@@ -12,6 +12,7 @@
 #include "gui/pairWizard/truncationwizard.h"
 #include "project.h"
 #include "fem.h"
+#include "fempair.h"
 
 int main(int argc, char *argv[])
 {
