@@ -213,11 +213,10 @@ const CMatrix& EigenModes::getMAC() const {
 
 
 void EigenModes::MACEstimationPrepare() {
-    mac = CMatrix(static_cast<int>(size()), static_cast<int>(size()));
+    mac = CMatrix(static_cast<int>(size()), static_cast<int>(size()), std::numeric_limits<CMatrix::T>::quiet_NaN());
     for (EigenModes::iterator it(begin()); it != end(); ++it) {
         it->updatePreMac();
     }
-    mac.fill(std::numeric_limits<CMatrix::T>::quiet_NaN());
 }
 
 void EigenModes::estimateAutoMAC(int i, int j) {

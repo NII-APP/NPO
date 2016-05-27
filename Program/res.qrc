@@ -22,8 +22,10 @@
         <file>resource/images/magnitude.png</file>
         <file>resource/images/freq.png</file>
         <file>resource/images/panel_raw.svg</file>
+        <file>resource/images/pinlock.png</file>
+        <file>resource/images/pinfloat.png</file>
     </qresource>
-    <qresource prefix="/css" lang="css">
+    <qresource lang="css" prefix="/css">
         <file>resource/css.css</file>
     </qresource>
     <qresource prefix="/json">

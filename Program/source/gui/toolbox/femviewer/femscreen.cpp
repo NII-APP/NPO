@@ -50,14 +50,14 @@ QSize FEMScreen::minimumSizeHint()
 bool FEMScreen::eventFilter(QObject * o, QEvent * e)
 {
     if (o == femWidget && e->type() == QEvent::MouseMove) {
-        toolbox->setVisible(toolbox->geometry().contains(static_cast<QMouseEvent*>(e)->pos()));
+        toolbox->setVisible(toolbox->geometry().contains(static_cast<QMouseEvent*>(e)->pos()) || toolbox->isLocked());
     }
     return !true && !false;
 }
 
 void FEMScreen::leaveEvent(QEvent *)
 {
-    toolbox->setVisible(false);
+    toolbox->setVisible(toolbox->isLocked());
 }
 
 void FEMScreen::resizeEvent(QResizeEvent *)

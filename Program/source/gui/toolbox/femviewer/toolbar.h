@@ -20,12 +20,14 @@ class ToolBar : public QToolBar
     const QIcon playIcon;
     QAction* const run;
     QAction* const stop;
+    QAction* const lock;
 
     FEMWidget* const femWidget;
 public:
     ToolBar(FEMWidget *femWidget, QWidget* parent = 0);
     ~ToolBar();
 
+    bool isLocked() const;
     void refresh();
     void setProxyModeState();
     void setMode(const int);

@@ -11,11 +11,8 @@
 #endif
 
 CMatrix::CMatrix() { }
-CMatrix::CMatrix(const CMatrix& m) { this->operator =(m); }
-CMatrix::CMatrix(int w, int h)
-{
-    resize(w, h);
-}
+CMatrix::CMatrix(const CMatrix& m) : CBasicMatrix(m) { }
+CMatrix::CMatrix(int w, int h, const T &v) : CBasicMatrix(w, h, v) { }
 
 CMatrix::T CMatrix::minInRow(int r) const {
     return *std::min_element(memory.begin() + wid * r, memory.begin() + wid * r + wid);
@@ -92,6 +89,15 @@ int CMatrix::finiteCount() const
     return count;
 }
 
+int CMatrix::count(const T &v) const
+{
+    int count(0);
+    for (Data::const_iterator it(memory.begin()); it != memory.end(); ++it) if (*it == v) {
+        ++count;
+    }
+    return count;
+}
+
 void CMatrix::nanToInf()
 {
     for (Data::iterator it(memory.begin()); it != memory.end(); ++it) {
@@ -103,15 +109,11 @@ void CMatrix::nanToInf()
 
 #ifndef NOT_QT_AVAILABLE
 QDataStream& operator<< (QDataStream& out, const CMatrix& m) {
-    return out << m.memory << m.wid;
+    return out << static_cast<const CBasicMatrix<CMatrix::T>&>(m);
 }
 
 QDataStream& operator>> (QDataStream& in, CMatrix& m) {
-    in >> m.memory >> m.wid;
-    if (m.wid) {
-        m.m.resize(m.memory.size() / m.wid);
-        m.repoint();
-    }
+    in >> static_cast<CBasicMatrix<CMatrix::T>&>(m);
     return in;
 }
 #endif //NOT_QT_AVAILABLE
@@ -123,16 +125,16 @@ double CMatrix::det(){
     int i, j, k;
     double det = 1;
     for ( i = 0; i < height(); i++){
-        for ( j = i+1; j < height(); j++){
-            if (m[i][i] == 0){
-            return 0;
+        for ( j = i+1; j < height(); j++) {
+            if (m[i][i] == 0) {
+                return 0;
             }
             double b = m[j][i]/m[i][i];
             for( k = i; k < height(); k++){
-            m[j][k] = m[j][k] - m[i][k] * b;
+                m[j][k] = m[j][k] - m[i][k] * b;
             }
         }
-    det *= m[i][i];
+        det *= m[i][i];
     }
     return det;
 }

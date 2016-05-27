@@ -11,10 +11,15 @@ class EigenMode;
 class ToolBar;
 class RelationModeInput;
 class QAction;
+class QLabel;
 
 class FEMPairViewer : public FEMScreen
 {
     Q_OBJECT
+
+protected:
+    virtual void moveEvent(QMoveEvent*);
+    virtual void resizeEvent(QResizeEvent*);
 
 public:
     FEMPairViewer(QWidget* parent = 0);
@@ -31,7 +36,7 @@ private:
     QAction* const trunc;
     const FEMPair* pair;
 
-
+    QLabel* const info;
 };
 
 

@@ -74,8 +74,10 @@ void TruncationWizard::update()
 {
     delete result;
     if (picker->a() && picker->b()) {
+        acceptB->setEnabled(true);
         result = new FEMPair(picker->a(), picker->b(), align->isChecked(), scale->isChecked());
     } else {
+        acceptB->setEnabled(false);
         result = nullptr;
     }
     relations->setPair(result);

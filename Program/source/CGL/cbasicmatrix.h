@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstddef>
 #include <fstream>
+#include <cassert>
 
 #ifndef NOT_QT_AVAILABLE
 #include <QDebug>
@@ -74,8 +75,7 @@ public:
         repoint();
     }
 
-    template <typename Type>
-    CBasicMatrix<T>& operator =(const CBasicMatrix<Type> &)
+    CBasicMatrix<T>& operator =(const CBasicMatrix<T> & m)
     {
         memory = m.memory;
         wid = m.wid;
@@ -129,6 +129,9 @@ public:
 
     void fill(const T& val)
     {
+#ifndef QT_NO_DEBUG
+        assert(memory.data() == m.front());
+#endif
         std::fill(memory.begin(), memory.end(), val);
     }
 

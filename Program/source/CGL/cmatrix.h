@@ -21,7 +21,7 @@ private:
     CMatrix dotTransposed() const;
 public:
     CMatrix();
-    CMatrix(int w, int h);
+    CMatrix(int w, int h, const T& v = T());
     CMatrix(const CMatrix&);
 
     T minInRow(int r) const;
@@ -33,6 +33,7 @@ public:
     void plusInRow(int r, const T& val);
     void plusInColumn(int c, const T& val);
     int finiteCount() const;
+    int count(const T& v) const;
 
 
     CMatrix pseudoInversed() const;
@@ -46,13 +47,6 @@ public:
 
     friend CVector operator*(const CVector&, const CMatrix&);
     friend CVector operator*(const CVector&, const CMatrix&);
-
-#ifdef QT_VERSION
-    friend QDebug operator<< (QDebug out, const CMatrix &obj);
-
-    friend QDataStream& operator<< (QDataStream&, const CMatrix&);
-    friend QDataStream& operator>> (QDataStream&, CMatrix&);
-#endif
 };
 
 CVector operator* (const CVector&, const CMatrix&);

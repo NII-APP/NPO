@@ -188,7 +188,11 @@
         "pause rus" : "Пауза",
         "pause eng" : "Pause",
         "mode rus" : "Форма",
-        "mode eng" : "Mode"
+        "mode eng" : "Mode",
+        "pin float rus" : "Скрывать",
+        "pin float eng" : "Unclock",
+        "pin lock rus" : "Закрепить",
+        "pin lock eng" : "Lock"
     },
 
     "FEMPairViewer" : {
@@ -200,7 +204,9 @@
         "low icon" : ":/media/resource/images/panel_raw.svg",
         "trunc rus" : "Усеченная модель",
         "trunc eng" : "Truncated model",
-        "trunc icon" : ":/media/resource/images/panel_pair.svg"
+        "trunc icon" : ":/media/resource/images/panel_pair.svg",
+        "info rus" : "Собственная форма (%1 (%2 Гц) - %3 (%4 Гц))",
+        "info eng" : "Eigen mode (%1 (%2 Hz) - %3 (%4 Hz))"
     },
 
     "modes identification wizard" : {
