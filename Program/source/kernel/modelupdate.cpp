@@ -46,7 +46,7 @@ void ModelUpdate::updateFreqByElasticity(){
     Material material(Material::MAT1);
     for (CVector::iterator it(elasticModulus.begin()); it != elasticModulus.end(); ++it){
         material[Material::MAT1_E] = *it;
-        theory->getMaterials().push_back(material);
+        theory->addMaterial(material);
     }
 
     FEMProcessor::syncCalculateModes(theory);
