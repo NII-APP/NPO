@@ -2,12 +2,15 @@
 #define MODELSPICKER_H
 
 #include <QWidget>
+#include "project.h"
 class FEM;
 class QComboBox;
 
 class ModelsPicker : public QWidget
 {
     Q_OBJECT
+
+    static Project::ConstModels femList();
 
 public:
     ModelsPicker(QWidget* parent = 0);

@@ -233,7 +233,7 @@ void FEMProcessor::FEMCalculateModes::run()
         if (element != nullptr) {
             trace[i].resize(element->size() + 3 + element->isHaveMidsideNodes() * element->midsideNodesCount());
             mem[i] = trace.at(i).data();
-            trace[i][0] = materialsRenumbering[__model->getSection(element->getSection())->getMatId()];
+            trace[i][0] = materialsRenumbering[__model->getSection(element->getSectionId())->getMatId()];
             trace[i][1] = igoTypeId(element);
             assert(trace[i][1] != -1);
             trace[i][2] = static_cast<int>(trace[i].size()) - 3;

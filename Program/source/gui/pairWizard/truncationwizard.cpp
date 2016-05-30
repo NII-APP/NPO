@@ -62,12 +62,10 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     connect(scale, &QCheckBox::clicked, this, &TruncationWizard::update);
     connect(picker, &ModelsPicker::modelsPicked, this, &TruncationWizard::update);
     connect(relations, &RelationDialog::relationsModified, viewer, &FEMPairViewer::updateRelations);
-
-    picker->setPick(std::pair<const FEM*, const FEM*>(Application::project()->FEMList().at(2),
-                                                      Application::project()->FEMList().at(3)));
 }
 
-TruncationWizard::~TruncationWizard() {
+TruncationWizard::~TruncationWizard()
+{
 }
 
 void TruncationWizard::update()

@@ -20,7 +20,8 @@ Tetra::Tetra(quint32 n1, quint32 n2, quint32 n3, quint32 n4)
 }
 
 Tetra::Tetra(const Tetra& v)
-    : midside(v.isHaveMidsideNodes() ? new quint32[midsideNodesCount()] : nullptr)
+    : FinitElement(v)
+    , midside(v.isHaveMidsideNodes() ? new quint32[midsideNodesCount()] : nullptr)
 {
     memcpy(n, v.n, sizeof(quint32) * nodesCount());
     memcpy(midside, v.midside, sizeof(quint32) * midsideNodesCount());

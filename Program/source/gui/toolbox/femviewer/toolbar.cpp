@@ -18,7 +18,7 @@ ToolBar::ToolBar(FEMWidget* femWidget, QWidget *parent)
     , playIcon(Identity::fromSvg(":/media/resource/images/play-512px.svg"))
     , run(new QAction(pauseIcon, Application::identity()->tr("pause", "FEMViewer"),this))
     , stop(new QAction(Identity::fromSvg(":/media/resource/images/stop-512px.svg"), Application::identity()->tr("stop", "FEMViewer"),this))
-    , lock(new QAction(this))
+    , lock(new QAction(Application::identity()->icon(":/media/resource/images/pinlock.png"), Application::identity()->tr("pin float", "FEMViewer"), this))
     , femWidget(femWidget)
 {
     this->setAutoFillBackground(true);

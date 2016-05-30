@@ -22,7 +22,7 @@ ModelsPicker::ModelsPicker(QWidget *parent)
             w1->removeItem(0);
         }
         int j(1);
-        for (const FEM* const i : Application::project()->FEMList()) {
+        for (const FEM* const i : femList()) {
             if (j != w2->currentData().toInt()) {
                 w1->insertItem(w1->count(), i->getName(), QVariant(j));
             }
@@ -42,10 +42,24 @@ ModelsPicker::ModelsPicker(QWidget *parent)
     connect(second, indexChangedSignal, [this, update]() { update(second, first); });
 }
 
+Project::ConstModels ModelsPicker::femList()
+{
+    Project::ConstModels l(Application::project()->FEMList());
+    Project::ConstModels::const_iterator it(l.begin());
+    while (it != l.end()) {
+        if ((*it)->getModes().empty()) {
+            it = l.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    return l;
+}
+
 const FEM* ModelsPicker::a()
 {
     if (first->currentData().toInt()) {
-        return Application::project()->FEMList().at(first->currentData().toInt() - 1);
+        return femList().at(first->currentData().toInt() - 1);
     } else {
         return nullptr;
     }
@@ -54,7 +68,7 @@ const FEM* ModelsPicker::a()
 const FEM* ModelsPicker::b()
 {
     if (second->currentData().toInt()) {
-        return Application::project()->FEMList().at(second->currentData().toInt() - 1);
+        return femList().at(second->currentData().toInt() - 1);
     } else {
         return nullptr;
     }
@@ -64,7 +78,7 @@ void ModelsPicker::setPick(const std::pair<const FEM*, const FEM*>& p)
 {
     int i(0);
     bool k(0);
-    Project::ConstModels l(Application::project()->FEMList());
+    const Project::ConstModels l(femList());
     while (i < l.size()) {
         if (l[i] == p.first) {
             first->setCurrentIndex(i - k);

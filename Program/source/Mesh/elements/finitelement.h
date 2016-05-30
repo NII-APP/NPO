@@ -75,10 +75,8 @@ public:
     ///+= n to each index
     void moveIndexes(quint32 n);
 
-    void setShell(const quint32& v);
-    quint32 getSection() const;
-    quint32& shell();
-    const quint32& shell() const;
+    void setSectionId(const quint32& v);
+    quint32 getSectionId() const;
 };
 
 QDataStream& operator<<(QDataStream&, const FinitElement&);

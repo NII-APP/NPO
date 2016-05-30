@@ -515,10 +515,10 @@ CArray FEM::extractElasticityModulus() {
     for (size_t i = 0; i != elasticyModulus.size(); ++i) {
         if (trace.at(i)) {
 #ifndef QT_NO_DEBUG
-            assert(trace[i]->getSection() >= sections.size());
-            assert(static_cast<int>(materials.size()) <= sections[trace[i]->getSection()]->getMatId());
+            assert(trace[i]->getSectionId() >= sections.size());
+            assert(static_cast<int>(materials.size()) <= sections[trace[i]->getSectionId()]->getMatId());
 #endif
-            elasticyModulus[i] = materials[sections[trace[i]->getSection()]->getMatId()][Material::MAT1_E];
+            elasticyModulus[i] = materials[sections[trace[i]->getSectionId()]->getMatId()][Material::MAT1_E];
         }
     }
     return elasticyModulus;

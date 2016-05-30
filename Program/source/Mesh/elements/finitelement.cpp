@@ -22,14 +22,12 @@ FinitElement::FinitElement()
 }
 
 
-void FinitElement::setShell(const quint32 &v) { shellIndex = v; }
-quint32 FinitElement::getSection() const { return shellIndex; }
-quint32& FinitElement::shell() { return shellIndex; }
-const quint32& FinitElement::shell() const { return shellIndex; }
+void FinitElement::setSectionId(const quint32 &v) { shellIndex = v; }
+quint32 FinitElement::getSectionId() const { return shellIndex; }
 
 QDataStream& operator<<(QDataStream& out, const FinitElement& element) {
     out << static_cast<quint32>(element.type())
-        << element.getSection() << element.size();
+        << element.getSectionId() << element.size();
     out.writeRawData(static_cast<const char*>(static_cast<const void*>(element.begin())), element.size() * sizeof(quint32));
     if (element.isHaveMidsideNodes()) {
         out << true;
@@ -43,7 +41,7 @@ QDataStream& operator<<(QDataStream& out, const FinitElement& element) {
 QDataStream& operator>>(QDataStream& in, FinitElement& element){
     quint32 shell;
     in >> shell;
-    element.setShell(shell);
+    element.setSectionId(shell);
     quint32 size;
     in >> size;
     element.resize(size);
@@ -124,7 +122,7 @@ FinitElement* FinitElement::load(QIODevice& in) {
 
     quint32 shell;
     Q_ASSERT(in.read(static_cast<char*>(static_cast<void*>(&shell)), sizeof(shell)) == sizeof(shell));
-    v->setShell(shell);
+    v->setSectionId(shell);
     quint32 size;
     in.waitForReadyRead(1000);
     Q_ASSERT(in.read(static_cast<char*>(static_cast<void*>(&size)), sizeof(size)) == sizeof(shell));
@@ -132,10 +130,8 @@ FinitElement* FinitElement::load(QIODevice& in) {
     in.waitForReadyRead(1000);
     Q_ASSERT(in.read(static_cast<char*>(static_cast<void*>(v->begin())), v->size() * sizeof(quint32)) == v->size() * sizeof(quint32));
 
-    /// @todo add import of shell and matherials data
     return v;
 }
-
 
 void FinitElement::moveIndexes(quint32 n) {
     quint32* it(this->begin());

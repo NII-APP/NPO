@@ -103,7 +103,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
                 }
                 int m(f.integer());
                 trace[id] = new core::Hexa(f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer(), f.integer());
-                trace[id]->setShell(m);
+                trace[id]->setSectionId(m);
                 f.skipRow();
             }
             delete row;
@@ -114,7 +114,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
             }
             int m(f.integer());
             trace[id] = new core::Quad(f.integer(), f.integer(), f.integer(), f.integer());
-            trace[id]->setShell(m);
+            trace[id]->setSectionId(m);
             f.skipRow();
         } else if (type == "CTETRA") {
             int id(f.integer());
@@ -135,7 +135,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
                     *i = f.integer();
                 }
             }
-            trace[id]->setShell(m);
+            trace[id]->setSectionId(m);
             f.skipRow();
         } else if (type == "CTRIA3") {
             int id(f.integer());
@@ -144,7 +144,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
             }
             int m(f.integer());
             trace[id] = new core::Tria(f.integer(), f.integer(), f.integer());
-            trace[id]->setShell(m);
+            trace[id]->setSectionId(m);
             f.skipRow();
         } else if (type == "CHEXA") {
             f += 4;
@@ -167,7 +167,7 @@ void FEM::nativeBDFParser(const QString& fileName) {
             }
             trace[id] = new core::Hexa(indexex[0],indexex[1],indexex[2],indexex[3],
                     indexex[4],indexex[5],indexex[6],indexex[7]);
-            trace[id]->setShell(m);
+            trace[id]->setSectionId(m);
             f.skipRow();
         } else if (type == "GRID") {
             f += BORDER_FIELD_SIZE - static_cast<int>(type.length()) - highAccuracy;

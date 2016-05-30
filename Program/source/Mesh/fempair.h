@@ -7,8 +7,8 @@
 
 class FEMPair
 {
-    FEM* const first;
-    FEM* const second;
+    FEM* first;
+    FEM* second;
     CIndexes relation;
     FEM* trunc;
     CMatrix macMatrix;
@@ -20,6 +20,7 @@ public:
     const CMatrix& mac() const { return macMatrix; }
 
     FEMPair(const FEM *a, const FEM *b, bool align = true, bool scale = true);
+    FEMPair();
     ~FEMPair();
 
     const FEM* theory() const { return first->getNodes().size() > second->getNodes().size() ? first : second; }
@@ -32,6 +33,12 @@ public:
 
     void makeMac(const CIndexes &r);
     void makeMac(const EigenModes&, const EigenModes&);
+
+    friend QDataStream& operator<<(QDataStream&, const FEMPair&);
+    friend QDataStream& operator>>(QDataStream&, FEMPair&);
 };
+
+QDataStream& operator<<(QDataStream&, const FEMPair&);
+QDataStream& operator>>(QDataStream&, FEMPair&);
 
 #endif // FEMPAIR_H

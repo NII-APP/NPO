@@ -46,6 +46,12 @@ FEMPair::FEMPair(const FEM *b, const FEM *a, bool align, bool scale)
 #endif
 }
 
+FEMPair::FEMPair()
+    : first(nullptr)
+    , second(nullptr)
+    , trunc(nullptr)
+{ }
+
 void FEMPair::calculateRelations()
 {
     //estimate relations
@@ -101,3 +107,17 @@ void FEMPair::makeMac(const CIndexes& r)
     }
 }
 
+QDataStream& operator<<(QDataStream& out, const FEMPair& pair)
+{
+    out << *pair.first << *pair.second << *pair.trunc << pair.relation << pair.macMatrix;
+    return out;
+}
+
+QDataStream& operator>>(QDataStream& in, FEMPair& pair)
+{
+    pair.first = new FEM;
+    pair.second = new FEM;
+    pair.trunc = new FEM;
+    in >> *pair.first >> *pair.second >> *pair.trunc >> pair.relation >> pair.macMatrix;
+    return in;
+}
