@@ -142,14 +142,14 @@ public:
 
     //sections
     const Sections& getSections() const { return sections; }
-    int addSection(const Section& v) { sections.push_back(v); return sections.size() - 1; }
+    int addSection(Section* const v) { sections.push_back(v); return static_cast<int>(sections.size() - 1); }
     void setSections(const Sections& v) { sections = v; }
     const Section* getSection(const int p) const { return sections.at(p); }
     Section* getSection(const int p) { return sections.at(p); }
 
     //materials
     const Materials& getMaterials() const { return materials; }
-    int addMaterial(const Material& v) { materials.push_back(v); return materials.size() - 1; }
+    int addMaterial(const Material& v) { materials.push_back(v); return static_cast<int>(materials.size() - 1); }
     void setMaterials(const Materials& v) { materials = v; }
     const Material& getMaterial(const int p) const { return materials.at(p); }
 
