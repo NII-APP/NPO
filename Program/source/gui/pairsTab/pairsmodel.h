@@ -4,10 +4,13 @@
 #include <QAbstractItemModel>
 
 class Project;
+class FEMPair;
 
 class PairModel : public QAbstractItemModel
 {
     Q_OBJECT
+
+    static bool isRootIndex(const QModelIndex& i);
 public:
     explicit PairModel(QObject *parent = 0);
 
@@ -19,6 +22,10 @@ public:
 
     void setProject(const Project* const);
     const Project* getProject() const;
+
+    static int pairId(const QModelIndex &);
+
+    void insertPair(FEMPair * const);
 
 private:
     const Project* __project;

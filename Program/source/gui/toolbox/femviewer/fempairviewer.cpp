@@ -53,18 +53,18 @@ FEMPairViewer::FEMPairViewer(QWidget* parent)
 
 void FEMPairViewer::setPair(const FEMPair* p)
 {
-    qDebug() << "set FEM pair";
     pair = p;
     femWidget->setVisible(p);
     if (p == nullptr) {
         femWidget->setData(nullptr);
+        updateToolBar();
         return;
     }
 
     femWidget->setData(QList<const FEM*>() << p->practic() << p->theory() << p->truncated());
     updateToolBar();
     mode->setMaximum(static_cast<int>(p->a()->getModes().size()), static_cast<int>(p->b()->getModes().size()));
-    mode->updateRelations();
+    mode->updateRelations(p->relations());
 }
 
 void FEMPairViewer::updateRelations(const CIndexes& r)

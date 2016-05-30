@@ -15,7 +15,6 @@ HEADERS += $$PWD/*.h \
     $$PWD/gui/pairsTab/pairsmodel.h \
     $$PWD/gui/pairsTab/pairstab.h \
     $$PWD/gui/pairsTab/pairsview.h \
-    $$PWD/gui/pairsTab/pairviewer.h \
     $$PWD/gui/toolbox/tablistwidget.h \
     $$PWD/gui/modesIdentificationWizard/modesidentchart.h \
     $$PWD/gui/modesIdentificationWizard/modesidentificationwizard.h \
@@ -45,7 +44,6 @@ SOURCES += $$PWD/*.cpp \
     $$PWD/gui/pairsTab/pairsmodel.cpp \
     $$PWD/gui/pairsTab/pairstab.cpp \
     $$PWD/gui/pairsTab/pairsview.cpp \
-    $$PWD/gui/pairsTab/pairviewer.cpp \
     $$PWD/gui/toolbox/tablistwidget.cpp \
     $$PWD/gui/modesIdentificationWizard/modesidentchart.cpp \
     $$PWD/gui/modesIdentificationWizard/modesidentificationwizard.cpp \

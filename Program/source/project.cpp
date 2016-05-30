@@ -3,6 +3,7 @@
 #include "eigenmodes.h"
 #include <QTime>
 #include <cassert>
+#include "fempair.h"
 
 const QString Project::INSURANCE_ROW = "In vino veritas, in aqua sanitas";
 
@@ -22,6 +23,15 @@ Project::ConstModels Project::FEMList() const {
     ConstModels m(geometries.size());
     for (int i(0); i != m.size(); ++i) {
         m[i] = geometries[i];
+    }
+    return m;
+}
+
+Project::ConstFEMPairs Project::pairsList() const
+{
+    ConstFEMPairs m(pairs.size());
+    for (int i(0); i != m.size(); ++i) {
+        m[i] = pairs[i];
     }
     return m;
 }
@@ -69,7 +79,11 @@ void Project::save(const QString &filename)
     for (size_t i = 0; i < geometries.size(); ++i ){
         out << *geometries.at(i);
     }
-    /// @todo save/load pairs
+
+    out << pairs.size();
+    for (const FEMPair* i : pairs) {
+        out << *i;
+    }
 #ifndef QT_NO_DEBUG
     qDebug() << "Time to save: " << loop.msecsTo(QTime::currentTime()) / 1000 << " ms";
 #endif
@@ -120,9 +134,15 @@ void Project::load(const QString &filename)
         geometries.push_back(g);
     }
 
-    file.close();
+    FEMPairs::size_type pairsSize;
+    in >> pairsSize;
+    pairs.resize(pairsSize);
+    for (FEMPair*& i : pairs) {
+        i = new FEMPair;
+        in >> *i;
+    }
 
-    /// @todo save/load pairs
+    file.close();
 #ifndef QT_NO_DEBUG
     qDebug() << "Time to load project: " << loop.msecsTo(QTime::currentTime()) << " ms";
 #endif

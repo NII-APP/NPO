@@ -35,14 +35,13 @@ void RelationDialog::setPair(FEMPair *p)
 {
     pair = p;
 
-    qDebug() << "set pair" << p;
+    qDebug() << "RelationDialog set pair" << p;
 
     if (!pair) {
         qDeleteAll(leftL);
         qDeleteAll(rightL);
         return;
     }
-
     buildLabels(leftL, *pair->a());
     buildLabels(rightL, *pair->b());
 
@@ -50,6 +49,7 @@ void RelationDialog::setPair(FEMPair *p)
         l->resize(maxW, l->height());
     foreach (QLabel* l, rightL)
         l->resize(maxW, l->height());
+
 
     this->setMinimumSize(maxW * 2 + 200, leftL.isEmpty() ? 0 : (leftL.first()->height() * (leftL.size() > rightL.size() ? leftL.size() : rightL.size())));
     const QSize minSize(std::max(this->minimumWidth(), this->width()), std::max(this->minimumHeight(), this->height()));

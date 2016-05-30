@@ -12,6 +12,8 @@ class FEMPair
     CIndexes relation;
     FEM* trunc;
     CMatrix macMatrix;
+
+    FEMPair(const FEMPair&);
 public:
     const CIndexes& relations() const { return relation; }
     void setRelations(const CIndexes& v) { relation = v; }

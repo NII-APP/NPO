@@ -16,7 +16,7 @@
 #include "BDFEntity.h"
 #endif
 
-const unsigned Identity::PROGRAM_VERSION = 5;
+const unsigned Identity::PROGRAM_VERSION = 6;
 
 Identity::Identity()
     : configuration(readConfig())

@@ -16,6 +16,7 @@ public:
     typedef std::vector<FEM*> Models;
     typedef std::vector<const FEM*> ConstModels;
     typedef std::vector<FEMPair*> FEMPairs;
+    typedef std::vector<const FEMPair*> ConstFEMPairs;
 
     static const QString INSURANCE_ROW;
 private:
@@ -31,8 +32,10 @@ public:
 
     ConstModels FEMList() const;
     Models& FEMList() { return geometries; }
-    const FEMPairs& pairsList() const { return pairs; }
+    const FEMPairs& pairsList() { return pairs; }
+    ConstFEMPairs pairsList() const;
     void pushFEM(FEM* const g) { geometries.push_back(g); }
+    void pushFEMPair(FEMPair* const g) { pairs.push_back(g); }
     void deleteFEM(const FEM * const m) { deleteFEM(std::find(geometries.begin(), geometries.end(), m) - geometries.begin()); }
     void deleteFEM(int id);
 

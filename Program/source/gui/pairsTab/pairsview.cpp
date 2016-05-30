@@ -6,8 +6,11 @@
 #include "pairsmodel.h"
 #include "project.h"
 #include "application.h"
+#include "pairsmodel.h"
 
-PairsView::PairsView(QWidget *parent) : QTreeView(parent)
+PairsView::PairsView(QWidget *parent)
+    : QTreeView(parent)
+    , currentPair(-1)
 {
     this->setModel(new PairModel(this));
     myModel()->setProject(Application::project());
@@ -25,7 +28,22 @@ void PairsView::acceptNewProject() {
 
 void PairsView::mousePressEvent(QMouseEvent *event) {
     QTreeView::mousePressEvent(event);
-    if (model()->data(this->indexAt(event->pos())) == Application::identity()->tr("add item", "pair tab/model")) {
+
+    const QModelIndex here(this->indexAt(event->pos()));
+    if (model()->data(here, Qt::DisplayRole) == Application::identity()->tr("add item", "pair tab/model")) {
         emit addPairPressed();
     }
+}
+
+
+void PairsView::currentChanged(const QModelIndex & current, const QModelIndex & prew) {
+    const int pairId(PairModel::pairId(current));
+    if (pairId != PairModel::pairId(prew) && pairId < myModel()->getProject()->pairsList().size()) {
+        emit currentPairChanged(pairId);
+    }
+}
+
+PairModel* PairsView::model() const
+{
+    return static_cast<PairModel*>(QTreeView::model());
 }

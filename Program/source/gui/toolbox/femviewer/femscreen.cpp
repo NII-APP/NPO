@@ -31,6 +31,7 @@ FEMScreen::FEMScreen(QWidget* parent)
 
     toolbox->move(0,0);
     toolbox->adjustSize();
+    toolbox->setVisible(false);
 }
 
 FEMScreen::~FEMScreen()

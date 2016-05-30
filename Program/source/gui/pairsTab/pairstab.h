@@ -3,7 +3,7 @@
 
 #include <QSplitter>
 class PairsView;
-class PairViewer;
+class FEMPairViewer;
 
 class PairsTab : public QSplitter
 {
@@ -13,11 +13,10 @@ public:
 
 public slots:
     void acceptNewProject();
-    void addPair();
 
 private:
     PairsView* const __view;
-    PairViewer* const __viewer;
+    FEMPairViewer* const __viewer;
 };
 
 #endif // PAIRTAB_H

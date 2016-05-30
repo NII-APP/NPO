@@ -54,3 +54,19 @@ QModelIndex PairModel::index(int row, int column, const QModelIndex &) const {
 
 void PairModel::setProject(const Project* const p) { __project = p; }
 const Project* PairModel::getProject() const { return __project; }
+
+bool PairModel::isRootIndex(const QModelIndex& i) {
+    return i.row() == -1 && i.column() == -1 && !i.internalId();
+}
+
+int PairModel::pairId(const QModelIndex & i)
+{
+    return i.row();
+}
+
+void PairModel::insertPair(FEMPair* const p)
+{
+    this->beginInsertRows(QModelIndex(), this->rowCount(QModelIndex()), this->rowCount(QModelIndex()) + 1);
+    Application::nonConstProject()->pushFEMPair(p);
+    this->endInsertRows();
+}

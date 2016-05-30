@@ -89,5 +89,5 @@ FEMPair* TruncationWizard::exec(QWidget* parent)
     connect(&w, &TruncationWizard::finished, loop, &QEventLoop::quit);
     w.show();
     loop->exec();
-    return w.result;
+    return w.QDialog::result() & QDialog::Accepted ? w.result : nullptr;
 }
