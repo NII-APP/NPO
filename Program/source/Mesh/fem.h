@@ -142,7 +142,7 @@ public:
 
     //sections
     const Sections& getSections() const { return sections; }
-    Sections& getSections() { return sections; }
+    int addSection(const Section& v) { sections.push_back(v); return sections.size() - 1; }
     void setSections(const Sections& v) { sections = v; }
     const Section* getSection(const int p) const { return sections.at(p); }
     Section* getSection(const int p) { return sections.at(p); }
