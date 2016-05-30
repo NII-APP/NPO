@@ -75,7 +75,7 @@ void FEMPairViewer::updateRelations(const CIndexes& r)
 void FEMPairViewer::resizeEvent(QResizeEvent* e)
 {
     FEMScreen::resizeEvent(e);
-    info->move((QPoint(0, toolbox->height())));
+    info->move((QPoint(0, this->height() - info->height())));
 }
 
 void FEMPairViewer::moveEvent(QMoveEvent* e)

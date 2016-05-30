@@ -149,7 +149,7 @@ public:
 
     //materials
     const Materials& getMaterials() const { return materials; }
-    Materials& getMaterials() { return materials; }
+    void addMaterial(const Material& v) { materials.push_back(v); }
     void setMaterials(const Materials& v) { materials = v; }
     const Material& getMaterial(const int p) const { return materials.at(p); }
 

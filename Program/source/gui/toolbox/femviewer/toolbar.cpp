@@ -18,25 +18,25 @@ ToolBar::ToolBar(FEMWidget* femWidget, QWidget *parent)
     , playIcon(Identity::fromSvg(":/media/resource/images/play-512px.svg"))
     , run(new QAction(pauseIcon, Application::identity()->tr("pause", "FEMViewer"),this))
     , stop(new QAction(Identity::fromSvg(":/media/resource/images/stop-512px.svg"), Application::identity()->tr("stop", "FEMViewer"),this))
-    , lock(new QAction(Application::identity()->icon(":/media/resource/images/pinfloat.png"), Application::identity()->tr("pin float", "FEMViewer"), this))
+    , lock(new QAction(this))
     , femWidget(femWidget)
 {
     this->setAutoFillBackground(true);
     this->layout()->setMargin(0);
 
-    lock->setCheckable(true);
-    lock->setChecked(true);
     connect(lock, &QAction::triggered, [this](bool v) {
         if (v) {
-            static const QIcon icon(Application::identity()->icon(":/media/resource/images/pinfloat.png"));
+            static const QIcon icon(Application::identity()->icon(":/media/resource/images/pinlock.png"));
             lock->setIcon(icon);
             lock->setText(Application::identity()->tr("pin float", "FEMViewer"));
         } else {
-            static const QIcon icon(Application::identity()->icon(":/media/resource/images/pinlock.png"));
+            static const QIcon icon(Application::identity()->icon(":/media/resource/images/pinfloat.png"));
             lock->setIcon(icon);
             lock->setText(Application::identity()->tr("pin lock", "FEMViewer"));
         }
     });
+    lock->setCheckable(true);
+    lock->setChecked(true);
     this->addAction(lock);
 
     this->addSeparator();

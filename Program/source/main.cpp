@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
 
     MainWindow w;
 
-    //delete TruncationWizard::exec();
-    //return 0;
+//    delete TruncationWizard::exec();
+//    return 0;
 #ifndef QT_NO_DEBUG
     w.show();
 #else
