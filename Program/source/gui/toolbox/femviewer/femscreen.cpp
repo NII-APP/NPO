@@ -36,6 +36,8 @@ FEMScreen::FEMScreen(QWidget* parent)
 
 FEMScreen::~FEMScreen()
 {
+    ///@todo Strongly comend to fix it
+    femWidget->setParent(nullptr);
 }
 
 QSize FEMScreen::sizeHint() const

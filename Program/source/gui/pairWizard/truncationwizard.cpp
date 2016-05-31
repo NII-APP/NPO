@@ -61,7 +61,7 @@ TruncationWizard::TruncationWizard(QWidget *parent)
     connect(align, &QCheckBox::clicked, this, &TruncationWizard::update);
     connect(scale, &QCheckBox::clicked, this, &TruncationWizard::update);
     connect(picker, &ModelsPicker::modelsPicked, this, &TruncationWizard::update);
-    connect(relations, &RelationDialog::relationsModified, viewer, &FEMPairViewer::updateRelations);
+    connect(relations, &RelationDialog::relationsChanged, viewer, &FEMPairViewer::updateRelations);
 }
 
 TruncationWizard::~TruncationWizard()
@@ -78,8 +78,8 @@ void TruncationWizard::update()
         acceptB->setEnabled(false);
         result = nullptr;
     }
-    relations->setPair(result);
     viewer->setPair(result);
+    relations->setPair(result);
 }
 
 FEMPair* TruncationWizard::exec(QWidget* parent)

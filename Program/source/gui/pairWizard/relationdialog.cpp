@@ -65,40 +65,12 @@ void RelationDialog::setPair(FEMPair *p)
     scarfUpRelations();
 }
 
-CIndexes RelationDialog::inverseRelations(const CIndexes& v, int newSize)
-{
-#ifndef QT_NO_DEBUG
-    assert(*std::max_element(v.begin(), v.end()) <= newSize);
-#endif
-    CIndexes r(newSize, -1);
-    for (size_t i(0); i != v.size(); ++i) if (v[i] >= 0) {
-        r[v[i]] = static_cast<int>(i);
-    }
-    return r;
-}
-
-CIndexes RelationDialog::belchRelations() const
-{
-    if (pair == nullptr) {
-        return CIndexes();
-    }
-    if (pair->a() != pair->theory()) {
-        return inverseRelations(relation, static_cast<int>(pair->theory()->getModes().size()));
-    } else {
-        return relation;
-    }
-}
-
 void RelationDialog::scarfUpRelations()
 {
     if (pair == nullptr) {
         return;
     }
-    if (pair->a() != pair->theory()) {
-        relation = inverseRelations(pair->relations(), static_cast<int>(pair->a()->getModes().size()));
-    } else {
-        relation = pair->relations();
-    }
+    relation = pair->friendlyRelations();
     bgUpdate();
     updateLines();
     emitRelationsUpdated();
@@ -317,9 +289,8 @@ void RelationDialog::updateLines()
 
 void RelationDialog::emitRelationsUpdated()
 {
-    pair->setRelations(belchRelations());
-    emit relationsUpdated(pair->relations());
-    emit relationsModified(relations());
+    pair->setFriendlyRelations(relations());
+    emit relationsChanged();
 }
 
 void RelationDialog::mousePressEvent(QMouseEvent *)

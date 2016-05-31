@@ -121,3 +121,33 @@ QDataStream& operator>>(QDataStream& in, FEMPair& pair)
     in >> *pair.first >> *pair.second >> *pair.trunc >> pair.relation >> pair.macMatrix;
     return in;
 }
+
+CIndexes FEMPair::inverseRelations(const CIndexes& v, int newSize)
+{
+#ifndef QT_NO_DEBUG
+    assert(*std::max_element(v.begin(), v.end()) <= newSize);
+#endif
+    CIndexes r(newSize, -1);
+    for (size_t i(0); i != v.size(); ++i) if (v[i] >= 0) {
+        r[v[i]] = static_cast<int>(i);
+    }
+    return r;
+}
+
+void FEMPair::setFriendlyRelations(const CIndexes& v)
+{
+    if (a() != theory()) {
+        return setRelations(inverseRelations(v, static_cast<int>(b()->getModes().size())));
+    } else {
+        return setRelations(v);
+    }
+}
+
+CIndexes FEMPair::friendlyRelations() const
+{
+    if (a() != theory()) {
+        return inverseRelations(relations(), static_cast<int>(a()->getModes().size()));
+    } else {
+        return relations();
+    }
+}

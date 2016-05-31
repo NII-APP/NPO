@@ -28,6 +28,7 @@ PairsTab::PairsTab(QWidget *parent)
     });
     connect(__view, &PairsView::currentPairChanged, [this] (int i) {
         __viewer->setPair(Application::project()->pairsList()[i]);
+        __viewer->updateRelations();
     });
 }
 

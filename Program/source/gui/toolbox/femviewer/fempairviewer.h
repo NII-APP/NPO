@@ -27,7 +27,7 @@ public:
     void setPair(const FEMPair*);
 
 public slots:
-    void updateRelations(const CIndexes&);
+    void updateRelations();
     void setMode(int, int);
 private:
     RelationModeInput* const mode;

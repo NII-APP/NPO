@@ -25,7 +25,7 @@ public:
         CIndexes::const_iterator i(r.begin() + cur);
         assert(r.end() > i);
         if (d > 0) {
-            while (i != r.end() && d) {
+            while (i < r.end() && d) {
                 ++i;
                 if (i != r.end() && *i >= 0) {
                     --d;
@@ -37,16 +37,19 @@ public:
                 } while (i != r.begin() && *i < 0);
             }
         } else if (d < 0) {
-            while (i >= r.begin() && d) {
+            while (i > r.begin() && d) {
                 --i;
                 if (i >= r.begin() && *i >= 0) {
                     ++d;
                 }
             }
+            if (d) {
+                return;
+            }
             if (i < r.begin()) {
                 do {
                     ++i;
-                } while (i != r.end() - 1 && *i < 0);
+                } while (i < r.end() - 1 && *i < 0);
             }
         }
         left()->setValue(i - r.begin() + 1);

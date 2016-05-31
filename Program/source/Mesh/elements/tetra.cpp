@@ -24,7 +24,9 @@ Tetra::Tetra(const Tetra& v)
     , midside(v.isHaveMidsideNodes() ? new quint32[midsideNodesCount()] : nullptr)
 {
     memcpy(n, v.n, sizeof(quint32) * nodesCount());
-    memcpy(midside, v.midside, sizeof(quint32) * midsideNodesCount());
+    if (v.midside != nullptr) {
+        memcpy(midside, v.midside, sizeof(quint32) * midsideNodesCount());
+    }
 }
 
 FinitElement* Tetra::clone() const { return new Tetra(*this); }

@@ -14,9 +14,13 @@ class FEMPair
     CMatrix macMatrix;
 
     FEMPair(const FEMPair&);
+
+    static CIndexes inverseRelations(const CIndexes& v, int newSize);
 public:
     const CIndexes& relations() const { return relation; }
+    CIndexes friendlyRelations() const;
     void setRelations(const CIndexes& v) { relation = v; }
+    void setFriendlyRelations(const CIndexes& v);
     void calculateRelations();
 
     const CMatrix& mac() const { return macMatrix; }

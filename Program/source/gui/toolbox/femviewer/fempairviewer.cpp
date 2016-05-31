@@ -63,13 +63,16 @@ void FEMPairViewer::setPair(const FEMPair* p)
 
     femWidget->setData(QList<const FEM*>() << p->practic() << p->theory() << p->truncated());
     updateToolBar();
-    mode->setMaximum(static_cast<int>(p->a()->getModes().size()), static_cast<int>(p->b()->getModes().size()));
-    mode->updateRelations(p->relations());
 }
 
-void FEMPairViewer::updateRelations(const CIndexes& r)
+void FEMPairViewer::updateRelations()
 {
-    mode->updateRelations(r);
+    const FEMPair* p(pair);
+    if (p == nullptr) {
+        qFatal("attempting to update relations in null pair state");
+    }
+    mode->updateRelations(p->friendlyRelations());
+    mode->setMaximum(static_cast<int>(p->a()->getModes().size()), static_cast<int>(p->b()->getModes().size()));
 }
 
 void FEMPairViewer::resizeEvent(QResizeEvent* e)
