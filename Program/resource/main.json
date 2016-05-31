@@ -46,7 +46,7 @@
         ]
     },
     "FileNameEdit" : {
-        "tooltip eng" : "Chose file",
+        "tooltip eng" : "Choose file",
         "tooltip rus" : "Указать файл",
         "warning tooltip rus" : "Файл не задан",
         "warning tooltip eng" : "Current file doesn't exist",
@@ -71,7 +71,7 @@
     },
     "chose modes" : {
         "caption rus" : "Укажите файл форм колебаний (не обязательно)",
-        "caption eng" : "Chose mesh file (optioanl)",
+        "caption eng" : "Choose mesh file (optional)",
         "filter" : "modes(*.f06 *.txt)"
     },
     "save project" : {
@@ -108,13 +108,13 @@
     },
     "wrong file" : {
         "text rus" : "Файл \"%1\" не является проектом, поддерживаемым данным приложением",
-        "text eng" : "Can't open this file \"%1\" as a projecto of this application",
+        "text eng" : "Can't open this file \"%1\" as a project of this application",
         "title rus" : "Возникла ошибка при открытии файла",
         "title eng" : "File error"
     },
     "obsolete program" : {
         "text rus" : "Проект \"%1\" создан в более новой версии приложения",
-        "text eng" : "Project \"%1\" was saved in newer sersion of application",
+        "text eng" : "Project \"%1\" was saved in newer version of application",
         "title rus" : "Возникла ошибка при открытии файла",
         "title eng" : "File error"
     },
@@ -134,18 +134,18 @@
         "mac eng" : "Auto-MAC",
         "mac calc rus" : "Идёт рассчет авто-MAC (%1/%2)",
         "mac calc eng" : "Auto-MAC computing (%1/%2)",
-    	"vertexes rus" : "Узлы (%1)",
-    	"vertexes eng" : "Nodes (%1)",
-    	"modes rus" : "Собственные формы (%1)",
-    	"modes eng" : "Eigen modes (%1)",
-    	"import rus" : "Импортировать собственные формы...",
-    	"import eng" : "Import eigen modes...",
-    	"identification rus" : "Идентифицировать собственные формы...",
-        "identification eng" : "Eigen modes import...",
+        "vertexes rus" : "Узлы (%1)",
+        "vertexes eng" : "Nodes (%1)",
+        "modes rus" : "Собственные формы (%1)",
+        "modes eng" : "Eigen modes (%1)",
+        "import rus" : "Импортировать собственные формы...",
+        "import eng" : "Import eigenmodes...",
+        "identification rus" : "Идентифицировать собственные формы...",
+        "identification eng" : "Eigenmodes identification...",
         "models list eng" : "Avalible models",
         "models list rus" : "Модели",
-        "compute rus" : "Расчитать собственные формы...",
-        "compute eng" : "Compute eigen modes..."
+        "compute rus" : "Рассчитать собственные формы...",
+        "compute eng" : "Compute eigenmodes..."
     },
 
     "pair tab" : {
@@ -159,7 +159,7 @@
             "add item rus" : "Добавить пару . . .",
             "add item eng" : "Add new pair . . .",
             "project is null rus" : "Не обнаружен проект для отображения",
-            "project is null eng" : "Project toesn't suggested"
+            "project is null eng" : "Project doesn't suggested"
         }
     },
 
@@ -173,7 +173,7 @@
         "auto align eng" : "auto align",
         "auto align rus" : "авто-выравнивание",
         "reset relations eng" : "Reset relations",
-        "reset relations rus" : "Восстановить по умаолчанию"
+        "reset relations rus" : "Восстановить по умолчанию"
     },
 
     "FEMViewer" : {
@@ -196,8 +196,8 @@
     },
 
     "FEMPairViewer" : {
-        "hi rus" : "Подробная модэль",
-        "hi eng" : "Hi-resolution model",
+        "hi rus" : "Подробная модель",
+        "hi eng" : "High-resolution model",
         "hi icon" : ":/media/resource/images/plane_model.svg",
         "low rus" : "Лаконичная модель",
         "low end" : "Low-resolution model",
@@ -206,7 +206,7 @@
         "trunc eng" : "Truncated model",
         "trunc icon" : ":/media/resource/images/panel_pair.svg",
         "info rus" : "Собственная форма (%1 (%2 Гц) - %3 (%4 Гц))",
-        "info eng" : "Eigen mode (%1 (%2 Hz) - %3 (%4 Hz))"
+        "info eng" : "Eigenmode (%1 (%2 Hz) - %3 (%4 Hz))"
     },
 
     "modes identification wizard" : {
@@ -253,7 +253,7 @@
             "amplitude eng" : "Amplitude"
         },
         "methods selector" : {
-            "title eng" : "<h2>Eigen modes identification methods</h2>",
+            "title eng" : "<h2>Eigenmodes identification methods</h2>",
             "title rus" : "<h2>Методы идентификации собственных форм</h2>",
             "export button eng" : "Modes export",
             "export button rus" : "Экспорт форм",

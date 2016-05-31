@@ -16,11 +16,10 @@ class CBasicMatrix
 {
 public:
     typedef T value_type;
-private:
-    typedef std::vector<T> Data;
-    typedef std::vector<T*> Pointers;
 
 protected:
+    typedef std::vector<T> Data;
+    typedef std::vector<T*> Pointers;
     Data memory;
     Pointers m;
     int wid;
