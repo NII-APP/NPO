@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>testFile/FRF_METEORIT.unv</file>
+    </qresource>
+</RCC>
