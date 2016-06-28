@@ -89,3 +89,60 @@ void EFEMS::SendFEMmaterials(int nmat, double **elast_prop)
 	ReadFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
 
 }
+
+
+void EFEMS::PrintModelAnsFormat(int itnum)
+{
+	int i,j,message;
+	DWORD cb;
+	message = 301;
+	WriteFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
+
+	WriteFile(hPSEdatapipe,&itnum,sizeof(int),&cb,NULL);
+
+	//ожидание конца выполнения команды решателем
+	ReadFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
+
+}
+
+void EFEMS::PrintModelElElast(int itnum)
+{
+	int i,j,message;
+	DWORD cb;
+	message = 302;
+	WriteFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
+
+	WriteFile(hPSEdatapipe,&itnum,sizeof(int),&cb,NULL);
+
+	//ожидание конца выполнения команды решателем
+	ReadFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
+
+}
+
+void EFEMS::PrintModelElEnergy(int itnum)
+{
+	int i,j,message;
+	DWORD cb;
+	message = 303;
+	WriteFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
+
+	WriteFile(hPSEdatapipe,&itnum,sizeof(int),&cb,NULL);
+
+	//ожидание конца выполнения команды решателем
+	ReadFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
+
+}
+
+void EFEMS::PrintModelEigForms(int itnum)
+{
+	int i,j,message;
+	DWORD cb;
+	message = 304;
+	WriteFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
+
+	WriteFile(hPSEdatapipe,&itnum,sizeof(int),&cb,NULL);
+
+	//ожидание конца выполнения команды решателем
+	ReadFile(hPSEcmdpipe,&message,sizeof(int),&cb,NULL);
+
+}

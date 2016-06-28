@@ -25,6 +25,7 @@ public:
     CVector operator+(const value_type& v) const;
     CVector operator+(const CVector& v) const;
     CVector operator-(const CVector& v) const;
+    CVector operator*(const double& number) const;
 
     double euclideanNorm() const;
 

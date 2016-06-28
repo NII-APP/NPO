@@ -110,6 +110,7 @@ double AFR::damping(const double& maxFreq) const
     } else {
         return std::numeric_limits<double>::quiet_NaN();
     }
+
     Q_ASSERT(freq.range() > 0);
     return freq.range() / maxFreq;
 }

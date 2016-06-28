@@ -151,7 +151,9 @@ public:
     const Materials& getMaterials() const { return materials; }
     int addMaterial(const Material& v) { materials.push_back(v); return static_cast<int>(materials.size() - 1); }
     void setMaterials(const Materials& v) { materials = v; }
+    void setMaterial(int matId,const Material& v) { materials.at(matId) = v; }
     const Material& getMaterial(const int p) const { return materials.at(p); }
+    Material& getMaterial(const int p) { return materials.at(p); }
 
     //elements
     FinitElements& elements() { return trace; }

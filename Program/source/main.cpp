@@ -12,6 +12,7 @@
 #include "gui/pairWizard/truncationwizard.h"
 #include "project.h"
 #include "fem.h"
+#include "kernel/modelupdate.h"
 #include "fempair.h"
 
 int main(int argc, char *argv[])
@@ -19,6 +20,7 @@ int main(int argc, char *argv[])
     Application a(argc, argv);
 
     MainWindow w;
+
 
 #ifndef QT_NO_DEBUG
     w.show();

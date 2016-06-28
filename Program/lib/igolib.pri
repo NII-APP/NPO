@@ -6,12 +6,14 @@ win32 {
     DEPENDPATH += $$PWD\igolib
 
     !contains(QMAKE_TARGET.arch, x86_64) {
-        message("x86_32 build")
-
         !win32-g++ {
+            message("x86_32 build msvc")
+
             LIBS += -lExtSolInterface
             PRE_TARGETDEPS += $$PWD/igolib/ExtSolInterface.lib
         } else {
+            message("x86_32 build mingw")
+
             LIBS += -lEFEMS
             PRE_TARGETDEPS += $$PWD/igolib/libEFEMS.a
         }

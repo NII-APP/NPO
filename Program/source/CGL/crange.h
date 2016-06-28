@@ -30,8 +30,9 @@ public:
     void setMax(const T& v) { this->second = v; }
 
     T range() const { return this->second - this->first; }
+    bool belong(const T& v ){ return v >= this->first && v <= this->second; }
 
-    void include(const T& v) {\
+    void include(const T& v) {
         if (std::isfinite(v)) {
             this->first = std::min(v, this->first);
             this->second = std::max(v, this->second);

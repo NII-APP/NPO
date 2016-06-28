@@ -3,9 +3,11 @@
 
 #include <complex>
 #include <vector>
+
 #include <crange.h>
 #include "../CGL/cslider.h"
 #include <QVector3D>
+
 
 class QString;
 class RealRange;

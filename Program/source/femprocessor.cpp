@@ -58,15 +58,6 @@ void FEMProcessor::calculateModes()
     w->start();
 }
 
-void FEMProcessor::syncCalculateModes(FEM* const model)
-{
-    FEMProcessor proc(model);
-    QEventLoop* loop(new QEventLoop(&proc));
-    connect(&proc, &FEMProcessor::finished, loop, &QEventLoop::quit);
-
-    proc.calculateModes();
-    loop->exec();
-}
 
 FEMProcessor::FEMWorker::FEMWorker(FEM* model, QObject* parent)
     : QThread(parent)
@@ -133,8 +124,11 @@ int igoTypeId(const FinitElement* const element) {
 
 }
 
-void FEMProcessor::FEMCalculateModes::run()
-{
+int FEMProcessor::iteration = 0;
+
+
+namespace {
+void camputations(FEM* __model) {
     EFEMS pefems;
 
     static const QString localTempDir("kisdir");
@@ -152,17 +146,19 @@ void FEMProcessor::FEMCalculateModes::run()
         }
     }
     static char* tempDirList(tempDir.data());
-
     //запуск решателя, инициализация каналов связи
-    this->sleep(1);
+    qDebug() << "starting exe";
+    qDebug() << tempDirList << exeFile.data();
     pefems.StartLocalSolverAndConnect(tempDirList, exeFile.data());
-    this->sleep(1);
     qDebug() << "solver started";
 
     ///pefems.ConnectToSolver();
-    pefems.SendParallelSettings(4,4,4,1,&tempDirList,3000.0,1000.0);
+    pefems.SendParallelSettings(12,4,4,1,&tempDirList,45000.0,2000.0);
+//    pefems.SendParallelSettings(4,4,4,1,&tempDirList,3000.0,1000.0);
 
+    qDebug() << "create FEM";
     pefems.CreatFEmodel(tempDirList);
+    qDebug() << "FEM created";
     CArray m(static_cast<int>(__model->getNodes().size()));
     std::copy(__model->getNodes().begin(), __model->getNodes().end(), m.begin());
     CArray::const_iterator it(m.end());
@@ -199,7 +195,7 @@ void FEMProcessor::FEMCalculateModes::run()
     pefems.SendFEMnodesCRD(static_cast<int>(m.size() / 3), 3, m.data());
 
 #ifndef QT_NO_DEBUG
-    qDebug() << "prepare materials";
+    qDebug() << "prepare materials (initial size" << __model->getMaterials().size() << ")";
 #endif
     FEM::Materials materials(__model->getMaterials());
     // materials may have undefined members (just to save native bdf id in array).
@@ -211,8 +207,11 @@ void FEMProcessor::FEMCalculateModes::run()
         while (matIt != materials.end() && matIt->getType() == Material::Undefined) {
             matIt = materials.erase(matIt);
             materialsRenumbering.reduceFrom(matIt - materials.begin() + 1);
+            qDebug() << matIt - materials.begin();
         }
-        ++matIt;
+        if (matIt != materials.end()) {
+            ++matIt;
+        }
     }
 #ifndef QT_NO_DEBUG
     qDebug() << "mat prepared" << materials.size() << materialsRenumbering;
@@ -277,6 +276,7 @@ void FEMProcessor::FEMCalculateModes::run()
 
     CMatrix matMatrix(3, static_cast<int>(materials.size()));
     for (int i(0); i < matMatrix.height(); ++i) {
+
         matMatrix[i][0] = materials.at(i).youngModulus();
         matMatrix[i][1] = materials.at(i).poissonRatio();
         matMatrix[i][2] = materials.at(i).density();
@@ -287,17 +287,28 @@ void FEMProcessor::FEMCalculateModes::run()
 #endif
     pefems.SendFEMmaterials(static_cast<int>(materials.size()), matMatrix.pointers());
 
-    pefems.CreateAutoSE(3000,5000,2000);
+#ifndef QT_NO_DEBUG
+    qDebug() << "Create super elements";
+#endif
+    pefems.CreateAutoSE(5000,10000,3000);
+//    pefems.CreateAutoSE(3000,5000,2000);
 
+//    pefems.PrintModelAnsFormat(iteration);
     const int encount(15);
+#ifndef QT_NO_DEBUG
+    qDebug() << "Start computation";
+#endif
     pefems.EIGFR_SSI(encount,0.00001,15);
+#ifndef QT_NO_DEBUG
+    qDebug() << "Get the results";
+#endif
 
     // получение найденных СЧ
     CArray frherz(encount);
     const int nfrobtained(pefems.GetFreqRes(encount,frherz.data()));
     if (encount != nfrobtained) {
         qDebug() << nfrobtained << "modes obtained...";
-        emit finished();
+        //emit finished();
         return;
     }
     qDebug() << "FREQ RESULTS [Hz]:";
@@ -314,9 +325,14 @@ void FEMProcessor::FEMCalculateModes::run()
     }
     CMatrix energy(static_cast<int>(trace.size()), encount);
     pefems.GetFormEnergy(static_cast<int>(trace.size()), energy.pointers());
+
+    pefems.PrintModelAnsFormat(FEMProcessor::iteration);
+    pefems.PrintModelElEnergy(FEMProcessor::iteration);
+    pefems.PrintModelEigForms(FEMProcessor::iteration);
+    pefems.PrintModelElElast(FEMProcessor::iteration);
+
     pefems.ClearExtSolver();
     pefems.DisconnectAndCloseSolver();
-
 
     CIndexes numbering(static_cast<int>(m.size() / 3));
 
@@ -332,7 +348,7 @@ void FEMProcessor::FEMCalculateModes::run()
     assert(j == m.size() / 3);
     assert(j == numbering.size());
     assert(j == forms.width() / 3);
-    emit startSetupModes();
+    //emit startSetupModes();
     EigenModes& modes(__model->getModes());
     modes.resize(nfrobtained);
     for (int i(0); i < nfrobtained; ++i) {
@@ -350,7 +366,7 @@ void FEMProcessor::FEMCalculateModes::run()
     }
 
     modes.estimateDefoultMagnitudes();
-    emit modesInited();
+    //emit modesInited();
 
 #ifndef QT_NO_DEBUG
     qDebug() << "Estimate auto MAC";
@@ -364,12 +380,23 @@ void FEMProcessor::FEMCalculateModes::run()
     for (int i(0); i != modes.size(); ++i) {
         for (int j(0); j != modes.size(); ++j) {
             modes.estimateAutoMAC(i, j);
-            emit MACUpdated();
+            //emit MACUpdated();
         }
     }
 #ifndef QT_NO_DEBUG
     qDebug() << "\tautoMac delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec";
 #endif
-    emit MACEstimated();
-    emit finished();
+    //emit MACEstimated();
+    //emit finished();
+}
+}
+
+void FEMProcessor::syncCalculateModes(FEM* const model)
+{
+    camputations(model);
+}
+
+void FEMProcessor::FEMCalculateModes::run()
+{
+    camputations(__model);
 }

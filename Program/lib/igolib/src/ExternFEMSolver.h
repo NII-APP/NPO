@@ -49,6 +49,12 @@ public:
 	int GetFormRes(int nfr, int NN, int NORT, double **eigform);
 	int GetFormEnergy(int NEL, double **eigfen);
 
+	// Печать результатов
+	void PrintModelAnsFormat(int itnum); //печать модели в текстовом виде
+	void PrintModelElElast(int itnum); //печать модели, номеров материалов и модулей упругости по элементам 
+	void PrintModelElEnergy(int itnum); //печать номеров материалов и энергии
+	void PrintModelEigForms(int itnum); //печать собственных форм
+
 	// Полная очистка решателя от последней решенной задачи
 	void ClearExtSolver(); //очистка от решенной задачи и ожидание следующего задания
 };

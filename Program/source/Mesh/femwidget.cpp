@@ -42,15 +42,15 @@ void FEMWidget::initializeCGL()
         //0x1804a4e90
         qDebug() << "log:" << shader->log();
         qDebug() << "come from GLSL version" << glGetString(GL_SHADING_LANGUAGE_VERSION_ARB);
-        qFatal("fatal shader eror");
+//        qFatal("fatal shader eror");
 #endif
     }
     if (!shader->bind()) {
 #ifndef QT_NO_DEBUG
-        qFatal(shader->log().toLocal8Bit());
+//        qFatal(shader->log().toLocal8Bit());
 #endif
     }
-    Q_ASSERT(shader->isLinked());
+//    Q_ASSERT(shader->isLinked());
     glEnableClientState(GL_VERTEX_ARRAY);
     shader->setUniformValue("k", 2.0f);
     repaintLoop->start();

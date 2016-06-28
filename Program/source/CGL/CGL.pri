@@ -8,3 +8,4 @@ else: {
 OBJECTS_DIR = $$PWD/../build/release/cgl/obj
 LIBS += -L$$PWD/../build/binaries -lcgl
 }
+

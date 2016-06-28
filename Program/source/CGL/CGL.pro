@@ -4,12 +4,13 @@
 #
 #-------------------------------------------------
 
+
 QT       += opengl
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TEMPLATE = lib
 CONFIG += staticlib
-CONFIG += c++11
 
 CONFIG(debug, debug|release): {
 OBJECTS_DIR = $$PWD/../build/debug/cgl/obj
@@ -36,3 +37,4 @@ unix {
 
 DISTFILES += \
     CGL.pri
+

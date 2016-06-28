@@ -95,6 +95,17 @@ CVector CVector::operator-(const CVector& v) const
     return result;
 }
 
+CVector CVector::operator*(const double& number) const
+{
+    CVector result(*this);
+    const iterator tail(result.end());
+    iterator i(result.begin());
+    for (; i != tail; ++i) {
+        *i *= number;
+    }
+    return result;
+}
+
 CVector CVector::transposed() const
 {
     CVector r(*this);

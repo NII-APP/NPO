@@ -41,6 +41,9 @@ public slots:
     void read(const QString& filename);
     void calculateModes();
     static void syncCalculateModes(FEM* const model);
+
+public:
+    static int iteration;
 };
 
 class FEMProcessor::FEMWorker : public QThread   {
