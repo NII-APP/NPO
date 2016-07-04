@@ -9,7 +9,7 @@ QVector3D& CVertexes::operator ()(int p) {
     return *static_cast<QVector3D*>(static_cast<void*>(this->data() + p + p + p));
 }
 const QVector3D& CVertexes::operator ()(int p) const {
-    return *static_cast<const QVector3D*>(static_cast<const void*>(this->data() + p + p + p));
+    return *static_cast<const QVector3D*>(static_cast<const void*>(this->data() + (p << 1) + p));
 }
 
 

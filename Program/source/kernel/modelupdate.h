@@ -4,6 +4,7 @@
 
 #include "fem.h"
 #include "fempair.h"
+#include "igofesolver.h"
 
 class ModelUpdate
 {
@@ -14,10 +15,12 @@ public:
     ~ModelUpdate();
 
     void updateFreqByElasticity();
+    void setSolverOptions(const IgoFESolver::SolverOptions&);
 
 private:
     FEMPair * const data;
     const FEM * model;
+    IgoFESolver::SolverOptions options;
     CVector testFreq; // вектор экспериментальных частот
     double accuracy; //точность уточнения
     int stepCount; //количество итераций уточнения

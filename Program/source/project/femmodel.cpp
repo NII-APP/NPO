@@ -1,4 +1,4 @@
-#include "viewermodel.h"
+#include "femmodel.h"
 
 #include <cassert>
 #include <exception>
@@ -10,27 +10,27 @@
 #include "identity.h"
 #include "application.h"
 #include "project.h"
-#include "femprocessor.h"
+#include "kernel/eigenmodesfounder.h"
 #include "gui/mainWindow/mainwindow.h"
 
 
-ViewerModel::ViewerModel(const Project * p, QObject* parent)
+FEMModel::FEMModel(const Project * p, QObject* parent)
     : QAbstractItemModel(parent)
     , __project(p)
 {
     Q_ASSERT(sizeof(quintptr) >= 4);
 }
 
-bool ViewerModel::isRootIndex(const QModelIndex& i) {
+bool FEMModel::isRootIndex(const QModelIndex& i) {
     return i.row() == -1 && i.column() == -1 && !i.internalId();
 }
-bool ViewerModel::isTopIndex(const QModelIndex& i) {
+bool FEMModel::isTopIndex(const QModelIndex& i) {
     return !i.internalId() && !isRootIndex(i);
 }
-bool ViewerModel::isInfoIndex(const QModelIndex& i) {
+bool FEMModel::isInfoIndex(const QModelIndex& i) {
     return i.internalId() && !(i.internalId() >> 16);
 }
-ViewerModel::ModelRow ViewerModel::modelRole(const int row, const int model) const {
+FEMModel::ModelRow FEMModel::modelRole(const int row, const int model) const {
     switch (row) {
     case 0:
         return Vertexes;
@@ -65,7 +65,7 @@ ViewerModel::ModelRow ViewerModel::modelRole(const int row, const int model) con
     return WrongId;
 }
 
-ViewerModel::ModelRow ViewerModel::modelRole(const QModelIndex& i) const {
+FEMModel::ModelRow FEMModel::modelRole(const QModelIndex& i) const {
     if (i.internalId() >> 16) {
         return static_cast<ModelRow>(i.internalId() >> 16);
     } else if (isInfoIndex(i)) {
@@ -74,7 +74,7 @@ ViewerModel::ModelRow ViewerModel::modelRole(const QModelIndex& i) const {
     return WrongId;
 }
 
-int ViewerModel::toRow(ModelRow r) {
+int FEMModel::toRow(ModelRow r) {
     switch (r) {
     case Vertexes:
         return 0;
@@ -85,14 +85,14 @@ int ViewerModel::toRow(ModelRow r) {
     }
 }
 
-int ViewerModel::modelId(const QModelIndex& i) {
+int FEMModel::modelId(const QModelIndex& i) {
     if (isRootIndex(i)) {
         return -1;
     }
     return isTopIndex(i) ? i.row() : (i.internalId() & 0xFFFF) - 1;
 }
 
-Qt::ItemFlags ViewerModel::flags(const QModelIndex &index) const
+Qt::ItemFlags FEMModel::flags(const QModelIndex &index) const
 {
     if (isTopIndex(index)) {
         return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
@@ -100,7 +100,7 @@ Qt::ItemFlags ViewerModel::flags(const QModelIndex &index) const
     return QAbstractItemModel::flags(index);
 }
 
-QModelIndex ViewerModel::index(int row, int column, const QModelIndex &parent) const {
+QModelIndex FEMModel::index(int row, int column, const QModelIndex &parent) const {
 #ifdef VIEWERMODEL_DEBUG
     qDebug() << "index" << row << parent << parent.internalId();
 #endif
@@ -127,17 +127,17 @@ QModelIndex ViewerModel::index(int row, int column, const QModelIndex &parent) c
     }
 }
 
-QModelIndex ViewerModel::FEMIndex(int femId) const
+QModelIndex FEMModel::FEMIndex(int femId) const
 {
     return index(femId, 0, QModelIndex());
 }
 
-QModelIndex ViewerModel::FEMIndex(const FEM* femId) const
+QModelIndex FEMModel::FEMIndex(const FEM* femId) const
 {
     return index(__project->toId(femId), 0, QModelIndex());
 }
 
-QModelIndex	ViewerModel::parent(const QModelIndex & index) const {
+QModelIndex	FEMModel::parent(const QModelIndex & index) const {
 #ifdef VIEWERMODEL_DEBUG
     qDebug() << "parent" << index;
 #endif
@@ -159,8 +159,8 @@ QModelIndex	ViewerModel::parent(const QModelIndex & index) const {
     }
 }
 
-int	ViewerModel::columnCount(const QModelIndex &) const { return 1; }
-int	ViewerModel::rowCount(const QModelIndex & i) const {
+int	FEMModel::columnCount(const QModelIndex &) const { return 1; }
+int	FEMModel::rowCount(const QModelIndex & i) const {
 #ifdef VIEWERMODEL_DEBUG
     qDebug() << "rowCount" << i;
 #endif
@@ -209,14 +209,14 @@ int	ViewerModel::rowCount(const QModelIndex & i) const {
     }
 }
 
-QVariant ViewerModel::headerData(int, Qt::Orientation, int role) const {
+QVariant FEMModel::headerData(int, Qt::Orientation, int role) const {
     if (role == Qt::DisplayRole) {
         return Application::identity()->tr("models list", "viewer model");
     }
     return QVariant();
 }
 
-bool ViewerModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool FEMModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     assert(role == Qt::EditRole);
     if (role != Qt::EditRole) {
@@ -232,7 +232,7 @@ bool ViewerModel::setData(const QModelIndex &index, const QVariant &value, int r
     }
 }
 
-bool ViewerModel::removeFEM(int id)
+bool FEMModel::removeFEM(int id)
 {
     try {
         this->beginRemoveRows(QModelIndex(), id, id);
@@ -244,14 +244,14 @@ bool ViewerModel::removeFEM(int id)
     }
 }
 
-void ViewerModel::addFEM(const QString& fname)
+void FEMModel::addFEM(const QString& fname)
 {
     FEM* fem(new FEM);
     try {
         try {
             fem->read(fname);
         } catch (std::exception e) {
-            QMessageBox::warning(static_cast<QWidget*>(Application::mainWindow()),
+            QMessageBox::warning(Application::mainWindow(),
                                  Application::identity()->tr("modes identification wizard/file warning/title"),
                                  QString(e.what()));
             return;
@@ -266,17 +266,17 @@ void ViewerModel::addFEM(const QString& fname)
     endInsertRows();
 }
 
-void ViewerModel::beginAddModes(const FEM* model)
+void FEMModel::beginAddModes(const FEM* model)
 {
     beginAddModes(FEMIndex(model));
 }
 
-void ViewerModel::endAddModes(const FEM* model)
+void FEMModel::endAddModes(const FEM* model)
 {
     endAddModes(FEMIndex(model));
 }
 
-void ViewerModel::beginAddModes(const QModelIndex & i)
+void FEMModel::beginAddModes(const QModelIndex & i)
 {
     if (WithoutModes < WithModes) {
         beginInsertRows(i, WithoutModes, WithModes - 1);
@@ -285,7 +285,7 @@ void ViewerModel::beginAddModes(const QModelIndex & i)
     }
 }
 
-void ViewerModel::endAddModes(const QModelIndex& i)
+void FEMModel::endAddModes(const QModelIndex& i)
 {
     if (WithoutModes < WithModes) {
         endInsertRows();
@@ -296,26 +296,50 @@ void ViewerModel::endAddModes(const QModelIndex& i)
     emit this->dataChanged(index, index, QVector<int>{ Qt::DisplayRole });
 }
 
-FEMProcessor* ViewerModel::importModes(int meshId, const QString& file)
+EigenModesFounder* FEMModel::provideFounder(int modelId)
 {
-    FEM* const model(Application::nonConstProject()->FEMList().at(meshId));
-    FEMProcessor* p(new FEMProcessor(model, this));
-    connect(p, SIGNAL(finished()), p, SLOT(deleteLater()));
-
-    beginAddModes(FEMIndex(model));
-    p->read(file);
-    connect(p, &FEMProcessor::modesInited, [this, p]() {
+    FEM* const model(Application::nonConstProject()->FEMList().at(modelId));
+    EigenModesFounder* const p(new EigenModesFounder(model, this));
+    connect(p, &EigenModesFounder::finished, p, &EigenModesFounder::deleteLater);
+    connect(p, &EigenModesFounder::modesMined, [this, &model](){ beginAddModes(FEMIndex(model)); });
+    connect(p, &EigenModesFounder::modesReceived, [this, p]() {
         this->endAddModes(FEMIndex(p->model()));
     });
-    connect(p, &FEMProcessor::MACUpdated, [this, p]() {
+    connect(p, &EigenModesFounder::MACUpdated, [this, p]() {
         const QModelIndex index(this->index(1, 0, FEMIndex(p->model())));
         emit this->dataChanged(index, index, QVector<int>{ Qt::DisplayRole });
     });
-
     return p;
 }
 
-QVariant ViewerModel::data(const QModelIndex & index, int role) const {
+FEMModel::SharedEigenModesFounder FEMModel::foundModes(const int modelId, std::function<void(EigenModesFounder * const)> f)
+{
+    EigenModesFounder* const p(provideFounder(modelId));
+    f(p);
+
+    //trick to avoid delete(p) while thread is still running
+    SharedEigenModesFounder* r(new SharedEigenModesFounder(p));
+    connect(p, &EigenModesFounder::finished, [r]{ delete r; });
+
+    return *r;
+}
+
+FEMModel::SharedEigenModesFounder FEMModel::importModes(const int modelId, const QString& file)
+{
+    return foundModes(modelId, [&file](EigenModesFounder* f){ f->readModes(file); });
+}
+
+FEMModel::SharedEigenModesFounder FEMModel::calculateModes(const int modelId, const IgoFESolver::SolverOptions& options)
+{
+    return foundModes(modelId, [&options](EigenModesFounder* f){ f->calculateModes(options); });
+}
+
+FEMModel::SharedEigenModesFounder FEMModel::identificateModes(const int modelId)
+{
+    return foundModes(modelId, [](EigenModesFounder* f){ f->identificateModes(); });
+}
+
+QVariant FEMModel::data(const QModelIndex & index, int role) const {
     if (role != Qt::DisplayRole && role != Qt::EditRole) {
         if (role == Qt::DecorationRole && isTopIndex(index) && __project->FEMList().size() == index.row()) {
             static const QIcon add(Identity::fromSvg(":/media/resource/images/list-add-512px.svg"));
@@ -348,17 +372,17 @@ QVariant ViewerModel::data(const QModelIndex & index, int role) const {
             static const QString macStr(Application::identity()->tr("mac", "viewer model"));
             static const QString macCalcStr(Application::identity()->tr("mac calc", "viewer model"));
             switch (r) {
-            case ViewerModel::Vertexes:
+            case FEMModel::Vertexes:
                 return vertexesStr.arg(mesh->getNodes().length());
-            case ViewerModel::Modes:
+            case FEMModel::Modes:
                 return modesStr.arg(mesh->getModes().size());
-            case ViewerModel::ImportModes:
+            case FEMModel::ImportModes:
                 return importStr;
-            case ViewerModel::ModesIdentification:
+            case FEMModel::ModesIdentification:
                 return identificationStr;
-            case ViewerModel::ModesCompute:
+            case FEMModel::ModesCompute:
                 return compute;
-            case ViewerModel::MAC:
+            case FEMModel::MAC:
                 const CMatrix& mac(mesh->getModes().getMAC());
                 if (mac.size() != mac.finiteCount()) {
                     return macCalcStr.arg(QString::number(mac.finiteCount()), QString::number(mac.size()));
@@ -374,10 +398,10 @@ QVariant ViewerModel::data(const QModelIndex & index, int role) const {
     }
 }
 
-void ViewerModel::setProject(const Project* p) {
+void FEMModel::setProject(const Project* p) {
     __project = p;
 }
 
-const Project* ViewerModel::getProject() {
+const Project* FEMModel::getProject() {
     return __project;
 }

@@ -1,9 +1,7 @@
 INCLUDEPATH += $$PWD
 
 SOURCES += \
-    $$PWD/*.cpp \
-    $$PWD/cindexes.cpp
+    $$PWD/*.cpp
 
 HEADERS += \
-    $$PWD/*.h \
-    $$PWD/cindexes.h
+    $$PWD/*.h

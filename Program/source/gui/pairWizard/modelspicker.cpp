@@ -96,4 +96,3 @@ ModelsPicker::~ModelsPicker()
 {
 
 }
-

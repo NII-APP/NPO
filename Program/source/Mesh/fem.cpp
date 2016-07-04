@@ -58,6 +58,7 @@ bool FEM::read(const QString &fileName) {
     } else if (!format.compare("txt", Qt::CaseInsensitive)) {
         modes.readTXT(fileName);
         modes.estimateDefoultMagnitudes();
+        modes.estimateAutoMAC();
         return true;
     } else if (!format.compare("f06", Qt::CaseInsensitive)) {
         modes.readF06(fileName);
@@ -77,6 +78,8 @@ bool FEM::read(const QString &fileName) {
             }
         }
         modes.estimateDefoultMagnitudes();
+
+        modes.estimateAutoMAC();
         return true;
     }
 
@@ -444,7 +447,8 @@ bool FEM::readUNV(const QString &fileName)
     return true;
 }
 
-void FEM::UNVTransformation(EigenModes &f) const {
+void FEM::UNVTransformation(EigenModes &f) const
+{
     for (EigenModes::iterator it(f.begin()); it != f.end(); ++it) {
         if (it->form().length() == UNVTransformations.size()) {
             std::vector<QMatrix3x3>::const_iterator m(UNVTransformations.begin());
@@ -459,7 +463,8 @@ void FEM::UNVTransformation(EigenModes &f) const {
     }
 }
 
-void FEM::render() const {
+void FEM::render() const
+{
     glColor3ub(0x00,0x00,0x00);
     for (FinitElements::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) {
         if (*it) {
@@ -493,7 +498,8 @@ void FEM::render() const {
     }
 }
 
-void FEM::renderNet() const {
+void FEM::renderNet() const
+{
     glDisableClientState(GL_COLOR_ARRAY);
     glColor3ub(0x00,0x88,0x88);
     for (FinitElements::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) if (*it) {
@@ -501,7 +507,8 @@ void FEM::renderNet() const {
     }
 }
 
-void FEM::renderSelectLabel(int vertex) const {
+void FEM::renderSelectLabel(int vertex) const
+{
     glBegin(GL_POINTS);
     glColor3ub(0xFF,0x00,0xFF);
     glBegin(GL_POINTS);
@@ -509,7 +516,8 @@ void FEM::renderSelectLabel(int vertex) const {
     glEnd();
 }
 
-CArray FEM::extractElasticityModulus() {
+CArray FEM::extractElasticityModulus()
+{
     CArray elasticyModulus(static_cast<int>(trace.size()));
 
     for (size_t i = 0; i != elasticyModulus.size(); ++i) {
@@ -683,6 +691,7 @@ QDataStream& operator << (QDataStream& out, const FEM& g) {
 
     return out;
 }
+
 QDataStream& operator >> (QDataStream& in, FEM& g)
 {
 #ifndef QT_NO_DEBUG
@@ -741,7 +750,8 @@ QDataStream& operator >> (QDataStream& in, FEM& g)
     return in;
 }
 
-void FEM::alignZero() {
+void FEM::alignZero()
+{
     QVector3D center(this->box().center());
     if (center.lengthSquared() == 0 || vertexes.empty()) {
         return;
@@ -754,7 +764,8 @@ void FEM::alignZero() {
     this->box().move(-center);
 }
 
-void FEM::scaleTo(double v) {
+void FEM::scaleTo(double v)
+{
     if (box().size() == 0.0) {
         return;
     }
@@ -791,7 +802,8 @@ CIndexes FEM::truncationIndexVector(const FEM& a, const FEM& b)
     return numbers;
 }
 
-FEM* FEM::truncation(const FEM& a, const FEM& b) {
+FEM* FEM::truncation(const FEM& a, const FEM& b)
+{
 #ifndef QT_NO_DEBUG
     qDebug() << "\ttruncation";
     const QTime begin(QTime::currentTime());

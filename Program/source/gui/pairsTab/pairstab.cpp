@@ -9,7 +9,7 @@
 #include "gui/pairWizard/truncationwizard.h"
 #include "project.h"
 #include "gui/mainWindow/mainwindow.h"
-#include "pairsmodel.h"
+#include "project/pairsmodel.h"
 
 PairsTab::PairsTab(QWidget *parent)
     : QSplitter(Qt::Horizontal, parent)

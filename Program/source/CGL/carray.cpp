@@ -1,5 +1,5 @@
 #include "carray.h"
-#include "crange.h"
+
 #include <cmath>
 #include <cstring>
 
@@ -7,6 +7,10 @@
 #include <QDataStream>
 #include <QDebug>
 #endif // NOT_QT_AVAILABLE
+
+#include "crange.h"
+#include "cvertexes.h"
+#include "cindexes.h"
 
 CArray::CArray(int size, const value_type &val)
   : std::vector<double>(size, val) { }
@@ -19,7 +23,42 @@ CArray::CArray(value_type *data, int size)
 }
 
 CArray::CArray(const CArray& enother)
-    : std::vector<double>(enother) { }
+    : std::vector<double>(enother.size())
+{
+    std::copy(enother.begin(), enother.end(), this->begin());
+}
+
+CArray::CArray(const CVertexes& enother)
+    : std::vector<double>(enother.size())
+{
+    std::copy(enother.begin(), enother.end(), this->begin());
+}
+
+CIndexes CArray::eraseAllIf(std::function<bool(int,const double&)> condition)
+{
+    CArray::const_iterator it(this->begin());
+    CArray::iterator jt(this->begin());
+    const CArray::const_iterator end(this->end());
+    CIndexes renumbering(static_cast<int>(this->size()));
+    int index(0);
+    int jndex(0);
+    while (it != end) {
+        while (it != end && condition(index, *it)) {
+            ++it;
+            ++index;
+        }
+        if (it != end) {
+            *jt = *it;
+            ++it;
+            ++jt;
+            renumbering[index] = jndex;
+            ++index;
+            ++jndex;
+        }
+    }
+    erase(jt, it);
+    return renumbering;
+}
 
 CIndexRange CArray::estimateRangeIndex() const
 {

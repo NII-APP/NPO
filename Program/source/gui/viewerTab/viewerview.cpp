@@ -6,101 +6,66 @@
 
 #include "application.h"
 #include "identity.h"
-#include "viewermodel.h"
+#include "project/femmodel.h"
 #include "project.h"
-#include "femprocessor.h"
+#include "kernel/eigenmodesfounder.h"
 #include "gui/modesIdentificationWizard/modesidentificationwizard.h"
 #include "eigenmodes.h"
 #include "fem.h"
 #include "gui/mainWindow/mainwindow.h"
+#include "kernel/igofesolver.h"
 
 ViewerView::ViewerView(QWidget *parent)
     : QTreeView(parent)
 {
-    this->setModel(new ViewerModel(Application::project(), this));
+    this->setModel(new FEMModel(Application::project(), this));
     connect(this->model(), &QAbstractItemModel::dataChanged, [this](const QModelIndex& a) { this->QAbstractItemView::update(a); });
     this->setFrameStyle(QFrame::NoFrame);
 }
 
 void ViewerView::currentChanged(const QModelIndex & current, const QModelIndex & prew) {
-    const int modelId(ViewerModel::modelId(current));
-    if (modelId != ViewerModel::modelId(prew) && modelId < myModel()->getProject()->FEMList().size()) {
+    const int modelId(FEMModel::modelId(current));
+    if (modelId != FEMModel::modelId(prew) && modelId < myModel()->getProject()->FEMList().size()) {
         emit currentModelChanged(modelId);
     }
-    if (current.internalId() && !ViewerModel::isInfoIndex(current)) {
+    if (current.internalId() && !FEMModel::isInfoIndex(current)) {
         emit currentModeChanged(current.row(), modelId);
     }
 }
 void ViewerView::mousePressEvent(QMouseEvent* e) {
     const QModelIndex current(this->indexAt(e->pos()));
-    const int modelId(ViewerModel::modelId(current));
+    const int modelId(FEMModel::modelId(current));
     QTreeView::mousePressEvent(e);
     if (this->model()->data(current) == Application::identity()->geometriesModelAdd()) {
         addFEM();
     }
 
-    const ViewerModel::ModelRow r(static_cast<ViewerModel*>(model())->modelRole(current));
-    if (r == ViewerModel::ImportModes) {
+    const FEMModel::ModelRow r(static_cast<FEMModel*>(model())->modelRole(current));
+    if (r == FEMModel::ImportModes) {
         importModes(modelId);
-    } else if (r == ViewerModel::ModesIdentification) {
-        identificateModes(modelId);
-    } else if (r == ViewerModel::MAC) {
-        emit MACPressed(modelId, buf.contains(modelId) ? buf[modelId] : nullptr);
-    } else if (r == ViewerModel::ModesCompute) {
-        calcModes(modelId);
+    } else if (r == FEMModel::ModesIdentification) {
+        myModel()->identificateModes(modelId);
+    } else if (r == FEMModel::MAC) {
+        emit MACPressed(modelId, buf.contains(modelId) ? buf[modelId] : FEMModel::SharedEigenModesFounder());
+    } else if (r == FEMModel::ModesCompute) {
+        FEMModel::SharedEigenModesFounder proc(myModel()->calculateModes(modelId, IgoFESolver::SolverOptions()));
+        connect(proc.get(), &EigenModesFounder::finished, [this, modelId](){
+            buf.remove(modelId);
+        });
+        buf.insert(modelId, proc);
     }
 }
-
-void ViewerView::calcModes(int v)
-{
-    //QMessageBox* const hold(new QMessageBox(static_cast<MainWindow*>(Application::mainWindow())));
-    //hold->setModal(true);
-    //hold->setStandardButtons(QMessageBox::NoButton);
-    //hold->setText("Ща посчитаю");
-    QEventLoop* const loop(new QEventLoop(this));
-    FEMProcessor* p(new FEMProcessor(Application::nonConstProject()->FEMList()[v], this));
-    connect(p, &FEMProcessor::finished, [loop]() { loop->exit(); });
-    connect(p, &FEMProcessor::startSetupModes, [this, p]() { this->myModel()->beginAddModes(p->model()); });
-    connect(p, &FEMProcessor::modesInited, [this, p]() { this->myModel()->endAddModes(p->model()); });//hold->close(); });
-    //hold->show();
-    p->calculateModes();
-    loop->exec();
-    //hold->deleteLater();
-    //p->deleteLater();
-}
-
-void ViewerView::identificateModes(int meshId)
-{
-    ModesIdentificationWizard* w(new ModesIdentificationWizard(Application::project()->FEMList().at(meshId), reinterpret_cast<QWidget*>(Application::mainWindow())));
-
-    QEventLoop* loop(new QEventLoop(w));
-    loop->connect(w, SIGNAL(finished(int)), SLOT(quit()));
-
-    w->show();
-
-    loop->exec();
-
-    if ((w->result() & QDialog::Accepted) && w->currentResult()) {
-        const FEM* const fem(Application::project()->FEMList().at(meshId));
-        myModel()->beginAddModes(fem);
-        EigenModes* solution(w->currentResult());
-        solution->estimateAutoMAC();
-        Application::nonConstProject()->constCast(fem)->getModes() = *w->currentResult();
-        myModel()->endAddModes(fem);
-    }
-
-    w->deleteLater();
-}
-
-void ViewerView::importModes(int meshId)
+void ViewerView::importModes(int modelId)
 {
     QString file(Application::identity()->choseModesFile());
     if (!QFile::exists(file)) {
         return;
     }
-    FEMProcessor* const proc(myModel()->importModes(meshId, file));
-    buf.insert(meshId, proc);
-    connect(proc, &FEMProcessor::finished, [meshId, this](){ this->buf.remove(meshId); });
+    FEMModel::SharedEigenModesFounder proc(myModel()->importModes(modelId, file));
+    connect(&*proc, &EigenModesFounder::finished, [this, modelId](){
+        buf.remove(modelId);
+    });
+    buf.insert(modelId, proc);
 }
 
 void ViewerView::addFEM()
@@ -115,9 +80,9 @@ void ViewerView::addFEM()
     setCurrentIndex(myModel()->index(Application::project()->FEMCount() - 1, 0, rootIndex()));
 }
 
-ViewerModel* ViewerView::myModel() const
+FEMModel* ViewerView::myModel() const
 {
-    return static_cast<ViewerModel*>(model());
+    return static_cast<FEMModel*>(model());
 }
 
 void ViewerView::acceptNewProject() {

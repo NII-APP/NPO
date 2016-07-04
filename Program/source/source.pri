@@ -3,16 +3,18 @@ include(Mesh/sharedMesh.pri)
 include(../lib/igolib.pri)
 
 INCLUDEPATH += $$PWD
+contains(TARGET, "tests") {
+} else {
+    SOURCES += $$PWD/main.cpp
+}
 
 HEADERS += $$PWD/*.h \
-    $$PWD/gui/viewerTab/viewermodel.h \
     $$PWD/gui/viewerTab/viewertab.h \
     $$PWD/gui/viewerTab/viewerview.h \
     $$PWD/gui/toolbox/filenameedit.h \
     $$PWD/gui/toolbox/macdisplay.h \
     $$PWD/gui/toolbox/pixmapwidget.h \
     $$PWD/gui/toolbox/femviewer/femviewer.h \
-    $$PWD/gui/pairsTab/pairsmodel.h \
     $$PWD/gui/pairsTab/pairstab.h \
     $$PWD/gui/pairsTab/pairsview.h \
     $$PWD/gui/toolbox/tablistwidget.h \
@@ -31,17 +33,21 @@ HEADERS += $$PWD/*.h \
     $$PWD/gui/toolbox/femviewer/frequencyinput.h \
     $$PWD/gui/toolbox/femviewer/femscreen.h \
     $$PWD/gui/toolbox/femviewer/relationmodeinput.h \
-    $$PWD/kernel/modelupdate.h
+    $$PWD/kernel/modelupdate.h \
+    $$PWD/kernel/igofesolver.h \
+    $$PWD/project/project.h \
+    $$PWD/project/pairsmodel.h \
+    $$PWD/project/femmodel.h \
+    $$PWD/kernel/eigenmodesfounder.h \
+    $$PWD/project.h
 
-SOURCES += $$PWD/*.cpp \
-    $$PWD/gui/viewerTab/viewermodel.cpp \
+SOURCES += \
     $$PWD/gui/viewerTab/viewertab.cpp \
     $$PWD/gui/viewerTab/viewerview.cpp \
     $$PWD/gui/toolbox/filenameedit.cpp \
     $$PWD/gui/toolbox/macdisplay.cpp \
     $$PWD/gui/toolbox/pixmapwidget.cpp \
     $$PWD/gui/toolbox/femviewer/femviewer.cpp \
-    $$PWD/gui/pairsTab/pairsmodel.cpp \
     $$PWD/gui/pairsTab/pairstab.cpp \
     $$PWD/gui/pairsTab/pairsview.cpp \
     $$PWD/gui/toolbox/tablistwidget.cpp \
@@ -60,4 +66,12 @@ SOURCES += $$PWD/*.cpp \
     $$PWD/gui/toolbox/femviewer/frequencyinput.cpp \
     $$PWD/gui/toolbox/femviewer/femscreen.cpp \
     $$PWD/gui/toolbox/femviewer/relationmodeinput.cpp \
-    $$PWD/kernel/modelupdate.cpp
+    $$PWD/kernel/modelupdate.cpp \
+    $$PWD/identity.cpp \
+    $$PWD/application.cpp \
+    $$PWD/kernel/igofesolver.cpp \
+    $$PWD/project/project.cpp \
+    $$PWD/project/pairsmodel.cpp \
+    $$PWD/project/femmodel.cpp \
+    $$PWD/kernel/eigenmodesfounder.cpp
+

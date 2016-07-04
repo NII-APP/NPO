@@ -1,8 +1,7 @@
 INCLUDEPATH += $$PWD
 
 SOURCES += \
-    $$PWD/**.cpp \
-    $$PWD/constrain.cpp
+    $$PWD/**.cpp
 SOURCES += \
     $$PWD/elements/**.cpp
 SOURCES += \
@@ -11,8 +10,7 @@ SOURCES += \
     $$PWD/section/**.cpp
 
 HEADERS += \
-    $$PWD/**.h \
-    $$PWD/constrain.h
+    $$PWD/**.h
 HEADERS += \
     $$PWD/elements/**.h
 HEADERS += \

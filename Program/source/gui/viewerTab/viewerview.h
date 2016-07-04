@@ -2,10 +2,11 @@
 #define VIEWERVIEW_H
 
 #include <QTreeView>
+#include "project/femmodel.h"
 
-class ViewerModel;
+class FEMModel;
 class QPushButton;
-class FEMProcessor;
+class EigenModesFounder;
 
 class ViewerView : public QTreeView
 {
@@ -14,7 +15,9 @@ class ViewerView : public QTreeView
     void currentChanged(const QModelIndex & current, const QModelIndex & previous);
 
 private:
-    ViewerModel* myModel() const;
+    FEMModel* myModel() const;
+    void importModes(int id);
+    void addFEM();
 public:
     ViewerView(QWidget* parent = 0);
 
@@ -22,19 +25,15 @@ signals:
     void currentModelChanged(int);
     void currentModeChanged(int, int);
     void modesIdentificationPressed(int);
-    void MACPressed(int, FEMProcessor*);
+    void MACPressed(int, FEMModel::SharedEigenModesFounder);
 
 public slots:
-    void addFEM();
-    void importModes(int id);
-    void identificateModes(int meshId);
-    void calcModes(int);
 
     void update();
     void acceptNewProject();
 
 private:
-    typedef QMap<int, FEMProcessor*> Processors;
+    typedef QMap<int, FEMModel::SharedEigenModesFounder> Processors;
     Processors buf;
 };
 

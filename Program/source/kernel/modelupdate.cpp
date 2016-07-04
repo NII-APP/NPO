@@ -1,16 +1,16 @@
+#include "modelupdate.h"
+
 #include <QFile>
 #include <QTextStream>
 
-#include "modelupdate.h"
-#include "femprocessor.h"
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+
 #include "cvector.h"
 #include "cmatrix.h"
 #include "material.h"
 #include "section/solid.h"
-#include <algorithm>
-#include <math.h>
-
-#include <iostream>
 
 ModelUpdate::ModelUpdate(FEMPair *d):
     data(d),
@@ -39,6 +39,11 @@ ModelUpdate::ModelUpdate(const FEM *m, const CVector& freq):
 
 }
 
+void ModelUpdate::setSolverOptions(const IgoFESolver::SolverOptions& o)
+{
+    options = o;
+}
+
 ModelUpdate::~ModelUpdate()
 {}
 
@@ -59,8 +64,9 @@ void ModelUpdate::updateFreqByElasticity(){
         theory = const_cast<FEM *>(model);
     }
 
-    if (theory->getModes().empty()) {
-        FEMProcessor::syncCalculateModes(theory);
+    EigenModes modes(theory->getModes());
+    if (modes.empty()) {
+        modes = IgoFESolver(options).estimateEigenModes(theory);
     }
 
     CVector deltaFreq(numberFreqCount);
@@ -121,13 +127,13 @@ void ModelUpdate::updateFreqByElasticity(){
         i = 0;
         for (CVector::iterator it(deltaFreq.begin()); it != deltaFreq.end(); ++it){
             stream << "\r\n";
-            mFreq[i][step] = theory->getModes()[i].frequency();
+            mFreq[i][step] = modes[i].frequency();
             if ( data != nullptr) {
-                stream << step << ")" << '\t' << practic->getModes()[data->relations()[i]].frequency() - theory->getModes()[i].frequency();
-                *it = pow(practic->getModes()[data->relations()[i]].frequency(),2) - pow(theory->getModes()[i].frequency(),2);
+                stream << step << ")" << '\t' << practic->getModes()[data->relations()[i]].frequency() - modes[i].frequency();
+                *it = pow(practic->getModes()[data->relations()[i]].frequency(),2) - pow(modes[i].frequency(),2);
             } else {
-                stream << step << ")" << '\t' << testFreq[i] - theory->getModes()[i].frequency();
-                *it = pow(testFreq[i],2) - pow(theory->getModes()[i].frequency(),2);
+                stream << step << ")" << '\t' << testFreq[i] - modes[i].frequency();
+                *it = pow(testFreq[i],2) - pow(modes[i].frequency(),2);
             }
             i++;
         }
@@ -136,7 +142,7 @@ void ModelUpdate::updateFreqByElasticity(){
         for (int j(0); j < sensitivity.height(); j++) {
             for (int k(0); k < sensitivity.width(); k++) {
                 if (materials[k].getType() != Material::Undefined) {
-                    sensitivity[j][k] = theory->getModes()[j].strainEnergy()[k] / materials[k].youngModulus();
+                    sensitivity[j][k] = modes[j].strainEnergy()[k] / materials[k].youngModulus();
                 }
                 else {
                     sensitivity[j][k] = 0;
@@ -182,10 +188,8 @@ void ModelUpdate::updateFreqByElasticity(){
 
         qDebug() << "syncCalculateModes";
         file.close();
-        FEMProcessor::iteration = step + 1;
 
-        theory->getModes().clear();
-        FEMProcessor::syncCalculateModes(theory);
+        modes = IgoFESolver(options).estimateEigenModes(theory);
     }
 
 }

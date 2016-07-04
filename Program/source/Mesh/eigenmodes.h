@@ -16,9 +16,10 @@ class EigenModes : public std::vector<EigenMode>
     QString file;
 
     static int findNext(CParse &i);//Just for readCRD()
+    void estimateAutoMAC(int i, int j);
 
 public:
-    EigenModes();
+    EigenModes(int size = 0);
 
     const CMatrix& getMAC() const;
 
@@ -31,8 +32,6 @@ public:
 
     void estimateDefoultMagnitudes();
     void estimateAutoMAC();
-    void MACEstimationPrepare();
-    void estimateAutoMAC(int i, int j);
 
     static float MAC(const EigenMode& a, const EigenMode& b);
 

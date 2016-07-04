@@ -9,8 +9,8 @@
 #include <QDebug>
 #endif
 
-EigenModes::EigenModes()
-{ }
+EigenModes::EigenModes(int size)
+    : std::vector<EigenMode>(size) {}
 
 int EigenModes::findNext(CParse& i)
 {
@@ -211,14 +211,6 @@ const CMatrix& EigenModes::getMAC() const {
     return mac;
 }
 
-
-void EigenModes::MACEstimationPrepare() {
-    mac = CMatrix(static_cast<int>(size()), static_cast<int>(size()), std::numeric_limits<CMatrix::T>::quiet_NaN());
-    for (EigenModes::iterator it(begin()); it != end(); ++it) {
-        it->updatePreMac();
-    }
-}
-
 void EigenModes::estimateAutoMAC(int i, int j) {
     if (i == j) {
         mac[i][j] = 1.0;
@@ -239,7 +231,10 @@ void EigenModes::estimateAutoMAC()
     qDebug() << "Estimate auto MAC";
     QTime start(QTime::currentTime());
 #endif
-    MACEstimationPrepare();
+    mac = CMatrix(static_cast<int>(size()), static_cast<int>(size()), std::numeric_limits<CMatrix::T>::quiet_NaN());
+    for (EigenModes::iterator it(begin()); it != end(); ++it) {
+        it->updatePreMac();
+    }
 #ifndef QT_NO_DEBUG
     qDebug() << "\tUpdare preMAC delay" << start.msecsTo(QTime::currentTime()) / 1000.0 << "sec";
     start = QTime::currentTime();

@@ -52,12 +52,7 @@ bool Project::isOwnProject(const QString& filename) {
     QDataStream in(&file);
     QString insuranceRow;
     in >> insuranceRow;
-    if (insuranceRow != INSURANCE_ROW) {
-        return false;
-    }
-    return true;
-
-    file.close();
+    return insuranceRow == INSURANCE_ROW;
 }
 
 void Project::save(const QString &filename)

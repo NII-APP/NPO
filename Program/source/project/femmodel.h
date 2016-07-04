@@ -1,13 +1,16 @@
-#ifndef VIEWERMODEL_H
-#define VIEWERMODEL_H
+#ifndef FEMMODEL_H
+#define FEMMODEL_H
 
 #include <QAbstractItemModel>
+#include <memory>
+#include <functional>
 
+#include "kernel/igofesolver.h"
 class Project;
 class FEM;
-class FEMProcessor;
+class EigenModesFounder;
 
-class ViewerModel : public QAbstractItemModel
+class FEMModel : public QAbstractItemModel
 {
 public:
     enum ModelRow {
@@ -20,12 +23,17 @@ public:
 
         WrongId = 0xFFFF
     };
+    typedef std::shared_ptr<EigenModesFounder> SharedEigenModesFounder;
 
 private:
     enum ModelRowsCount {
         WithModes = 3,
         WithoutModes = 4
     };
+
+    EigenModesFounder* provideFounder(int modelId);
+    SharedEigenModesFounder foundModes(const int modelId, std::function<void(EigenModesFounder* const)> f);
+
 public:
     static bool isRootIndex(const QModelIndex&);
     static bool isTopIndex(const QModelIndex&);
@@ -35,7 +43,7 @@ public:
     static int modelId(const QModelIndex&);
     static int toRow(ModelRow);
 
-    ViewerModel(const Project*, QObject* parent = 0);
+    FEMModel(const Project*, QObject* parent = 0);
 
     QModelIndex FEMIndex(int femId) const;
     QModelIndex FEMIndex(const FEM *) const;
@@ -49,7 +57,10 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     bool removeFEM(int id);
     void addFEM(const QString&);
-    FEMProcessor* importModes(int, const QString&);
+
+    SharedEigenModesFounder importModes(const int modelId, const QString& fileName);
+    SharedEigenModesFounder calculateModes(const int modelId, const IgoFESolver::SolverOptions &options);
+    SharedEigenModesFounder identificateModes(const int modelId);
 
     void setProject(const Project*);
     const Project* getProject();
@@ -61,4 +72,4 @@ private:
     const Project* __project;
 };
 
-#endif // VIEWERMODEL_H
+#endif // FEMMODEL_H

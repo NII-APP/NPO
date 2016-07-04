@@ -3,10 +3,9 @@
 #include <QMouseEvent>
 #include <QDebug>
 
-#include "pairsmodel.h"
+#include "project/pairsmodel.h"
 #include "project.h"
 #include "application.h"
-#include "pairsmodel.h"
 
 PairsView::PairsView(QWidget *parent)
     : QTreeView(parent)

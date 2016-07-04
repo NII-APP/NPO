@@ -10,7 +10,7 @@ class ViewerNode;
 
 class FEMViewer;
 class MACDisplay;
-class FEMProcessor;
+class EigenModesFounder;
 
 class ViewerTab : public QSplitter
 {
@@ -35,10 +35,6 @@ signals:
 
 public slots:
     void acceptNewProject();
-    void setMode(int);
-    void setModel(const FEM *);
-    void setModel(int id);
-    void addModel();
 };
 
 #endif // VIEWERTAB_H
