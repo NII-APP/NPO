@@ -1,7 +1,6 @@
 #ifndef MODELUPDATE_H
 #define MODELUPDATE_H
 
-
 #include "fem.h"
 #include "fempair.h"
 #include "igofesolver.h"
@@ -10,18 +9,20 @@ class ModelUpdate
 {
 
 public:
-    ModelUpdate(FEMPair *);
-    ModelUpdate(const FEM *, const CVector& freq);
+    ModelUpdate(int numberFreqCountIn = 3,
+                int stepCountIn = 7,
+                double accuracyIn = 0.1,
+                int numberMatIn = 20,
+                double variationIn = 20,
+                double scaleIn = 1);
     ~ModelUpdate();
 
-    void updateFreqByElasticity();
+    void updateFreqByElasticity(FEMPair * pair);
+    void updateFreqByElasticity(const FEM *, const CVector& freq);
     void setSolverOptions(const IgoFESolver::SolverOptions&);
 
 private:
-    FEMPair * const data;
-    const FEM * model;
     IgoFESolver::SolverOptions options;
-    CVector testFreq; // вектор экспериментальных частот
     double accuracy; //точность уточнения
     int stepCount; //количество итераций уточнения
     int numberFreqCount; //количество уточняемых частот
