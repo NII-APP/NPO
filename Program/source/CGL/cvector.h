@@ -19,15 +19,27 @@ public:
     void transpose();
     CVector transposed() const;
 
+    double average();
+
     CVector& operator+=(const value_type& v);
     CVector& operator+=(const CVector& v);
+    CVector& operator-=(const value_type& v);
+    CVector& operator-=(const CVector& v);
+    CVector& operator/=(const value_type& v);
+    CVector& operator*=(const value_type& v);
 
     CVector operator+(const value_type& v) const;
     CVector operator+(const CVector& v) const;
+    CVector operator-(const value_type& v) const;
     CVector operator-(const CVector& v) const;
     CVector operator*(const double& number) const;
+    CVector operator/(const CVector& v) const;
+    CVector operator/(const double& number) const;
+
+    CVector abs();
 
     double euclideanNorm() const;
+    bool belong(const double& n);
 
 private:
     Orientation orientation;

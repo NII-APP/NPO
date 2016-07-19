@@ -33,13 +33,13 @@ HEADERS += $$PWD/*.h \
     $$PWD/gui/toolbox/femviewer/frequencyinput.h \
     $$PWD/gui/toolbox/femviewer/femscreen.h \
     $$PWD/gui/toolbox/femviewer/relationmodeinput.h \
-    $$PWD/kernel/modelupdate.h \
     $$PWD/kernel/igofesolver.h \
     $$PWD/project/project.h \
     $$PWD/project/pairsmodel.h \
     $$PWD/project/femmodel.h \
     $$PWD/kernel/eigenmodesfounder.h \
-    $$PWD/project.h
+    $$PWD/project.h \
+    $$PWD/kernel/modelrefining.h
 
 SOURCES += \
     $$PWD/gui/viewerTab/viewertab.cpp \
@@ -66,12 +66,12 @@ SOURCES += \
     $$PWD/gui/toolbox/femviewer/frequencyinput.cpp \
     $$PWD/gui/toolbox/femviewer/femscreen.cpp \
     $$PWD/gui/toolbox/femviewer/relationmodeinput.cpp \
-    $$PWD/kernel/modelupdate.cpp \
     $$PWD/identity.cpp \
     $$PWD/application.cpp \
     $$PWD/kernel/igofesolver.cpp \
     $$PWD/project/project.cpp \
     $$PWD/project/pairsmodel.cpp \
     $$PWD/project/femmodel.cpp \
-    $$PWD/kernel/eigenmodesfounder.cpp
+    $$PWD/kernel/eigenmodesfounder.cpp \
+    $$PWD/kernel/modelrefining.cpp
 

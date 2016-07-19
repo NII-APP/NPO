@@ -27,12 +27,48 @@ void CVector::transpose()
     orientation == Horizontal ? orientation = Vertical : orientation = Horizontal;
 }
 
+double CVector::average() {
+    double average(0);
+    std::for_each(begin(),end(),[&](double it){average += it;});
+    return size() != 0 ? average / size() : 0;
+}
+
 CVector& CVector::operator+=(const value_type& v)
 {
     iterator i(begin());
     const iterator tail(end());
     for (; i != tail; ++i) {
         *i += v;
+    }
+    return *this;
+}
+
+CVector& CVector::operator*=(const value_type& v)
+{
+    iterator i(begin());
+    const iterator tail(end());
+    for (; i != tail; ++i) {
+        *i *= v;
+    }
+    return *this;
+}
+
+CVector& CVector::operator-=(const value_type& v)
+{
+    iterator i(begin());
+    const iterator tail(end());
+    for (; i != tail; ++i) {
+        *i -= v;
+    }
+    return *this;
+}
+
+CVector& CVector::operator/=(const value_type& v)
+{
+    iterator i(begin());
+    const iterator tail(end());
+    for (; i != tail; ++i) {
+        *i /= v;
     }
     return *this;
 }
@@ -51,6 +87,8 @@ double CVector::euclideanNorm() const
 
 CVector& CVector::operator+=(const CVector& v)
 {
+    Q_ASSERT (this->size() != v.size());
+
     const iterator tail(end());
     const_iterator j(v.begin());
     iterator i(begin());
@@ -60,6 +98,18 @@ CVector& CVector::operator+=(const CVector& v)
     return *this;
 }
 
+CVector& CVector::operator-=(const CVector& v)
+{
+    Q_ASSERT (this->size() != v.size());
+
+    const iterator tail(end());
+    const_iterator j(v.begin());
+    iterator i(begin());
+    for (; i != tail; ++i, ++j) {
+        *i -= *j;
+    }
+    return *this;
+}
 CVector CVector::operator+(const value_type& v) const
 {
     CVector result(*this);
@@ -83,6 +133,17 @@ CVector CVector::operator+(const CVector& v) const
     return result;
 }
 
+CVector CVector::operator-(const value_type& v) const
+{
+    CVector result(*this);
+    iterator i(result.begin());
+    const iterator tail(result.end());
+    for (; i != tail; ++i) {
+        *i -= v;
+    }
+    return result;
+}
+
 CVector CVector::operator-(const CVector& v) const
 {
     CVector result(*this);
@@ -95,6 +156,10 @@ CVector CVector::operator-(const CVector& v) const
     return result;
 }
 
+bool CVector::belong(const double& n){
+    return std::find(begin(),end(),n) - end();
+}
+
 CVector CVector::operator*(const double& number) const
 {
     CVector result(*this);
@@ -102,6 +167,40 @@ CVector CVector::operator*(const double& number) const
     iterator i(result.begin());
     for (; i != tail; ++i) {
         *i *= number;
+    }
+    return result;
+}
+
+CVector CVector::operator/(const value_type& v) const
+{
+    CVector result(*this);
+    iterator i(result.begin());
+    const iterator tail(result.end());
+    for (; i != tail; ++i) {
+        *i /= v;
+    }
+    return result;
+}
+
+CVector CVector::operator/(const CVector& v) const
+{
+    CVector result(*this);
+    const iterator tail(result.end());
+    const_iterator j(v.begin());
+    iterator i(result.begin());
+    for (; i != tail; ++i, ++j) {
+        *i /= *j;
+    }
+    return result;
+}
+
+CVector CVector::abs()
+{
+    CVector result(*this);
+    iterator i(result.begin());
+    const iterator tail(result.end());
+    for (; i != tail; ++i) {
+        *i = std::abs(*i);
     }
     return result;
 }

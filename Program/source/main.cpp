@@ -12,7 +12,7 @@
 #include "gui/pairWizard/truncationwizard.h"
 #include "project.h"
 #include "fem.h"
-#include "kernel/modelupdate.h"
+#include "kernel/modelrefining.h"
 #include "fempair.h"
 #include "kernel/igofesolver.h"
 
