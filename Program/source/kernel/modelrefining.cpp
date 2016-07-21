@@ -16,13 +16,15 @@ ModelRefining::ModelRefining(const FEM * modelIn)
     : model(const_cast<FEM*>(modelIn))
     , variationElement(modelIn->getElements().size())
     , changeOfElement(modelIn->getElements().size())
-    , scale([](const CVector& p, const CVector& pPrev, const CVector& absoluteOptimumIn)->double{
-                CVector absoluteOptimum(absoluteOptimumIn);
-                if (pPrev.empty()){
-                    return 1;
-                } else {
-                    return abs(absoluteOptimum.average() / (p - pPrev).average());
-                }
+    , heuristicCoefScale(1)
+    , scale([](const CVector& testFreq,const CVector& currentFreq,const CVector& oldFreq, const double& scaleValue)->double{
+                         if (oldFreq.empty()) {
+                             return 1;
+                         } else {
+                             return scaleValue * (testFreq - currentFreq).euclideanNorm()
+                                      / (currentFreq - oldFreq).euclideanNorm();
+                         }
+
             })
 {
     for (RangeVector::iterator it(variationElement.begin()); it != variationElement.end(); ++it) {
@@ -52,8 +54,8 @@ ModelRefining::StopingCondition::StopingCondition()
     , stognationLength(3)
 {}
 
-bool ModelRefining::StopingCondition::stop(const CVector& vecAccuracyIn){
-    int currentStepCount(static_cast<int>(vecAccuracyIn.size()));
+bool ModelRefining::StopingCondition::stop(const CVector& accuracyOnSteps){
+    int currentStepCount(static_cast<int>(accuracyOnSteps.size()));
     bool isStep(false);
     bool isAccuracy(false);
     bool isStognation(false);
@@ -61,14 +63,14 @@ bool ModelRefining::StopingCondition::stop(const CVector& vecAccuracyIn){
     if (isStepCountCondition) {
         isStep = currentStepCount >= stepCount;
     }
-    if(isAccuracyCondition && !vecAccuracyIn.empty()) {
-        isAccuracy = vecAccuracyIn.back() < accuracy;
+    if(isAccuracyCondition && !accuracyOnSteps.empty()) {
+        isAccuracy = accuracyOnSteps.back() < accuracy;
     }
-    if(isStognationCondition && vecAccuracyIn.size() >=  stognationLength) {
-        CVector vDisper(stognationLength);
-        std::copy(vecAccuracyIn.end() - stognationLength, vecAccuracyIn.end(), vDisper.begin());
-        vDisper = vDisper - vDisper.average();
-        isStognation = vDisper.abs().estimateRange().getMax() < stognation;
+    if(isStognationCondition && accuracyOnSteps.size() >=  stognationLength) {
+        CVector disper(stognationLength);
+        std::copy(accuracyOnSteps.end() - stognationLength, accuracyOnSteps.end(), disper.begin());
+        disper = disper - disper.average();
+        isStognation = disper.abs().estimateRange().getMax() < stognation;
     }
 
     return !(isStep || isAccuracy || isStognation);
@@ -81,9 +83,9 @@ void ModelRefining::updateFreqByElasticity(const CVector& testFreq)
         modes = IgoFESolver(solverOptions).estimateEigenModes(model);
     }
 
+    double scaleValue;
     int numberFreq(static_cast<int>(testFreq.size()));
     int numberElements(static_cast<int>(model->getElements().size()));
-    double scaleValue(1);
     CMatrix sensitivity(numberElements,numberFreq);
 
     CVector oldFreq;
@@ -142,12 +144,10 @@ void ModelRefining::updateFreqByElasticity(const CVector& testFreq)
 
         sensitivity = calculateSens(modes,sensitivity,elasticModulus);
 
-        if(vectAccuracy.size() == 2){
-            scaleValue = scale(currentFreq,oldFreq,testFreq - currentFreq);
-        }
+        scaleValue = scale(testFreq,currentFreq,oldFreq,scaleValue);
 
         elasticModulus = elasticModulus + (deltaFreq * (sensitivity.pseudoInversed()))
-                                            * scaleValue;
+                                            * scaleValue * heuristicCoefScale;
 
         elasticModulus = setLimits(model,rengElasticModulus,elasticModulus);
 
@@ -176,7 +176,7 @@ CVector ModelRefining::setLimits( const FEM * const modelIn
     for (int k(0); k < modelIn->getElements().size(); k++) {
         FinitElement *element = modelIn->getElements().at(k);
         if (element != nullptr) {
-            if ( !(rengElasticModulusIn.at(k).belong(elasticModulus.at(k))) ) {
+            if ( !(rengElasticModulusIn.at(k).isContain(elasticModulus.at(k))) ) {
                 double max = rengElasticModulusIn.at(k).getMax();
                 double min = rengElasticModulusIn.at(k).getMin();
                 elasticModulus.at(k) = elasticModulus.at(k) >= max ? max : min;
@@ -188,7 +188,8 @@ CVector ModelRefining::setLimits( const FEM * const modelIn
 }
 
 
-CMatrix ModelRefining::calculateSens(const EigenModes &modes,const CMatrix &sensitivity,const CVector &materials) {
+CMatrix ModelRefining::calculateSens(const EigenModes &modes,const CMatrix &sensitivity,const CVector &materials)
+{
     CMatrix tempSens(sensitivity);
     for (int j(0); j < tempSens.height(); j++) {
         for (int k(0); k < tempSens.width(); k++) {
@@ -207,34 +208,52 @@ void ModelRefining::setSolverOptions(const IgoFESolver::SolverOptions& o)
 {
     solverOptions = o;
 }
-const IgoFESolver::SolverOptions& ModelRefining::getSolverOptions(){
+const IgoFESolver::SolverOptions& ModelRefining::getSolverOptions() const
+{
     return solverOptions;
 }
 
-void ModelRefining::setStopingCondition(const StopingCondition& stopingConditionIn){
+void ModelRefining::setStopingCondition(const StopingCondition& stopingConditionIn)
+{
     stopingCondition = stopingConditionIn;
 }
-const ModelRefining::StopingCondition& ModelRefining::getStopingCondition(){
+const ModelRefining::StopingCondition& ModelRefining::getStopingCondition() const
+{
     return stopingCondition;
 }
 
-void ModelRefining::setVariationElement(const RangeVector& variationElementIn){
-    variationElement = variationElementIn;
+void ModelRefining::setVariationElement(const RangeVector& maxAndMinValuePropOfElement)
+{
+    variationElement = maxAndMinValuePropOfElement;
 }
-const RangeVector& ModelRefining::getVariationElement(){
+const RangeVector& ModelRefining::getVariationElement() const
+{
     return variationElement;
 }
 
-void ModelRefining::setChangeOfElement(const BoolVector& changeOfElementIn){
+void ModelRefining::setChangeOfElement(const BoolVector& changeOfElementIn)
+{
     changeOfElement = changeOfElementIn;
 }
-const BoolVector& ModelRefining::getChangeOfElement(){
+const BoolVector& ModelRefining::getChangeOfElement() const
+{
     return changeOfElement;
 }
 
-void ModelRefining::setScaleFactor(const ScaleFactor& scaleFactorIn){
+void ModelRefining::setScaleFactor(const ScaleFactor& scaleFactorIn)
+{
     scale = scaleFactorIn;
 }
-const ScaleFactor& ModelRefining::getScaleFactor(){
+const ScaleFactor& ModelRefining::getScaleFactor() const
+{
     return scale;
+}
+
+void ModelRefining::setHeuristicCoefScale(const double& val)
+{
+    heuristicCoefScale = val;
+}
+const double& ModelRefining::getHeuristicCoefScale() const
+{
+    return heuristicCoefScale;
 }

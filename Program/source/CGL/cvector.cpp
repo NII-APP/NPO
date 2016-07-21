@@ -1,6 +1,7 @@
 #include "cvector.h"
 #include <vector>
 #include <iostream>
+#include <numeric>
 
 
 CVector::CVector(int size, double initialValue, Orientation theOrientation)
@@ -28,9 +29,11 @@ void CVector::transpose()
 }
 
 double CVector::average() {
-    double average(0);
-    std::for_each(begin(),end(),[&](double it){average += it;});
-    return size() != 0 ? average / size() : 0;
+    if (empty()) {
+        return std::numeric_limits<double>::quiet_NaN();
+    } else {
+        return std::accumulate(begin(),end(),0) / size();
+    }
 }
 
 CVector& CVector::operator+=(const value_type& v)
@@ -87,7 +90,7 @@ double CVector::euclideanNorm() const
 
 CVector& CVector::operator+=(const CVector& v)
 {
-    Q_ASSERT (this->size() != v.size());
+    Q_ASSERT (this->size() == v.size());
 
     const iterator tail(end());
     const_iterator j(v.begin());
@@ -156,11 +159,11 @@ CVector CVector::operator-(const CVector& v) const
     return result;
 }
 
-bool CVector::belong(const double& n){
-    return std::find(begin(),end(),n) - end();
+bool CVector::isContain(const value_type& n) const  {
+    return std::find(begin(),end(),n) != end();
 }
 
-CVector CVector::operator*(const double& number) const
+CVector CVector::operator*(const value_type& number) const
 {
     CVector result(*this);
     const iterator tail(result.end());

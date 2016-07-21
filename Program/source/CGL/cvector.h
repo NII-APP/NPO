@@ -11,7 +11,7 @@ public:
         Vertical
     };
 
-    CVector(int size = 0, double initialValue = 0.0, Orientation = Horizontal);
+    CVector(int size = 0, value_type initialValue = 0.0, Orientation = Horizontal);
     CVector(const CVector&);
 
     Orientation getOrientation() const;
@@ -32,14 +32,14 @@ public:
     CVector operator+(const CVector& v) const;
     CVector operator-(const value_type& v) const;
     CVector operator-(const CVector& v) const;
-    CVector operator*(const double& number) const;
+    CVector operator*(const value_type& v) const;
     CVector operator/(const CVector& v) const;
-    CVector operator/(const double& number) const;
+    CVector operator/(const value_type& v) const;
 
     CVector abs();
 
     double euclideanNorm() const;
-    bool belong(const double& n);
+    bool isContain(const value_type& n) const;
 
 private:
     Orientation orientation;

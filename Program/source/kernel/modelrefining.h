@@ -7,7 +7,7 @@
 #include <functional>
 #include "crange.h"
 
-typedef std::function<double(const CVector&, const CVector&, const CVector&)> ScaleFactor;
+typedef std::function<double(const CVector&,const CVector&,const CVector&, const double&)> ScaleFactor;
 typedef std::vector<CRealRange> RangeVector;
 typedef std::vector<bool> BoolVector;
 
@@ -35,20 +35,23 @@ public:
         virtual bool stop(const CVector&);
     };
 
-    void setScaleFactor(const ScaleFactor& scaleFactorIn);
-    const ScaleFactor& getScaleFactor();
+    void setScaleFactor(const ScaleFactor&);
+    const ScaleFactor& getScaleFactor() const;
+
+    void setHeuristicCoefScale(const double&);
+    const double& getHeuristicCoefScale() const;
 
     void setChangeOfElement(const BoolVector&);
-    const BoolVector& getChangeOfElement();
+    const BoolVector& getChangeOfElement() const;
 
     void setVariationElement(const RangeVector&);
-    const RangeVector& getVariationElement();
+    const RangeVector& getVariationElement() const;
 
     void setStopingCondition(const StopingCondition&);
-    const StopingCondition& getStopingCondition();
+    const StopingCondition& getStopingCondition() const;
 
     void setSolverOptions(const IgoFESolver::SolverOptions&);
-    const IgoFESolver::SolverOptions& getSolverOptions();
+    const IgoFESolver::SolverOptions& getSolverOptions() const;
 
 private:
     FEM * const model;
@@ -57,6 +60,7 @@ private:
     ScaleFactor scale;
     RangeVector variationElement;
     BoolVector changeOfElement;
+    double heuristicCoefScale;
 
     CMatrix calculateSens(const EigenModes&,const CMatrix&,const CVector&);
     CVector setLimits(const FEM * const, RangeVector&, const CVector&);
