@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
 {
     Application a(argc, argv);
 
+
+#ifndef SANDBOX
     MainWindow w;
 
 #ifndef QT_NO_DEBUG
@@ -27,5 +29,7 @@ int main(int argc, char *argv[])
 #else
     w.showMaximized();
 #endif
+#endif
+
     return a.exec();
 }

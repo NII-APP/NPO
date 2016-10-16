@@ -15,7 +15,7 @@ Application::Application(int argc, char** argv)
     , pro(new Project)
     , window(0)
 {
-    QFile css(":/css/css.css");
+    QFile css(":/css/resource/css.css");
     css.open(QFile::ReadOnly);
     this->setStyleSheet(QString(css.readAll()));
     this->setOrganizationName(self->organizationName());

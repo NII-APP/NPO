@@ -11,6 +11,7 @@ class Constrain
 {
 public:
     Constrain();
+    Constrain(int);
     ~Constrain();
 
     enum Sides {

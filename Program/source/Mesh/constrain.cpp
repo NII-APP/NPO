@@ -8,6 +8,15 @@ Constrain::Constrain()
 
 }
 
+Constrain::Constrain(int v)
+    : fixedSides(0)
+{
+    while (v) {
+        addConstrain(v % 10);
+        v /= 10;
+    }
+}
+
 Constrain::~Constrain()
 {
 

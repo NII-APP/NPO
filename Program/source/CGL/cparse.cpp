@@ -222,7 +222,8 @@ std::string CParse::word()
     return ret;
 }
 
-void CParse::skipRow() {
+void CParse::skipRow()
+{
     if (!d) {
         return;
     }

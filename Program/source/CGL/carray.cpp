@@ -6,10 +6,10 @@
 #ifndef NOT_QT_AVAILABLE
 #include <QDataStream>
 #include <QDebug>
+#include "cvertexes.h"
 #endif // NOT_QT_AVAILABLE
 
 #include "crange.h"
-#include "cvertexes.h"
 #include "cindexes.h"
 
 CArray::CArray(int size, const value_type &val)
@@ -28,11 +28,14 @@ CArray::CArray(const CArray& enother)
     std::copy(enother.begin(), enother.end(), this->begin());
 }
 
+
+#ifndef NOT_QT_AVAILABLE
 CArray::CArray(const CVertexes& enother)
     : std::vector<double>(enother.size())
 {
     std::copy(enother.begin(), enother.end(), this->begin());
 }
+#endif
 
 CIndexes CArray::eraseAllIf(std::function<bool(int,const double&)> condition)
 {

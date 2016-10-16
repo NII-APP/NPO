@@ -3,6 +3,10 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <cassert>
+//#define FAST
+#ifdef FAST
+#include "elements/tetra.h"
+#endif
 
 const float FEMWidget::AnimationOptions::doublePi = acos(-1.0f) * 2;
 const QRgb FEMWidget::DEFAULT_COLOR = qRgb(0x00,0xFF,0x88);
@@ -42,15 +46,15 @@ void FEMWidget::initializeCGL()
         //0x1804a4e90
         qDebug() << "log:" << shader->log();
         qDebug() << "come from GLSL version" << glGetString(GL_SHADING_LANGUAGE_VERSION_ARB);
-//        qFatal("fatal shader eror");
+        qFatal("fatal shader eror");
 #endif
     }
     if (!shader->bind()) {
 #ifndef QT_NO_DEBUG
-//        qFatal(shader->log().toLocal8Bit());
+        qFatal(shader->log().toLocal8Bit());
 #endif
     }
-//    Q_ASSERT(shader->isLinked());
+    Q_ASSERT(shader->isLinked());
     glEnableClientState(GL_VERTEX_ARRAY);
     shader->setUniformValue("k", 2.0f);
     repaintLoop->start();
@@ -178,25 +182,28 @@ void FEMWidget::drawUnityQuad() {
 
 void FEMWidget::paintCGL()
 {
-    QTime now(QTime::currentTime());
+    const QTime now(QTime::currentTime());
     int i(0);
     for (MeshBuffer* item : meshes) if (visible.testBit(i++)) {
         item->bind();
         shader->setUniformValue("k", static_cast<GLfloat>(item->fem()->getBox().size() / 10.0f * item->getCurrentDefoultMagnitude() * animation->now(now)));
 
-        item->fem()->render();
-        item->fem()->renderNet();
+        item->render();
         item->release();
     }
     repaintLoop->start();
     //to save background unity quad
     shader->setUniformValue("k", 0.0f);
+    const int delay(now.msecsTo(QTime::currentTime()));
+    //qDebug() << delay << 1000.0 / delay;
 }
 
 FEMWidget::MeshBuffer::MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader, QObject* parent)
     : QObject(parent)
     , self(data)
     , vertex(QOpenGLBuffer::VertexBuffer)
+    , index(QOpenGLBuffer::IndexBuffer)
+    , netIndex(QOpenGLBuffer::IndexBuffer)
     , array(new QOpenGLVertexArrayObject(this))
     , vertexSize(static_cast<int>(data->getNodes().size()) * sizeof(CVertexes::value_type))
     , colorsSize(static_cast<int>(data->getNodes().size()) * sizeof(CGL::Colors::value_type))
@@ -217,15 +224,80 @@ FEMWidget::MeshBuffer::MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader,
     shader->setAttributeBuffer("in_Form", GL_FLOAT, vertexSize + colorsSize, 3);
     shader->enableAttributeArray("in_Form");
     setCurrentMode(0);
+    vertex.release();
+
+
+
+
+
+
+
+
+#ifdef FAST
+    std::vector<GLuint> d;
+    for (const FinitElement* i : data->getElements()) if (i) {
+        if (i->type() == FinitElement::TetraType) {
+             for (const GLuint j : static_cast<const Tetra*>(i)->renderIndexes()) {
+                             d.push_back(j);
+                         }
+        }
+    }
+    index.create();
+    index.bind();
+    index.allocate(d.data(), d.size() * sizeof(GLuint));
+    index.release();
+
+    d.clear();
+    qDebug() << "cdlear";
+    for (const FinitElement* i : data->getElements()) if (i) {
+        if (i->type() == FinitElement::TetraType) {
+             for (const GLuint j : static_cast<const Tetra*>(i)->netIndexes()) {
+                             d.push_back(j);
+                         }
+        }
+    }
+    qDebug() << "dReady" << d.size();
+    netIndex.create();
+    netIndex.bind();
+    netIndex.allocate(d.data(), d.size() * sizeof(GLuint));
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
     array->release();
+}
+
+void FEMWidget::MeshBuffer::render()
+{
+#ifdef FAST
+    index.bind();
+    glDrawElements(GL_TRIANGLES, index.size() / sizeof(GLuint), GL_UNSIGNED_INT, nullptr);
+    index.release();
+    glDisableClientState(GL_COLOR_ARRAY);
+    glColor3ub(0x00,0x88,0x88);
+    netIndex.bind();
+    glDrawElements(GL_LINES, netIndex.size() / sizeof(GLuint), GL_UNSIGNED_INT, nullptr);
+    netIndex.release();
+#else
+    self->render();
+    self->renderNet();
+#endif
 }
 
 void FEMWidget::MeshBuffer::bind()
 {
     array->bind();
     vertex.bind();
-    shader->setAttributeBuffer("in_Color", GL_UNSIGNED_BYTE, vertexSize, 3);
-    shader->enableAttributeArray("in_Color");
 }
 
 void FEMWidget::setMode(int m, const FEM * const mesh)
@@ -235,19 +307,23 @@ void FEMWidget::setMode(int m, const FEM * const mesh)
     }
 }
 
-void FEMWidget::setMagnitude(double v) {
+void FEMWidget::setMagnitude(double v)
+{
     animation->setMagnitude(v);
 }
 
-void FEMWidget::setFrequency(double v) {
+void FEMWidget::setFrequency(double v)
+{
     animation->setFrequency(v);
 }
 
-void FEMWidget::pause() {
+void FEMWidget::pause()
+{
     animation->pause();
 }
 
-void FEMWidget::play() {
+void FEMWidget::play()
+{
     animation->play();
 }
 

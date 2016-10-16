@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+
 #ifndef NOT_QT_AVAILABLE
 #include <QDataStream>
 #include <QTextStream>

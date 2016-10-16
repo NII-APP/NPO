@@ -2,7 +2,7 @@
 #define TETRA_H
 #include "finitelement.h"
 
-#include <QDebug>
+#include <QtOpenGL>
 
 namespace core {
 
@@ -16,6 +16,8 @@ public:
     Tetra(quint32 n1, quint32 n2, quint32 n3, quint32 n4);
     ~Tetra() { delete[] midside; }
 
+    const std::vector<GLuint> renderIndexes() const;
+    const std::vector<GLuint> netIndexes() const;
     void render() const;
     void renderNet() const;
     FinitElement* clone() const;

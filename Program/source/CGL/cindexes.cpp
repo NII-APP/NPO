@@ -1,6 +1,8 @@
 #include "cindexes.h"
 
+#ifndef NOT_QT_AVAILABLE
 #include <QDebug>
+#endif
 
 CIndexes::CIndexes(const int size, const int defaultValue)
     : std::vector<int>(size, defaultValue)
@@ -31,6 +33,7 @@ void CIndexes::reduceFrom(const int pos)
     }
 }
 
+#ifndef NOT_QT_AVAILABLE
 QDebug operator<<(QDebug out, const CIndexes& m)
 {
     switch (m.size()) {
@@ -61,3 +64,4 @@ QDebug operator<<(QDebug out, const CIndexes& m)
         return out;
     }
 }
+#endif

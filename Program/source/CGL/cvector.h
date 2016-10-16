@@ -1,5 +1,6 @@
 #ifndef CVECTOR_H
 #define CVECTOR_H
+#include <iostream>
 #include "carray.h"
 
 class CVector : public CArray
@@ -7,11 +8,12 @@ class CVector : public CArray
 public:
 
     enum Orientation {
-        Horizontal,//as a default
-        Vertical
+        Horizontal,
+        Vertical,
+        MeaningLess//as a default
     };
 
-    CVector(int size = 0, value_type initialValue = 0.0, Orientation = Horizontal);
+    CVector(int size = 0, value_type initialValue = 0.0, Orientation = MeaningLess);
     CVector(const CVector&);
 
     Orientation getOrientation() const;
@@ -19,7 +21,8 @@ public:
     void transpose();
     CVector transposed() const;
 
-    double average();
+    double average() const;
+	double euclideanNorm() const;
 
     CVector& operator+=(const value_type& v);
     CVector& operator+=(const CVector& v);
@@ -38,13 +41,13 @@ public:
 
     CVector abs();
 
-    double euclideanNorm() const;
     bool isContain(const value_type& n) const;
 
 private:
     Orientation orientation;
 };
 
+std::ostream& operator<<(std::ostream&, const CVector&);
 #ifndef NOT_QT_AVAILABLE
 QDebug operator<<(QDebug out, const CVector& m);
 QDataStream& operator<< (QDataStream& out, const CVector& m);

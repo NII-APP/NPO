@@ -98,10 +98,10 @@ void AFRArray::read(const QString& filename, int nodesCount) {
     QByteArray data(file.readAll());
 
     CParse p(data.data());
-
     while (p.testPrew("    -1")) {
         p.skipRow();
         const int datasetId(p.integer());
+        p.skipRow();
         if (datasetId != 58) {
             //http://www.svibs.com/resources/ARTeMIS_Modal_Help/UFF%20Data%20Set%20Number%2058.html
 #ifdef AFR_ARRAY_READER_DEBUG
@@ -170,11 +170,11 @@ void AFRArray::read(const QString& filename, int nodesCount) {
             p.skipRow();
             const int dataType(p.integer());
             if (dataType != 5 && dataType != 6) {
-                throw std::exception("unsuported uff-58 data type (onlu complex suported)");
+                throw std::exception("unsuported uff-58 data type (complex suported only)");
             }
             array.resize(p.integer());
-            const int evenAbscissa(p.integer() == 1);
-            if (!evenAbscissa) {
+            const int evenAbscissa(p.integer());
+            if (evenAbscissa != 1) {
                 p.skipRows(5);
                 for (AFR::iterator it(array.begin()); it != array.end(); ++it) {
                     it->frequency = p.real();
@@ -188,16 +188,16 @@ void AFRArray::read(const QString& filename, int nodesCount) {
                 Q_ASSERT(lim);
                 std::sort(array.begin(), array.end(), [](const FrequencyMagnitude& a, const FrequencyMagnitude& b)->bool{ return a.frequency < b.frequency; });
             } else {
-                CRange<double> freqRange;
+                CRealRange freqRange;
                 freqRange.setMin(p.real());
-                freqRange.setMax(p.real());
+                freqRange.setMax(p.real() * array.size() + freqRange.min());
                 p.skipRows(5);
                 double id(0);
                 for (FrequencyMagnitude& it : array) {
                     it.amplitude.real(p.real());
                     it.amplitude.imag(p.real());
                     it.frequency = freqRange(id / array.size());
-                    ++id;
+                    id += 1.0;
                 }
                 int lim(2);
                 while (!p.testPrew("    -1") && --lim) {

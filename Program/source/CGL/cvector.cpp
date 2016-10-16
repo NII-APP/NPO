@@ -28,11 +28,26 @@ void CVector::transpose()
     orientation == Horizontal ? orientation = Vertical : orientation = Horizontal;
 }
 
-double CVector::average() {
+double CVector::average() const
+{
+	if (empty()) {
+		return std::numeric_limits<double>::quiet_NaN();
+	}
+	else {
+		return std::accumulate(begin(), end(), 0) / size();
+	}
+}
+
+double CVector::euclideanNorm() const
+{
     if (empty()) {
         return std::numeric_limits<double>::quiet_NaN();
     } else {
-        return std::accumulate(begin(),end(),0) / size();
+		CVector::value_type r(0.0);
+		for (const CVector::value_type& i : *this) {
+			r += i * i;
+		}
+        return sqrt(r);
     }
 }
 
@@ -76,21 +91,11 @@ CVector& CVector::operator/=(const value_type& v)
     return *this;
 }
 
-double CVector::euclideanNorm() const
-{
-    double r(0.0);
-    const const_iterator tail(end());
-    const_iterator i(begin());
-    for (; i != tail; ++i) {
-        const value_type& v(*i);
-        r += v * v;
-    }
-    return sqrt(r);
-}
-
 CVector& CVector::operator+=(const CVector& v)
 {
+#ifdef QT_VERSION
     Q_ASSERT (this->size() == v.size());
+#endif
 
     const iterator tail(end());
     const_iterator j(v.begin());
@@ -103,7 +108,9 @@ CVector& CVector::operator+=(const CVector& v)
 
 CVector& CVector::operator-=(const CVector& v)
 {
+#ifndef NOT_QT_AVAILABLE
     Q_ASSERT (this->size() != v.size());
+#endif
 
     const iterator tail(end());
     const_iterator j(v.begin());
@@ -215,6 +222,27 @@ CVector CVector::transposed() const
     return r;
 }
 
+std::ostream& operator<<(std::ostream& out, const CVector& m)
+{
+	if (m.size() < 7) {
+		out << "CArray[ " << m.size() << " ] { ";
+		int i(0);
+		while (i != m.size()) {
+			out << m[i];
+			if (++i != m.size()) {
+				out << " , ";
+			} else {
+				out << ' ';
+			}
+		}
+		out << '}';
+	} else {
+		out << "CArray[ " << m.size() << " ] { " << m[0] << " , " << m[1] << " , " << m[2]
+			<< " ... " << m[m.size() - 3] << " , " << m[m.size() - 2] << " , " << m[m.size() - 1] << " }";
+	}
+	return out;
+}
+
 #ifndef NOT_QT_AVAILABLE
 QDebug operator<<(QDebug out, const CVector& m)
 {
@@ -241,7 +269,7 @@ QDebug operator<<(QDebug out, const CVector& m)
         out << "CArray[ 6 ] {" << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << ',' << m[4] << ',' << m[5] << "}";
         return out;
     default:
-        out << "CArray(" << m.size() << ") {" << m[0] << ',' << m[1] << ',' << m[2]
+        out << "CArray[" << m.size() << "] {" << m[0] << ',' << m[1] << ',' << m[2]
             << "..." << m[m.size() - 3] << ',' << m[m.size() - 2] << ',' << m[m.size() - 1] << "}";
         return out;
     }

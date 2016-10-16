@@ -33,6 +33,34 @@ protected:
         }
     }
 
+	static void writeRow(std::ostream& out, const T *m, const int width)
+	{
+
+		switch (width) {
+		case 1:
+			out << '\t' << m[0] << '\n';
+			return;
+		case 2:
+			out << '\t' << m[0] << ',' << m[1] << '\n';
+			return;
+		case 3:
+			out << '\t' << m[0] << ',' << m[1] << ',' << m[2] << '\n';
+			return;
+		case 4:
+			out << '\t' << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << '\n';
+			return;
+		case 5:
+			out << '\t' << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << ',' << m[4] << '\n';
+			return;
+		case 6:
+			out << '\t' << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << ',' << m[4] << ',' << m[5] << '\n';
+			return;
+		default:
+			out << '\t' << m[0] << ',' << m[1] << ',' << m[2] << "..." << m[width - 3] << ',' << m[width - 2] << ',' << m[width - 1] << '\n';
+			return;
+		}
+	}
+#ifndef NOT_QT_AVAILABLE
     static void writeRow(QDebug out, const T *m, const int width)
     {
         switch (width) {
@@ -59,6 +87,7 @@ protected:
             return;
         }
     }
+#endif
 
 public:
     CBasicMatrix() : wid(0) { }
@@ -143,6 +172,7 @@ public:
 
 
 
+	template <typename Type> friend std::ostream& operator<< (std::ostream& out, const CBasicMatrix<Type>& obj);
 #ifndef NOT_QT_AVAILABLE
     template <typename Type>
     friend QDebug operator<< (QDebug out, const CBasicMatrix<Type> &obj);
@@ -153,6 +183,33 @@ public:
     friend QDataStream& operator>> (QDataStream&, CBasicMatrix<Type>&);
 #endif
 };
+template <typename Type>
+std::ostream& operator<< (std::ostream& out, const CBasicMatrix<Type>& obj)
+{
+	if (obj.height() == 0 || obj.width() == 0) {
+		out << "CMatrix(" << obj.height() << ',' << obj.width() << ") { }\n";
+		return out;
+	}
+	if (obj.height() <= 10) {
+		out << "CMatrix(" << obj.height() << ',' << obj.width() << ") {\n";
+		for (int i(0); i != obj.height(); ++i) {
+			CBasicMatrix<Type>::writeRow(out, obj[i], obj.width());
+		}
+		out << "}\n";
+	}
+	else {
+		out << "CMatrix(" << obj.height() << ',' << obj.width() << ") {\n";
+		for (int i(0); i != 5; ++i) {
+			CBasicMatrix<Type>::writeRow(out, obj[i], obj.width());
+		}
+		out << "\t\t...\n";
+		for (int i(obj.height() - 5); i != obj.height(); ++i) {
+			CBasicMatrix<Type>::writeRow(out, obj[i], obj.width());
+		}
+		out << "}\n";
+	}
+	return out;
+}
 
 #ifndef NOT_QT_AVAILABLE
 

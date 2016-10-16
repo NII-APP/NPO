@@ -30,12 +30,27 @@ Tetra::Tetra(const Tetra& v)
 }
 
 FinitElement* Tetra::clone() const { return new Tetra(*this); }
+
 FinitElement::FinitElementType Tetra::type() const { return TetraType; }
-void Tetra::render() const {
-    const quint32 m[] = { n[0], n[1], n[2], n[3], n[0], n[1] };
+
+const std::vector<GLuint> Tetra::renderIndexes() const
+{
+     return std::vector<GLuint>{ n[0], n[1], n[2], n[3], n[1], n[2], n[0], n[3], n[2], n[0], n[1], n[3], };
+}
+
+const std::vector<GLuint> Tetra::netIndexes() const
+{
+     return std::vector<GLuint>{ n[0], n[1], n[0], n[2], n[0], n[3], n[1], n[2], n[1], n[3], n[2], n[3] };
+}
+
+void Tetra::render() const
+{
+    const quint32 m[] = { n[0], n[1], n[2], n[3], n[0], n[1] };\
     glDrawElements(GL_TRIANGLE_STRIP, sizeof(m) / sizeof(quint32), GL_UNSIGNED_INT, m);
 }
-void Tetra::renderNet() const {
+
+void Tetra::renderNet() const
+{
     const quint32 m[] = { n[0], n[1], n[2], n[3], n[0], n[2], n[1], n[3] };
     glDrawElements(GL_LINE_LOOP, sizeof(m) / sizeof(quint32), GL_UNSIGNED_INT, m);
 }

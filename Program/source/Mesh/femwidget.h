@@ -10,6 +10,10 @@
 #include <cparallelepiped.h>
 #include <QString>
 
+
+
+
+
 class FEMWidget : public CGLWidget
 {
     Q_OBJECT
@@ -80,6 +84,8 @@ class FEMWidget::MeshBuffer : public QObject
 {
     const FEM* const self;
     QOpenGLBuffer vertex;
+    QOpenGLBuffer index;
+    QOpenGLBuffer netIndex;
     QOpenGLVertexArrayObject* array;
     const int vertexSize;
     const int colorsSize;
@@ -90,6 +96,7 @@ class FEMWidget::MeshBuffer : public QObject
 public:
     MeshBuffer(const FEM* data, QOpenGLShaderProgram* shader, QObject* parent);
 
+    void render();
     void bind();
     void release() { array->release(); }
     const FEM* fem() const { return self; }

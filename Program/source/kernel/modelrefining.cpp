@@ -168,7 +168,7 @@ void ModelRefining::updateFreqByElasticity(const CVector& testFreq)
 
 }
 
-CVector ModelRefining::setLimits( const FEM * const modelIn
+CVector ModelRefining::setLimits(const FEM * const modelIn
                               , RangeVector &rengElasticModulusIn
                               , const CVector &elasticModulusIn) {
 
@@ -176,7 +176,7 @@ CVector ModelRefining::setLimits( const FEM * const modelIn
     for (int k(0); k < modelIn->getElements().size(); k++) {
         FinitElement *element = modelIn->getElements().at(k);
         if (element != nullptr) {
-            if ( !(rengElasticModulusIn.at(k).isContain(elasticModulus.at(k))) ) {
+            if (!(rengElasticModulusIn.at(k).isContain(elasticModulus.at(k))) ) {
                 double max = rengElasticModulusIn.at(k).getMax();
                 double min = rengElasticModulusIn.at(k).getMin();
                 elasticModulus.at(k) = elasticModulus.at(k) >= max ? max : min;

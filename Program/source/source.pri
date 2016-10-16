@@ -39,7 +39,8 @@ HEADERS += $$PWD/*.h \
     $$PWD/project/femmodel.h \
     $$PWD/kernel/eigenmodesfounder.h \
     $$PWD/project.h \
-    $$PWD/kernel/modelrefining.h
+    $$PWD/kernel/modelrefining.h \
+    $$PWD/gui/solverSettingsWidget/solversettingswidget.h
 
 SOURCES += \
     $$PWD/gui/viewerTab/viewertab.cpp \
@@ -73,5 +74,6 @@ SOURCES += \
     $$PWD/project/pairsmodel.cpp \
     $$PWD/project/femmodel.cpp \
     $$PWD/kernel/eigenmodesfounder.cpp \
-    $$PWD/kernel/modelrefining.cpp
+    $$PWD/kernel/modelrefining.cpp \
+    $$PWD/gui/solverSettingsWidget/solversettingswidget.cpp
 

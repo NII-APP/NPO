@@ -465,6 +465,7 @@ void FEM::UNVTransformation(EigenModes &f) const
 
 void FEM::render() const
 {
+    glColor3ub(0xfc,0x00,0xe8);
     glColor3ub(0x00,0x00,0x00);
     for (FinitElements::const_iterator it(trace.begin()), end(trace.end()); it != end; ++it) {
         if (*it) {
