@@ -241,6 +241,8 @@ bool FEM::readUNV(const QString &fileName)
     }
     UNVTransformations.clear();
 
+    int staticLoadCaseNumber(-1);
+
     int blockId;
     while (static_cast<bool>(blockId = arriveKnownUNVBlock(f))) {
         switch (blockId) {
@@ -353,7 +355,10 @@ bool FEM::readUNV(const QString &fileName)
              && (analysisType != 5 || realNum != 1))) {
                 throw std::exception("Unconsistent uff-55 note!");
             }
-            if (loadCaseNumber != 0) {
+            if (staticLoadCaseNumber == -1) {
+                staticLoadCaseNumber = loadCaseNumber;
+            }
+            if (loadCaseNumber != staticLoadCaseNumber) {
                 throw std::exception("uff plural load case unv not suported");
             }
 #ifndef QT_NO_DEBUG
@@ -391,7 +396,10 @@ bool FEM::readUNV(const QString &fileName)
                 } else {
                     complex.real(f.real());
                     complex.imag(f.real());
-                    modes.push_back(EigenMode(abs(complex)));
+#ifndef M_PI
+                    static const double M_PI(acos(-1.0));
+#endif
+                    modes.push_back(EigenMode(abs(complex) / 2.0 / M_PI));
                 }
                 EigenMode& mode(modes.back());
                 f.skipRow();
